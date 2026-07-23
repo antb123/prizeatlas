@@ -1,106 +1,149 @@
 ## Goals
 
-All 12 top-level prize CSV files MUST use one ordered 22-column header based on `nobel.csv`, with provenance and location placeholders appended:
+All 12 top-level prize CSV files MUST use one ordered, lossless 26-column schema:
 
-`year,category,prize,motivation,prize_share,laureate_id,laureate_type,full_name,birth_date,birth_city,birth_country,sex,organization_name,organization_city,organization_country,death_date,death_city,death_country,field_language,source,location_research,location_birth`
+`award_record_id,year,category,prize,motivation,prize_share,source_laureate_id,laureate_type,full_name,birth_date,birth_year,birth_city,birth_country,birth_coordinates,citizenship_countries,sex,affiliation_name,affiliation_city,affiliation_country,affiliation_coordinates,death_date,death_city,death_country,field_language,biographical_note,remarks`
 
-Success means every existing data row remains one row, every mapped value is carried into its canonical column without rewriting its text,
-every unmapped nonempty value is explicitly counted before accepted loss, unavailable values and both new location fields are empty CSV fields,
-and all 12 top-level CSV datasets use the canonical shape.
+Success means every input row remains one output row in the same order, every nonempty source value is preserved exactly in its mapped field,
+every award record has a unique persistent identifier, canonical fields absent from a source and both coordinate fields are empty CSV fields,
+existing literal placeholders remain unchanged, and all 12 datasets use the exact canonical header.
+
+The resulting records SHALL support all 12 awards without cross-file laureate deduplication and SHALL provide stable award identifiers for
+later educational concept tags and Wikipedia links.
 
 ## Background
 
-The directory currently contains 12 top-level CSV files. `nobel.csv` (lines 1-1027) has the broadest 19-column biographical schema but no
-source-label column. Nine award files use compact variants of the `year`/laureate/country/rationale/source schema, while
-`breakthrough.csv` (lines 1-131) and `crafoord.csv` (lines 1-83) also contain enriched birth and affiliation fields. No top-level generator
-remains: the older Nobel dataset, three component Breakthrough datasets, `merge_breakthrough.py`, and `build_crafoord.py` are under the
-repo-root `trash/` directory and are outside this conversion.
+The directory currently contains 12 top-level CSV files. `nobel.csv` (lines 1-1027) has the broadest 19-column biographical schema. The other
+11 files use compact award schemas; `breakthrough.csv` (lines 1-131) and `crafoord.csv` (lines 1-83) also contain enriched birth and affiliation
+fields. The current files have 2,686 parsed data rows in total.
 
-The current enriched-data baselines are 80 nonempty `birth_info` and 79 nonempty `birth_year` values in `breakthrough.csv`, plus 81 nonempty
-values in each field in `crafoord.csv`. These values have no destination under the requested mapping and their counted removal is accepted.
-`fields.csv` has a separate contracted mapping from all 68 nonempty `birth_year` values to `birth_date`; its one nonempty `remarks` value is
-accepted loss after reporting.
+The previous draft mapped every non-Nobel `country` value to `birth_country` and accepted removal of `birth_info`, enriched `birth_year`, and
+`remarks`. Repository evidence shows that Crafoord `country` was sourced from Wikidata property P27 (country of citizenship), not birthplace.
+It also shows that Breakthrough's collective LIGO record uses `birth_year=2016` for a publication rather than a person. The product decision is
+now to distinguish birthplace, source-provided year text, citizenship, and affiliation geography and to preserve every available top-level
+source value for later enrichment.
 
-The parent directory is now a newly initialized Git worktree. Under the current execution identity, Git commands require the per-command
-safe-directory override `-c safe.directory=/home/antb2/dev/rsync/nobel`; implementation MUST NOT change global Git configuration to bypass
-that ownership check.
+The future explorer will load all 12 canonical datasets as independent award records. It will not initially attempt to identify the same
+person across records. Educational links concern concepts associated with an award, such as relativity or the photoelectric effect, rather
+than being embedded as Markdown in names or motivation text.
+
+Older component files under `trash/` contain source-only fields such as Breakthrough `alma_mater` that are absent from the authoritative
+top-level CSVs. Recovering those historical fields is a separate source-enrichment task; this conversion is lossless with respect to the 12
+top-level inputs and MUST NOT merge data back from `trash/`.
+
+The parent directory is a newly initialized Git worktree. Under the current execution identity, Git commands require the per-command
+safe-directory override `-c safe.directory=/home/antb2/dev/rsync/nobel`; implementation MUST NOT change global Git configuration.
 
 ## Assumptions
 
-1. **Load-bearing:** The canonical schema is the ordered 19-column `nobel.csv` header followed by `source`, `location_research`, and `location_birth`.
-2. **Load-bearing:** Existing `country` values map to `birth_country`, preserving their text even though some source datasets describe nationality rather than literal birthplace.
-3. **Load-bearing:** Existing `rationale` values map to `motivation`, and `laureate` maps to `full_name`.
-4. Empty canonical fields are serialized as empty values, not invented values such as `NA`, except that existing literal values are preserved.
-5. Row order, row count, Unicode text, embedded punctuation, and existing field text remain unchanged.
-6. **Load-bearing:** Files under the repo-root `trash/` are out of scope; top-level `breakthrough.csv` and `crafoord.csv` are authoritative static inputs.
-7. Existing `source` values are award/source labels rather than URLs or citations; this change preserves those labels but does not claim to add external provenance links.
-8. **Load-bearing:** Each future location value is one WGS84 decimal-degree pair ordered as `longitude,latitude`; coordinate enrichment is outside this conversion.
+1. **Load-bearing:** Each CSV row is an independent award record; repeated people across rows or files remain separate.
+2. **Load-bearing:** Non-Nobel `country` values represent source-stated citizenship or nationality and map to `citizenship_countries`, not birthplace or residence.
+3. **Load-bearing:** Existing `rationale` maps to `motivation`, `laureate` maps to `full_name`, and non-Nobel `source` maps to `prize`.
+4. **Load-bearing:** `birth_year` remains a distinct lossless source field because at least one collective Breakthrough record does not describe a person's birth.
+5. Empty canonical fields are serialized as empty values, not invented values such as `NA`, except where an existing literal value is preserved.
+6. Row order, row count, Unicode text, embedded punctuation, and all existing field text remain unchanged.
+7. **Load-bearing:** Files under the repo-root `trash/` are out of scope; top-level `breakthrough.csv` and `crafoord.csv` are authoritative static inputs.
+8. **Load-bearing:** Coordinates are WGS84 decimal-degree pairs ordered as `longitude,latitude`; coordinate enrichment is outside this conversion.
+9. **Load-bearing:** Educational concepts are many-to-many with award records and will be stored outside award text in a later step.
 
-## Canonical field mapping
+## Canonical schema and mapping
 
 Every output MUST use the exact header and order in Goals.
 
 | Existing field | Canonical field | Applies to |
 | --- | --- | --- |
+| generated persistent value | `award_record_id` | all files |
 | `year`, `Year` | `year` | all files |
 | `field` | `category` | Breakthrough, Crafoord, Wolf |
-| existing `category` | `category` | Lasker |
+| existing `category` | `category` | Nobel, Lasker |
+| existing `prize` | `prize` | Nobel |
 | existing `source` | `prize` | all non-Nobel awards |
 | `rationale` | `motivation` | non-Nobel awards |
-| `laureate` | `full_name` | non-Nobel awards |
-| `birth_year` | `birth_date` | Fields Medal only |
-| `country` | `birth_country` | non-Nobel awards |
-| existing `sex` | `sex` | Fields Medal |
-| `affiliation` | `organization_name` | Breakthrough, Crafoord, Fields Medal |
-| existing `source` | `source` | non-Nobel awards |
+| existing `motivation` | `motivation` | Nobel |
+| existing `prize_share` | `prize_share` | Nobel |
+| existing `laureate_id` | `source_laureate_id` | Nobel |
+| existing `laureate_type` | `laureate_type` | Nobel |
+| `laureate`, existing `full_name` | `full_name` | all files |
+| `birth_year` | `birth_year` | Breakthrough, Crafoord, Fields Medal |
+| existing `birth_date`, `birth_city`, `birth_country` | same semantic field | Nobel |
+| `country` | `citizenship_countries` | all non-Nobel awards |
+| existing `sex` | `sex` | Nobel, Fields Medal |
+| `affiliation` | `affiliation_name` | Breakthrough, Crafoord, Fields Medal |
+| `organization_name` | `affiliation_name` | Nobel |
+| `organization_city` | `affiliation_city` | Nobel |
+| `organization_country` | `affiliation_country` | Nobel |
+| existing `death_date`, `death_city`, `death_country` | same semantic field | Nobel |
+| existing `field_language` | `field_language` | Nobel |
+| `birth_info` | `biographical_note` | Breakthrough, Crafoord |
+| existing `remarks` | `remarks` | Fields Medal |
 
-For non-Nobel awards, the existing `source` value MUST populate both `prize` and `source`: `prize` identifies the award while `source`
-preserves the existing award/source label for compatibility. Fields without a mapping MUST be left empty. Existing canonical Nobel fields
-MUST remain unchanged, with empty `source`, `location_research`, and `location_birth` fields appended because no current values exist.
+No existing source field is discarded. Fields without a mapping for a particular dataset MUST be empty. The conversion MUST NOT derive
+`birth_country`, `affiliation_city`, or `affiliation_country` from citizenship or free-form affiliation text.
 
-`birth_info` and `birth_year` in `breakthrough.csv` and `crafoord.csv`, plus `remarks` in `fields.csv`, have no canonical destination and MUST
-NOT be substituted into a semantically different field. Their values MAY be dropped only after verification reports the nonempty count for
-every affected field in every file. This exception does not apply to `fields.csv` `birth_year`, which MUST map to `birth_date`.
+`full_name`, `motivation`, and `biographical_note` MUST be preserved verbatim, including any existing literal HTML tags or entities, and
+treated as untrusted text by consumers. The conversion MUST NOT generate Markdown, HTML, inferred Wikipedia URLs, or automatically
+constructed article links.
 
-## Location placeholders
+### Requirement: Lossless canonical mapping — Conversion MUST preserve every source field
 
-`location_research` SHALL represent the coordinates of the affiliated university or research association, and `location_birth` SHALL
-represent the coordinates of the place of birth. This conversion MUST leave both fields empty in every row and MUST NOT perform geocoding or
-infer coordinates.
+#### Scenario: Compare before and after
+- WHEN a source row and its converted award record are compared through the mapping table
+- THEN every nonempty source value appears unchanged in its canonical destination
+- AND no source field is omitted from the mapping
+- AND input row order is unchanged
 
-When populated by a later enrichment, each field MUST contain either one complete `longitude,latitude` pair or be empty. Both members MUST
-be base-10 WGS84 decimal degrees: longitude from -180 through 180 followed by latitude from -90 through 90. CSV-aware serialization MUST
-quote a populated pair because its comma belongs to the field value.
+## Award record identity
 
-### Requirement: Empty location placeholders — Conversion MUST add both location fields without enrichment
+Each converted row MUST receive an `award_record_id` formed from the lowercase dataset filename stem, a hyphen, and the one-based data-row
+position padded to six digits. For example, the first data row in `nobel.csv` is `nobel-000001`.
+
+Identifiers MUST be unique across all 12 files and MUST be written into the canonical datasets as persistent data. Row position defines only
+the initial assignment during this conversion. Once assigned, identifiers MUST be treated as stored identity and MUST NOT be regenerated
+after reordering or field edits. A later refresh MAY update an existing row in place or append a new record with the next unused identifier;
+any full upstream replacement requires an explicit old-to-new reconciliation outside this conversion. Deleted identifiers MUST NOT be reused.
+
+The identifier belongs to the award record, not the person. Two awards for the same person MUST retain separate `award_record_id` values.
+`source_laureate_id` preserves Nobel's existing source-specific person identifier but MUST NOT be treated as a cross-dataset identity.
+
+### Requirement: Stable award identity — Every row MUST have one unique award identifier
+
+#### Scenario: Initialize canonical identifiers
+- WHEN all converted records are inspected
+- THEN every `award_record_id` matches `^[a-z0-9_]+-[0-9]{6}$`
+- AND no identifier is empty or duplicated
+- AND repeated laureate names remain independent records
+
+## Geography and enrichment fields
+
+The canonical geography fields have distinct meanings:
+
+- `birth_country` is a verified place of birth.
+- `citizenship_countries` is the source-stated citizenship or nationality and MAY contain the existing semicolon-separated values.
+- `affiliation_city` and `affiliation_country` describe the listed research institution or organization.
+- Neither citizenship nor affiliation establishes residence; this schema has no `residence_country` field.
+
+`birth_coordinates` SHALL represent the place of birth and `affiliation_coordinates` SHALL represent the listed affiliation. This conversion
+MUST leave both fields empty in every row and MUST NOT geocode or infer coordinates.
+
+When populated by later enrichment, each coordinate field MUST contain either one complete `longitude,latitude` pair or be empty. Both
+members MUST be base-10 WGS84 decimal degrees: longitude from -180 through 180 followed by latitude from -90 through 90. CSV-aware
+serialization MUST quote a populated pair because its comma belongs to the field value.
+
+### Requirement: Empty coordinate placeholders — Conversion MUST add both coordinate fields without enrichment
 
 #### Scenario: Convert current datasets
 - WHEN any top-level CSV row is converted
-- THEN `location_research` is empty
-- AND `location_birth` is empty
+- THEN `birth_coordinates` is empty
+- AND `affiliation_coordinates` is empty
 
-### Requirement: Canonical header — Every CSV MUST have the exact ordered 22-column header
+## Educational concepts
 
-#### Scenario: Validate all files
-- WHEN all 12 top-level CSV files are parsed after conversion
-- THEN each parser field list exactly equals the canonical header
-- AND every row has exactly 22 fields
+The educational goal is to connect an award to explanatory subjects, not to alter its source text or assume the link should be a laureate
+biography. A later step SHALL model a controlled concept vocabulary and a many-to-many association keyed by `award_record_id`, allowing
+examples such as `relativity` or `photoelectric-effect` to carry labeled Wikipedia URLs.
 
-### Requirement: Preserve records — Conversion MUST preserve record identity and content
-
-#### Scenario: Compare before and after
-- WHEN a source and converted file are compared through its mapping
-- THEN the data-row count is unchanged
-- AND each nonempty mapped source value appears unchanged in its destination field
-- AND input row order is unchanged
-
-### Requirement: Accounted field loss — Every nonempty unmapped value MUST be counted before removal
-
-#### Scenario: Convert enriched and Fields datasets
-- WHEN `breakthrough.csv`, `crafoord.csv`, and `fields.csv` are converted
-- THEN the conversion report identifies each unmapped field and its nonempty input count
-- AND the report matches the current baselines of 80/79 for Breakthrough `birth_info`/`birth_year`, 81/81 for Crafoord `birth_info`/`birth_year`, and 1 for Fields `remarks`
-- AND none of those unmapped values is silently placed in a canonical field
+Creating concept records, assigning tags, and fetching Wikipedia content are outside this conversion. The conversion MUST only establish the
+stable award identity required by that later work.
 
 ## Static dataset conversion
 
@@ -134,40 +177,51 @@ The expected input headers are exact contracts:
 - `nobel.csv`:
   `year,category,prize,motivation,prize_share,laureate_id,laureate_type,full_name,birth_date,birth_city,birth_country,sex,organization_name,organization_city,organization_country,death_date,death_city,death_country,field_language`
 
-Files under the repo-root `trash/` MUST remain unchanged. Because the new repository does not yet track those files, implementation MUST
-capture their content hashes before conversion and compare the same file set and hashes afterward. The implementation MUST NOT regenerate
-`breakthrough.csv` or `crafoord.csv`; both SHALL be converted directly from their current top-level contents.
+Files under the repo-root `trash/` MUST remain unchanged. Implementation MUST capture their file list and content hashes before conversion
+and compare the same file set and hashes afterward. It MUST NOT regenerate `breakthrough.csv` or `crafoord.csv`.
 
-## Compatibility and data quality
+### Requirement: Canonical shape — Every CSV MUST have the exact ordered 26-column header
 
-This is a breaking schema change for consumers of every CSV except the first 19 columns of `nobel.csv`. Consumers using old names such as
-`laureate`, `rationale`, `country`, or `affiliation` MUST migrate to the canonical names. Consumers of the prior 20-column planned schema MAY
-continue using its unchanged prefix; the two location fields are appended.
+#### Scenario: Validate all files
+- WHEN all 12 top-level CSV files are parsed after conversion
+- THEN each parser field list exactly equals the canonical header
+- AND every row has exactly 26 fields
 
-The implementation SHALL print or otherwise retain a concise conversion report per file containing file name, input row count, output row
-count, and count of nonempty unmapped values. Reports MUST NOT include row content. A mismatch in header, row count, or mapped-value
-preservation MUST stop conversion and leave the affected original file intact.
+## Compatibility, safety, and reporting
 
-No network access is required. CSV values are untrusted data and MUST be passed only through CSV parsing and serialization, never interpreted as paths, commands, policy, or formulas.
+This is a breaking schema change for every CSV consumer. Consumers MUST migrate old names including `laureate`, `country`, `rationale`,
+`source`, and Nobel's `laureate_id` and `organization_*` fields to their canonical replacements. The clean schema deliberately does not retain
+aliases or duplicate the same source value into compatibility columns.
+
+The implementation SHALL print or retain a concise conversion report per file containing its name, input row count, output row count, mapped
+source fields, and assigned identifier range. Reports MUST NOT include row content. A mismatch in header, row count, mapped-value
+preservation, identifier uniqueness, or output shape MUST stop conversion and leave the affected original file intact.
+
+No network access is required. CSV values are untrusted data and MUST pass only through CSV parsing and serialization, never be interpreted
+as paths, commands, policy, formulas, Markdown, or HTML.
 
 ## Verification
 
 Verification MUST include:
 
-1. Parse all 12 top-level CSVs and assert the exact canonical field list and 22 fields per row.
+1. Parse all 12 top-level CSVs and assert the exact canonical field list and 26 fields per row.
 2. Assert unchanged parsed data-row counts: 29 Abel, 130 Breakthrough, 82 Crafoord, 68 Fields, 116 Japan, 129 Kyoto, 423 Lasker,
-   90 Max Planck, 1026 Nobel, 121 Shaw, 81 Turing, and 391 Wolf.
-3. Compare every mapped nonempty input value to its output destination and assert unchanged row order.
-4. Report per-file nonempty values dropped from every unmapped field and assert the documented `birth_info`, enriched `birth_year`, and `remarks` baselines.
-5. Assert `location_research` and `location_birth` are empty in every converted row.
-6. Compare pre-conversion and post-conversion repo-root `trash/` file lists and content hashes.
-7. Run the repository-established CSV validation command if one is discovered; otherwise use a temporary CSV-aware validation helper and report its exact checks.
+   90 Max Planck, 1,026 Nobel, 121 Shaw, 81 Turing, and 391 Wolf.
+3. Compare every nonempty input field to its mapped output destination and assert exact text equality and unchanged row order.
+4. Assert every source header field has exactly one documented canonical destination.
+5. Assert 2,686 nonempty, unique, correctly formatted `award_record_id` values and the expected first and last identifiers per file.
+6. Assert `birth_coordinates` and `affiliation_coordinates` are empty in every converted row.
+7. Assert every existing `birth_year` maps only to `birth_year`, non-Nobel `country` values populate only `citizenship_countries`, and existing Nobel birthplace and affiliation geography retain their distinct mappings.
+8. Compare pre-conversion and post-conversion repo-root `trash/` file lists and content hashes.
+9. Run the repository-established CSV validation command if one is discovered; otherwise use a temporary CSV-aware validation helper and report its exact checks.
 
 ## Scope
 
-Expected implementation scope is 12 existing CSV files. Estimated implementation change size is 2,686 CSV data-row rewrites and no Python
-changes. A temporary, reviewable conversion helper MAY be used from a temporary directory and removed after verification; a maintained
-project script requires an explicit request.
+Expected implementation scope is 12 existing CSV files. Estimated implementation change size is 2,686 CSV data-row rewrites and no
+maintained Python changes. A temporary, reviewable conversion helper MAY be used from a temporary directory and removed after verification;
+a maintained project script requires an explicit request. Concept/tag CSVs, Wikipedia URLs, application code, deduplication, geocoding, and
+SQLite are outside this step.
 
 Implementation SHALL use one branch for this specification, conventional commits, review before merge, and a squash merge into the `202607`
-month branch. Unit-level schema and mapping checks SHALL be created alongside implementation where the repository provides a test location.
+month branch. Unit-level schema, mapping, and identity checks SHALL be created alongside implementation where the repository provides a test
+location.
