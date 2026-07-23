@@ -27,10 +27,6 @@ The future explorer will load all 12 canonical datasets as independent award rec
 person across records. Educational links concern concepts associated with an award, such as relativity or the photoelectric effect, rather
 than being embedded as Markdown in names or motivation text.
 
-Older component files under `trash/` contain source-only fields such as Breakthrough `alma_mater` that are absent from the authoritative
-top-level CSVs. Recovering those historical fields is a separate source-enrichment task; this conversion is lossless with respect to the 12
-top-level inputs and MUST NOT merge data back from `trash/`.
-
 The parent directory is a newly initialized Git worktree. Under the current execution identity, Git commands require the per-command
 safe-directory override `-c safe.directory=/home/antb2/dev/rsync/nobel`; implementation MUST NOT change global Git configuration.
 
@@ -42,9 +38,8 @@ safe-directory override `-c safe.directory=/home/antb2/dev/rsync/nobel`; impleme
 4. **Load-bearing:** `birth_year` remains a distinct lossless source field because at least one collective Breakthrough record does not describe a person's birth.
 5. Empty canonical fields are serialized as empty values, not invented values such as `NA`, except where an existing literal value is preserved.
 6. Row order, row count, Unicode text, embedded punctuation, and all existing field text remain unchanged.
-7. **Load-bearing:** Files under the repo-root `trash/` are out of scope; top-level `breakthrough.csv` and `crafoord.csv` are authoritative static inputs.
-8. **Load-bearing:** Coordinates are WGS84 decimal-degree pairs ordered as `longitude,latitude`; coordinate enrichment is outside this conversion.
-9. **Load-bearing:** Educational concepts are many-to-many with award records and will be stored outside award text in a later step.
+7. **Load-bearing:** Coordinates are WGS84 decimal-degree pairs ordered as `longitude,latitude`; coordinate enrichment is outside this conversion.
+8. **Load-bearing:** Educational concepts are many-to-many with award records and will be stored outside award text in a later step.
 
 ## Canonical schema and mapping
 
@@ -177,9 +172,6 @@ The expected input headers are exact contracts:
 - `nobel.csv`:
   `year,category,prize,motivation,prize_share,laureate_id,laureate_type,full_name,birth_date,birth_city,birth_country,sex,organization_name,organization_city,organization_country,death_date,death_city,death_country,field_language`
 
-Files under the repo-root `trash/` MUST remain unchanged. Implementation MUST capture their file list and content hashes before conversion
-and compare the same file set and hashes afterward. It MUST NOT regenerate `breakthrough.csv` or `crafoord.csv`.
-
 ### Requirement: Canonical shape — Every CSV MUST have the exact ordered 26-column header
 
 #### Scenario: Validate all files
@@ -212,8 +204,7 @@ Verification MUST include:
 5. Assert 2,686 nonempty, unique, correctly formatted `award_record_id` values and the expected first and last identifiers per file.
 6. Assert `birth_coordinates` and `affiliation_coordinates` are empty in every converted row.
 7. Assert every existing `birth_year` maps only to `birth_year`, non-Nobel `country` values populate only `citizenship_countries`, and existing Nobel birthplace and affiliation geography retain their distinct mappings.
-8. Compare pre-conversion and post-conversion repo-root `trash/` file lists and content hashes.
-9. Run the repository-established CSV validation command if one is discovered; otherwise use a temporary CSV-aware validation helper and report its exact checks.
+8. Run the repository-established CSV validation command if one is discovered; otherwise use a temporary CSV-aware validation helper and report its exact checks.
 
 ## Scope
 

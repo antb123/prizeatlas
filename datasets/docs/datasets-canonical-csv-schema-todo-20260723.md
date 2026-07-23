@@ -4,17 +4,16 @@
 
 Depends-on: none
 
-Files: all 12 top-level CSV files listed in the specification; all files under the repo-root `trash/` (read-only).
+Files: all 12 top-level CSV files listed in the specification.
 
 Steps → verify:
 
 1. Using the documented safe-directory override, create and switch to the specification's implementation branch before changing any dataset.
 2. Create a temporary, outside-the-worktree baseline containing each active CSV's exact header, parsed row count, row order, and every source field value.
-3. Retain the repo-relative file list and content hash of every file under the repo-root `trash/` in the same baseline.
-4. Assert every active input header and row count matches the exact contracts in the specification before permitting conversion to start.
-5. Report the temporary baseline location for CSV-01 through CSV-04; do not modify any dataset or repo-root `trash/` file.
+3. Assert every active input header and row count matches the exact contracts in the specification before permitting conversion to start.
+4. Report the temporary baseline location for CSV-01 through CSV-04; do not modify any dataset.
 
-Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8, 9.
+Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8.
 
 ### ID: CSV-01 — Normalize standalone compact award datasets
 
@@ -34,7 +33,7 @@ Steps → verify:
 5. Emit the required per-file conversion report, then parse each output and assert the exact canonical header, 26 fields per row,
    unchanged row count/order, equality of every source value at its destination, and unique correctly formatted identifiers.
 
-Relevant assumptions: 1, 2, 3, 5, 6, 7, 8.
+Relevant assumptions: 1, 2, 3, 5, 6, 7.
 
 ### ID: CSV-02 — Normalize enriched Breakthrough and Crafoord datasets
 
@@ -50,9 +49,9 @@ Steps → verify:
    `country → citizenship_countries`, and `affiliation → affiliation_name`, without invoking or restoring a generator.
 4. Leave birthplace, affiliation city/country, and both coordinate fields empty when the source has no explicit values.
 5. Assert exact canonical headers, 26 fields per row, 130 Breakthrough rows, 82 Crafoord rows, unchanged order, equality of every
-   source value at its destination, unique identifiers, and an unchanged repo-root `trash/` file list and hash set.
+   source value at its destination, and unique identifiers.
 
-Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8.
+Relevant assumptions: 1, 2, 3, 4, 5, 6, 7.
 
 ### ID: CSV-03 — Normalize Fields and Nobel datasets
 
@@ -72,7 +71,7 @@ Steps → verify:
 6. Emit the required reports and assert exact canonical headers, 26 fields per row, 68 Fields rows, 1,026 Nobel rows, unchanged order,
    equality of every source value at its destination, and unique correctly formatted identifiers.
 
-Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8.
+Relevant assumptions: 1, 2, 3, 4, 5, 6, 7.
 
 ### ID: CSV-04 — Run cross-dataset acceptance checks
 
@@ -90,8 +89,7 @@ Steps → verify:
 5. Assert non-Nobel country values appear in `citizenship_countries`, Nobel geography retains its distinct meanings, and both coordinate fields
    are empty in every row.
 6. Confirm names, motivations, and biographical notes preserve existing text and markup verbatim without generated Markdown, HTML, or Wikipedia links.
-7. Compare the CSV-00 and post-conversion repo-root `trash/` file lists and content hashes.
-8. Run the repository-established CSV validation command, or a temporary CSV-aware validator when none exists.
-9. Use conventional commits on the specification branch, obtain review, and squash-merge into `202607`.
+7. Run the repository-established CSV validation command, or a temporary CSV-aware validator when none exists.
+8. Use conventional commits on the specification branch, obtain review, and squash-merge into `202607`.
 
-Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8, 9.
+Relevant assumptions: 1, 2, 3, 4, 5, 6, 7, 8.
