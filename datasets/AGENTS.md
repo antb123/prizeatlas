@@ -76,8 +76,12 @@ Safe preview:
   stderr.
 - Each confirmed result contains the exact `award_record_id`, match reason, Wikidata source
   URL, and an `updates` object ready for guarded blank-only SQLite updates.
-- The `updates` object names the entity identifier `laureate_wikidata_qid` and never asks an
-  agent to place it in `source_laureate_id`.
+- It returns the verified person or organization QID at
+  `results[].updates.laureate_wikidata_qid` and the corresponding source URL at
+  `results[].wikidata_url`.
+- It does not return the award-family QID in each result because that value is already
+  populated in SQLite `award_wikidata_qid`.
+- It never asks an agent to place a Wikidata QID in `source_laureate_id`.
 - Abstained results contain an empty `updates` object and the reason confirmation failed.
 - The tool abstains when it cannot confirm identity and reports conflicts instead of
   guessing.
