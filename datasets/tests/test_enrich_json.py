@@ -120,6 +120,89 @@ class EnrichJsonTests(unittest.TestCase):
             self.assertEqual(("Q42", "official-123", "Individual", "1900-01-02"), stored)
             self.assertEqual({"status": "applied", "rows": 1}, payload["database_apply"])
 
+    def test_db_mode_selects_exact_record_id(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            database = Path(temporary) / "awards.sqlite3"
+            self.create_database(
+                database,
+                "abel_prize-000001",
+                prize="Abel Prize",
+                award_wikidata_qid="Q188184",
+                full_name="First Person",
+            )
+            with sqlite3.connect(database) as connection:
+                connection.execute(
+                    """
+                    INSERT INTO awards (award_record_id, prize, award_wikidata_qid, full_name)
+                    VALUES ('abel_prize-000002', 'Abel Prize', 'Q188184', 'Second Person')
+                    """
+                )
+
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+                candidate["laureate_type"] = "Individual"
+
+            output = io.StringIO()
+            with (
+                patch.object(enrich, "resolve", return_value=("Q42", {"labels": {"en": {"value": "Second Person"}}}, "individual", "award match")),
+                patch.object(enrich, "fill_row", side_effect=fill),
+                contextlib.redirect_stdout(output),
+            ):
+                result = enrich.main(["--db", str(database), "--record-id", "abel_prize-000002"])
+
+            with sqlite3.connect(database) as connection:
+                stored = connection.execute(
+                    "SELECT award_record_id, laureate_wikidata_qid FROM awards ORDER BY award_record_id"
+                ).fetchall()
+
+            payload = json.loads(output.getvalue())
+            self.assertEqual(0, result)
+            self.assertEqual(["abel_prize-000002"], [item["award_record_id"] for item in payload["results"]])
+            self.assertEqual([("abel_prize-000001", None), ("abel_prize-000002", "Q42")], stored)
+
+    def test_db_mode_rejects_missing_record_id_before_research(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            database = Path(temporary) / "awards.sqlite3"
+            self.create_database(database, "abel_prize-000001")
+
+            with patch.object(enrich, "resolve") as resolve:
+                result = enrich.main(["--db", str(database), "--record-id", "abel_prize-999999"])
+
+            self.assertEqual(1, result)
+            resolve.assert_not_called()
+
+    def test_db_mode_selects_target_range(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            database = Path(temporary) / "awards.sqlite3"
+            self.create_database(
+                database,
+                "abel_prize-000001",
+                prize="Abel Prize",
+                award_wikidata_qid="Q188184",
+                full_name="First Person",
+            )
+            with sqlite3.connect(database) as connection:
+                connection.execute(
+                    """
+                    INSERT INTO awards (award_record_id, prize, award_wikidata_qid, full_name)
+                    VALUES ('abel_prize-000002', 'Abel Prize', 'Q188184', 'Second Person')
+                    """
+                )
+
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+                candidate["laureate_type"] = "Individual"
+
+            output = io.StringIO()
+            with (
+                patch.object(enrich, "resolve", return_value=("Q42", {"labels": {"en": {"value": "Second Person"}}}, "individual", "award match")),
+                patch.object(enrich, "fill_row", side_effect=fill),
+                contextlib.redirect_stdout(output),
+            ):
+                result = enrich.main(["--db", str(database), "--offset", "1", "--limit", "1"])
+
+            payload = json.loads(output.getvalue())
+            self.assertEqual(0, result)
+            self.assertEqual(["abel_prize-000002"], [item["award_record_id"] for item in payload["results"]])
+
     def test_database_updates_preserve_existing_values_and_ignore_disallowed_or_blank_values(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             database = Path(temporary) / "awards.sqlite3"

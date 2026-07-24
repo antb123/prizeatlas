@@ -87,6 +87,7 @@ Read from and apply updates to the migrated database:
 `uv run scripts/enrich.py --db awards.sqlite3`
 
 - Use `--db awards.sqlite3` for enrichment under the current SQLite workflow. CSV input is a legacy dry-run interface only.
+- Select exact rows with repeatable `--record-id <award_record_id>`, or select a target range with `--offset N --limit N`.
 - Stdout is one JSON document for the agent. Progress messages are written separately to
   stderr.
 - Each confirmed result contains the exact `award_record_id`, match reason, Wikidata source

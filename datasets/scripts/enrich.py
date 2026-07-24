@@ -49,6 +49,8 @@ USAGE
     cd datasets
     uv run python scripts/enrich.py --db awards.sqlite3
     uv run python scripts/enrich.py --db awards.sqlite3 --limit 20
+    uv run python scripts/enrich.py --db awards.sqlite3 --offset 5 --limit 5
+    uv run python scripts/enrich.py --db awards.sqlite3 --record-id abel_prize-000001
 
     The legacy CSV interface remains available for read-only reports with
     --dry-run. Requests are sequential and politely backed off, with a
@@ -417,7 +419,7 @@ def read_database_rows(path: str) -> list[dict[str, str]]:
     connection = sqlite3.connect(path)
     connection.row_factory = sqlite3.Row
     try:
-        rows = connection.execute(f"SELECT {columns} FROM awards").fetchall()
+        rows = connection.execute(f"SELECT {columns} FROM awards ORDER BY rowid").fetchall()
         return [
             {field: row[field] or "" for field in DATABASE_INPUT_FIELDS}
             for row in rows
@@ -480,6 +482,8 @@ def main(argv: list[str] | None = None) -> int:
     output.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
     output.add_argument("--db", help="read from and apply proposed updates to this SQLite database")
     ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
+    ap.add_argument("--offset", type=int, default=0, help="skip the first N target rows")
+    ap.add_argument("--record-id", action="append", default=[], help="process this exact award_record_id (repeatable)")
     ap.add_argument("--delay", type=float, default=0.1, help="seconds to pause before each request")
     args = ap.parse_args(argv)
 
@@ -487,6 +491,10 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("CSV input cannot be combined with --db")
     if not args.db and not args.csv:
         ap.error("CSV input is required unless --db is used")
+    if args.offset < 0:
+        ap.error("--offset cannot be negative")
+    if args.record_id and (args.offset or args.limit):
+        ap.error("--record-id cannot be combined with --offset or --limit")
 
     header: list[str] | None = None
     cache_path = ""
@@ -518,9 +526,18 @@ def main(argv: list[str] | None = None) -> int:
             return True
         return r["laureate_type"].strip() == "Individual" and not r["death_date"].strip()
 
-    targets = [r for r in rows if needs_work(r)]
-    if args.limit:
-        targets = targets[:args.limit]
+    if args.record_id:
+        rows_by_id = {row["award_record_id"]: row for row in rows}
+        requested_ids = list(dict.fromkeys(args.record_id))
+        missing_ids = [record_id for record_id in requested_ids if record_id not in rows_by_id]
+        if missing_ids:
+            log(f"record selection: outcome=failed missing={','.join(missing_ids)}")
+            return 1
+        targets = [rows_by_id[record_id] for record_id in requested_ids]
+    else:
+        targets = [r for r in rows if needs_work(r)]
+        end = args.offset + args.limit if args.limit else None
+        targets = targets[args.offset:end]
     log(f"targets: {len(targets)} of {len(rows)} rows")
 
     stats = {"individual": 0, "organization": 0, "abstain": 0}
