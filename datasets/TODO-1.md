@@ -37,7 +37,11 @@ Research tasks MAY run in parallel, including within one dataset, because record
 
 Target: `awards.sqlite3`; source snapshot: `abel_prize.csv` (read-only).
 
-Verify 29 missing source IDs; decide from sources whether category is inapplicable; review death status without filling living recipients. Birth and affiliation coordinates are already populated.
+Confirm whether the official source exposes a stable laureate ID. Its year/profile URL is not
+an ID, so leave `source_laureate_id` blank when no explicit identifier exists. Abel has no
+formal categories: keep `category`, `field_language`, and `biographical_note` blank. Review
+death status without filling living recipients. Birth and affiliation coordinates are already
+populated.
 
 - [ ] `ABEL-001` — Verify and retrieve data for `abel_prize-000001` through `abel_prize-000005` (5 records).
 - [ ] `ABEL-002` — Verify and retrieve data for `abel_prize-000006` through `abel_prize-000010` (5 records).

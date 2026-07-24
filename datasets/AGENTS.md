@@ -20,6 +20,17 @@ places - use todays name, country, location
 - add `birth_coordinates` / `affiliation_coordinates` only after the named place is verified.
 - do not infer `prize_share` or death details for the living.
 - Organizations carry no birth/sex/death data.
+- `source_laureate_id` is only a stable identifier explicitly assigned by the official award
+  source or its API. It is not a profile URL, URL slug, Wikipedia/Wikidata identifier, or an
+  identifier invented from the name/year. Leave it blank when the source exposes no ID.
+- When an award has no formal categories, leave `category` blank. Never write `N/A`,
+  `Not applicable`, the prize name, or a derived subject area as a placeholder.
+- `field_language` is source-specific: an explicitly supplied research/peace/economics field
+  or a literature laureate's writing language. Do not derive it from a laureate's work,
+  occupation, department, or motivation. Leave it blank for Abel Prize records.
+- `biographical_note` preserves a concise note already supplied by a source dataset, such as
+  a parenthesized lifespan or source birth text. Do not generate, summarize, or copy a prose
+  biography into it. Leave it blank for Abel Prize records.
 
 ## current data target
 
