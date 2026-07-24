@@ -245,30 +245,30 @@ Target: `awards.sqlite3`; source snapshot: `japan_prize.csv` (read-only).
 
 Retrieve source IDs; resolve the bounded birth, sex, and affiliation-city gaps; determine category only from the official award source; and collect applicable death data and verified coordinates.
 
-- [ ] `JAPAN-001` — Verify and retrieve data for `japan_prize-000001` through `japan_prize-000005` (5 records).
-- [ ] `JAPAN-002` — Verify and retrieve data for `japan_prize-000006` through `japan_prize-000010` (5 records).
-- [ ] `JAPAN-003` — Verify and retrieve data for `japan_prize-000011` through `japan_prize-000015` (5 records).
-- [ ] `JAPAN-004` — Verify and retrieve data for `japan_prize-000016` through `japan_prize-000020` (5 records).
-- [ ] `JAPAN-005` — Verify and retrieve data for `japan_prize-000021` through `japan_prize-000025` (5 records).
-- [ ] `JAPAN-006` — Verify and retrieve data for `japan_prize-000026` through `japan_prize-000030` (5 records).
-- [ ] `JAPAN-007` — Verify and retrieve data for `japan_prize-000031` through `japan_prize-000035` (5 records).
-- [ ] `JAPAN-008` — Verify and retrieve data for `japan_prize-000036` through `japan_prize-000040` (5 records).
-- [ ] `JAPAN-009` — Verify and retrieve data for `japan_prize-000041` through `japan_prize-000045` (5 records).
-- [ ] `JAPAN-010` — Verify and retrieve data for `japan_prize-000046` through `japan_prize-000050` (5 records).
-- [ ] `JAPAN-011` — Verify and retrieve data for `japan_prize-000051` through `japan_prize-000055` (5 records).
-- [ ] `JAPAN-012` — Verify and retrieve data for `japan_prize-000056` through `japan_prize-000060` (5 records).
-- [ ] `JAPAN-013` — Verify and retrieve data for `japan_prize-000061` through `japan_prize-000065` (5 records).
-- [ ] `JAPAN-014` — Verify and retrieve data for `japan_prize-000066` through `japan_prize-000070` (5 records).
-- [ ] `JAPAN-015` — Verify and retrieve data for `japan_prize-000071` through `japan_prize-000075` (5 records).
-- [ ] `JAPAN-016` — Verify and retrieve data for `japan_prize-000076` through `japan_prize-000080` (5 records).
-- [ ] `JAPAN-017` — Verify and retrieve data for `japan_prize-000081` through `japan_prize-000085` (5 records).
-- [ ] `JAPAN-018` — Verify and retrieve data for `japan_prize-000086` through `japan_prize-000090` (5 records).
-- [ ] `JAPAN-019` — Verify and retrieve data for `japan_prize-000091` through `japan_prize-000095` (5 records).
-- [ ] `JAPAN-020` — Verify and retrieve data for `japan_prize-000096` through `japan_prize-000100` (5 records).
-- [ ] `JAPAN-021` — Verify and retrieve data for `japan_prize-000101` through `japan_prize-000105` (5 records).
-- [ ] `JAPAN-022` — Verify and retrieve data for `japan_prize-000106` through `japan_prize-000110` (5 records).
-- [ ] `JAPAN-023` — Verify and retrieve data for `japan_prize-000111` through `japan_prize-000115` (5 records).
-- [ ] `JAPAN-024` — Verify and retrieve data for `japan_prize-000116` through `japan_prize-000116` (1 record).
+- [x] `JAPAN-001` — Verify and retrieve data for `japan_prize-000001` through `japan_prize-000005` (5 records).
+- [x] `JAPAN-002` — Verify and retrieve data for `japan_prize-000006` through `japan_prize-000010` (5 records).
+- [x] `JAPAN-003` — Verify and retrieve data for `japan_prize-000011` through `japan_prize-000015` (5 records).
+- [x] `JAPAN-004` — Verify and retrieve data for `japan_prize-000016` through `japan_prize-000020` (5 records).
+- [x] `JAPAN-005` — Verify and retrieve data for `japan_prize-000021` through `japan_prize-000025` (5 records).
+- [x] `JAPAN-006` — Verify and retrieve data for `japan_prize-000026` through `japan_prize-000030` (5 records).
+- [x] `JAPAN-007` — Verify and retrieve data for `japan_prize-000031` through `japan_prize-000035` (5 records).
+- [x] `JAPAN-008` — Verify and retrieve data for `japan_prize-000036` through `japan_prize-000040` (5 records).
+- [x] `JAPAN-009` — Verify and retrieve data for `japan_prize-000041` through `japan_prize-000045` (5 records).
+- [x] `JAPAN-010` — Verify and retrieve data for `japan_prize-000046` through `japan_prize-000050` (5 records).
+- [x] `JAPAN-011` — Verify and retrieve data for `japan_prize-000051` through `japan_prize-000055` (5 records).
+- [x] `JAPAN-012` — Verify and retrieve data for `japan_prize-000056` through `japan_prize-000060` (5 records).
+- [x] `JAPAN-013` — Verify and retrieve data for `japan_prize-000061` through `japan_prize-000065` (5 records).
+- [x] `JAPAN-014` — Verify and retrieve data for `japan_prize-000066` through `japan_prize-000070` (5 records).
+- [x] `JAPAN-015` — Verify and retrieve data for `japan_prize-000071` through `japan_prize-000075` (5 records).
+- [x] `JAPAN-016` — Verify and retrieve data for `japan_prize-000076` through `japan_prize-000080` (5 records).
+- [x] `JAPAN-017` — Verify and retrieve data for `japan_prize-000081` through `japan_prize-000085` (5 records).
+- [x] `JAPAN-018` — Verify and retrieve data for `japan_prize-000086` through `japan_prize-000090` (5 records).
+- [x] `JAPAN-019` — Verify and retrieve data for `japan_prize-000091` through `japan_prize-000095` (5 records).
+- [x] `JAPAN-020` — Verify and retrieve data for `japan_prize-000096` through `japan_prize-000100` (5 records).
+- [x] `JAPAN-021` — Verify and retrieve data for `japan_prize-000101` through `japan_prize-000105` (5 records).
+- [x] `JAPAN-022` — Verify and retrieve data for `japan_prize-000106` through `japan_prize-000110` (5 records).
+- [x] `JAPAN-023` — Verify and retrieve data for `japan_prize-000111` through `japan_prize-000115` (5 records).
+- [x] `JAPAN-024` — Verify and retrieve data for `japan_prize-000116` through `japan_prize-000116` (1 record).
 
 ## Kyoto Prize — 129 rows
 
@@ -401,24 +401,24 @@ Target: `awards.sqlite3`; source snapshot: `max_planck_medal.csv` (read-only).
 
 Retrieve source IDs and 64 missing official citations; resolve birth and affiliation gaps; verify category applicability; review death status; and add verified coordinates.
 
-- [ ] `MAXP-001` — Verify and retrieve data for `max_planck_medal-000001` through `max_planck_medal-000005` (5 records).
-- [ ] `MAXP-002` — Verify and retrieve data for `max_planck_medal-000006` through `max_planck_medal-000010` (5 records).
-- [ ] `MAXP-003` — Verify and retrieve data for `max_planck_medal-000011` through `max_planck_medal-000015` (5 records).
-- [ ] `MAXP-004` — Verify and retrieve data for `max_planck_medal-000016` through `max_planck_medal-000020` (5 records).
-- [ ] `MAXP-005` — Verify and retrieve data for `max_planck_medal-000021` through `max_planck_medal-000025` (5 records).
-- [ ] `MAXP-006` — Verify and retrieve data for `max_planck_medal-000026` through `max_planck_medal-000030` (5 records).
-- [ ] `MAXP-007` — Verify and retrieve data for `max_planck_medal-000031` through `max_planck_medal-000035` (5 records).
-- [ ] `MAXP-008` — Verify and retrieve data for `max_planck_medal-000036` through `max_planck_medal-000040` (5 records).
-- [ ] `MAXP-009` — Verify and retrieve data for `max_planck_medal-000041` through `max_planck_medal-000045` (5 records).
-- [ ] `MAXP-010` — Verify and retrieve data for `max_planck_medal-000046` through `max_planck_medal-000050` (5 records).
-- [ ] `MAXP-011` — Verify and retrieve data for `max_planck_medal-000051` through `max_planck_medal-000055` (5 records).
-- [ ] `MAXP-012` — Verify and retrieve data for `max_planck_medal-000056` through `max_planck_medal-000060` (5 records).
-- [ ] `MAXP-013` — Verify and retrieve data for `max_planck_medal-000061` through `max_planck_medal-000065` (5 records).
-- [ ] `MAXP-014` — Verify and retrieve data for `max_planck_medal-000066` through `max_planck_medal-000070` (5 records).
-- [ ] `MAXP-015` — Verify and retrieve data for `max_planck_medal-000071` through `max_planck_medal-000075` (5 records).
-- [ ] `MAXP-016` — Verify and retrieve data for `max_planck_medal-000076` through `max_planck_medal-000080` (5 records).
-- [ ] `MAXP-017` — Verify and retrieve data for `max_planck_medal-000081` through `max_planck_medal-000085` (5 records).
-- [ ] `MAXP-018` — Verify and retrieve data for `max_planck_medal-000086` through `max_planck_medal-000090` (5 records).
+- [x] `MAXP-001` — Verify and retrieve data for `max_planck_medal-000001` through `max_planck_medal-000005` (5 records).
+- [x] `MAXP-002` — Verify and retrieve data for `max_planck_medal-000006` through `max_planck_medal-000010` (5 records).
+- [x] `MAXP-003` — Verify and retrieve data for `max_planck_medal-000011` through `max_planck_medal-000015` (5 records).
+- [x] `MAXP-004` — Verify and retrieve data for `max_planck_medal-000016` through `max_planck_medal-000020` (5 records).
+- [x] `MAXP-005` — Verify and retrieve data for `max_planck_medal-000021` through `max_planck_medal-000025` (5 records).
+- [x] `MAXP-006` — Verify and retrieve data for `max_planck_medal-000026` through `max_planck_medal-000030` (5 records).
+- [x] `MAXP-007` — Verify and retrieve data for `max_planck_medal-000031` through `max_planck_medal-000035` (5 records).
+- [x] `MAXP-008` — Verify and retrieve data for `max_planck_medal-000036` through `max_planck_medal-000040` (5 records).
+- [x] `MAXP-009` — Verify and retrieve data for `max_planck_medal-000041` through `max_planck_medal-000045` (5 records).
+- [x] `MAXP-010` — Verify and retrieve data for `max_planck_medal-000046` through `max_planck_medal-000050` (5 records).
+- [x] `MAXP-011` — Verify and retrieve data for `max_planck_medal-000051` through `max_planck_medal-000055` (5 records).
+- [x] `MAXP-012` — Verify and retrieve data for `max_planck_medal-000056` through `max_planck_medal-000060` (5 records).
+- [x] `MAXP-013` — Verify and retrieve data for `max_planck_medal-000061` through `max_planck_medal-000065` (5 records).
+- [x] `MAXP-014` — Verify and retrieve data for `max_planck_medal-000066` through `max_planck_medal-000070` (5 records).
+- [x] `MAXP-015` — Verify and retrieve data for `max_planck_medal-000071` through `max_planck_medal-000075` (5 records).
+- [x] `MAXP-016` — Verify and retrieve data for `max_planck_medal-000076` through `max_planck_medal-000080` (5 records).
+- [x] `MAXP-017` — Verify and retrieve data for `max_planck_medal-000081` through `max_planck_medal-000085` (5 records).
+- [x] `MAXP-018` — Verify and retrieve data for `max_planck_medal-000086` through `max_planck_medal-000090` (5 records).
 
 ## Nobel Prize — 1026 rows
 
@@ -671,23 +671,23 @@ Target: `awards.sqlite3`; source snapshot: `turing_award.csv` (read-only).
 
 Retrieve source IDs; resolve the one remaining birth-city gap and applicable death-place gaps; verify category applicability; and add verified coordinates.
 
-- [ ] `TURING-001` — Verify and retrieve data for `turing_award-000001` through `turing_award-000005` (5 records).
-- [ ] `TURING-002` — Verify and retrieve data for `turing_award-000006` through `turing_award-000010` (5 records).
-- [ ] `TURING-003` — Verify and retrieve data for `turing_award-000011` through `turing_award-000015` (5 records).
-- [ ] `TURING-004` — Verify and retrieve data for `turing_award-000016` through `turing_award-000020` (5 records).
-- [ ] `TURING-005` — Verify and retrieve data for `turing_award-000021` through `turing_award-000025` (5 records).
-- [ ] `TURING-006` — Verify and retrieve data for `turing_award-000026` through `turing_award-000030` (5 records).
-- [ ] `TURING-007` — Verify and retrieve data for `turing_award-000031` through `turing_award-000035` (5 records).
-- [ ] `TURING-008` — Verify and retrieve data for `turing_award-000036` through `turing_award-000040` (5 records).
-- [ ] `TURING-009` — Verify and retrieve data for `turing_award-000041` through `turing_award-000045` (5 records).
-- [ ] `TURING-010` — Verify and retrieve data for `turing_award-000046` through `turing_award-000050` (5 records).
-- [ ] `TURING-011` — Verify and retrieve data for `turing_award-000051` through `turing_award-000055` (5 records).
-- [ ] `TURING-012` — Verify and retrieve data for `turing_award-000056` through `turing_award-000060` (5 records).
-- [ ] `TURING-013` — Verify and retrieve data for `turing_award-000061` through `turing_award-000065` (5 records).
-- [ ] `TURING-014` — Verify and retrieve data for `turing_award-000066` through `turing_award-000070` (5 records).
-- [ ] `TURING-015` — Verify and retrieve data for `turing_award-000071` through `turing_award-000075` (5 records).
-- [ ] `TURING-016` — Verify and retrieve data for `turing_award-000076` through `turing_award-000080` (5 records).
-- [ ] `TURING-017` — Verify and retrieve data for `turing_award-000081` through `turing_award-000081` (1 record).
+- [x] `TURING-001` — Verify and retrieve data for `turing_award-000001` through `turing_award-000005` (5 records).
+- [x] `TURING-002` — Verify and retrieve data for `turing_award-000006` through `turing_award-000010` (5 records).
+- [x] `TURING-003` — Verify and retrieve data for `turing_award-000011` through `turing_award-000015` (5 records).
+- [x] `TURING-004` — Verify and retrieve data for `turing_award-000016` through `turing_award-000020` (5 records).
+- [x] `TURING-005` — Verify and retrieve data for `turing_award-000021` through `turing_award-000025` (5 records).
+- [x] `TURING-006` — Verify and retrieve data for `turing_award-000026` through `turing_award-000030` (5 records).
+- [x] `TURING-007` — Verify and retrieve data for `turing_award-000031` through `turing_award-000035` (5 records).
+- [x] `TURING-008` — Verify and retrieve data for `turing_award-000036` through `turing_award-000040` (5 records).
+- [x] `TURING-009` — Verify and retrieve data for `turing_award-000041` through `turing_award-000045` (5 records).
+- [x] `TURING-010` — Verify and retrieve data for `turing_award-000046` through `turing_award-000050` (5 records).
+- [x] `TURING-011` — Verify and retrieve data for `turing_award-000051` through `turing_award-000055` (5 records).
+- [x] `TURING-012` — Verify and retrieve data for `turing_award-000056` through `turing_award-000060` (5 records).
+- [x] `TURING-013` — Verify and retrieve data for `turing_award-000061` through `turing_award-000065` (5 records).
+- [x] `TURING-014` — Verify and retrieve data for `turing_award-000066` through `turing_award-000070` (5 records).
+- [x] `TURING-015` — Verify and retrieve data for `turing_award-000071` through `turing_award-000075` (5 records).
+- [x] `TURING-016` — Verify and retrieve data for `turing_award-000076` through `turing_award-000080` (5 records).
+- [x] `TURING-017` — Verify and retrieve data for `turing_award-000081` through `turing_award-000081` (1 record).
 
 ## Wolf Prize — 391 rows
 
