@@ -21,28 +21,40 @@ places - use todays name, country, location
 - do not infer `prize_share` or death details for the living.
 - Organizations carry no birth/sex/death data.
 
-main award files (source url under each — read it instead of searching):
+main award files (sources under each — read these instead of searching):
 - abel_prize.csv
-  https://abelprize.no
+  official:   https://abelprize.no
+  wikipedia:  https://en.wikipedia.org/wiki/Abel_Prize
 - breakthrough.csv
-  https://breakthroughprize.org
+  official:   https://breakthroughprize.org
+  wikipedia:  https://en.wikipedia.org/wiki/Breakthrough_Prize
 - crafoord.csv
-  https://www.crafoordprize.se
+  official:   https://www.crafoordprize.se
+  wikipedia:  https://en.wikipedia.org/wiki/Crafoord_Prize
 - fields.csv
-  https://www.mathunion.org/imu-awards/fields-medal
+  official:   https://www.mathunion.org/imu-awards/fields-medal
+  wikipedia:  https://en.wikipedia.org/wiki/Fields_Medal
 - japan_prize.csv
-  https://www.japanprize.jp/en/
+  official:   https://www.japanprize.jp/en/
+  wikipedia:  https://en.wikipedia.org/wiki/Japan_Prize
 - kyoto_prize.csv
-  https://www.kyotoprize.org/en/
+  official:   https://www.kyotoprize.org/en/
+  wikipedia:  https://en.wikipedia.org/wiki/Kyoto_Prize
 - lasker_awards.csv
-  https://laskerfoundation.org
+  official:   https://laskerfoundation.org
+  wikipedia:  https://en.wikipedia.org/wiki/Lasker_Award
 - max_planck_medal.csv
-  https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille
+  official:   https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille
+  wikipedia:  https://en.wikipedia.org/wiki/Max_Planck_Medal
 - nobel.csv
-  https://www.nobelprize.org
+  official:   https://www.nobelprize.org
+  wikipedia:  https://en.wikipedia.org/wiki/List_of_Nobel_laureates
 - shaw_prize.csv
-  https://www.shawprize.org
+  official:   https://www.shawprize.org
+  wikipedia:  https://en.wikipedia.org/wiki/Shaw_Prize
 - turing_award.csv
-  https://amturing.acm.org
+  official:   https://amturing.acm.org
+  wikipedia:  https://en.wikipedia.org/wiki/Turing_Award
 - wolf_prize.csv
-  https://wolffund.org.il
+  official:   https://wolffund.org.il
+  wikipedia:  https://en.wikipedia.org/wiki/Wolf_Prize
