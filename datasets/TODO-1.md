@@ -64,11 +64,11 @@ death status without filling living recipients. Birth and affiliation coordinate
 populated.
 
 - [x] `ABEL-001` — Verify and retrieve data for `abel_prize-000001` through `abel_prize-000005` (5 records).
-- [ ] `ABEL-002` — Verify and retrieve data for `abel_prize-000006` through `abel_prize-000010` (5 records).
-- [ ] `ABEL-003` — Verify and retrieve data for `abel_prize-000011` through `abel_prize-000015` (5 records).
-- [ ] `ABEL-004` — Verify and retrieve data for `abel_prize-000016` through `abel_prize-000020` (5 records).
-- [ ] `ABEL-005` — Verify and retrieve data for `abel_prize-000021` through `abel_prize-000025` (5 records).
-- [ ] `ABEL-006` — Verify and retrieve data for `abel_prize-000026` through `abel_prize-000029` (4 records).
+- [x] `ABEL-002` — Verify and retrieve data for `abel_prize-000006` through `abel_prize-000010` (5 records).
+- [x] `ABEL-003` — Verify and retrieve data for `abel_prize-000011` through `abel_prize-000015` (5 records).
+- [x] `ABEL-004` — Verify and retrieve data for `abel_prize-000016` through `abel_prize-000020` (5 records).
+- [x] `ABEL-005` — Verify and retrieve data for `abel_prize-000021` through `abel_prize-000025` (5 records).
+- [x] `ABEL-006` — Verify and retrieve data for `abel_prize-000026` through `abel_prize-000029` (4 records).
 
 ## Breakthrough Prize — 148 rows
 
@@ -76,36 +76,36 @@ Target: `awards.sqlite3`; source snapshot: `breakthrough.csv` (read-only).
 
 Source-verify provisional person data; retrieve 148 source IDs; complete applicable birth, affiliation, death, and coordinate gaps. Existing malformed affiliation values are handled by QC tasks below and MUST NOT be overwritten in ordinary batches.
 
-- [ ] `BREAK-001` — Verify and retrieve data for `breakthrough-000001` through `breakthrough-000005` (5 records).
-- [ ] `BREAK-002` — Verify and retrieve data for `breakthrough-000006` through `breakthrough-000010` (5 records).
-- [ ] `BREAK-003` — Verify and retrieve data for `breakthrough-000011` through `breakthrough-000015` (5 records).
-- [ ] `BREAK-004` — Verify and retrieve data for `breakthrough-000016` through `breakthrough-000020` (5 records).
-- [ ] `BREAK-005` — Verify and retrieve data for `breakthrough-000021` through `breakthrough-000025` (5 records).
-- [ ] `BREAK-006` — Verify and retrieve data for `breakthrough-000026` through `breakthrough-000030` (5 records).
-- [ ] `BREAK-007` — Verify and retrieve data for `breakthrough-000031` through `breakthrough-000035` (5 records).
-- [ ] `BREAK-008` — Verify and retrieve data for `breakthrough-000036` through `breakthrough-000040` (5 records).
-- [ ] `BREAK-009` — Verify and retrieve data for `breakthrough-000041` through `breakthrough-000045` (5 records).
-- [ ] `BREAK-010` — Verify and retrieve data for `breakthrough-000046` through `breakthrough-000050` (5 records).
-- [ ] `BREAK-011` — Verify and retrieve data for `breakthrough-000051` through `breakthrough-000055` (5 records).
-- [ ] `BREAK-012` — Verify and retrieve data for `breakthrough-000056` through `breakthrough-000060` (5 records).
-- [ ] `BREAK-013` — Verify and retrieve data for `breakthrough-000061` through `breakthrough-000065` (5 records).
-- [ ] `BREAK-014` — Verify and retrieve data for `breakthrough-000066` through `breakthrough-000070` (5 records).
-- [ ] `BREAK-015` — Verify and retrieve data for `breakthrough-000071` through `breakthrough-000075` (5 records).
-- [ ] `BREAK-016` — Verify and retrieve data for `breakthrough-000076` through `breakthrough-000080` (5 records).
-- [ ] `BREAK-017` — Verify and retrieve data for `breakthrough-000081` through `breakthrough-000085` (5 records).
-- [ ] `BREAK-018` — Verify and retrieve data for `breakthrough-000086` through `breakthrough-000090` (5 records).
-- [ ] `BREAK-019` — Verify and retrieve data for `breakthrough-000091` through `breakthrough-000095` (5 records).
-- [ ] `BREAK-020` — Verify and retrieve data for `breakthrough-000096` through `breakthrough-000100` (5 records).
-- [ ] `BREAK-021` — Verify and retrieve data for `breakthrough-000101` through `breakthrough-000105` (5 records).
-- [ ] `BREAK-022` — Verify and retrieve data for `breakthrough-000106` through `breakthrough-000110` (5 records).
-- [ ] `BREAK-023` — Verify and retrieve data for `breakthrough-000111` through `breakthrough-000115` (5 records).
-- [ ] `BREAK-024` — Verify and retrieve data for `breakthrough-000116` through `breakthrough-000120` (5 records).
-- [ ] `BREAK-025` — Verify and retrieve data for `breakthrough-000121` through `breakthrough-000125` (5 records).
-- [ ] `BREAK-026` — Verify and retrieve data for `breakthrough-000126` through `breakthrough-000130` (5 records).
-- [ ] `BREAK-027` — Verify and retrieve data for `breakthrough-000131` through `breakthrough-000135` (5 records).
-- [ ] `BREAK-028` — Verify and retrieve data for `breakthrough-000136` through `breakthrough-000140` (5 records).
-- [ ] `BREAK-029` — Verify and retrieve data for `breakthrough-000141` through `breakthrough-000145` (5 records).
-- [ ] `BREAK-030` — Verify and retrieve data for `breakthrough-000146` through `breakthrough-000148` (3 records).
+- [x] `BREAK-001` — Verify and retrieve data for `breakthrough-000001` through `breakthrough-000005` (5 records).
+- [x] `BREAK-002` — Verify and retrieve data for `breakthrough-000006` through `breakthrough-000010` (5 records).
+- [x] `BREAK-003` — Verify and retrieve data for `breakthrough-000011` through `breakthrough-000015` (5 records).
+- [x] `BREAK-004` — Verify and retrieve data for `breakthrough-000016` through `breakthrough-000020` (5 records).
+- [x] `BREAK-005` — Verify and retrieve data for `breakthrough-000021` through `breakthrough-000025` (5 records).
+- [x] `BREAK-006` — Verify and retrieve data for `breakthrough-000026` through `breakthrough-000030` (5 records).
+- [x] `BREAK-007` — Verify and retrieve data for `breakthrough-000031` through `breakthrough-000035` (5 records).
+- [x] `BREAK-008` — Verify and retrieve data for `breakthrough-000036` through `breakthrough-000040` (5 records).
+- [x] `BREAK-009` — Verify and retrieve data for `breakthrough-000041` through `breakthrough-000045` (5 records).
+- [x] `BREAK-010` — Verify and retrieve data for `breakthrough-000046` through `breakthrough-000050` (5 records).
+- [x] `BREAK-011` — Verify and retrieve data for `breakthrough-000051` through `breakthrough-000055` (5 records).
+- [x] `BREAK-012` — Verify and retrieve data for `breakthrough-000056` through `breakthrough-000060` (5 records).
+- [x] `BREAK-013` — Verify and retrieve data for `breakthrough-000061` through `breakthrough-000065` (5 records).
+- [x] `BREAK-014` — Verify and retrieve data for `breakthrough-000066` through `breakthrough-000070` (5 records).
+- [x] `BREAK-015` — Verify and retrieve data for `breakthrough-000071` through `breakthrough-000075` (5 records).
+- [x] `BREAK-016` — Verify and retrieve data for `breakthrough-000076` through `breakthrough-000080` (5 records).
+- [x] `BREAK-017` — Verify and retrieve data for `breakthrough-000081` through `breakthrough-000085` (5 records).
+- [x] `BREAK-018` — Verify and retrieve data for `breakthrough-000086` through `breakthrough-000090` (5 records).
+- [x] `BREAK-019` — Verify and retrieve data for `breakthrough-000091` through `breakthrough-000095` (5 records).
+- [x] `BREAK-020` — Verify and retrieve data for `breakthrough-000096` through `breakthrough-000100` (5 records).
+- [x] `BREAK-021` — Verify and retrieve data for `breakthrough-000101` through `breakthrough-000105` (5 records).
+- [x] `BREAK-022` — Verify and retrieve data for `breakthrough-000106` through `breakthrough-000110` (5 records).
+- [x] `BREAK-023` — Verify and retrieve data for `breakthrough-000111` through `breakthrough-000115` (5 records).
+- [x] `BREAK-024` — Verify and retrieve data for `breakthrough-000116` through `breakthrough-000120` (5 records).
+- [x] `BREAK-025` — Verify and retrieve data for `breakthrough-000121` through `breakthrough-000125` (5 records).
+- [x] `BREAK-026` — Verify and retrieve data for `breakthrough-000126` through `breakthrough-000130` (5 records).
+- [x] `BREAK-027` — Verify and retrieve data for `breakthrough-000131` through `breakthrough-000135` (5 records).
+- [x] `BREAK-028` — Verify and retrieve data for `breakthrough-000136` through `breakthrough-000140` (5 records).
+- [x] `BREAK-029` — Verify and retrieve data for `breakthrough-000141` through `breakthrough-000145` (5 records).
+- [x] `BREAK-030` — Verify and retrieve data for `breakthrough-000146` through `breakthrough-000148` (3 records).
 
 ## Crafoord Prize — 82 rows
 
@@ -113,9 +113,9 @@ Target: `awards.sqlite3`; source snapshot: `crafoord.csv` (read-only).
 
 Retrieve the 2 remaining source IDs, resolve the small birth-detail gaps, collect affiliations for all 82 rows, and add coordinates only after each place is verified.
 
-- [ ] `CRAF-001` — Verify and retrieve data for `crafoord-000001` through `crafoord-000005` (5 records).
-- [ ] `CRAF-002` — Verify and retrieve data for `crafoord-000006` through `crafoord-000010` (5 records).
-- [ ] `CRAF-003` — Verify and retrieve data for `crafoord-000011` through `crafoord-000015` (5 records).
+- [x] `CRAF-001` — Verify and retrieve data for `crafoord-000001` through `crafoord-000005` (5 records).
+- [x] `CRAF-002` — Verify and retrieve data for `crafoord-000006` through `crafoord-000010` (5 records).
+- [x] `CRAF-003` — Verify and retrieve data for `crafoord-000011` through `crafoord-000015` (5 records).
 - [ ] `CRAF-004` — Verify and retrieve data for `crafoord-000016` through `crafoord-000020` (5 records).
 - [ ] `CRAF-005` — Verify and retrieve data for `crafoord-000021` through `crafoord-000025` (5 records).
 - [ ] `CRAF-006` — Verify and retrieve data for `crafoord-000026` through `crafoord-000030` (5 records).
@@ -639,31 +639,31 @@ Target: `awards.sqlite3`; source snapshot: `shaw_prize.csv` (read-only).
 
 Retrieve 87 missing source IDs; complete recipient birth, sex, affiliation, and applicable death details; move official category information only when explicitly supported; and add verified coordinates.
 
-- [ ] `SHAW-001` — Verify and retrieve data for `shaw_prize-000001` through `shaw_prize-000005` (5 records).
-- [ ] `SHAW-002` — Verify and retrieve data for `shaw_prize-000006` through `shaw_prize-000010` (5 records).
-- [ ] `SHAW-003` — Verify and retrieve data for `shaw_prize-000011` through `shaw_prize-000015` (5 records).
-- [ ] `SHAW-004` — Verify and retrieve data for `shaw_prize-000016` through `shaw_prize-000020` (5 records).
-- [ ] `SHAW-005` — Verify and retrieve data for `shaw_prize-000021` through `shaw_prize-000025` (5 records).
-- [ ] `SHAW-006` — Verify and retrieve data for `shaw_prize-000026` through `shaw_prize-000030` (5 records).
-- [ ] `SHAW-007` — Verify and retrieve data for `shaw_prize-000031` through `shaw_prize-000035` (5 records).
-- [ ] `SHAW-008` — Verify and retrieve data for `shaw_prize-000036` through `shaw_prize-000040` (5 records).
-- [ ] `SHAW-009` — Verify and retrieve data for `shaw_prize-000041` through `shaw_prize-000045` (5 records).
-- [ ] `SHAW-010` — Verify and retrieve data for `shaw_prize-000046` through `shaw_prize-000050` (5 records).
-- [ ] `SHAW-011` — Verify and retrieve data for `shaw_prize-000051` through `shaw_prize-000055` (5 records).
-- [ ] `SHAW-012` — Verify and retrieve data for `shaw_prize-000056` through `shaw_prize-000060` (5 records).
-- [ ] `SHAW-013` — Verify and retrieve data for `shaw_prize-000061` through `shaw_prize-000065` (5 records).
-- [ ] `SHAW-014` — Verify and retrieve data for `shaw_prize-000066` through `shaw_prize-000070` (5 records).
-- [ ] `SHAW-015` — Verify and retrieve data for `shaw_prize-000071` through `shaw_prize-000075` (5 records).
-- [ ] `SHAW-016` — Verify and retrieve data for `shaw_prize-000076` through `shaw_prize-000080` (5 records).
-- [ ] `SHAW-017` — Verify and retrieve data for `shaw_prize-000081` through `shaw_prize-000085` (5 records).
-- [ ] `SHAW-018` — Verify and retrieve data for `shaw_prize-000086` through `shaw_prize-000090` (5 records).
-- [ ] `SHAW-019` — Verify and retrieve data for `shaw_prize-000091` through `shaw_prize-000095` (5 records).
-- [ ] `SHAW-020` — Verify and retrieve data for `shaw_prize-000096` through `shaw_prize-000100` (5 records).
-- [ ] `SHAW-021` — Verify and retrieve data for `shaw_prize-000101` through `shaw_prize-000105` (5 records).
-- [ ] `SHAW-022` — Verify and retrieve data for `shaw_prize-000106` through `shaw_prize-000110` (5 records).
-- [ ] `SHAW-023` — Verify and retrieve data for `shaw_prize-000111` through `shaw_prize-000115` (5 records).
-- [ ] `SHAW-024` — Verify and retrieve data for `shaw_prize-000116` through `shaw_prize-000120` (5 records).
-- [ ] `SHAW-025` — Verify and retrieve data for `shaw_prize-000121` through `shaw_prize-000121` (1 record).
+- [x] `SHAW-001` — Verify and retrieve data for `shaw_prize-000001` through `shaw_prize-000005` (5 records).
+- [x] `SHAW-002` — Verify and retrieve data for `shaw_prize-000006` through `shaw_prize-000010` (5 records).
+- [x] `SHAW-003` — Verify and retrieve data for `shaw_prize-000011` through `shaw_prize-000015` (5 records).
+- [x] `SHAW-004` — Verify and retrieve data for `shaw_prize-000016` through `shaw_prize-000020` (5 records).
+- [x] `SHAW-005` — Verify and retrieve data for `shaw_prize-000021` through `shaw_prize-000025` (5 records).
+- [x] `SHAW-006` — Verify and retrieve data for `shaw_prize-000026` through `shaw_prize-000030` (5 records).
+- [x] `SHAW-007` — Verify and retrieve data for `shaw_prize-000031` through `shaw_prize-000035` (5 records).
+- [x] `SHAW-008` — Verify and retrieve data for `shaw_prize-000036` through `shaw_prize-000040` (5 records).
+- [x] `SHAW-009` — Verify and retrieve data for `shaw_prize-000041` through `shaw_prize-000045` (5 records).
+- [x] `SHAW-010` — Verify and retrieve data for `shaw_prize-000046` through `shaw_prize-000050` (5 records).
+- [x] `SHAW-011` — Verify and retrieve data for `shaw_prize-000051` through `shaw_prize-000055` (5 records).
+- [x] `SHAW-012` — Verify and retrieve data for `shaw_prize-000056` through `shaw_prize-000060` (5 records).
+- [x] `SHAW-013` — Verify and retrieve data for `shaw_prize-000061` through `shaw_prize-000065` (5 records).
+- [x] `SHAW-014` — Verify and retrieve data for `shaw_prize-000066` through `shaw_prize-000070` (5 records).
+- [x] `SHAW-015` — Verify and retrieve data for `shaw_prize-000071` through `shaw_prize-000075` (5 records).
+- [x] `SHAW-016` — Verify and retrieve data for `shaw_prize-000076` through `shaw_prize-000080` (5 records).
+- [x] `SHAW-017` — Verify and retrieve data for `shaw_prize-000081` through `shaw_prize-000085` (5 records).
+- [x] `SHAW-018` — Verify and retrieve data for `shaw_prize-000086` through `shaw_prize-000090` (5 records).
+- [x] `SHAW-019` — Verify and retrieve data for `shaw_prize-000091` through `shaw_prize-000095` (5 records).
+- [x] `SHAW-020` — Verify and retrieve data for `shaw_prize-000096` through `shaw_prize-000100` (5 records).
+- [x] `SHAW-021` — Verify and retrieve data for `shaw_prize-000101` through `shaw_prize-000105` (5 records).
+- [x] `SHAW-022` — Verify and retrieve data for `shaw_prize-000106` through `shaw_prize-000110` (5 records).
+- [x] `SHAW-023` — Verify and retrieve data for `shaw_prize-000111` through `shaw_prize-000115` (5 records).
+- [x] `SHAW-024` — Verify and retrieve data for `shaw_prize-000116` through `shaw_prize-000120` (5 records).
+- [x] `SHAW-025` — Verify and retrieve data for `shaw_prize-000121` through `shaw_prize-000121` (1 record).
 
 ## Turing Award — 81 rows
 
