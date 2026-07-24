@@ -2,8 +2,8 @@
 """enrich.py — fill blank biographical cells in a laureate CSV from Wikidata.
 
 WHAT IT DOES
-    Given one of the award CSVs (the shared 26-column schema), it fills ONLY the
-    empty cells of these fields, and never overwrites an existing value:
+    Given awards.sqlite3, it fills ONLY the empty cells of these fields, and
+    never overwrites an existing value:
 
         source_laureate_id  laureate_type  birth_date  birth_year
         birth_city  birth_country  sex  death_date  death_city  death_country
@@ -47,15 +47,12 @@ THE CONFIRMATION GATE  (this is the whole safety of the tool)
 
 USAGE
     cd datasets
-    uv run python scripts/enrich.py crafoord.csv              # enrich in place
-    uv run python scripts/enrich.py shaw_prize.csv --dry-run  # preview, no write
-    uv run python scripts/enrich.py shaw_prize.csv --db awards.sqlite3
-    uv run python scripts/enrich.py wolf_prize.csv --limit 20 # first 20 targets
+    uv run python scripts/enrich.py --db awards.sqlite3
+    uv run python scripts/enrich.py --db awards.sqlite3 --limit 20
 
-    Resumable: name -> QID resolutions are cached in <file>.enrich-cache.json, so
-    a re-run does not repeat the expensive searches. Requests are sequential and
-    politely backed off, with a contactable User-Agent and maxlag per Wikimedia
-    API etiquette.
+    The legacy CSV interface remains available for read-only reports with
+    --dry-run. Requests are sequential and politely backed off, with a
+    contactable User-Agent and maxlag per Wikimedia API etiquette.
 """
 from __future__ import annotations
 
@@ -108,6 +105,12 @@ WRITE_FIELDS = (
 DATABASE_WRITE_FIELDS = (
     "laureate_wikidata_qid", "laureate_type", "birth_date", "birth_year",
     "birth_city", "birth_country", "sex", "death_date", "death_city", "death_country",
+)
+DATABASE_INPUT_FIELDS = (
+    "award_record_id", "category", "prize", "award_wikidata_qid",
+    "source_laureate_id", "laureate_wikidata_qid", "laureate_type", "full_name",
+    "birth_date", "birth_year", "birth_city", "birth_country", "sex",
+    "death_date", "death_city", "death_country", "biographical_note",
 )
 
 _ENTITY_CACHE: dict[str, dict] = {}   # in-run QID -> entity, avoids refetching
@@ -387,6 +390,9 @@ def write_csv(path: str, header: list[str], rows: list[dict]) -> None:
 
 
 def known_qid(row: dict, cache: dict[str, str]) -> str:
+    database_id = row.get("laureate_wikidata_qid", "").strip()
+    if QID.fullmatch(database_id):
+        return database_id
     source_id = row["source_laureate_id"].strip()
     if QID.fullmatch(source_id):
         return source_id
@@ -400,6 +406,24 @@ def proposed_updates(before: dict, after: dict, qid: str) -> dict[str, str]:
         if field != "source_laureate_id" and after[field] != before[field]:
             updates[field] = after[field]
     return updates
+
+
+def read_database_rows(path: str) -> list[dict[str, str]]:
+    """Read enrichment inputs from SQLite without holding a write transaction."""
+    if not os.path.isfile(path):
+        raise DatabaseUpdateError(f"database not found: {path}")
+
+    columns = ", ".join(f'"{field}"' for field in DATABASE_INPUT_FIELDS)
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        rows = connection.execute(f"SELECT {columns} FROM awards").fetchall()
+        return [
+            {field: row[field] or "" for field in DATABASE_INPUT_FIELDS}
+            for row in rows
+        ]
+    finally:
+        connection.close()
 
 
 def apply_database_updates(path: str, results: list[dict]) -> int:
@@ -450,25 +474,40 @@ def apply_database_updates(path: str, results: list[dict]) -> int:
 # Main.
 # ----------------------------------------------------------------------------
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Enrich a laureate CSV from Wikidata (empty cells only).")
-    ap.add_argument("csv", help="path to the award CSV (run from the datasets/ directory)")
+    ap = argparse.ArgumentParser(description="Enrich laureates from Wikidata (empty cells only).")
+    ap.add_argument("csv", nargs="?", help="legacy CSV input; use only with --dry-run")
     output = ap.add_mutually_exclusive_group()
     output.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
-    output.add_argument("--db", help="apply proposed updates to this SQLite database instead of writing the CSV")
+    output.add_argument("--db", help="read from and apply proposed updates to this SQLite database")
     ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
     ap.add_argument("--delay", type=float, default=2.0, help="seconds to pause before each request")
     args = ap.parse_args(argv)
 
-    with open(args.csv, newline="") as f:
-        reader = csv.DictReader(f)
-        header = reader.fieldnames
-        rows = list(reader)
+    if args.db and args.csv:
+        ap.error("CSV input cannot be combined with --db")
+    if not args.db and not args.csv:
+        ap.error("CSV input is required unless --db is used")
 
-    cache_path = f"{os.path.splitext(args.csv)[0]}.enrich-cache.json"
-    cache: dict[str, str] = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
-
-    award_qids = resolve_award_qids(rows, args.delay)
-    log(f"award anchors: {sorted(award_qids) or 'none (relying on birth_year only)'}")
+    header: list[str] | None = None
+    cache_path = ""
+    cache: dict[str, str] = {}
+    if args.db:
+        try:
+            rows = read_database_rows(args.db)
+        except (DatabaseUpdateError, OSError, sqlite3.Error) as error:
+            log(f"database read: path={args.db} outcome=failed error={error}")
+            return 1
+        award_qids: set[str] = set()
+        log("award anchors: using awards.award_wikidata_qid")
+    else:
+        with open(args.csv, newline="") as f:
+            reader = csv.DictReader(f)
+            header = reader.fieldnames
+            rows = list(reader)
+        cache_path = f"{os.path.splitext(args.csv)[0]}.enrich-cache.json"
+        cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+        award_qids = resolve_award_qids(rows, args.delay)
+        log(f"award anchors: {sorted(award_qids) or 'none (relying on birth_year only)'}")
 
     # Targets: rows not yet enriched, PLUS living individuals to re-check for a
     # newly recorded death (this is the periodic "did someone die" update run).
@@ -495,7 +534,8 @@ def main(argv: list[str] | None = None) -> int:
             verdict = "individual" if Q_HUMAN in set(claim_ids(ent, P_INSTANCE_OF)) else "organization"
             reason = "known QID (recheck)"
         else:
-            qid, ent, verdict, reason = resolve(row, award_qids, args.delay)
+            row_award_qids = {row["award_wikidata_qid"]} if args.db and QID.fullmatch(row["award_wikidata_qid"]) else award_qids
+            qid, ent, verdict, reason = resolve(row, row_award_qids, args.delay)
 
         if not qid:
             stats["abstain"] += 1
@@ -526,17 +566,17 @@ def main(argv: list[str] | None = None) -> int:
         if not args.dry_run and not args.db:
             json.dump(cache, open(cache_path, "w"))  # save resolution progress
 
-    if not args.dry_run and not args.db:
+    if not args.dry_run and not args.db and header is not None:
         write_csv(args.csv, header, rows)
 
     report = {
-        "input_csv": args.csv,
         "dry_run": args.dry_run,
         "target": args.db or "awards.sqlite3",
         "processed": len(targets),
         "summary": stats,
         "results": results,
     }
+    report["input_db" if args.db else "input_csv"] = args.db or args.csv
     exit_code = 0
     if args.db:
         try:

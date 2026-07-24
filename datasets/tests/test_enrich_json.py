@@ -79,23 +79,17 @@ class EnrichJsonTests(unittest.TestCase):
             )
             self.assertNotIn("source_laureate_id", payload["results"][0]["updates"])
 
-    def test_db_mode_applies_report_without_writing_csv(self) -> None:
+    def test_db_mode_reads_and_applies_report_without_csv(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            path = Path(temporary) / "abel_prize.csv"
             database = Path(temporary) / "awards.sqlite3"
-            row = {column: "" for column in import_sqlite.CSV_COLUMNS}
-            row.update({
-                "award_record_id": "abel_prize-000001",
-                "year": "2000",
-                "prize": "Abel Prize",
-                "full_name": "Example Person",
-            })
-            with path.open("w", newline="") as target:
-                writer = csv.DictWriter(target, fieldnames=import_sqlite.CSV_COLUMNS)
-                writer.writeheader()
-                writer.writerow(row)
-            original = path.read_bytes()
-            self.create_database(database, "abel_prize-000001")
+            self.create_database(
+                database,
+                "abel_prize-000001",
+                prize="Abel Prize",
+                award_wikidata_qid="Q188184",
+                source_laureate_id="official-123",
+                full_name="Example Person",
+            )
 
             def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
                 candidate["source_laureate_id"] = qid
@@ -104,12 +98,11 @@ class EnrichJsonTests(unittest.TestCase):
 
             output = io.StringIO()
             with (
-                patch.object(enrich, "resolve_award_qids", return_value={"Q188184"}),
                 patch.object(enrich, "resolve", return_value=("Q42", {"labels": {"en": {"value": "Example Person"}}}, "individual", "award match")),
                 patch.object(enrich, "fill_row", side_effect=fill),
                 contextlib.redirect_stdout(output),
             ):
-                result = enrich.main([str(path), "--db", str(database)])
+                result = enrich.main(["--db", str(database)])
 
             with sqlite3.connect(database) as connection:
                 stored = connection.execute(
@@ -122,8 +115,9 @@ class EnrichJsonTests(unittest.TestCase):
 
             payload = json.loads(output.getvalue())
             self.assertEqual(0, result)
-            self.assertEqual(original, path.read_bytes())
-            self.assertEqual(("Q42", None, "Individual", "1900-01-02"), stored)
+            self.assertEqual(str(database), payload["input_db"])
+            self.assertNotIn("input_csv", payload)
+            self.assertEqual(("Q42", "official-123", "Individual", "1900-01-02"), stored)
             self.assertEqual({"status": "applied", "rows": 1}, payload["database_apply"])
 
     def test_database_updates_preserve_existing_values_and_ignore_disallowed_or_blank_values(self) -> None:
