@@ -11,6 +11,10 @@ WHAT IT DOES
     Affiliation, citizenship, coordinates, motivation and field_language are left
     for other passes (Wikidata gives current employer, not institution-at-award).
 
+    Stdout is one JSON document for data-agent consumption. Progress and retry
+    messages go to stderr. Each confirmed result includes guarded SQLite-ready
+    proposed updates, with the entity QID named laureate_wikidata_qid.
+
 STRATEGY  (the Wikidata-first half of scripts/extract-wikipedia.md)
     - Every value is a structured Wikidata claim. There is no LLM and no prose
       scraping: the program never uses model "memory" and never infers a fact.
@@ -101,6 +105,7 @@ WRITE_FIELDS = (
 )
 
 _ENTITY_CACHE: dict[str, dict] = {}   # in-run QID -> entity, avoids refetching
+QID = re.compile(r"Q[1-9][0-9]*")
 
 
 def log(msg: str) -> None:
@@ -371,16 +376,32 @@ def write_csv(path: str, header: list[str], rows: list[dict]) -> None:
     os.replace(tmp, path)
 
 
+def known_qid(row: dict, cache: dict[str, str]) -> str:
+    source_id = row["source_laureate_id"].strip()
+    if QID.fullmatch(source_id):
+        return source_id
+    cached = cache.get(row["full_name"], "").strip()
+    return cached if QID.fullmatch(cached) else ""
+
+
+def proposed_updates(before: dict, after: dict, qid: str) -> dict[str, str]:
+    updates = {"laureate_wikidata_qid": qid}
+    for field in WRITE_FIELDS:
+        if field != "source_laureate_id" and after[field] != before[field]:
+            updates[field] = after[field]
+    return updates
+
+
 # ----------------------------------------------------------------------------
 # Main.
 # ----------------------------------------------------------------------------
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Enrich a laureate CSV from Wikidata (empty cells only).")
     ap.add_argument("csv", help="path to the award CSV (run from the datasets/ directory)")
     ap.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
     ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
     ap.add_argument("--delay", type=float, default=2.0, help="seconds to pause before each request")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     with open(args.csv, newline="") as f:
         reader = csv.DictReader(f)
@@ -396,7 +417,7 @@ def main() -> int:
     # Targets: rows not yet enriched, PLUS living individuals to re-check for a
     # newly recorded death (this is the periodic "did someone die" update run).
     def needs_work(r: dict) -> bool:
-        if not r["source_laureate_id"].strip():   # never identified
+        if not known_qid(r, cache):                # never identified
             return True
         if not r["laureate_type"].strip():         # identified but type not set yet
             return True
@@ -408,10 +429,10 @@ def main() -> int:
     log(f"targets: {len(targets)} of {len(rows)} rows")
 
     stats = {"individual": 0, "organization": 0, "abstain": 0}
-    issues: list[str] = []
+    results: list[dict] = []
     for i, row in enumerate(targets, 1):
         name = row["full_name"]
-        known = row["source_laureate_id"].strip() or cache.get(name, "")
+        known = known_qid(row, cache)
         if known:                                 # already identified -> reuse, just fill gaps
             qid = known
             ent = get_entity(qid, args.delay)
@@ -422,13 +443,29 @@ def main() -> int:
 
         if not qid:
             stats["abstain"] += 1
-            issues.append(f"ABSTAIN  {name}: {reason}")
+            results.append({
+                "award_record_id": row["award_record_id"],
+                "full_name": name,
+                "status": "abstained",
+                "reason": reason,
+                "updates": {},
+            })
             log(f"[{i}/{len(targets)}] {name} -> abstain ({reason})")
             continue
 
+        before = row.copy()
         fill_row(row, qid, ent, verdict, args.delay)
         cache[name] = qid
         stats[verdict] += 1
+        results.append({
+            "award_record_id": row["award_record_id"],
+            "full_name": name,
+            "status": "confirmed",
+            "reason": reason,
+            "entity_label": label(ent),
+            "wikidata_url": f"https://www.wikidata.org/wiki/{qid}",
+            "updates": proposed_updates(before, row, qid),
+        })
         log(f"[{i}/{len(targets)}] {name} -> {qid} {verdict} ({reason})")
         if not args.dry_run:
             json.dump(cache, open(cache_path, "w"))  # save resolution progress
@@ -436,13 +473,15 @@ def main() -> int:
     if not args.dry_run:
         write_csv(args.csv, header, rows)
 
-    print(f"\n{'DRY RUN — ' if args.dry_run else ''}{args.csv}: "
-          f"{stats['individual']} individuals, {stats['organization']} organisations, "
-          f"{stats['abstain']} abstained (left blank).")
-    if issues:
-        print(f"\nunconfirmed ({len(issues)}) — review these names:")
-        for line in issues:
-            print(f"  {line}")
+    json.dump({
+        "input_csv": args.csv,
+        "dry_run": args.dry_run,
+        "target": "awards.sqlite3",
+        "processed": len(targets),
+        "summary": stats,
+        "results": results,
+    }, sys.stdout, ensure_ascii=False, indent=2)
+    print()
     return 0
 
 
