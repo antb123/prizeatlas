@@ -49,6 +49,7 @@ USAGE
     cd datasets
     uv run python scripts/enrich.py crafoord.csv              # enrich in place
     uv run python scripts/enrich.py shaw_prize.csv --dry-run  # preview, no write
+    uv run python scripts/enrich.py shaw_prize.csv --db awards.sqlite3
     uv run python scripts/enrich.py wolf_prize.csv --limit 20 # first 20 targets
 
     Resumable: name -> QID resolutions are cached in <file>.enrich-cache.json, so
@@ -64,6 +65,7 @@ import json
 import os
 import random
 import re
+import sqlite3
 import sys
 import time
 import urllib.error
@@ -103,9 +105,17 @@ WRITE_FIELDS = (
     "source_laureate_id", "laureate_type", "birth_date", "birth_year",
     "birth_city", "birth_country", "sex", "death_date", "death_city", "death_country",
 )
+DATABASE_WRITE_FIELDS = (
+    "laureate_wikidata_qid", "laureate_type", "birth_date", "birth_year",
+    "birth_city", "birth_country", "sex", "death_date", "death_city", "death_country",
+)
 
 _ENTITY_CACHE: dict[str, dict] = {}   # in-run QID -> entity, avoids refetching
 QID = re.compile(r"Q[1-9][0-9]*")
+
+
+class DatabaseUpdateError(Exception):
+    """Proposed updates cannot be applied without violating the database contract."""
 
 
 def log(msg: str) -> None:
@@ -392,13 +402,59 @@ def proposed_updates(before: dict, after: dict, qid: str) -> dict[str, str]:
     return updates
 
 
+def apply_database_updates(path: str, results: list[dict]) -> int:
+    """Apply nonblank allowlisted result updates atomically."""
+    if not os.path.isfile(path):
+        raise DatabaseUpdateError(f"database not found: {path}")
+
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute("BEGIN")
+        applied = 0
+        for result in results:
+            record_id = result.get("award_record_id")
+            if not isinstance(record_id, str) or not record_id:
+                raise DatabaseUpdateError(f"invalid award_record_id: {record_id!r}")
+            if connection.execute("SELECT 1 FROM awards WHERE award_record_id = ?", (record_id,)).fetchone() is None:
+                raise DatabaseUpdateError(f"award_record_id not found: {record_id}")
+
+            proposed = result.get("updates", {})
+            updates = [
+                (field, proposed[field])
+                for field in DATABASE_WRITE_FIELDS
+                if isinstance(proposed.get(field), str) and proposed[field].strip()
+            ]
+            if not updates:
+                continue
+
+            assignments = [
+                f'"{field}" = ?' if field == "laureate_wikidata_qid" else f'"{field}" = COALESCE(NULLIF("{field}", \'\'), ?)'
+                for field, _ in updates
+            ]
+            values = [value for _, value in updates]
+            connection.execute(
+                f"UPDATE awards SET {', '.join(assignments)} WHERE award_record_id = ?",
+                (*values, record_id),
+            )
+            applied += 1
+        connection.commit()
+        return applied
+    except BaseException:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+
 # ----------------------------------------------------------------------------
 # Main.
 # ----------------------------------------------------------------------------
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Enrich a laureate CSV from Wikidata (empty cells only).")
     ap.add_argument("csv", help="path to the award CSV (run from the datasets/ directory)")
-    ap.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
+    output = ap.add_mutually_exclusive_group()
+    output.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
+    output.add_argument("--db", help="apply proposed updates to this SQLite database instead of writing the CSV")
     ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
     ap.add_argument("--delay", type=float, default=2.0, help="seconds to pause before each request")
     args = ap.parse_args(argv)
@@ -467,22 +523,34 @@ def main(argv: list[str] | None = None) -> int:
             "updates": proposed_updates(before, row, qid),
         })
         log(f"[{i}/{len(targets)}] {name} -> {qid} {verdict} ({reason})")
-        if not args.dry_run:
+        if not args.dry_run and not args.db:
             json.dump(cache, open(cache_path, "w"))  # save resolution progress
 
-    if not args.dry_run:
+    if not args.dry_run and not args.db:
         write_csv(args.csv, header, rows)
 
-    json.dump({
+    report = {
         "input_csv": args.csv,
         "dry_run": args.dry_run,
-        "target": "awards.sqlite3",
+        "target": args.db or "awards.sqlite3",
         "processed": len(targets),
         "summary": stats,
         "results": results,
-    }, sys.stdout, ensure_ascii=False, indent=2)
+    }
+    exit_code = 0
+    if args.db:
+        try:
+            applied = apply_database_updates(args.db, results)
+            report["database_apply"] = {"status": "applied", "rows": applied}
+            log(f"database apply: path={args.db} rows={applied} outcome=applied")
+        except (DatabaseUpdateError, OSError, sqlite3.Error) as error:
+            report["database_apply"] = {"status": "rolled_back", "rows": 0}
+            log(f"database apply: path={args.db} outcome=rolled_back error={error}")
+            exit_code = 1
+
+    json.dump(report, sys.stdout, ensure_ascii=False, indent=2)
     print()
-    return 0
+    return exit_code
 
 
 if __name__ == "__main__":

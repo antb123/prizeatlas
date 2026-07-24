@@ -82,7 +82,11 @@ Safe preview:
 
 `uv run scripts/enrich.py crafoord.csv --dry-run --limit 5`
 
-- Always use `--dry-run` for verification/retrieval work under the current SQLite workflow.
+Apply the same report updates after review:
+
+`uv run scripts/enrich.py crafoord.csv --db awards.sqlite3`
+
+- Use `--dry-run` for verification/retrieval and `--db awards.sqlite3` to apply updates under the current SQLite workflow.
 - Stdout is one JSON document for the agent. Progress messages are written separately to
   stderr.
 - Each confirmed result contains the exact `award_record_id`, match reason, Wikidata source
@@ -97,10 +101,8 @@ Safe preview:
 - The tool abstains when it cannot confirm identity and reports conflicts instead of
   guessing.
 - Name-to-QID resolutions are cached in `<dataset>.enrich-cache.json`.
-- Without `--dry-run`, it rewrites the CSV and cache. Data agents must not use write mode.
-- The current tool writes a Wikidata QID into CSV `source_laureate_id`; the SQLite schema
-  instead reserves `source_laureate_id` for the award source and stores the entity QID in
-  `laureate_wikidata_qid`. Do not use write mode until the tool is adapted to SQLite.
+- `--db` leaves the CSV and cache unchanged, validates every report record ID, and applies all allowed nonblank updates in one transaction.
+- Without `--dry-run` or `--db`, the legacy mode rewrites the CSV and cache and writes a Wikidata QID into CSV `source_laureate_id`. Data agents must not use that mode.
 - It intentionally does not retrieve affiliations, citizenship, coordinates, motivations,
   or field/language values.
 
