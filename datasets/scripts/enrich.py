@@ -51,6 +51,7 @@ USAGE
     uv run python scripts/enrich.py --db awards.sqlite3 --limit 20
     uv run python scripts/enrich.py --db awards.sqlite3 --offset 5 --limit 5
     uv run python scripts/enrich.py --db awards.sqlite3 --record-id abel_prize-000001
+    uv run python scripts/enrich.py --db awards.sqlite3 --all
 
     The legacy CSV interface remains available for read-only reports with
     --dry-run. Requests are sequential and politely backed off, with a
@@ -481,9 +482,10 @@ def main(argv: list[str] | None = None) -> int:
     output = ap.add_mutually_exclusive_group()
     output.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
     output.add_argument("--db", help="read from and apply proposed updates to this SQLite database")
-    ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
+    ap.add_argument("--limit", type=int, default=0, help="process at most N target rows")
     ap.add_argument("--offset", type=int, default=0, help="skip the first N target rows")
     ap.add_argument("--record-id", action="append", default=[], help="process this exact award_record_id (repeatable)")
+    ap.add_argument("--all", action="store_true", help="explicitly process every target row")
     ap.add_argument("--delay", type=float, default=0.1, help="seconds to pause before each request")
     args = ap.parse_args(argv)
 
@@ -493,8 +495,14 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("CSV input is required unless --db is used")
     if args.offset < 0:
         ap.error("--offset cannot be negative")
+    if args.offset and not args.limit:
+        ap.error("--offset requires --limit")
     if args.record_id and (args.offset or args.limit):
         ap.error("--record-id cannot be combined with --offset or --limit")
+    if args.all and (args.record_id or args.offset or args.limit):
+        ap.error("--all cannot be combined with --record-id, --offset, or --limit")
+    if args.db and not (args.record_id or args.limit or args.all):
+        ap.error("--db requires --record-id, --limit, or explicit --all")
 
     header: list[str] | None = None
     cache_path = ""

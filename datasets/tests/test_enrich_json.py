@@ -102,7 +102,7 @@ class EnrichJsonTests(unittest.TestCase):
                 patch.object(enrich, "fill_row", side_effect=fill),
                 contextlib.redirect_stdout(output),
             ):
-                result = enrich.main(["--db", str(database)])
+                result = enrich.main(["--db", str(database), "--record-id", "abel_prize-000001"])
 
             with sqlite3.connect(database) as connection:
                 stored = connection.execute(
@@ -119,6 +119,21 @@ class EnrichJsonTests(unittest.TestCase):
             self.assertNotIn("input_csv", payload)
             self.assertEqual(("Q42", "official-123", "Individual", "1900-01-02"), stored)
             self.assertEqual({"status": "applied", "rows": 1}, payload["database_apply"])
+
+    def test_db_mode_requires_explicit_selection(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            database = Path(temporary) / "awards.sqlite3"
+            self.create_database(database, "abel_prize-000001")
+
+            with (
+                patch.object(enrich, "read_database_rows") as read_database_rows,
+                contextlib.redirect_stderr(io.StringIO()),
+                self.assertRaises(SystemExit) as raised,
+            ):
+                enrich.main(["--db", str(database)])
+
+            self.assertEqual(2, raised.exception.code)
+            read_database_rows.assert_not_called()
 
     def test_db_mode_selects_exact_record_id(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
