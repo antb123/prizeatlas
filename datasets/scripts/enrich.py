@@ -480,7 +480,7 @@ def main(argv: list[str] | None = None) -> int:
     output.add_argument("--dry-run", action="store_true", help="report only; do not write the CSV")
     output.add_argument("--db", help="read from and apply proposed updates to this SQLite database")
     ap.add_argument("--limit", type=int, default=0, help="process at most N target rows (0 = all)")
-    ap.add_argument("--delay", type=float, default=2.0, help="seconds to pause before each request")
+    ap.add_argument("--delay", type=float, default=0.1, help="seconds to pause before each request")
     args = ap.parse_args(argv)
 
     if args.db and args.csv:
