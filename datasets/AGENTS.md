@@ -21,16 +21,28 @@ places - use todays name, country, location
 - do not infer `prize_share` or death details for the living.
 - Organizations carry no birth/sex/death data.
 
-main award files:
+main award files (source url under each — read it instead of searching):
 - abel_prize.csv
+  https://abelprize.no
 - breakthrough.csv
+  https://breakthroughprize.org
 - crafoord.csv
+  https://www.crafoordprize.se
 - fields.csv
+  https://www.mathunion.org/imu-awards/fields-medal
 - japan_prize.csv
+  https://www.japanprize.jp/en/
 - kyoto_prize.csv
+  https://www.kyotoprize.org/en/
 - lasker_awards.csv
+  https://laskerfoundation.org
 - max_planck_medal.csv
+  https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille
 - nobel.csv
+  https://www.nobelprize.org
 - shaw_prize.csv
+  https://www.shawprize.org
 - turing_award.csv
+  https://amturing.acm.org
 - wolf_prize.csv
+  https://wolffund.org.il
