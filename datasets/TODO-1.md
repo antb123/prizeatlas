@@ -137,20 +137,20 @@ Target: `awards.sqlite3`; source snapshot: `fields.csv` (read-only).
 
 Retrieve source IDs, separate affiliation cities from institution text where supported, verify whether category and motivation are inapplicable, and add verified coordinates. One malformed nonblank affiliation value is handled by QC-FIELDS-001.
 
-- [ ] `FIELDS-001` — Verify and retrieve data for `fields-000001` through `fields-000005` (5 records).
-- [ ] `FIELDS-002` — Verify and retrieve data for `fields-000006` through `fields-000010` (5 records).
-- [ ] `FIELDS-003` — Verify and retrieve data for `fields-000011` through `fields-000015` (5 records).
-- [ ] `FIELDS-004` — Verify and retrieve data for `fields-000016` through `fields-000020` (5 records).
-- [ ] `FIELDS-005` — Verify and retrieve data for `fields-000021` through `fields-000025` (5 records).
-- [ ] `FIELDS-006` — Verify and retrieve data for `fields-000026` through `fields-000030` (5 records).
-- [ ] `FIELDS-007` — Verify and retrieve data for `fields-000031` through `fields-000035` (5 records).
-- [ ] `FIELDS-008` — Verify and retrieve data for `fields-000036` through `fields-000040` (5 records).
-- [ ] `FIELDS-009` — Verify and retrieve data for `fields-000041` through `fields-000045` (5 records).
-- [ ] `FIELDS-010` — Verify and retrieve data for `fields-000046` through `fields-000050` (5 records).
-- [ ] `FIELDS-011` — Verify and retrieve data for `fields-000051` through `fields-000055` (5 records).
-- [ ] `FIELDS-012` — Verify and retrieve data for `fields-000056` through `fields-000060` (5 records).
-- [ ] `FIELDS-013` — Verify and retrieve data for `fields-000061` through `fields-000065` (5 records).
-- [ ] `FIELDS-014` — Verify and retrieve data for `fields-000066` through `fields-000068` (3 records).
+- [x] `FIELDS-001` — Verify and retrieve data for `fields-000001` through `fields-000005` (5 records).
+- [x] `FIELDS-002` — Verify and retrieve data for `fields-000006` through `fields-000010` (5 records).
+- [x] `FIELDS-003` — Verify and retrieve data for `fields-000011` through `fields-000015` (5 records).
+- [x] `FIELDS-004` — Verify and retrieve data for `fields-000016` through `fields-000020` (5 records).
+- [x] `FIELDS-005` — Verify and retrieve data for `fields-000021` through `fields-000025` (5 records).
+- [x] `FIELDS-006` — Verify and retrieve data for `fields-000026` through `fields-000030` (5 records).
+- [x] `FIELDS-007` — Verify and retrieve data for `fields-000031` through `fields-000035` (5 records).
+- [x] `FIELDS-008` — Verify and retrieve data for `fields-000036` through `fields-000040` (5 records).
+- [x] `FIELDS-009` — Verify and retrieve data for `fields-000041` through `fields-000045` (5 records).
+- [x] `FIELDS-010` — Verify and retrieve data for `fields-000046` through `fields-000050` (5 records).
+- [x] `FIELDS-011` — Verify and retrieve data for `fields-000051` through `fields-000055` (5 records).
+- [x] `FIELDS-012` — Verify and retrieve data for `fields-000056` through `fields-000060` (5 records).
+- [x] `FIELDS-013` — Verify and retrieve data for `fields-000061` through `fields-000065` (5 records).
+- [x] `FIELDS-014` — Verify and retrieve data for `fields-000066` through `fields-000068` (3 records).
 
 ## Canada Gairdner International Award — 387 rows
 
