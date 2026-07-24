@@ -90,6 +90,10 @@ Read from and apply updates to the migrated database:
 - Select exact rows with repeatable `--record-id <award_record_id>`, or select a target range with `--offset N --limit N`.
 - Dataset tasks MUST pass every assigned `award_record_id` with repeatable `--record-id`; do not derive task ranges with `--limit` or `--offset` because living-person rechecks change target positions.
 - A database run without a selector is rejected. `--all` is the explicit whole-database mode and MUST NOT be used for a bounded dataset task.
+- Repeat `--record-id` once per assigned row:
+
+  `uv run scripts/enrich.py --db awards.sqlite3 --record-id abel_prize-000006 --record-id abel_prize-000007`
+
 - Stdout is one JSON document for the agent. Progress messages are written separately to
   stderr.
 - Each confirmed result contains the exact `award_record_id`, match reason, Wikidata source

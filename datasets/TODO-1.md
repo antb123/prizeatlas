@@ -33,6 +33,26 @@ Every dataset task below uses this contract:
 
 Research tasks MAY run in parallel, including within one dataset, because record ranges do not overlap. SQLite writes MUST use short transactions; an agent MUST finish source research before acquiring the write lock.
 
+## Running a bounded dataset task
+
+Use the exact `award_record_id` values named by the task. Pass each one separately with
+`--record-id`; the command validates that every requested row exists before research or writes:
+
+```bash
+uv run scripts/enrich.py --db awards.sqlite3 \
+  --record-id abel_prize-000006 \
+  --record-id abel_prize-000007 \
+  --record-id abel_prize-000008 \
+  --record-id abel_prize-000009 \
+  --record-id abel_prize-000010
+```
+
+Do not use `--limit` or `--offset` to derive a TODO range. The target list includes living
+Individuals for death-status rechecks, so target positions are not consecutive
+`award_record_id` values and can change after enrichment. A database run without a selector is
+rejected. `--all` is the explicit whole-database mode and MUST NOT be used for any bounded task
+in this file.
+
 ## Abel Prize — 29 rows
 
 Target: `awards.sqlite3`; source snapshot: `abel_prize.csv` (read-only).
@@ -43,7 +63,7 @@ formal categories: keep `category`, `field_language`, and `biographical_note` bl
 death status without filling living recipients. Birth and affiliation coordinates are already
 populated.
 
-- [ ] `ABEL-001` — Verify and retrieve data for `abel_prize-000001` through `abel_prize-000005` (5 records).
+- [x] `ABEL-001` — Verify and retrieve data for `abel_prize-000001` through `abel_prize-000005` (5 records).
 - [ ] `ABEL-002` — Verify and retrieve data for `abel_prize-000006` through `abel_prize-000010` (5 records).
 - [ ] `ABEL-003` — Verify and retrieve data for `abel_prize-000011` through `abel_prize-000015` (5 records).
 - [ ] `ABEL-004` — Verify and retrieve data for `abel_prize-000016` through `abel_prize-000020` (5 records).
