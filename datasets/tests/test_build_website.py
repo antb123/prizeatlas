@@ -192,15 +192,53 @@ class WebsiteBuildTests(unittest.TestCase):
             mode = stat.S_IMODE(path.stat().st_mode)
             self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)
 
-        generated = {path.resolve() for path in (self.website / "dist").rglob("*") if path.is_file()}
-        for html_path in (self.website / "dist").rglob("*.html"):
+        dist = self.website / "dist"
+        generated = {path.resolve() for path in dist.rglob("*") if path.is_file()}
+        for html_path in dist.rglob("*.html"):
             document = html_path.read_text()
             for href in re.findall(r'href="([^"]+)"', document):
                 if urlsplit(href).scheme:
                     continue
-                resolved = (html_path.parent / href).resolve()
+                if href.startswith("/"):
+                    # Only the error page links absolutely; its links carry the deployment path prefix.
+                    self.assertTrue(href.startswith("/awards/"), f"{html_path}: {href}")
+                    resolved = (dist / href[len("/awards/") :]).resolve()
+                else:
+                    resolved = (html_path.parent / href).resolve()
                 target = resolved / "index.html" if href.endswith("/") else resolved
                 self.assertIn(target, generated, f"{html_path}: {href}")
+
+    def test_error_page_and_robots_serve_from_the_deployment_root(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "record-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Example Winner",
+            }
+        ]
+        database = self.create_database(rankings, records)
+
+        plan = build.build_site(database, "https://example.org/awards/", self.website)
+
+        robots = (self.website / "dist/robots.txt").read_text()
+        self.assertIn("Sitemap: https://example.org/awards/sitemap.xml", robots)
+
+        error_html = (self.website / "dist/404.html").read_text()
+        self.assertIn("<title>Page not found</title>", error_html)
+        self.assertIn('<meta name="robots" content="noindex">', error_html)
+        self.assertIn('href="/awards/static/style.css"', error_html)
+        self.assertIn('href="/awards/favicon.svg"', error_html)
+        self.assertIn('href="/awards/"', error_html)
+        self.assertNotIn("<link rel=\"canonical\"", error_html)
+
+        # The error page is not a route: it must stay out of the sitemap and the page counts.
+        root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
+        locations = [element.text for element in root.findall(".//{*}loc")]
+        self.assertEqual(len(plan.jobs), len(locations))
+        self.assertNotIn("https://example.org/awards/404.html", locations)
 
     def test_latest_thirty_prefixes_and_same_prefix_labels(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

@@ -32,7 +32,7 @@ SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 YEAR_PREFIX = re.compile(r"([0-9]{4})")
 SITEMAP_URL_LIMIT = 50_000
 SITEMAP_BYTE_LIMIT = 52_428_800
-TEMPLATES = ("base.html", "index.html", "prize.html", "category.html", "year.html", "winner.html")
+TEMPLATES = ("base.html", "index.html", "prize.html", "category.html", "year.html", "winner.html", "404.html")
 FACT_FIELDS = (
     ("Type", "laureate_type"),
     ("Born", "birth_date"),
@@ -584,6 +584,11 @@ def write_sitemaps(
     return len(locations)
 
 
+def write_robots(output: Path, base_url: str) -> None:
+    body = f"User-agent: *\nAllow: /\n\nSitemap: {public_url(base_url, '/sitemap.xml')}\n"
+    (output / "robots.txt").write_text(body, encoding="utf-8")
+
+
 def _environment(website_dir: Path) -> Environment:
     environment = Environment(
         loader=FileSystemLoader(website_dir / "templates"),
@@ -612,6 +617,26 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
     )
     (target_directory / "index.html").write_text(html, encoding="utf-8")
     return job.route
+
+
+def render_error_page(environment: Environment, output: Path, base_url: str) -> None:
+    """Render /404.html.
+
+    Every other page links relatively, which the server resolves against the file's own directory. The error page is
+    served for arbitrary request URLs, so its links must be absolute from the deployment root instead.
+    """
+    root = urlsplit(base_url).path
+    html = environment.get_template("404.html").render(
+        title="Page not found",
+        description="This page does not exist. Browse the ranked awards and their recipients instead.",
+        canonical="",
+        breadcrumbs=(),
+        home_href=root,
+        favicon_href=root + "favicon.svg",
+        style_href=root + "static/style.css",
+        href=lambda target: root + target.lstrip("/"),
+    )
+    (output / "404.html").write_text(html, encoding="utf-8")
 
 
 def _make_world_readable(root: Path) -> None:
@@ -659,6 +684,8 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
             )
             list(rendered)
         write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
+        write_robots(staging, normalized_base_url)
+        render_error_page(environment, staging, normalized_base_url)
         _make_world_readable(staging)
         _promote(staging, dist)
     finally:
