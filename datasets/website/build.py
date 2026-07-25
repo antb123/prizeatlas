@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import posixpath
 import re
 import shutil
@@ -46,6 +47,7 @@ TEMPLATES = (
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 PRIZE_PAGE_YEARS = 30
+DESCRIPTION_LIMIT = 160
 FACT_FIELDS = (
     ("Type", "laureate_type"),
     ("Born", "birth_date"),
@@ -287,6 +289,74 @@ def _page(
     return PageJob(template, route, title, description, tuple(breadcrumbs), context)
 
 
+def _clamp(text: str, limit: int = DESCRIPTION_LIMIT) -> str:
+    """Collapse whitespace and cut on a word boundary, so a description reads as a sentence in a result list."""
+    collapsed = " ".join(text.split())
+    if len(collapsed) <= limit:
+        return collapsed
+    return collapsed[: limit - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+
+
+def _names(values: list[str], limit: int = 3) -> str:
+    if len(values) > limit:
+        return f"{', '.join(values[:limit])} and {len(values) - limit} more"
+    if len(values) > 1:
+        return f"{', '.join(values[:-1])} and {values[-1]}"
+    return values[0] if values else ""
+
+
+def _year_span(years: list[str]) -> str:
+    prefixes = sorted({year[:4] for year in years if year})
+    if not prefixes:
+        return ""
+    return prefixes[0] if prefixes[0] == prefixes[-1] else f"{prefixes[0]}-{prefixes[-1]}"
+
+
+def _laureate_schema(record: AwardRecord, url: str) -> dict[str, Any]:
+    """schema.org markup for one recipient, carrying only the fields the record actually holds."""
+    payload: dict[str, Any] = {
+        "@type": "Organization" if record.laureate_type == "Organization" else "Person",
+        "name": record.full_name,
+        "url": url,
+    }
+    if _nonblank(record.laureate_wikidata_qid):
+        payload["sameAs"] = f"https://www.wikidata.org/wiki/{record.laureate_wikidata_qid}"
+    if _nonblank(record.birth_date):
+        payload["birthDate"] = record.birth_date
+    if birth_place := ", ".join(value for value in (record.birth_city, record.birth_country) if _nonblank(value)):
+        payload["birthPlace"] = {"@type": "Place", "name": birth_place}
+    if _nonblank(record.death_date):
+        payload["deathDate"] = record.death_date
+    if _nonblank(record.affiliation_name):
+        payload["affiliation"] = {"@type": "Organization", "name": record.affiliation_name}
+    return payload
+
+
+def _structured_data(base_url: str, job: PageJob) -> str:
+    graph: list[dict[str, Any]] = []
+    if job.breadcrumbs:
+        graph.append(
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": position,
+                        "name": crumb.label,
+                        **({"item": public_url(base_url, crumb.route)} if crumb.route else {}),
+                    }
+                    for position, crumb in enumerate(job.breadcrumbs, start=1)
+                ],
+            }
+        )
+    if schema := job.context.get("schema"):
+        graph.append(schema)
+    if not graph:
+        return ""
+    # Escaping "<" keeps a "</script>" inside any field from closing the block early; it stays valid JSON.
+    return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False).replace("<", "\\u003c")
+
+
 def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]:
     """Collapse recipients who share one citation into a single group.
 
@@ -477,12 +547,17 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 category_years.sort(key=lambda item: item[0], reverse=True)
                 category_years.sort(key=lambda item: item[2], reverse=True)
                 title = f"{ranking.prize_name} for {category}: Winners by Year"
+                category_records = [record for record in prize_records if record.category == category]
+                category_span = _year_span([record.year for record in category_records])
                 jobs.append(
                     _page(
                         "category.html",
                         category_route,
                         title,
-                        f"Explore {ranking.prize_name} for {category} winners by year.",
+                        _clamp(
+                            f"All {len(category_records)} {ranking.prize_name} laureates in {category}, {category_span}, "
+                            f"with the citation for each award year."
+                        ),
                         (
                             Breadcrumb("Home", "/"),
                             Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
@@ -545,7 +620,10 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 "prize.html",
                 prize_routes[ranking.qid],
                 prize_title,
-                f"Explore {ranking.prize_name} winners, categories, years, and award information.",
+                _clamp(
+                    f"All {len(prize_records)} {ranking.prize_name} laureates, {_year_span([record.year for record in prize_records])}. "
+                    f"{ranking.blurb}"
+                ),
                 (Breadcrumb("Home", "/"), Breadcrumb(ranking.prize_name, None)),
                 prize=ranking,
                 routed_categories=routed_categories,
@@ -559,17 +637,20 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         for (routed_category, year), grouped_records in year_records.items():
             route = year_routes[(routed_category, year)]
             display_category = next((record.category for record in grouped_records if _nonblank(record.category)), "")
+            ordered_group = sorted(grouped_records, key=lambda record: record.award_record_id)
+            roll_call = _names([record.full_name for record in ordered_group])
+            # The award leads, then the recipients: a long recipient name must not push the year page's description
+            # into looking identical to the winner page's, which leads with the name.
             if display_category:
                 title = f"{ranking.prize_name} for {display_category} {year}: Winners"
-                description = f"Meet the {ranking.prize_name} for {display_category} winners in {year}."
+                description = _clamp(f"{ranking.prize_name} for {display_category}, {year}: awarded to {roll_call}.")
             else:
                 title = f"{ranking.prize_name} {year}: Winners"
-                description = f"Meet the {ranking.prize_name} winners in {year}."
+                description = _clamp(f"{ranking.prize_name}, {year}: awarded to {roll_call}.")
             crumbs = [Breadcrumb("Home", "/"), Breadcrumb(ranking.prize_name, prize_routes[ranking.qid])]
             if routed_category is not None:
                 crumbs.append(Breadcrumb(routed_category, prize_routes[ranking.qid] + f"{category_slugs[routed_category]}/"))
             crumbs.append(Breadcrumb(year, None))
-            ordered_group = sorted(grouped_records, key=lambda record: record.award_record_id)
             jobs.append(
                 _page(
                     "year.html",
@@ -588,14 +669,13 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             year_page_count += 1
 
             for record in ordered_group:
-                if _nonblank(record.category):
-                    winner_title = f"{ranking.prize_name} for {record.category} {record.year} — {record.full_name}"
-                    winner_description = (
-                        f"{record.full_name}, winner of the {ranking.prize_name} for {record.category} in {record.year}."
-                    )
-                else:
-                    winner_title = f"{ranking.prize_name} {record.year} — {record.full_name}"
-                    winner_description = f"{record.full_name}, winner of the {ranking.prize_name} in {record.year}."
+                # Name first: people search for the person, not the prize, and the name survives SERP truncation.
+                award_label = f"{ranking.prize_name} for {record.category}" if _nonblank(record.category) else ranking.prize_name
+                winner_title = f"{record.full_name} — {award_label}, {record.year}"
+                detail = record.motivation if _nonblank(record.motivation) else ""
+                if _nonblank(record.affiliation_name):
+                    detail = f"{detail} At the time: {record.affiliation_name}." if detail else f"At the time: {record.affiliation_name}."
+                winner_description = _clamp(f"{record.full_name} won the {award_label} in {record.year}. {detail}".strip())
                 winner_crumbs = [
                     Breadcrumb("Home", "/"),
                     Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
@@ -627,6 +707,10 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                             if other.award_record_id != record.award_record_id
                         ),
                         person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
+                        schema={
+                            **_laureate_schema(record, public_url(base_url, all_record_routes[record.award_record_id])),
+                            "award": f"{award_label}, {record.year}",
+                        },
                         wikipedia_url=wikipedia_search_url(record.full_name),
                     )
                 )
@@ -634,14 +718,24 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
 
     people = plan_people(records, routes_by_laureate, all_record_routes)
     for person in people:
+        prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
+        span = _year_span([record.year for record, _ in person.awards])
+        latest = person.awards[-1][0]
         jobs.append(
             _page(
                 "person.html",
                 person.route,
                 f"{person.name}: awards and recognition",
-                f"Every recorded award won by {person.name}, with the year, category, and citation for each.",
+                _clamp(
+                    f"{person.name} won {len(person.awards)} recorded {'award' if len(person.awards) == 1 else 'awards'} "
+                    f"({span}): {_names(prizes, limit=4)}."
+                ),
                 (Breadcrumb("Home", "/"), Breadcrumb("People", PEOPLE_ROUTE), Breadcrumb(person.name, None)),
                 person=person,
+                schema={
+                    **_laureate_schema(latest, public_url(base_url, person.route)),
+                    "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
+                },
             )
         )
 
@@ -766,6 +860,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
         people_route=PEOPLE_ROUTE,
+        structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
         **job.context,
     )
@@ -789,6 +884,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
         people_route=PEOPLE_ROUTE,
+        structured_data="",
         href=lambda target: root + target.lstrip("/"),
     )
     (output / "404.html").write_text(html, encoding="utf-8")

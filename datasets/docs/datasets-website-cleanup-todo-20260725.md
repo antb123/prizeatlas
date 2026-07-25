@@ -133,11 +133,21 @@ Steps → verify:
 4. Set a `--score` custom property on `index.html` line 20 and add a bar to `.score` → 100 and 60 are visually
    distinguishable, the numeral stays readable, and mobile at 390px does not overflow.
 
-## CLEAN-4 — Metadata and crawl
+## CLEAN-4 — Metadata and crawl — DONE 20260725
 
 ID: `CLEAN-4` — Real descriptions, name-first titles, social cards, structured data, robots, 404. Spec §2.1-§2.5.
 
 Depends-on: none
+
+Outcome: all 7,238 descriptions and all 7,238 titles are unique; 7,236 JSON-LD blocks, all valid; no description
+exceeds 200 characters.
+
+Year-page descriptions lead with the award and then the recipients, rather than the reverse. One Breakthrough Prize
+record carries a 200-character "name" (the LIGO author list); leading with the name made its year page and its winner
+page truncate to the same 160 characters. Leading with the award keeps the two distinct whatever the name length.
+
+Winner page `h1` is now the laureate's name alone — the prize, category, and year moved to the eyebrow, which the
+name-first `<title>` had otherwise duplicated.
 
 Files:
 

@@ -6,8 +6,15 @@
   <title>{{ title }}</title>
   <meta name="description" content="{{ description }}">
   {% if canonical %}<link rel="canonical" href="{{ canonical }}">{% endif %}
+  <meta property="og:site_name" content="Awards">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  {% if canonical %}<meta property="og:url" content="{{ canonical }}">{% endif %}
+  <meta name="twitter:card" content="summary">
   <link rel="icon" href="{{ favicon_href }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ style_href }}">
+  {% if structured_data %}<script type="application/ld+json">{{ structured_data|safe }}</script>{% endif %}
   {% block head %}{% endblock %}
 </head>
 <body>

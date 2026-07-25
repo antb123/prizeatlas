@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import sqlite3
@@ -158,7 +159,7 @@ class WebsiteBuildTests(unittest.TestCase):
         )
 
         physics_html = physics.read_text()
-        self.assertIn("<title>Nobel Prize for Physics 1939 — Ernest Orlando Lawrence</title>", physics_html)
+        self.assertIn("<title>Ernest Orlando Lawrence — Nobel Prize for Physics, 1939</title>", physics_html)
         self.assertIn('href="../../../../favicon.svg"', physics_html)
         self.assertIn('href="../../../../static/style.css"', physics_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
@@ -177,7 +178,7 @@ class WebsiteBuildTests(unittest.TestCase):
             home_html,
         )
         turing_html = turing.read_text()
-        self.assertIn("<title>Turing Award for Computer science 1989 — Organization Example</title>", turing_html)
+        self.assertIn("<title>Organization Example — Turing Award for Computer science, 1989</title>", turing_html)
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)
         self.assertNotIn("/computer-science/", turing_html)
 
@@ -207,6 +208,81 @@ class WebsiteBuildTests(unittest.TestCase):
                     resolved = (html_path.parent / href).resolve()
                 target = resolved / "index.html" if href.endswith("/") else resolved
                 self.assertIn(target, generated, f"{html_path}: {href}")
+
+    def test_metadata_is_unique_and_structured_data_is_safe(self) -> None:
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        records = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "Geoffrey Hinton",
+                "laureate_wikidata_qid": "Q92894",
+                "laureate_type": "Individual",
+                "birth_date": "1947-12-06",
+                "birth_city": "London",
+                "birth_country": "United Kingdom",
+                "affiliation_name": "University of Toronto",
+                # A citation that would close the JSON-LD block early if it were not escaped.
+                "motivation": "for work on </script><script>alert(1)</script> networks",
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Chemistry",
+                "year": "2024",
+                "full_name": "Second Laureate",
+                "laureate_wikidata_qid": "Q2",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
+        self.assertIn('<meta property="og:title" content="Geoffrey Hinton — Nobel Prize for Physics, 2024">', winner)
+        self.assertIn('<meta name="twitter:card" content="summary">', winner)
+        self.assertIn('<meta property="og:url" content="https://example.org/nobel-prize/physics/2024/geoffrey-hinton/">', winner)
+        self.assertIn("At the time: University of Toronto.", winner)
+
+        block = winner.split('<script type="application/ld+json">')[1].split("</script>")[0]
+        payload = json.loads(block)
+        graph = {entry["@type"]: entry for entry in payload["@graph"]}
+        self.assertEqual("Geoffrey Hinton", graph["Person"]["name"])
+        self.assertEqual("https://www.wikidata.org/wiki/Q92894", graph["Person"]["sameAs"])
+        self.assertEqual("1947-12-06", graph["Person"]["birthDate"])
+        self.assertEqual("London, United Kingdom", graph["Person"]["birthPlace"]["name"])
+        self.assertEqual("Nobel Prize for Physics, 2024", graph["Person"]["award"])
+        self.assertEqual(5, len(graph["BreadcrumbList"]["itemListElement"]))
+        # Citations never enter the schema, so the injected tag cannot reach the block at all.
+        self.assertNotIn("alert(1)", block)
+
+        # A field that does reach the schema is escaped, so "</script>" cannot close the block early.
+        hostile = build.AwardRecord(
+            *(
+                {"full_name": "Test", "affiliation_name": "</script><script>alert(1)</script>"}.get(column, "")
+                for column in build.AWARD_COLUMNS
+            )
+        )
+        rendered = build._structured_data(
+            "https://example.org/",
+            build.PageJob("winner.html", "/x/", "t", "d", (), {"schema": build._laureate_schema(hostile, "https://example.org/x/")}),
+        )
+        self.assertNotIn("<script>", rendered)
+        self.assertIn("\\u003c/script>", rendered)
+        self.assertEqual("</script><script>alert(1)</script>", json.loads(rendered)["@graph"][0]["affiliation"]["name"])
+
+        # The homepage has no breadcrumbs and no laureate, so it emits no structured data at all.
+        self.assertNotIn("application/ld+json", (self.website / "dist/index.html").read_text())
+
+        descriptions = [
+            re.search(r'name="description" content="([^"]*)"', path.read_text()).group(1)
+            for path in (self.website / "dist").rglob("*.html")
+        ]
+        self.assertEqual(len(descriptions), len(set(descriptions)), "every page needs its own description")
 
     def test_shared_citation_prints_once_and_year_pages_link_neighbours(self) -> None:
         rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
