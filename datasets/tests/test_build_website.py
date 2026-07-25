@@ -154,6 +154,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         physics_html = physics.read_text()
         self.assertIn("<title>Nobel Prize for Physics 1939 — Ernest Orlando Lawrence</title>", physics_html)
+        self.assertIn('href="../../../../favicon.svg"', physics_html)
         self.assertIn('href="../../../../static/style.css"', physics_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
         self.assertNotIn("<em>unsafe</em>", physics_html)

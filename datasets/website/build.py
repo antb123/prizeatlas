@@ -592,6 +592,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         canonical=public_url(base_url, job.route),
         breadcrumbs=job.breadcrumbs,
         home_href=relative_route(job.route, "/"),
+        favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
         href=lambda target: relative_route(job.route, target),
         **job.context,
@@ -636,6 +637,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     dist = website_dir / "dist"
     try:
         (staging / "static").mkdir()
+        shutil.copyfile(website_dir / "static" / "favicon.svg", staging / "favicon.svg")
         shutil.copyfile(website_dir / "static" / "style.css", staging / "static" / "style.css")
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
