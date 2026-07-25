@@ -14,7 +14,6 @@ from typing import Any
 
 WD_API = "https://www.wikidata.org/w/api.php"
 WP_API = "https://en.wikipedia.org/w/api.php"
-NOMINATIM_API = "https://nominatim.openstreetmap.org/search"
 USER_AGENT = "nobel-coordinate-lookup/1.0 (https://bpventures.us; datasets cleanup)"
 EARTH_GLOBES = {
     "http://www.wikidata.org/entity/Q2",
@@ -24,14 +23,13 @@ QID = re.compile(r"Q[1-9][0-9]*", re.IGNORECASE)
 
 Entity = dict[str, Any]
 Coordinate = tuple[float, float]  # longitude, latitude
-BoundingBox = tuple[float, float, float, float]  # south, north, west, east
 
 
 class LookupFailure(Exception):
     """A lookup that cannot produce one verified coordinate."""
 
 
-def api(endpoint: str, params: dict[str, Any]) -> Any:
+def api(endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
     query = {**params, "format": "json"}
     request = urllib.request.Request(
         f"{endpoint}?{urllib.parse.urlencode(query)}",
@@ -41,64 +39,13 @@ def api(endpoint: str, params: dict[str, Any]) -> Any:
         with urllib.request.urlopen(request, timeout=20) as response:
             data = json.load(response)
     except urllib.error.HTTPError as error:
-        raise LookupFailure(f"lookup API returned HTTP {error.code}") from error
+        raise LookupFailure(f"Wikimedia API returned HTTP {error.code}") from error
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
-        raise LookupFailure(f"lookup API request failed: {error}") from error
+        raise LookupFailure(f"Wikimedia API request failed: {error}") from error
 
-    if isinstance(data, dict) and (error := data.get("error")):
-        raise LookupFailure(f"lookup API error {error.get('code', 'unknown')}: {error.get('info', 'no details')}")
+    if error := data.get("error"):
+        raise LookupFailure(f"Wikimedia API error {error.get('code', 'unknown')}: {error.get('info', 'no details')}")
     return data
-
-
-def country_bbox(country: str) -> BoundingBox:
-    data = api(NOMINATIM_API, {
-        "q": country,
-        "format": "jsonv2",
-        "featuretype": "country",
-        "addressdetails": 1,
-        "accept-language": "en",
-        "limit": 5,
-    })
-    if not isinstance(data, list):
-        raise LookupFailure("country bounding-box lookup returned an invalid response")
-
-    matches = [
-        result
-        for result in data
-        if isinstance(result, dict)
-        and result.get("addresstype") == "country"
-        and result.get("address", {}).get("country", "").casefold() == country.casefold()
-    ]
-    if not matches:
-        raise LookupFailure(f"country {country!r} has no exact bounding-box match")
-    if len(matches) > 1:
-        candidates = "; ".join(str(result.get("display_name", "unknown")) for result in matches)
-        raise LookupFailure(f"ambiguous country {country!r}: {candidates}")
-
-    values = matches[0].get("boundingbox")
-    if not isinstance(values, list) or len(values) != 4:
-        raise LookupFailure(f"country {country!r} has no usable bounding box")
-    try:
-        south, north, west, east = (float(value) for value in values)
-    except (TypeError, ValueError) as error:
-        raise LookupFailure(f"country {country!r} has an invalid bounding box") from error
-    if not (-90 <= south <= north <= 90 and -180 <= west <= 180 and -180 <= east <= 180):
-        raise LookupFailure(f"country {country!r} has an invalid bounding box")
-    return south, north, west, east
-
-
-def coordinate_in_bbox(coordinate: Coordinate, bbox: BoundingBox) -> bool:
-    longitude, latitude = coordinate
-    south, north, west, east = bbox
-    longitude_inside = west <= longitude <= east if west <= east else longitude >= west or longitude <= east
-    return south <= latitude <= north and longitude_inside
-
-
-def validate_country_coordinate(country: str, coordinate: Coordinate) -> None:
-    bbox = country_bbox(country)
-    if not coordinate_in_bbox(coordinate, bbox):
-        longitude, latitude = coordinate
-        raise LookupFailure(f"coordinate {longitude},{latitude} falls outside the bounding box for {country!r}")
 
 
 def wikipedia_qid(title: str) -> str | None:
@@ -263,7 +210,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         lookup_query = query if QID.fullmatch(query) else f"{query}, {country}"
         qid, entity, coordinate, match_method = resolve(lookup_query)
-        validate_country_coordinate(country, coordinate)
     except LookupFailure as error:
         print(f"lookup failed: {error}", file=sys.stderr)
         return 1

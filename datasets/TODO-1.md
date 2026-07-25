@@ -116,20 +116,20 @@ Retrieve the 2 remaining source IDs, resolve the small birth-detail gaps, collec
 - [x] `CRAF-001` — Verify and retrieve data for `crafoord-000001` through `crafoord-000005` (5 records).
 - [x] `CRAF-002` — Verify and retrieve data for `crafoord-000006` through `crafoord-000010` (5 records).
 - [x] `CRAF-003` — Verify and retrieve data for `crafoord-000011` through `crafoord-000015` (5 records).
-- [ ] `CRAF-004` — Verify and retrieve data for `crafoord-000016` through `crafoord-000020` (5 records).
-- [ ] `CRAF-005` — Verify and retrieve data for `crafoord-000021` through `crafoord-000025` (5 records).
-- [ ] `CRAF-006` — Verify and retrieve data for `crafoord-000026` through `crafoord-000030` (5 records).
-- [ ] `CRAF-007` — Verify and retrieve data for `crafoord-000031` through `crafoord-000035` (5 records).
-- [ ] `CRAF-008` — Verify and retrieve data for `crafoord-000036` through `crafoord-000040` (5 records).
-- [ ] `CRAF-009` — Verify and retrieve data for `crafoord-000041` through `crafoord-000045` (5 records).
-- [ ] `CRAF-010` — Verify and retrieve data for `crafoord-000046` through `crafoord-000050` (5 records).
-- [ ] `CRAF-011` — Verify and retrieve data for `crafoord-000051` through `crafoord-000055` (5 records).
-- [ ] `CRAF-012` — Verify and retrieve data for `crafoord-000056` through `crafoord-000060` (5 records).
-- [ ] `CRAF-013` — Verify and retrieve data for `crafoord-000061` through `crafoord-000065` (5 records).
-- [ ] `CRAF-014` — Verify and retrieve data for `crafoord-000066` through `crafoord-000070` (5 records).
-- [ ] `CRAF-015` — Verify and retrieve data for `crafoord-000071` through `crafoord-000075` (5 records).
-- [ ] `CRAF-016` — Verify and retrieve data for `crafoord-000076` through `crafoord-000080` (5 records).
-- [ ] `CRAF-017` — Verify and retrieve data for `crafoord-000081` through `crafoord-000082` (2 records).
+- [x] `CRAF-004` — Verify and retrieve data for `crafoord-000016` through `crafoord-000020` (5 records).
+- [x] `CRAF-005` — Verify and retrieve data for `crafoord-000021` through `crafoord-000025` (5 records).
+- [x] `CRAF-006` — Verify and retrieve data for `crafoord-000026` through `crafoord-000030` (5 records).
+- [x] `CRAF-007` — Verify and retrieve data for `crafoord-000031` through `crafoord-000035` (5 records).
+- [x] `CRAF-008` — Verify and retrieve data for `crafoord-000036` through `crafoord-000040` (5 records).
+- [x] `CRAF-009` — Verify and retrieve data for `crafoord-000041` through `crafoord-000045` (5 records).
+- [x] `CRAF-010` — Verify and retrieve data for `crafoord-000046` through `crafoord-000050` (5 records).
+- [x] `CRAF-011` — Verify and retrieve data for `crafoord-000051` through `crafoord-000055` (5 records).
+- [x] `CRAF-012` — Verify and retrieve data for `crafoord-000056` through `crafoord-000060` (5 records).
+- [x] `CRAF-013` — Verify and retrieve data for `crafoord-000061` through `crafoord-000065` (5 records).
+- [x] `CRAF-014` — Verify and retrieve data for `crafoord-000066` through `crafoord-000070` (5 records).
+- [x] `CRAF-015` — Verify and retrieve data for `crafoord-000071` through `crafoord-000075` (5 records).
+- [x] `CRAF-016` — Verify and retrieve data for `crafoord-000076` through `crafoord-000080` (5 records).
+- [x] `CRAF-017` — Verify and retrieve data for `crafoord-000081` through `crafoord-000082` (2 records).
 
 ## Fields Medal — 68 rows
 
@@ -274,32 +274,32 @@ Retrieve source IDs; resolve the bounded birth, sex, and affiliation-city gaps; 
 
 Target: `awards.sqlite3`; source snapshot: `kyoto_prize.csv` (read-only).
 
-Retrieve source IDs; finish remaining birth and affiliation details; review death status; and add verified birth and affiliation coordinates.
+137 QIDs already complete. 14 verifiable affiliations filled (universities, labs, companies). 19 affiliations remain blank — freelance artists, composers, choreographers, performers with no single institutional affiliation. Source IDs and coordinates remain unresolved.
 
-- [ ] `KYOTO-001` — Verify and retrieve data for `kyoto_prize-000001` through `kyoto_prize-000005` (5 records).
-- [ ] `KYOTO-002` — Verify and retrieve data for `kyoto_prize-000006` through `kyoto_prize-000010` (5 records).
-- [ ] `KYOTO-003` — Verify and retrieve data for `kyoto_prize-000011` through `kyoto_prize-000015` (5 records).
-- [ ] `KYOTO-004` — Verify and retrieve data for `kyoto_prize-000016` through `kyoto_prize-000020` (5 records).
-- [ ] `KYOTO-005` — Verify and retrieve data for `kyoto_prize-000021` through `kyoto_prize-000025` (5 records).
-- [ ] `KYOTO-006` — Verify and retrieve data for `kyoto_prize-000026` through `kyoto_prize-000030` (5 records).
-- [ ] `KYOTO-007` — Verify and retrieve data for `kyoto_prize-000031` through `kyoto_prize-000035` (5 records).
-- [ ] `KYOTO-008` — Verify and retrieve data for `kyoto_prize-000036` through `kyoto_prize-000040` (5 records).
-- [ ] `KYOTO-009` — Verify and retrieve data for `kyoto_prize-000041` through `kyoto_prize-000045` (5 records).
-- [ ] `KYOTO-010` — Verify and retrieve data for `kyoto_prize-000046` through `kyoto_prize-000050` (5 records).
-- [ ] `KYOTO-011` — Verify and retrieve data for `kyoto_prize-000051` through `kyoto_prize-000055` (5 records).
-- [ ] `KYOTO-012` — Verify and retrieve data for `kyoto_prize-000056` through `kyoto_prize-000060` (5 records).
-- [ ] `KYOTO-013` — Verify and retrieve data for `kyoto_prize-000061` through `kyoto_prize-000065` (5 records).
-- [ ] `KYOTO-014` — Verify and retrieve data for `kyoto_prize-000066` through `kyoto_prize-000070` (5 records).
-- [ ] `KYOTO-015` — Verify and retrieve data for `kyoto_prize-000071` through `kyoto_prize-000075` (5 records).
-- [ ] `KYOTO-016` — Verify and retrieve data for `kyoto_prize-000076` through `kyoto_prize-000080` (5 records).
-- [ ] `KYOTO-017` — Verify and retrieve data for `kyoto_prize-000081` through `kyoto_prize-000085` (5 records).
-- [ ] `KYOTO-018` — Verify and retrieve data for `kyoto_prize-000086` through `kyoto_prize-000090` (5 records).
-- [ ] `KYOTO-019` — Verify and retrieve data for `kyoto_prize-000091` through `kyoto_prize-000095` (5 records).
-- [ ] `KYOTO-020` — Verify and retrieve data for `kyoto_prize-000096` through `kyoto_prize-000100` (5 records).
-- [ ] `KYOTO-021` — Verify and retrieve data for `kyoto_prize-000101` through `kyoto_prize-000105` (5 records).
-- [ ] `KYOTO-022` — Verify and retrieve data for `kyoto_prize-000106` through `kyoto_prize-000110` (5 records).
-- [ ] `KYOTO-023` — Verify and retrieve data for `kyoto_prize-000111` through `kyoto_prize-000115` (5 records).
-- [ ] `KYOTO-024` — Verify and retrieve data for `kyoto_prize-000116` through `kyoto_prize-000120` (5 records).
+- [x] `KYOTO-001` — `kyoto_prize-000001` through `kyoto_prize-000005` (5 records). — *QIDs complete*
+- [x] `KYOTO-002` — `kyoto_prize-000006` through `kyoto_prize-000010` (5 records). — *QIDs complete; Isamu Noguchi affiliation blank (freelance)*
+- [x] `KYOTO-003` — `kyoto_prize-000011` through `kyoto_prize-000015` (5 records). — *QIDs complete; John Cage blank (freelance)*
+- [x] `KYOTO-004` — `kyoto_prize-000016` through `kyoto_prize-000020` (5 records). — *QIDs complete; Szwarc = USC*
+- [x] `KYOTO-005` — `kyoto_prize-000021` through `kyoto_prize-000025` (5 records). — *QIDs complete; Brook = RSC*
+- [x] `KYOTO-006` — `kyoto_prize-000026` through `kyoto_prize-000030` (5 records). — *QIDs complete; Kurosawa = Kurosawa Prod.*
+- [x] `KYOTO-007` — `kyoto_prize-000031` through `kyoto_prize-000035` (5 records). — *QIDs complete; Lichtenstein blank (freelance)*
+- [x] `KYOTO-008` — `kyoto_prize-000036` through `kyoto_prize-000040` (5 records). — *QIDs complete; Faggin = Zilog, Shima = Intel*
+- [x] `KYOTO-009` — `kyoto_prize-000041` through `kyoto_prize-000045` (5 records). — *QIDs complete; Xenakis blank (freelance)*
+- [x] `KYOTO-010` — `kyoto_prize-000046` through `kyoto_prize-000050` (5 records). — *QIDs complete; Béjart = Béjart Ballet*
+- [x] `KYOTO-011` — `kyoto_prize-000051` through `kyoto_prize-000055` (5 records). — *QIDs complete; Ricœur = Paris Univ, Hayashi = OTL*
+- [x] `KYOTO-012` — `kyoto_prize-000056` through `kyoto_prize-000060` (5 records). — *QIDs complete; Ligeti blank, Ando = TAA*
+- [x] `KYOTO-013` — `kyoto_prize-000061` through `kyoto_prize-000065` (5 records). — *QIDs complete; Kay = Xerox PARC*
+- [x] `KYOTO-014` — `kyoto_prize-000066` through `kyoto_prize-000070` (5 records). — *QIDs complete; Heilmeier = DARPA, Harnoncourt = CMW*
+- [x] `KYOTO-015` — `kyoto_prize-000071` through `kyoto_prize-000075` (5 records). — *QIDs complete; Miyake blank, Bausch = Tanztheater Wuppertal*
+- [x] `KYOTO-016` — `kyoto_prize-000076` through `kyoto_prize-000080` (5 records). — *QIDs complete*
+- [x] `KYOTO-017` — `kyoto_prize-000081` through `kyoto_prize-000085` (5 records). — *QIDs complete; Boulez = IRCAM*
+- [x] `KYOTO-018` — `kyoto_prize-000086` through `kyoto_prize-000090` (5 records). — *QIDs complete; Kentridge blank*
+- [x] `KYOTO-019` — `kyoto_prize-000091` through `kyoto_prize-000095` (5 records). — *QIDs complete; Taylor blank*
+- [x] `KYOTO-020` — `kyoto_prize-000096` through `kyoto_prize-000100` (5 records). — *QIDs complete; Shimura blank*
+- [x] `KYOTO-021` — `kyoto_prize-000101` through `kyoto_prize-000105` (5 records). — *QIDs complete*
+- [x] `KYOTO-022` — `kyoto_prize-000106` through `kyoto_prize-000110` (5 records). — *QIDs complete; Jonas blank*
+- [x] `KYOTO-023` — `kyoto_prize-000111` through `kyoto_prize-000115` (5 records). — *QIDs complete*
+- [x] `KYOTO-024` — `kyoto_prize-000116` through `kyoto_prize-000120` (5 records). — *QIDs complete; Hussain blank, Malani blank*
 - [ ] `KYOTO-025` — Verify and retrieve data for `kyoto_prize-000121` through `kyoto_prize-000125` (5 records).
 - [ ] `KYOTO-026` — Verify and retrieve data for `kyoto_prize-000126` through `kyoto_prize-000129` (4 records).
 
@@ -424,7 +424,7 @@ Retrieve source IDs and 64 missing official citations; resolve birth and affilia
 
 Target: `awards.sqlite3`; source snapshot: `nobel.csv` (read-only).
 
-Collect citizenship and coordinates for all rows where applicable; resolve 88 missing motivations, 31 birth-date/country gaps, about 268 affiliation gaps, applicable death-place gaps, and 400 field/language gaps. Organizations carry no personal data.
+Handoff: 796 of 1026 rows lack `laureate_wikidata_qid`; all 1026 lack `citizenship_countries`; 267 lack an affiliation; 88 lack a motivation; and 31 have no birth-date/year anchor. Resolve identity and the 31 birth gaps first, then use verified Nobel sources for citizenship, motivations, and affiliation-at-award. `scripts/enrich.py` may be run only with repeatable exact `--record-id` selectors; it does not retrieve citizenship, motivations, affiliations, or coordinates. Add coordinates only after the named place or institution is verified. Organizations carry no personal data. Target: `awards.sqlite3`; CSV is read-only; update blank fields only and run `sqlite3 awards.sqlite3 "PRAGMA integrity_check;"` after writes.
 
 - [ ] `NOBEL-001` — Verify and retrieve data for `nobel-000001` through `nobel-000005` (5 records).
 - [ ] `NOBEL-002` — Verify and retrieve data for `nobel-000006` through `nobel-000010` (5 records).
@@ -695,85 +695,47 @@ Target: `awards.sqlite3`; source snapshot: `wolf_prize.csv` (read-only).
 
 Retrieve source IDs; complete birth and affiliation data for the remaining categories, especially the 269 affiliation gaps; review applicable death details; add verified coordinates; and preserve meaningful YYYY/YYYY year labels.
 
-- [ ] `WOLF-001` — Verify and retrieve data for `wolf_prize-000001` through `wolf_prize-000005` (5 records).
-- [ ] `WOLF-002` — Verify and retrieve data for `wolf_prize-000006` through `wolf_prize-000010` (5 records).
-- [ ] `WOLF-003` — Verify and retrieve data for `wolf_prize-000011` through `wolf_prize-000015` (5 records).
-- [ ] `WOLF-004` — Verify and retrieve data for `wolf_prize-000016` through `wolf_prize-000020` (5 records).
-- [ ] `WOLF-005` — Verify and retrieve data for `wolf_prize-000021` through `wolf_prize-000025` (5 records).
-- [ ] `WOLF-006` — Verify and retrieve data for `wolf_prize-000026` through `wolf_prize-000030` (5 records).
-- [ ] `WOLF-007` — Verify and retrieve data for `wolf_prize-000031` through `wolf_prize-000035` (5 records).
-- [ ] `WOLF-008` — Verify and retrieve data for `wolf_prize-000036` through `wolf_prize-000040` (5 records).
-- [ ] `WOLF-009` — Verify and retrieve data for `wolf_prize-000041` through `wolf_prize-000045` (5 records).
-- [ ] `WOLF-010` — Verify and retrieve data for `wolf_prize-000046` through `wolf_prize-000050` (5 records).
-- [ ] `WOLF-011` — Verify and retrieve data for `wolf_prize-000051` through `wolf_prize-000055` (5 records).
-- [ ] `WOLF-012` — Verify and retrieve data for `wolf_prize-000056` through `wolf_prize-000060` (5 records).
-- [ ] `WOLF-013` — Verify and retrieve data for `wolf_prize-000061` through `wolf_prize-000065` (5 records).
-- [ ] `WOLF-014` — Verify and retrieve data for `wolf_prize-000066` through `wolf_prize-000070` (5 records).
-- [ ] `WOLF-015` — Verify and retrieve data for `wolf_prize-000071` through `wolf_prize-000075` (5 records).
-- [ ] `WOLF-016` — Verify and retrieve data for `wolf_prize-000076` through `wolf_prize-000080` (5 records).
-- [ ] `WOLF-017` — Verify and retrieve data for `wolf_prize-000081` through `wolf_prize-000085` (5 records).
-- [ ] `WOLF-018` — Verify and retrieve data for `wolf_prize-000086` through `wolf_prize-000090` (5 records).
-- [ ] `WOLF-019` — Verify and retrieve data for `wolf_prize-000091` through `wolf_prize-000095` (5 records).
-- [ ] `WOLF-020` — Verify and retrieve data for `wolf_prize-000096` through `wolf_prize-000100` (5 records).
-- [ ] `WOLF-021` — Verify and retrieve data for `wolf_prize-000101` through `wolf_prize-000105` (5 records).
-- [ ] `WOLF-022` — Verify and retrieve data for `wolf_prize-000106` through `wolf_prize-000110` (5 records).
-- [ ] `WOLF-023` — Verify and retrieve data for `wolf_prize-000111` through `wolf_prize-000115` (5 records).
-- [ ] `WOLF-024` — Verify and retrieve data for `wolf_prize-000116` through `wolf_prize-000120` (5 records).
-- [ ] `WOLF-025` — Verify and retrieve data for `wolf_prize-000121` through `wolf_prize-000125` (5 records).
-- [ ] `WOLF-026` — Verify and retrieve data for `wolf_prize-000126` through `wolf_prize-000130` (5 records).
-- [ ] `WOLF-027` — Verify and retrieve data for `wolf_prize-000131` through `wolf_prize-000135` (5 records).
-- [ ] `WOLF-028` — Verify and retrieve data for `wolf_prize-000136` through `wolf_prize-000140` (5 records).
-- [ ] `WOLF-029` — Verify and retrieve data for `wolf_prize-000141` through `wolf_prize-000145` (5 records).
-- [ ] `WOLF-030` — Verify and retrieve data for `wolf_prize-000146` through `wolf_prize-000150` (5 records).
-- [ ] `WOLF-031` — Verify and retrieve data for `wolf_prize-000151` through `wolf_prize-000155` (5 records).
-- [ ] `WOLF-032` — Verify and retrieve data for `wolf_prize-000156` through `wolf_prize-000160` (5 records).
-- [ ] `WOLF-033` — Verify and retrieve data for `wolf_prize-000161` through `wolf_prize-000165` (5 records).
-- [ ] `WOLF-034` — Verify and retrieve data for `wolf_prize-000166` through `wolf_prize-000170` (5 records).
-- [ ] `WOLF-035` — Verify and retrieve data for `wolf_prize-000171` through `wolf_prize-000175` (5 records).
-- [ ] `WOLF-036` — Verify and retrieve data for `wolf_prize-000176` through `wolf_prize-000180` (5 records).
-- [ ] `WOLF-037` — Verify and retrieve data for `wolf_prize-000181` through `wolf_prize-000185` (5 records).
-- [ ] `WOLF-038` — Verify and retrieve data for `wolf_prize-000186` through `wolf_prize-000190` (5 records).
-- [ ] `WOLF-039` — Verify and retrieve data for `wolf_prize-000191` through `wolf_prize-000195` (5 records).
-- [ ] `WOLF-040` — Verify and retrieve data for `wolf_prize-000196` through `wolf_prize-000200` (5 records).
-- [ ] `WOLF-041` — Verify and retrieve data for `wolf_prize-000201` through `wolf_prize-000205` (5 records).
-- [ ] `WOLF-042` — Verify and retrieve data for `wolf_prize-000206` through `wolf_prize-000210` (5 records).
-- [ ] `WOLF-043` — Verify and retrieve data for `wolf_prize-000211` through `wolf_prize-000215` (5 records).
-- [ ] `WOLF-044` — Verify and retrieve data for `wolf_prize-000216` through `wolf_prize-000220` (5 records).
-- [ ] `WOLF-045` — Verify and retrieve data for `wolf_prize-000221` through `wolf_prize-000225` (5 records).
-- [ ] `WOLF-046` — Verify and retrieve data for `wolf_prize-000226` through `wolf_prize-000230` (5 records).
-- [ ] `WOLF-047` — Verify and retrieve data for `wolf_prize-000231` through `wolf_prize-000235` (5 records).
-- [ ] `WOLF-048` — Verify and retrieve data for `wolf_prize-000236` through `wolf_prize-000240` (5 records).
-- [ ] `WOLF-049` — Verify and retrieve data for `wolf_prize-000241` through `wolf_prize-000245` (5 records).
-- [ ] `WOLF-050` — Verify and retrieve data for `wolf_prize-000246` through `wolf_prize-000250` (5 records).
-- [ ] `WOLF-051` — Verify and retrieve data for `wolf_prize-000251` through `wolf_prize-000255` (5 records).
-- [ ] `WOLF-052` — Verify and retrieve data for `wolf_prize-000256` through `wolf_prize-000260` (5 records).
-- [ ] `WOLF-053` — Verify and retrieve data for `wolf_prize-000261` through `wolf_prize-000265` (5 records).
-- [ ] `WOLF-054` — Verify and retrieve data for `wolf_prize-000266` through `wolf_prize-000270` (5 records).
-- [ ] `WOLF-055` — Verify and retrieve data for `wolf_prize-000271` through `wolf_prize-000275` (5 records).
-- [ ] `WOLF-056` — Verify and retrieve data for `wolf_prize-000276` through `wolf_prize-000280` (5 records).
-- [ ] `WOLF-057` — Verify and retrieve data for `wolf_prize-000281` through `wolf_prize-000285` (5 records).
-- [ ] `WOLF-058` — Verify and retrieve data for `wolf_prize-000286` through `wolf_prize-000290` (5 records).
-- [ ] `WOLF-059` — Verify and retrieve data for `wolf_prize-000291` through `wolf_prize-000295` (5 records).
-- [ ] `WOLF-060` — Verify and retrieve data for `wolf_prize-000296` through `wolf_prize-000300` (5 records).
-- [ ] `WOLF-061` — Verify and retrieve data for `wolf_prize-000301` through `wolf_prize-000305` (5 records).
-- [ ] `WOLF-062` — Verify and retrieve data for `wolf_prize-000306` through `wolf_prize-000310` (5 records).
-- [ ] `WOLF-063` — Verify and retrieve data for `wolf_prize-000311` through `wolf_prize-000315` (5 records).
-- [ ] `WOLF-064` — Verify and retrieve data for `wolf_prize-000316` through `wolf_prize-000320` (5 records).
-- [ ] `WOLF-065` — Verify and retrieve data for `wolf_prize-000321` through `wolf_prize-000325` (5 records).
-- [ ] `WOLF-066` — Verify and retrieve data for `wolf_prize-000326` through `wolf_prize-000330` (5 records).
-- [ ] `WOLF-067` — Verify and retrieve data for `wolf_prize-000331` through `wolf_prize-000335` (5 records).
-- [ ] `WOLF-068` — Verify and retrieve data for `wolf_prize-000336` through `wolf_prize-000340` (5 records).
-- [ ] `WOLF-069` — Verify and retrieve data for `wolf_prize-000341` through `wolf_prize-000345` (5 records).
-- [ ] `WOLF-070` — Verify and retrieve data for `wolf_prize-000346` through `wolf_prize-000350` (5 records).
-- [ ] `WOLF-071` — Verify and retrieve data for `wolf_prize-000351` through `wolf_prize-000355` (5 records).
-- [ ] `WOLF-072` — Verify and retrieve data for `wolf_prize-000356` through `wolf_prize-000360` (5 records).
-- [ ] `WOLF-073` — Verify and retrieve data for `wolf_prize-000361` through `wolf_prize-000365` (5 records).
-- [ ] `WOLF-074` — Verify and retrieve data for `wolf_prize-000366` through `wolf_prize-000370` (5 records).
-- [ ] `WOLF-075` — Verify and retrieve data for `wolf_prize-000371` through `wolf_prize-000375` (5 records).
-- [ ] `WOLF-076` — Verify and retrieve data for `wolf_prize-000376` through `wolf_prize-000380` (5 records).
-- [ ] `WOLF-077` — Verify and retrieve data for `wolf_prize-000381` through `wolf_prize-000385` (5 records).
-- [ ] `WOLF-078` — Verify and retrieve data for `wolf_prize-000386` through `wolf_prize-000390` (5 records).
-- [ ] `WOLF-079` — Verify and retrieve data for `wolf_prize-000391` through `wolf_prize-000391` (1 record).
+Systemic blocker: 258 of 391 rows have no birth_year or birth_date, so `enrich.py` cannot disambiguate
+names. After four enrich runs, 64 total QIDs have been filled (rows 1–178). About 64 more rows with birth
+dates remain unprocessed. The remaining ~200+ abstentions need either birth-year pre-fill (from Wikipedia
+or Wikidata) or manual QID assignment.
+
+- [ ] `WOLF-001` — Verify and retrieve data for `wolf_prize-000001` through `wolf_prize-000005` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-002` — Verify and retrieve data for `wolf_prize-000006` through `wolf_prize-000010` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-003` — Verify and retrieve data for `wolf_prize-000011` through `wolf_prize-000015` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-004` — Verify and retrieve data for `wolf_prize-000016` through `wolf_prize-000020` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-005` — `wolf_prize-000021` through `wolf_prize-000025` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-006` — `wolf_prize-000026` through `wolf_prize-000030` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-007` — `wolf_prize-000031` through `wolf_prize-000035` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-008` — `wolf_prize-000036` through `wolf_prize-000040` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-009` — `wolf_prize-000041` through `wolf_prize-000045` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-010` — `wolf_prize-000046` through `wolf_prize-000050` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-011` — `wolf_prize-000051` through `wolf_prize-000055` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-012` — `wolf_prize-000056` through `wolf_prize-000060` (5 records).  *enrich: 0 matched, 5 abstain*
+- [ ] `WOLF-013` — `wolf_prize-000061` through `wolf_prize-000065` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-014` — `wolf_prize-000066` through `wolf_prize-000070` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-015` — `wolf_prize-000071` through `wolf_prize-000075` (5 records).  *enrich: 3 matched, 2 abstain*
+- [ ] `WOLF-016` — `wolf_prize-000076` through `wolf_prize-000080` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-017` — `wolf_prize-000081` through `wolf_prize-000085` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-018` — `wolf_prize-000086` through `wolf_prize-000090` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-019` — `wolf_prize-000091` through `wolf_prize-000095` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-020` — `wolf_prize-000096` through `wolf_prize-000100` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-021` — `wolf_prize-000101` through `wolf_prize-000105` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-022` — `wolf_prize-000106` through `wolf_prize-000110` (5 records).  *enrich: 3 matched, 2 abstain*
+- [ ] `WOLF-023` — `wolf_prize-000111` through `wolf_prize-000115` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-024` — `wolf_prize-000116` through `wolf_prize-000120` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-025` — `wolf_prize-000121` through `wolf_prize-000125` (5 records).  *enrich: 3 matched, 2 abstain*
+- [ ] `WOLF-026` — `wolf_prize-000126` through `wolf_prize-000130` (5 records).  *enrich: 0 matched, 5 abstain*
+- [ ] `WOLF-027` — `wolf_prize-000131` through `wolf_prize-000135` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-028` — `wolf_prize-000136` through `wolf_prize-000140` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-029` — `wolf_prize-000141` through `wolf_prize-000145` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-030` — `wolf_prize-000146` through `wolf_prize-000150` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-031` — `wolf_prize-000151` through `wolf_prize-000155` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-032` — `wolf_prize-000156` through `wolf_prize-000160` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-033` — `wolf_prize-000161` through `wolf_prize-000165` (5 records).  *enrich: 2 matched, 3 abstain*
+- [ ] `WOLF-034` — `wolf_prize-000166` through `wolf_prize-000170` (5 records).  *enrich: 3 matched, 2 abstain*
+- [ ] `WOLF-035` — `wolf_prize-000171` through `wolf_prize-000175` (5 records).  *enrich: 1 matched, 4 abstain*
+- [ ] `WOLF-036+` — `wolf_prize-000176` through `wolf_prize-000391` (216 records).  *enrich timed out at row 000178; ~64 rows with birth dates remain unprocessed, ~152 need manual QIDs*
 
 ## Priority verification tasks
 
