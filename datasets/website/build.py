@@ -45,6 +45,7 @@ TEMPLATES = (
 )
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
+PRIZE_PAGE_YEARS = 30
 FACT_FIELDS = (
     ("Type", "laureate_type"),
     ("Born", "birth_date"),
@@ -286,6 +287,18 @@ def _page(
     return PageJob(template, route, title, description, tuple(breadcrumbs), context)
 
 
+def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]:
+    """Collapse recipients who share one citation into a single group.
+
+    A shared prize carries one motivation for every recipient. Printing it under each name repeats the same sentence
+    two or three times per year. Groups keep the order in which their first recipient appeared.
+    """
+    groups: dict[str, list[tuple[AwardRecord, str]]] = {}
+    for record, route in pairs:
+        groups.setdefault(record.motivation, []).append((record, route))
+    return tuple((motivation, tuple(members)) for motivation, members in groups.items())
+
+
 def _surname_key(name: str) -> tuple[str, str]:
     """Order people by the last word of their name, then the whole name."""
     slug = slugify(name)
@@ -453,7 +466,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                         year,
                         year_routes[(category, year)],
                         _year_prefix(year, grouped[0].award_record_id),
-                        tuple(
+                        _by_motivation(
                             (record, all_record_routes[record.award_record_id])
                             for record in sorted(grouped, key=lambda item: item.award_record_id)
                         ),
@@ -492,14 +505,29 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             direct_years.sort(key=lambda item: item[0], reverse=True)
             direct_years.sort(key=lambda item: item[2], reverse=True)
 
+        # Adjacent award years within one category, so a year page is never a dead end.
+        neighbours: dict[tuple[str | None, str], tuple[tuple[str, str] | None, tuple[str, str] | None]] = {}
+        years_by_category: dict[str | None, list[tuple[int, str, str]]] = {}
+        for (category_key, year), route in year_routes.items():
+            prefix = _year_prefix(year, year_records[(category_key, year)][0].award_record_id)
+            years_by_category.setdefault(category_key, []).append((prefix, year, route))
+        for category_key, entries in years_by_category.items():
+            entries.sort()
+            for index, (_, year, _route) in enumerate(entries):
+                earlier = entries[index - 1] if index else None
+                later = entries[index + 1] if index + 1 < len(entries) else None
+                neighbours[(category_key, year)] = (
+                    (earlier[1], earlier[2]) if earlier else None,
+                    (later[1], later[2]) if later else None,
+                )
+
         ordered_records = _descending_records(prize_records)
         recent_prefixes = {
             _year_prefix(record.year, record.award_record_id)
             for record in ordered_records
         }
-        recent_prefixes = set(sorted(recent_prefixes, reverse=True)[:30])
+        recent_prefixes = set(sorted(recent_prefixes, reverse=True)[:PRIZE_PAGE_YEARS])
         recent = [record for record in ordered_records if _year_prefix(record.year, record.award_record_id) in recent_prefixes]
-        older = [record for record in ordered_records if _year_prefix(record.year, record.award_record_id) not in recent_prefixes]
 
         def group_prize_records(group: list[AwardRecord]) -> tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]:
             result: list[tuple[str, tuple[tuple[AwardRecord, str], ...]]] = []
@@ -524,7 +552,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 category_links=tuple(category_links),
                 year_links=tuple(direct_years),
                 recent_groups=group_prize_records(recent),
-                older_groups=group_prize_records(older),
+                recent_years=PRIZE_PAGE_YEARS,
             )
         )
 
@@ -552,7 +580,9 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                     prize=ranking,
                     category=display_category,
                     year=year,
-                    winners=tuple((record, all_record_routes[record.award_record_id]) for record in ordered_group),
+                    winners=_by_motivation((record, all_record_routes[record.award_record_id]) for record in ordered_group),
+                    earlier_year=neighbours[(routed_category, year)][0],
+                    later_year=neighbours[(routed_category, year)][1],
                 )
             )
             year_page_count += 1
@@ -591,6 +621,11 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                         record=record,
                         facts=facts,
                         year_route=route,
+                        co_laureates=tuple(
+                            (other, all_record_routes[other.award_record_id])
+                            for other in ordered_group
+                            if other.award_record_id != record.award_record_id
+                        ),
                         person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
                         wikipedia_url=wikipedia_search_url(record.full_name),
                     )

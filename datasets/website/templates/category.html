@@ -12,10 +12,12 @@
     <li>
       <a class="category-year" href="{{ href(route) }}">{{ year }}</a>
       <ul class="category-recipients">
-        {% for record, winner_route in winners %}
+        {% for motivation, members in winners %}
         <li>
-          <a href="{{ href(winner_route) }}">{{ record.full_name }}</a>
-          {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
+          <p class="recipient-names">
+            {% for record, winner_route in members %}<a href="{{ href(winner_route) }}">{{ record.full_name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+          </p>
+          {% if motivation %}<p>{{ motivation }}</p>{% endif %}
         </li>
         {% endfor %}
       </ul>

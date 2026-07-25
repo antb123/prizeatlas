@@ -18,6 +18,16 @@
       {% endif %}
     </section>
     {% endif %}
+    {% if co_laureates %}
+    <section>
+      <h2>Shared with</h2>
+      <ul class="co-laureates">
+        {% for other, other_route in co_laureates %}
+        <li><a href="{{ href(other_route) }}">{{ other.full_name }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
     <section>
       <h2>Award</h2>
       <dl class="award-facts">

@@ -208,6 +208,71 @@ class WebsiteBuildTests(unittest.TestCase):
                 target = resolved / "index.html" if href.endswith("/") else resolved
                 self.assertIn(target, generated, f"{html_path}: {href}")
 
+    def test_shared_citation_prints_once_and_year_pages_link_neighbours(self) -> None:
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        shared = "for foundational discoveries in machine learning"
+        records = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "John J. Hopfield",
+                "motivation": shared,
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "Geoffrey Hinton",
+                "motivation": shared,
+            },
+            {
+                "award_record_id": "nobel-3",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2023",
+                "full_name": "Solo Laureate",
+                "motivation": "for something else entirely",
+            },
+            {
+                "award_record_id": "nobel-4",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Chemistry",
+                "year": "2024",
+                "full_name": "Other Category",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        # Two laureates share one citation, so it appears once on both the category and the year page.
+        category_html = (self.website / "dist/nobel-prize/physics/index.html").read_text()
+        self.assertEqual(1, category_html.count(shared))
+        self.assertIn("John J. Hopfield", category_html)
+        self.assertIn("Geoffrey Hinton", category_html)
+
+        year_html = (self.website / "dist/nobel-prize/physics/2024/index.html").read_text()
+        self.assertEqual(1, year_html.count(shared))
+        # 2024 is the latest Physics year, so it links back to 2023 and offers no next link.
+        self.assertIn('href="../2023/"', year_html)
+        self.assertNotIn('rel="next"', year_html)
+        self.assertIn('rel="next"', (self.website / "dist/nobel-prize/physics/2023/index.html").read_text())
+        # Chemistry has a single year, so its year page has no neighbours at all.
+        self.assertNotIn("<nav class=\"pagination\"", (self.website / "dist/nobel-prize/chemistry/2024/index.html").read_text())
+
+        hinton = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
+        self.assertIn("Shared with", hinton)
+        self.assertIn('href="../john-j-hopfield/"', hinton)
+        # A sole recipient has nobody to share with.
+        self.assertNotIn("Shared with", (self.website / "dist/nobel-prize/physics/2023/solo-laureate/index.html").read_text())
+
     def test_person_pages_merge_awards_by_laureate_qid(self) -> None:
         rankings = [
             ("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
@@ -392,10 +457,12 @@ class WebsiteBuildTests(unittest.TestCase):
         build.build_site(database, "https://example.org/", self.website)
 
         html = (self.website / "dist/test-prize/index.html").read_text()
-        disclosure = html.index("<details>")
-        self.assertLess(html.index("Winner 29"), disclosure)
-        self.assertGreater(html.index("Winner 30"), disclosure)
-        self.assertLess(html.index("Special Winner"), disclosure)
+        # The prize page carries the most recent 30 award years; older years live on their own year pages.
+        self.assertIn("Winner 29", html)
+        self.assertIn("Special Winner", html)
+        self.assertNotIn("Winner 30", html)
+        self.assertIn('href="1970/"', html)
+        self.assertTrue((self.website / "dist/test-prize/1970/winner-30/index.html").is_file())
 
     def test_scoped_collisions_preserve_previous_output(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

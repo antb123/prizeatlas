@@ -252,6 +252,20 @@ h3 {
   color: var(--muted);
 }
 
+.category-recipients .recipient-names {
+  margin: 0;
+  color: var(--ink);
+}
+
+.co-laureates {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.co-laureates li {
+  margin-block: 0.35rem;
+}
+
 .winner-list span {
   display: block;
   color: var(--muted);

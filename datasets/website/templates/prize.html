@@ -38,13 +38,8 @@
   </ul>
 </section>
 <section>
-  <h2>Winners</h2>
+  <h2>Recent winners</h2>
+  <p>The last {{ recent_years }} award years. Use the {% if routed_categories %}categories{% else %}years{% endif %} above for the full record.</p>
   {{ winner_groups(recent_groups) }}
-  {% if older_groups %}
-  <details>
-    <summary>More winners</summary>
-    {{ winner_groups(older_groups) }}
-  </details>
-  {% endif %}
 </section>
 {% endblock %}

@@ -59,12 +59,28 @@ Steps → verify:
 7. Add Prizes / People to the header nav in `base.html` lines 13-16 → present on all pages, relative hrefs correct at
    every depth (check root, `/nobel-prize/`, and `/nobel-prize/physics/2024/geoffrey-hinton/`).
 
-## CLEAN-2 — Listing page repairs
+## CLEAN-2 — Listing page repairs — DONE 20260725
 
 ID: `CLEAN-2` — Group shared motivations, shrink the prize pages, link winner pages to their neighbours.
 Spec §3.4, §3.5, §3.3.
 
 Depends-on: none (step 4 links to `CLEAN-1` routes; land it after)
+
+Outcome, measured on the real build:
+
+| Page | Before | After |
+|---|---|---|
+| `nobel-prize/` | 141 KB | 45 KB |
+| `lasker-award/` | 96 KB | 40 KB |
+| `nobel-prize/physics/` | 70 KB | 63 KB |
+
+Shared citations now print once with the recipients listed together, on both category and year pages. The prize page
+carries the most recent `PRIZE_PAGE_YEARS` (30) award years; the `<details>` blob holding every older laureate is
+gone, and those pages stay reachable through the category and year routes. 88,881 internal links resolve, none broken.
+
+**Deviation from spec §3.3:** previous/next year links went on the **year** page, not the winner page. The year page
+was the thinnest page type on the site and is the natural home for year navigation; the winner page already reaches
+its year through breadcrumbs and now also carries co-laureates and a person link.
 
 Files:
 
