@@ -9,11 +9,19 @@
   time of the award rather than a whole career.</p>
 </header>
 <ol class="rank-list">
-  {% for name, count in affiliations %}
+  {% for affiliation in affiliations %}
   <li>
     <span class="rank-position">{{ loop.index }}</span>
-    <span>{{ name }}</span>
-    <span class="rank-count" style="--share: {{ count * 100 // leader }}">{{ count }}</span>
+    <span>{{ affiliation.name }}
+      {% if affiliation.units %}
+      <ul class="rank-units">
+        {% for unit, unit_count in affiliation.units %}
+        <li>{{ unit }} <span class="rank-unit-count">{{ unit_count }}</span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </span>
+    <span class="rank-count" style="--share: {{ affiliation.count * 100 // leader }}">{{ affiliation.count }}</span>
   </li>
   {% endfor %}
 </ol>

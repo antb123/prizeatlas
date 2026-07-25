@@ -89,6 +89,7 @@ AWARD_COLUMNS = (
     "birth_country",
     "citizenship_countries",
     "affiliation_name",
+    "affiliation_sub_name",
     "affiliation_city",
     "affiliation_country",
     "death_date",
@@ -132,12 +133,22 @@ class AwardRecord:
     birth_country: str
     citizenship_countries: str
     affiliation_name: str
+    affiliation_sub_name: str
     affiliation_city: str
     affiliation_country: str
     death_date: str
     death_city: str
     death_country: str
     biographical_note: str
+
+
+@dataclass(frozen=True, slots=True)
+class Affiliation:
+    """An institution and the constituent units recorded under it. `count` is laureates, not awards, so it is the
+    size of the union of the units' members and is never their sum."""
+    name: str
+    count: int
+    units: tuple[tuple[str, int], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -318,6 +329,28 @@ def _clamp(text: str, limit: int = DESCRIPTION_LIMIT) -> str:
     return collapsed[: limit - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
 
 
+def _winner_description(record: AwardRecord, award_label: str) -> str:
+    """Name, prize, motivation, then where they were.
+
+    The unit is dropped before anything is clamped. A long one — "Department of Economics and School of Public
+    Policy" — costs 78 of 160 characters and would eat the motivation, which is the reason the prize was won and
+    outranks knowing which building they sat in.
+    """
+    lead = f"{record.full_name} won the {award_label} in {record.year}."
+    motivation = record.motivation if _nonblank(record.motivation) else ""
+    if not _nonblank(record.affiliation_name):
+        return _clamp(f"{lead} {motivation}")
+
+    places = [record.affiliation_name]
+    if _nonblank(record.affiliation_sub_name):
+        places.insert(0, f"{record.affiliation_sub_name}, {record.affiliation_name}")
+    for place in places:
+        candidate = " ".join(f"{lead} {motivation} At the time: {place}.".split())
+        if len(candidate) <= DESCRIPTION_LIMIT:
+            return candidate
+    return _clamp(candidate)
+
+
 def _names(values: list[str], limit: int = 3) -> str:
     if len(values) > limit:
         return f"{', '.join(values[:limit])} and {len(values) - limit} more"
@@ -350,6 +383,9 @@ def _laureate_schema(record: AwardRecord, url: str) -> dict[str, Any]:
         payload["deathDate"] = record.death_date
     if _nonblank(record.affiliation_name):
         payload["affiliation"] = {"@type": "Organization", "name": record.affiliation_name}
+        # schema.org's department is an Organization, not a string. The parent stays the resolvable entity.
+        if _nonblank(record.affiliation_sub_name):
+            payload["affiliation"]["department"] = {"@type": "Organization", "name": record.affiliation_sub_name}
     return payload
 
 
@@ -390,21 +426,25 @@ def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str,
     return tuple((motivation, tuple(members)) for motivation, members in groups.items())
 
 
-def plan_places(people: list[Laureate]) -> tuple[list[Place], list[tuple[str, int]]]:
+def plan_places(people: list[Laureate]) -> tuple[list[Place], list[Affiliation]]:
     """Rank birth countries and affiliations by laureate, never by award record.
 
     A laureate with seven awards is one person born in one country. Counting records would rank a country by how
     decorated its emigrants were rather than how many laureates it produced.
+
+    Affiliations are keyed on (institution, unit) so that a school ranks under its parent while still being shown.
+    Someone recorded under both Harvard Medical School and Harvard University appears in two units and once in
+    Harvard's own count, which is why a parent's count is a union and not a sum.
     """
     by_country: dict[str, list[Laureate]] = {}
-    by_affiliation: dict[str, set[str]] = {}
+    by_affiliation: dict[tuple[str, str], set[str]] = {}
     for person in people:
         birth = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
         if country := birth.strip():
             by_country.setdefault(country, []).append(person)
         for record, _ in person.awards:
             if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST:
-                by_affiliation.setdefault(record.affiliation_name, set()).add(person.qid)
+                by_affiliation.setdefault((record.affiliation_name, record.affiliation_sub_name), set()).add(person.qid)
 
     countries: list[Place] = []
     slugs: dict[str, str] = {}
@@ -416,8 +456,23 @@ def plan_places(people: list[Laureate]) -> tuple[list[Place], list[tuple[str, in
         countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
     countries.sort(key=lambda place: (-len(place.people), place.name))
 
-    affiliations = sorted(((name, len(members)) for name, members in by_affiliation.items()), key=lambda row: (-row[1], row[0]))
+    members_by_name: dict[str, set[str]] = {}
+    units_by_name: dict[str, dict[str, set[str]]] = {}
+    for (name, unit), members in by_affiliation.items():
+        members_by_name.setdefault(name, set()).update(members)
+        if unit:
+            units_by_name.setdefault(name, {}).setdefault(unit, set()).update(members)
+
+    affiliations = [
+        Affiliation(name, len(members), _ranked(units_by_name.get(name, {})))
+        for name, members in members_by_name.items()
+    ]
+    affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
     return countries, affiliations
+
+
+def _ranked(units: dict[str, set[str]]) -> tuple[tuple[str, int], ...]:
+    return tuple(sorted(((unit, len(members)) for unit, members in units.items()), key=lambda row: (-row[1], row[0])))
 
 
 def _surname_key(name: str) -> tuple[str, str]:
@@ -716,10 +771,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 # Name first: people search for the person, not the prize, and the name survives SERP truncation.
                 award_label = f"{ranking.prize_name} for {record.category}" if _nonblank(record.category) else ranking.prize_name
                 winner_title = f"{record.full_name} — {award_label}, {record.year}"
-                detail = record.motivation if _nonblank(record.motivation) else ""
-                if _nonblank(record.affiliation_name):
-                    detail = f"{detail} At the time: {record.affiliation_name}." if detail else f"At the time: {record.affiliation_name}."
-                winner_description = _clamp(f"{record.full_name} won the {award_label} in {record.year}. {detail}".strip())
+                winner_description = _winner_description(record, award_label)
                 winner_crumbs = [
                     Breadcrumb("Home", "/"),
                     Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
@@ -823,7 +875,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             ),
             (Breadcrumb("Home", "/"), Breadcrumb("Institutions", None)),
             affiliations=tuple(affiliations[:AFFILIATION_ROWS]),
-            leader=affiliations[0][1] if affiliations else 0,
+            leader=affiliations[0].count if affiliations else 0,
             recorded=recorded_affiliations,
             total=len(records),
         )

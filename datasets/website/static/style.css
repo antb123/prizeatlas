@@ -265,13 +265,36 @@ h3 {
   border-top: 1px solid var(--rule);
 }
 
-.rank-list li {
+/* Direct children only: an institution's constituent units nest a second list inside the middle column, and those
+   rows are not themselves ranked. */
+.rank-list > li {
   display: grid;
   grid-template-columns: 2.5rem minmax(0, 1fr) 6rem;
   gap: 1rem;
   align-items: baseline;
   padding-block: 0.6rem;
   border-bottom: 1px solid var(--rule);
+}
+
+/* The schools and departments recorded under an institution. They are shown, never ranked, and they do not sum to
+   the parent: one laureate can be recorded under both a school and the university itself. */
+.rank-units {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.rank-units li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.15rem;
+}
+
+.rank-unit-count {
+  font-variant-numeric: tabular-nums;
 }
 
 .rank-position {

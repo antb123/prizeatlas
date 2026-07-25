@@ -15,6 +15,7 @@
     {% if record.affiliation_name or record.affiliation_city or record.affiliation_country %}
     <section>
       <h2>Affiliation</h2>
+      {% if record.affiliation_sub_name %}<p>{{ record.affiliation_sub_name }}</p>{% endif %}
       {% if record.affiliation_name %}<p>{{ record.affiliation_name }}</p>{% endif %}
       {% if record.affiliation_city or record.affiliation_country %}
       <p>{{ record.affiliation_city }}{% if record.affiliation_city and record.affiliation_country %}, {% endif %}{{ record.affiliation_country }}</p>
