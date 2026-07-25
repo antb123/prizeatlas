@@ -46,6 +46,7 @@ TEMPLATES = (
 )
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
+HOMEPAGE_ROWS = 8
 PRIZE_PAGE_YEARS = 30
 DESCRIPTION_LIMIT = 160
 # Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
@@ -475,17 +476,6 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
     rankings = sorted(rankings, key=lambda ranking: ranking.score, reverse=True)
     jobs: list[PageJob] = []
     prize_routes = {ranking.qid: f"/{ranking.slug}/" for ranking in rankings}
-    jobs.append(
-        _page(
-            "index.html",
-            "/",
-            "Prestigious Awards and Winners",
-            "Ranked international prizes and winners whose work has made a proven impact on human knowledge.",
-            (),
-            prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
-        )
-    )
-
     category_page_count = 0
     year_page_count = 0
     winner_page_count = 0
@@ -744,6 +734,54 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 },
             )
         )
+
+    # The homepage is planned last: it reports on the whole site, so it needs the laureates and their routes.
+    year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
+    latest_year = max(year_prefixes)
+    # At most two per prize, so the list shows the breadth of a season rather than one prize's whole cohort.
+    recent: list[AwardRecord] = []
+    seen_per_prize: dict[str, int] = {}
+    for record in sorted(
+        (record for record in records if _year_prefix(record.year, record.award_record_id) >= latest_year - 1),
+        key=lambda record: (
+            -_year_prefix(record.year, record.award_record_id),
+            -ranking_by_qid[record.award_wikidata_qid].score,
+            record.full_name,
+        ),
+    ):
+        if seen_per_prize.get(record.award_wikidata_qid, 0) >= 2:
+            continue
+        seen_per_prize[record.award_wikidata_qid] = seen_per_prize.get(record.award_wikidata_qid, 0) + 1
+        recent.append(record)
+    decorated = sorted(
+        (person for person in people if len(person.awards) > 1),
+        key=lambda person: (-len(person.awards), _surname_key(person.name)),
+    )
+    jobs.append(
+        _page(
+            "index.html",
+            "/",
+            "Prestigious Awards and Winners",
+            _clamp(
+                f"{len(people):,} laureates and {len(records):,} awards across {len(rankings)} international prizes, "
+                f"{min(year_prefixes)}-{latest_year}. Ranked, cross-referenced, and browsable by person."
+            ),
+            (),
+            prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
+            totals=(
+                (f"{len(people):,}", "laureates"),
+                (f"{len(records):,}", "awards"),
+                (f"{len(rankings)}", "prizes"),
+                (f"{min(year_prefixes)}-{latest_year}", "years"),
+                (f"{len({record.birth_country for record in records if _nonblank(record.birth_country)})}", "countries"),
+            ),
+            recent=tuple(
+                (record, all_record_routes[record.award_record_id], ranking_by_qid[record.award_wikidata_qid])
+                for record in recent[:HOMEPAGE_ROWS]
+            ),
+            decorated=tuple(decorated[:HOMEPAGE_ROWS]),
+        )
+    )
 
     page_count = max(1, -(-len(people) // PEOPLE_PER_PAGE))
     for number in range(1, page_count + 1):

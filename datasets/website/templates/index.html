@@ -2,24 +2,62 @@
 {% block content %}
 <header class="page-intro">
   <p class="eyebrow">An editorial ranking</p>
-  <h1>{{ title }}</h1>
+  <h1>Prestigious Awards and Winners</h1>
   <p>Explore international prizes and the people and organizations recognized by them.</p>
 </header>
-<ol class="ranking">
-  {% for prize, route in prizes %}
-  <li>
-    <article>
-      <div class="rank">{{ loop.index }}</div>
-      <div>
-        <h2>
-          <a href="{{ href(route) }}">{{ prize.prize_name }}</a>
-          <a class="external-link" href="{{ prize.url }}" aria-label="{{ prize.prize_name }} official website" title="Official website">↗</a>
-        </h2>
-        <p>{{ prize.blurb }}</p>
-      </div>
-      <p class="score"><span>Score</span> {{ prize.score }}</p>
-    </article>
-  </li>
+<dl class="totals">
+  {% for value, label in totals %}
+  <div><dt>{{ value }}</dt><dd>{{ label }}</dd></div>
   {% endfor %}
-</ol>
+</dl>
+{% if decorated %}
+<section>
+  <h2>Most decorated</h2>
+  <p>Laureates recognized by the widest range of these prizes.</p>
+  <ol class="highlights">
+    {% for person in decorated %}
+    <li>
+      <a href="{{ href(person.route) }}">{{ person.name }}</a>
+      <span>{{ person.awards | length }} awards</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% if recent %}
+<section>
+  <h2>Recently awarded</h2>
+  <ol class="highlights">
+    {% for record, route, prize in recent %}
+    <li>
+      <a href="{{ href(route) }}">{{ record.full_name }}</a>
+      <span>{{ prize.prize_name }}, {{ record.year }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+<section>
+  <h2>Ranked awards</h2>
+  <ol class="ranking">
+    {% for prize, route in prizes %}
+    <li>
+      <article>
+        <div class="rank">{{ loop.index }}</div>
+        <div>
+          <h3>
+            <a href="{{ href(route) }}">{{ prize.prize_name }}</a>
+            <a class="external-link" href="{{ prize.url }}" aria-label="{{ prize.prize_name }} official website" title="Official website">↗</a>
+          </h3>
+          <p>{{ prize.blurb }}</p>
+        </div>
+        <p class="score" style="--score: {{ prize.score }}">
+          <span>Score</span> {{ prize.score }}
+          <span class="score-bar" aria-hidden="true"></span>
+        </p>
+      </article>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
 {% endblock %}

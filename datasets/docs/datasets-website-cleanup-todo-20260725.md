@@ -105,11 +105,23 @@ Steps → verify:
 3. Add a co-laureate list to `winner.html` → Hinton's page links Hopfield; a sole winner renders no empty section.
 4. Add previous/next year links within the same prize and category → first and last years render only one link.
 
-## CLEAN-3 — Homepage
+## CLEAN-3 — Homepage — DONE 20260725
 
 ID: `CLEAN-3` — Give the homepage scale, names, and a readable score. Spec §1.1-§1.4.
 
 Depends-on: CLEAN-1 (step 2 needs person routes)
+
+Outcome: the homepage opens with a scale line, then names, then the ranking. Every figure was cross-checked against
+SQL: 2,367 laureates, 3,091 awards, 14 prizes, 1901-2026, 171 countries.
+
+The index page is now planned last in `create_site_plan` rather than first, because it reports on the whole site and
+needs the laureates and their routes.
+
+"Recently awarded" takes at most two entries per prize. Sorting purely by year then prize score filled it with one
+prize's cohort — four Fields Medal 2026 laureates out of eight rows. The cap gives five prizes instead.
+
+Score bars are a `--score` custom property consumed by `width: calc(var(--score) * 1%)`, right-aligned at desktop
+and full-width in the mobile single-column layout.
 
 Files:
 
