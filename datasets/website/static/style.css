@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   --paper: #f4f0e7;
   --surface: #fbf8f1;
   --ink: #262823;
@@ -11,6 +11,17 @@
   line-height: 1.6;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #191a17;
+    --surface: #212320;
+    --ink: #eceadf;
+    --muted: #a3a599;
+    --accent: #a3c3a5;
+    --rule: #3d3f39;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -20,6 +31,9 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   color: var(--ink);
   background: var(--paper);
@@ -99,6 +113,7 @@ footer p {
 }
 
 main {
+  flex: 1;
   padding-block: 2.5rem 5rem;
 }
 
@@ -121,11 +136,11 @@ h3 {
 }
 
 h1 {
-  max-width: 22ch;
+  max-width: 26ch;
   margin: 0.25rem 0 1rem;
-  font-size: clamp(2rem, 8vw, 4.5rem);
+  font-size: clamp(1.9rem, 5vw, 3rem);
   font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
 }
 
 h2 {
@@ -239,6 +254,9 @@ h3 {
 }
 
 .category-year {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
@@ -248,13 +266,19 @@ h3 {
 }
 
 .category-recipients p {
+  max-width: 62ch;
   margin: 0.25rem 0 0;
   color: var(--muted);
+  font-size: 0.9375rem;
+  font-style: italic;
 }
 
 .category-recipients .recipient-names {
+  max-width: none;
   margin: 0;
   color: var(--ink);
+  font-size: 1rem;
+  font-style: normal;
 }
 
 .group-category {

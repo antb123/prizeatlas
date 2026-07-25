@@ -242,11 +242,30 @@ Steps → verify:
 4. Rebuild and diff the sitemap against the previous build → every removed URL is a category page that was intended to
    go, and no winner page changed route unintentionally.
 
-## CLEAN-6 — Craft pass
+## CLEAN-6 — Craft pass — DONE 20260725
 
 ID: `CLEAN-6` — Typography and layout corrections. Spec §4.1-§4.5.
 
 Depends-on: CLEAN-1, CLEAN-2, CLEAN-3 (layouts must have stopped moving)
+
+Done: `h1` clamp cap 4.5rem → 3rem; `body` flex column with `main { flex: 1 }` so short pages pin their footer;
+`.category-year` sticky within its row; citations on category pages set italic at 0.9375rem on a 62ch measure so the
+names carry the page; dark scheme added as a `prefers-color-scheme` override of the six existing custom properties.
+
+Contrast measured for every text/background pair in both schemes — all pass WCAG AA, most AAA:
+
+| Pair | Light | Dark |
+|---|---|---|
+| body on paper | 13.09 AAA | 14.48 AAA |
+| muted on paper | 5.05 AA | 6.99 AA |
+| link on paper | 5.20 AA | 9.08 AAA |
+| body on surface | 14.04 AAA | 13.12 AAA |
+| muted on surface | 5.41 AA | 6.33 AA |
+| link on surface | 5.57 AA | 8.23 AAA |
+
+**Not verified visually:** the dark scheme was checked by contrast arithmetic and by confirming the media query ships
+in `dist/static/style.css`, not by screenshot. Headless Chrome's `--force-dark-mode` applies its own auto-darkening
+filter rather than setting `prefers-color-scheme`, so it cannot exercise this rule. Worth one look in a real browser.
 
 Files:
 
