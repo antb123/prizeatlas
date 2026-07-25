@@ -48,6 +48,9 @@ PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 PRIZE_PAGE_YEARS = 30
 DESCRIPTION_LIMIT = 160
+# Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
+# category yields a page per award; they browse by year instead.
+YEAR_ROUTED_PRIZES = frozenset({"japan-prize"})
 FACT_FIELDS = (
     ("Type", "laureate_type"),
     ("Born", "birth_date"),
@@ -492,7 +495,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
     for ranking in rankings:
         prize_records = records_by_qid[ranking.qid]
         categories = {record.category for record in prize_records if _nonblank(record.category)}
-        routed_categories = len(categories) > 1
+        routed_categories = len(categories) > 1 and ranking.slug not in YEAR_ROUTED_PRIZES
         category_slugs = _category_slugs(categories) if routed_categories else {}
         if routed_categories and any(not _nonblank(record.category) for record in prize_records):
             raise BuildFailure(f"blank routed category qid={ranking.qid}")
@@ -636,7 +639,10 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
 
         for (routed_category, year), grouped_records in year_records.items():
             route = year_routes[(routed_category, year)]
-            display_category = next((record.category for record in grouped_records if _nonblank(record.category)), "")
+            # A year-routed prize can award several topics in one year, so name the category in the heading only when
+            # the year has exactly one; otherwise each recipient group carries its own.
+            year_categories = {record.category for record in grouped_records if _nonblank(record.category)}
+            display_category = next(iter(year_categories)) if len(year_categories) == 1 else ""
             ordered_group = sorted(grouped_records, key=lambda record: record.award_record_id)
             roll_call = _names([record.full_name for record in ordered_group])
             # The award leads, then the recipients: a long recipient name must not push the year page's description
@@ -660,6 +666,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                     crumbs,
                     prize=ranking,
                     category=display_category,
+                    show_group_categories=len(year_categories) > 1,
                     year=year,
                     winners=_by_motivation((record, all_record_routes[record.award_record_id]) for record in ordered_group),
                     earlier_year=neighbours[(routed_category, year)][0],

@@ -191,11 +191,33 @@ Steps → verify:
    **Deployment follow-up, not yet done:** nginx needs `error_page 404 /404.html;` in the server block. Until then
    the file is built but never served.
 
-## CLEAN-5 — Category normalization
+## CLEAN-5 — Category normalization — DONE 20260725
 
 ID: `CLEAN-5` — Collapse duplicate Japan Prize categories and route rotating-topic prizes by year. Spec §2.6.
 
 Depends-on: none
+
+Outcome: `dist/japan-prize/` holds 42 year directories instead of 73 category directories. Site-wide category pages
+fell from 98 to 26; total pages from 7,237 to 7,122.
+
+Only four merges were applied, all pure punctuation or plural variants. Backup: `awards.sqlite3.*.japan-categories.bak`.
+
+| Merged | Into |
+|---|---|
+| Life Science | Life Sciences |
+| Electronics, Information and Communication | Electronics, Information, and Communication |
+| Medical Science and Medicinal Science | Medical Science, Medicinal Science |
+| Resources, Energy, Environment and Social Infrastructure / …, Social Infrastructure | Resources, Energy, the Environment, and Social Infrastructure |
+
+**Deliberately not merged.** Of 72 Japan Prize categories, most are genuine annual topics rather than spelling
+variants — the prize picks two fields afresh each year. Pairs like "Biological Production and Biological Environment"
+vs "Biological Production and Environment", or "Materials and Production" vs "Materials Science and Production", need
+a subject-matter judgement rather than a text rule, so they were left alone. Routing by year makes them harmless:
+category is now displayed data, not a URL.
+
+The routing override is `YEAR_ROUTED_PRIZES` in `build.py`, keyed on the curated prize slug. Crafoord was reviewed
+and left category-routed: its five categories are standing divisions, not annual topics. A year that awards more than
+one topic names each one against its recipients rather than in the page heading.
 
 Files:
 

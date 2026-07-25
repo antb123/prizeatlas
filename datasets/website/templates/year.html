@@ -9,6 +9,7 @@
   <ol class="recipient-list">
     {% for motivation, members in winners %}
     <li>
+      {% if show_group_categories and members[0][0].category %}<p class="group-category">{{ members[0][0].category }}</p>{% endif %}
       <h3>
         {% for record, route in members %}<a href="{{ href(route) }}">{{ record.full_name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
       </h3>

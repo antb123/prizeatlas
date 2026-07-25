@@ -145,18 +145,19 @@ class WebsiteBuildTests(unittest.TestCase):
 
         plan = build.build_site(database, "https://example.org/awards/", self.website)
 
-        self.assertEqual((3, 4, 5), (plan.prize_count, plan.category_count, plan.winner_count))
+        # Japan Prize routes by year, so only the Nobel Prize contributes category pages.
+        self.assertEqual((3, 2, 5), (plan.prize_count, plan.category_count, plan.winner_count))
         physics = self.website / "dist/nobel-prize/physics/1939/ernest-orlando-lawrence/index.html"
         physics_category = self.website / "dist/nobel-prize/physics/index.html"
         turing = self.website / "dist/turing-award/1989/organization-example/index.html"
         self.assertTrue(physics.is_file())
         self.assertTrue(turing.is_file())
-        self.assertTrue(
-            (
-                self.website
-                / "dist/japan-prize/electronics-information-and-communication-2/2000/first-recipient/index.html"
-            ).is_file()
-        )
+        # The Japan Prize picks its topic afresh each year, so its winners sit under the year, not a category slug.
+        self.assertTrue((self.website / "dist/japan-prize/2000/first-recipient/index.html").is_file())
+        self.assertFalse((self.website / "dist/japan-prize/electronics-information-and-communication").exists())
+        japan_html = (self.website / "dist/japan-prize/index.html").read_text()
+        self.assertIn('href="2000/"', japan_html)
+        self.assertIn('href="2001/"', japan_html)
 
         physics_html = physics.read_text()
         self.assertIn("<title>Ernest Orlando Lawrence — Nobel Prize for Physics, 1939</title>", physics_html)
@@ -208,6 +209,38 @@ class WebsiteBuildTests(unittest.TestCase):
                     resolved = (html_path.parent / href).resolve()
                 target = resolved / "index.html" if href.endswith("/") else resolved
                 self.assertIn(target, generated, f"{html_path}: {href}")
+
+    def test_year_routed_prize_names_each_topic_in_the_year(self) -> None:
+        rankings = [("Q3", "Japan Prize", "japan-prize", "https://example.org/japan", 80)]
+        records = [
+            {
+                "award_record_id": "japan-1",
+                "award_wikidata_qid": "Q3",
+                "prize_name": "Japan Prize",
+                "category": "Life Sciences",
+                "year": "2000",
+                "full_name": "Biology Laureate",
+                "motivation": "for work in biology",
+            },
+            {
+                "award_record_id": "japan-2",
+                "award_wikidata_qid": "Q3",
+                "prize_name": "Japan Prize",
+                "category": "Materials and Production",
+                "year": "2000",
+                "full_name": "Materials Laureate",
+                "motivation": "for work in materials",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        year_html = (self.website / "dist/japan-prize/2000/index.html").read_text()
+        # Two topics share one year, so neither may claim the heading; each recipient group names its own.
+        self.assertIn("<title>Japan Prize 2000: Winners</title>", year_html)
+        self.assertIn('<p class="group-category">Life Sciences</p>', year_html)
+        self.assertIn('<p class="group-category">Materials and Production</p>', year_html)
 
     def test_metadata_is_unique_and_structured_data_is_safe(self) -> None:
         rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
