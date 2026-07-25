@@ -38,6 +38,9 @@ ALIASES = {
     "University of Oxford, UK": "University of Oxford",
     "Institute for Advanced Study, USA": "Institute for Advanced Study",
     "Institute for Advanced Study, Princeton": "Institute for Advanced Study",
+    # The Institute for Advanced Study sits in Princeton but is independent of the university; the source claims it
+    # as Princeton's. Kyoto University's own Institute for Advanced Study is a different place and stays separate.
+    "Princeton University's Institute for Advanced Studies, USA": "Institute for Advanced Study",
     "Hebrew University of Jerusalem, Israel": "Hebrew University of Jerusalem",
     "Collège de France, France": "Collège de France",
     "University of Toronto, Canada": "University of Toronto",
