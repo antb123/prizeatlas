@@ -91,10 +91,18 @@ HISTORICAL_BY_CITY = {
 # Names we keep even though ISO 3166 lists them differently. "Russian Federation" is the ISO name; "Russia" is what
 # English readers expect and pycountry carries no common_name for it.
 DISPLAY_EXCEPTIONS = frozenset({"Russia", "Democratic Republic of the Congo"})
-# Individual records whose columns hold the wrong thing entirely.
+# Individual records whose columns hold the wrong thing entirely, each checked against a source by hand because
+# Wikidata cannot settle it.
 RECORD_FIXES = {
     # The sex landed in birth_country and the country in birth_city.
     "lasker_awards-000225": {"birth_country": "United States", "birth_city": ""},
+    # The Gairdner source conflates two people: it credits the connective-tissue work of Karl Meyer the biochemist
+    # (Q1732372, 1899-1990) but carries the dates of Karl Friedrich Meyer, the Swiss pathologist (1884-1974). The
+    # record now points at the biochemist, so the note holding the pathologist's dates has to go with it.
+    "gairdner_international_award-000011": {"death_date": "1990-05-18", "biographical_note": ""},
+    # Wikidata has no birthplace for Nicholas Lydon (Q547551), and no reliable biography gives a city. England is
+    # attested; the Royal Society confirms the identity. The other record had a different person's date entirely.
+    "lasker_awards-000341": {"birth_date": "1957-02-27", "birth_year": "1957", "birth_city": "", "birth_country": "United Kingdom"},
 }
 # States that no longer exist. A parenthetical naming one glosses the outer name rather than modernising it, as in
 # "Belarus (USSR)", so the outer name is the modern one there.
@@ -129,7 +137,9 @@ def modern_country(value: str, city: str = "") -> str:
 
 def plan(database: Path) -> list[tuple[str, str, str, str]]:
     """Every (record, column, old, new) the clean would write."""
-    columns = ", ".join(("award_record_id", *TEXT_COLUMNS, *COUNTRY_COLUMNS, "birth_city"))
+    fix_columns = {column for fields in RECORD_FIXES.values() for column in fields}
+    selected = dict.fromkeys(("award_record_id", *TEXT_COLUMNS, *COUNTRY_COLUMNS, "birth_city", *sorted(fix_columns)))
+    columns = ", ".join(f'"{column}"' for column in selected)
     with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(f"SELECT {columns} FROM awards").fetchall()
@@ -146,7 +156,7 @@ def plan(database: Path) -> list[tuple[str, str, str, str]]:
             if (new := modern_country(old, city)) != old:
                 changes.append((row["award_record_id"], column, old, new))
         for column, new in RECORD_FIXES.get(row["award_record_id"], {}).items():
-            if (old := row[column] or "") != new:
+            if (old := row[column] if row[column] is not None else "") != new:
                 changes.append((row["award_record_id"], column, old, new))
     return changes
 
