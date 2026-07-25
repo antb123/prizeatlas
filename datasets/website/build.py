@@ -21,7 +21,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import quote_plus, urlsplit, urlunsplit
 from xml.sax.saxutils import escape as xml_escape
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
@@ -169,6 +169,10 @@ def validate_official_url(value: str) -> None:
 
 def public_url(base_url: str, route: str) -> str:
     return base_url + route.lstrip("/")
+
+
+def wikipedia_search_url(name: str) -> str:
+    return f"https://en.wikipedia.org/w/index.php?search={quote_plus(name)}"
 
 
 def relative_route(source_route: str, target_route: str) -> str:
@@ -368,7 +372,15 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 category_route = prize_routes[ranking.qid] + f"{category_slugs[category]}/"
                 category_links.append((category, category_route))
                 category_years = [
-                    (year, year_routes[(category, year)], _year_prefix(year, grouped[0].award_record_id))
+                    (
+                        year,
+                        year_routes[(category, year)],
+                        _year_prefix(year, grouped[0].award_record_id),
+                        tuple(
+                            (record, all_record_routes[record.award_record_id])
+                            for record in sorted(grouped, key=lambda item: item.award_record_id)
+                        ),
+                    )
                     for (record_category, year), grouped in year_records.items()
                     if record_category == category
                 ]
@@ -502,6 +514,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                         record=record,
                         facts=facts,
                         year_route=route,
+                        wikipedia_url=wikipedia_search_url(record.full_name),
                     )
                 )
                 winner_page_count += 1

@@ -170,6 +170,13 @@ h3 {
   margin: 0 0 0.5rem;
 }
 
+.external-link {
+  display: inline-block;
+  margin-left: 0.3rem;
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
 .rank {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
@@ -208,6 +215,35 @@ h3 {
 .route-list li,
 .winner-list li {
   margin-block: 0.5rem;
+}
+
+.category-years,
+.category-recipients {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-years > li {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.category-year {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.category-recipients li + li {
+  margin-top: 1rem;
+}
+
+.category-recipients p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
 }
 
 .winner-list span {
@@ -249,6 +285,10 @@ summary {
 
 .lead {
   font-size: 1.2rem;
+}
+
+.external-source {
+  font-weight: 700;
 }
 
 .facts dl,

@@ -69,6 +69,10 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("ngo-bao-chau", build.slugify("Ngô Bao Châu"))
         self.assertEqual("sren", build.slugify("Søren"))
         self.assertEqual("frank-h-shu", build.slugify("Frank H. Shu (徐遐生)"))
+        self.assertEqual(
+            "https://en.wikipedia.org/w/index.php?search=Ng%C3%B4+B%E1%BA%A3o+Ch%C3%A2u",
+            build.wikipedia_search_url("Ngô Bảo Châu"),
+        )
         self.assertEqual("https://example.org/awards/", build.normalize_base_url("https://example.org/awards"))
         for value in (
             "http://example.org/",
@@ -142,6 +146,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertEqual((3, 4, 5), (plan.prize_count, plan.category_count, plan.winner_count))
         physics = self.website / "dist/nobel-prize/physics/1939/ernest-orlando-lawrence/index.html"
+        physics_category = self.website / "dist/nobel-prize/physics/index.html"
         turing = self.website / "dist/turing-award/1989/organization-example/index.html"
         self.assertTrue(physics.is_file())
         self.assertTrue(turing.is_file())
@@ -159,6 +164,18 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
         self.assertNotIn("<em>unsafe</em>", physics_html)
         self.assertIn('href="../"', physics_html)
+        self.assertIn(
+            'href="https://en.wikipedia.org/w/index.php?search=Ernest+Orlando+Lawrence"',
+            physics_html,
+        )
+        physics_category_html = physics_category.read_text()
+        self.assertIn('href="1939/ernest-orlando-lawrence/">Ernest Orlando Lawrence</a>', physics_category_html)
+        self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_category_html)
+        home_html = (self.website / "dist/index.html").read_text()
+        self.assertIn(
+            'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
+            home_html,
+        )
         turing_html = turing.read_text()
         self.assertIn("<title>Turing Award for Computer science 1989 — Organization Example</title>", turing_html)
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)

@@ -7,9 +7,19 @@
 </header>
 <section>
   <h2>Award years</h2>
-  <ul class="route-list year-grid">
-    {% for year, route, prefix in years %}
-    <li><a href="{{ href(route) }}">{{ year }}</a></li>
+  <ul class="category-years">
+    {% for year, route, prefix, winners in years %}
+    <li>
+      <a class="category-year" href="{{ href(route) }}">{{ year }}</a>
+      <ul class="category-recipients">
+        {% for record, winner_route in winners %}
+        <li>
+          <a href="{{ href(winner_route) }}">{{ record.full_name }}</a>
+          {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
     {% endfor %}
   </ul>
 </section>

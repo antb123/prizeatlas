@@ -11,7 +11,10 @@
     <article>
       <div class="rank">{{ loop.index }}</div>
       <div>
-        <h2><a href="{{ href(route) }}">{{ prize.prize_name }}</a></h2>
+        <h2>
+          <a href="{{ href(route) }}">{{ prize.prize_name }}</a>
+          <a class="external-link" href="{{ prize.url }}" aria-label="{{ prize.prize_name }} official website" title="Official website">↗</a>
+        </h2>
         <p>{{ prize.blurb }}</p>
       </div>
       <p class="score"><span>Score</span> {{ prize.score }}</p>
