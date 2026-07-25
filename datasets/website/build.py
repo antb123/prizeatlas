@@ -42,11 +42,19 @@ TEMPLATES = (
     "winner.html",
     "person.html",
     "people.html",
+    "countries.html",
+    "country.html",
+    "affiliations.html",
     "404.html",
 )
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
+COUNTRIES_ROUTE = "/countries/"
+AFFILIATIONS_ROUTE = "/affiliations/"
+AFFILIATION_ROWS = 40
+# Recorded in the affiliation column but not an institution.
+AFFILIATION_BLOCKLIST = frozenset({"Freelance"})
 PRIZE_PAGE_YEARS = 30
 DESCRIPTION_LIMIT = 160
 # Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
@@ -157,6 +165,14 @@ class Laureate:
 
 
 @dataclass(frozen=True, slots=True)
+class Place:
+    name: str
+    slug: str
+    route: str
+    people: tuple[Laureate, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class SitePlan:
     jobs: tuple[PageJob, ...]
     prize_count: int
@@ -165,6 +181,7 @@ class SitePlan:
     winner_count: int
     recipient_count: int
     person_count: int
+    country_count: int
 
 
 def slugify(value: str) -> str:
@@ -371,6 +388,36 @@ def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str,
     for record, route in pairs:
         groups.setdefault(record.motivation, []).append((record, route))
     return tuple((motivation, tuple(members)) for motivation, members in groups.items())
+
+
+def plan_places(people: list[Laureate]) -> tuple[list[Place], list[tuple[str, int]]]:
+    """Rank birth countries and affiliations by laureate, never by award record.
+
+    A laureate with seven awards is one person born in one country. Counting records would rank a country by how
+    decorated its emigrants were rather than how many laureates it produced.
+    """
+    by_country: dict[str, list[Laureate]] = {}
+    by_affiliation: dict[str, set[str]] = {}
+    for person in people:
+        birth = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
+        if country := birth.strip():
+            by_country.setdefault(country, []).append(person)
+        for record, _ in person.awards:
+            if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST:
+                by_affiliation.setdefault(record.affiliation_name, set()).add(person.qid)
+
+    countries: list[Place] = []
+    slugs: dict[str, str] = {}
+    for name, members in by_country.items():
+        slug = slugify(name)
+        if slug in slugs:
+            raise BuildFailure(f"duplicate country slug slug={slug} name={name!r} other={slugs[slug]!r}")
+        slugs[slug] = name
+        countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
+    countries.sort(key=lambda place: (-len(place.people), place.name))
+
+    affiliations = sorted(((name, len(members)) for name, members in by_affiliation.items()), key=lambda row: (-row[1], row[0]))
+    return countries, affiliations
 
 
 def _surname_key(name: str) -> tuple[str, str]:
@@ -735,6 +782,53 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             )
         )
 
+    countries, affiliations = plan_places(people)
+    recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
+    jobs.append(
+        _page(
+            "countries.html",
+            COUNTRIES_ROUTE,
+            "Where laureates were born",
+            _clamp(
+                f"The birthplaces of {sum(len(place.people) for place in countries):,} laureates across "
+                f"{len(countries)} countries, ranked. Birthplace only, not where the work was done."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("Countries", None)),
+            countries=tuple(countries),
+            leader=countries[0].people.__len__() if countries else 0,
+        )
+    )
+    for place in countries:
+        jobs.append(
+            _page(
+                "country.html",
+                place.route,
+                f"Laureates born in {place.name}",
+                _clamp(
+                    f"{len(place.people)} award-winning {'laureate' if len(place.people) == 1 else 'laureates'} "
+                    f"born in {place.name}, with every prize each of them won."
+                ),
+                (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(place.name, None)),
+                place=place,
+            )
+        )
+    jobs.append(
+        _page(
+            "affiliations.html",
+            AFFILIATIONS_ROUTE,
+            "Institutions with the most laureates",
+            _clamp(
+                f"The universities, institutes, and laboratories most often recorded against these awards, ranked by "
+                f"laureate. Recorded for {recorded_affiliations:,} of {len(records):,} awards."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("Institutions", None)),
+            affiliations=tuple(affiliations[:AFFILIATION_ROWS]),
+            leader=affiliations[0][1] if affiliations else 0,
+            recorded=recorded_affiliations,
+            total=len(records),
+        )
+    )
+
     # The homepage is planned last: it reports on the whole site, so it needs the laureates and their routes.
     year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
     latest_year = max(year_prefixes)
@@ -820,6 +914,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         winner_page_count,
         len(records),
         len(people),
+        len(countries),
     )
 
 
@@ -904,6 +999,8 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
         people_route=PEOPLE_ROUTE,
+        countries_route=COUNTRIES_ROUTE,
+        affiliations_route=AFFILIATIONS_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
         **job.context,
@@ -928,6 +1025,8 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
         people_route=PEOPLE_ROUTE,
+        countries_route=COUNTRIES_ROUTE,
+        affiliations_route=AFFILIATIONS_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
     )
@@ -1006,7 +1105,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         "website build complete "
         f"prizes={plan.prize_count} categories={plan.category_count} year_pages={plan.year_count} "
-        f"winner_pages={plan.winner_count} people={plan.person_count} recipients={plan.recipient_count} "
+        f"winner_pages={plan.winner_count} people={plan.person_count} countries={plan.country_count} recipients={plan.recipient_count} "
         f"sitemap_urls={len(plan.jobs)} generated_pages={len(plan.jobs)}"
     )
     return 0

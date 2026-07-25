@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Institutions</p>
+  <h1>{{ title }}</h1>
+  <p>Universities, institutes, and laboratories ranked by how many laureates are recorded against them.</p>
+  <p class="caveat">An affiliation is recorded for {{ "{:,}".format(recorded) }} of {{ "{:,}".format(total) }} awards.
+  This ranks what is recorded, which is not the same as the full picture, and an affiliation is the one held at the
+  time of the award rather than a whole career.</p>
+</header>
+<ol class="rank-list">
+  {% for name, count in affiliations %}
+  <li>
+    <span class="rank-position">{{ loop.index }}</span>
+    <span>{{ name }}</span>
+    <span class="rank-count" style="--share: {{ count * 100 // leader }}">{{ count }}</span>
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}

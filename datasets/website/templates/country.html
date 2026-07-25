@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Born in</p>
+  <h1>{{ place.name }}</h1>
+  <p>{{ place.people | length }} {{ "laureate" if place.people | length == 1 else "laureates" }} on record were born here.</p>
+</header>
+<ul class="people-index">
+  {% for person in place.people %}
+  <li>
+    <a href="{{ href(person.route) }}">{{ person.name }}</a>
+    <span>{{ person.awards | length }}</span>
+  </li>
+  {% endfor %}
+</ul>
+<p><a href="{{ href(countries_route) }}">All countries</a></p>
+{% endblock %}

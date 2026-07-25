@@ -246,6 +246,56 @@ h3 {
   text-align: right;
 }
 
+.caveat {
+  max-width: 44rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border-left: 3px solid var(--rule);
+  color: var(--muted);
+}
+
+.page-intro > p.caveat {
+  font-size: 0.9375rem;
+}
+
+.rank-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.rank-list li {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) 6rem;
+  gap: 1rem;
+  align-items: baseline;
+  padding-block: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rank-position {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.rank-count {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* A bar under the count, sized by its share of the leader, so the distribution reads at a glance. */
+.rank-count::after {
+  content: "";
+  display: block;
+  width: calc(var(--share) * 1%);
+  height: 3px;
+  margin-top: 0.3rem;
+  margin-left: auto;
+  background: var(--accent);
+}
+
 .score-bar {
   display: block;
   width: calc(var(--score) * 1%);
