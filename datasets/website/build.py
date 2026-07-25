@@ -600,6 +600,11 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
     return job.route
 
 
+def _make_world_readable(root: Path) -> None:
+    for path in (root, *root.rglob("*")):
+        path.chmod(0o2755 if path.is_dir() else 0o644)
+
+
 def _promote(staging: Path, dist: Path) -> None:
     backup: Path | None = None
     if dist.exists():
@@ -639,6 +644,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
             )
             list(rendered)
         write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
+        _make_world_readable(staging)
         _promote(staging, dist)
     finally:
         if staging.exists():

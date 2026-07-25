@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import shutil
 import sqlite3
+import stat
 import sys
 import tempfile
 import unittest
@@ -169,6 +170,9 @@ class WebsiteBuildTests(unittest.TestCase):
             "https://example.org/awards/nobel-prize/physics/1939/ernest-orlando-lawrence/",
             locations,
         )
+        for path in (self.website / "dist", *(self.website / "dist").rglob("*")):
+            mode = stat.S_IMODE(path.stat().st_mode)
+            self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)
 
         generated = {path.resolve() for path in (self.website / "dist").rglob("*") if path.is_file()}
         for html_path in (self.website / "dist").rglob("*.html"):
