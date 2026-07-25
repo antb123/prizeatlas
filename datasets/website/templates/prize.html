@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% macro winner_groups(groups) %}
+<div class="winner-groups">
+  {% for year, winners in groups %}
+  <section class="winner-group">
+    <h3>{{ year }}</h3>
+    <ul class="winner-list">
+      {% for record, route in winners %}
+      <li>
+        <a href="{{ href(route) }}">{{ record.full_name }}</a>
+        {% if routed_categories %}<span>{{ record.category }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+{% endmacro %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Ranked award · Score {{ prize.score }}</p>
+  <h1>{{ title }}</h1>
+  <p>{{ prize.blurb }}</p>
+</header>
+<section class="award-note">
+  <h2>Why it ranks here</h2>
+  <p>{{ prize.reasoning }}</p>
+  <p><a class="external" href="{{ prize.url }}">Official website</a></p>
+</section>
+<section>
+  <h2>{% if routed_categories %}Categories{% else %}Award years{% endif %}</h2>
+  <ul class="route-list">
+    {% if routed_categories %}
+      {% for category, route in category_links %}<li><a href="{{ href(route) }}">{{ category }}</a></li>{% endfor %}
+    {% else %}
+      {% for year, route, prefix in year_links %}<li><a href="{{ href(route) }}">{{ year }}</a></li>{% endfor %}
+    {% endif %}
+  </ul>
+</section>
+<section>
+  <h2>Winners</h2>
+  {{ winner_groups(recent_groups) }}
+  {% if older_groups %}
+  <details>
+    <summary>More winners</summary>
+    {{ winner_groups(older_groups) }}
+  </details>
+  {% endif %}
+</section>
+{% endblock %}

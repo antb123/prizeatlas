@@ -16,8 +16,6 @@ Every build MUST generate an XML sitemap containing the absolute URL of every pu
 Every page MUST have a unique factual title, one descriptive `h1`, a meta description, breadcrumbs where the page is
 below the homepage, and an absolute canonical URL.
 
-DESIGN style is clean DANISH furniture store
-
 ## Background
 
 `awards.sqlite3` is the source of truth under `AGENTS.md:35-58`. It currently contains 3,091 award rows, 14 prize
@@ -48,7 +46,7 @@ configuration. `.gitignore:1-3` currently ignores only the live SQLite files.
 
 ## Scope
 
-Sixteen implementation files, approximately 1,500 lines, plus the live `award_ranking` table update:
+Sixteen implementation files, approximately 1,550 lines, plus the live `award_ranking` table update:
 
 | File | Current line range | Change |
 | --- | --- | --- |
@@ -58,14 +56,14 @@ Sixteen implementation files, approximately 1,500 lines, plus the live `award_ra
 | `docs/datasets-award-ranking-20260725.md` | existing lines 1-119 | Add the slug to the ranking-table contract. |
 | `website/build.py` | new file, lines 1-300 | Read, validate, route, render the site with eight worker threads, and generate the sitemap. |
 | `website/build.py.lock` | new generated file, lines 1-30 | Lock the inline Jinja dependency. |
-| `website/templates/base.html` | new file, lines 1-60 | Shared document shell, SEO metadata, breadcrumbs, navigation, and footer. |
+| `website/templates/base.html` | new file, lines 1-70 | Shared document shell, document metadata, SEO metadata, breadcrumbs, navigation, and footer. |
 | `website/templates/index.html` | new file, lines 1-65 | Ranked prize homepage. |
 | `website/templates/prize.html` | new file, lines 1-85 | Prize description, reasoning, official link, and category or year links. |
 | `website/templates/category.html` | new file, lines 1-70 | Category landing page and year links. |
 | `website/templates/year.html` | new file, lines 1-90 | Prize/category/year heading and linked recipient list. |
 | `website/templates/winner.html` | new file, lines 1-120 | Wikipedia-style winner article, facts, award, and affiliation. |
 | `website/static/style.css` | new file, lines 1-200 | Responsive semantic presentation, breadcrumbs, and winner fact panel. |
-| `tests/test_build_website.py` | new file, lines 1-270 | Route, recency, SEO, sitemap, rendering, escaping, and failure tests. |
+| `tests/test_build_website.py` | new file, lines 1-300 | Route, recency, SEO, sitemap, rendering, escaping, and failure tests. |
 | `.gitignore` | existing lines 1-3 | Ignore `website/dist/` and temporary website build directories. |
 | `AGENTS.md` | existing lines 35-62 | Document the build command, source, output, and generated-file rule. |
 
@@ -101,18 +99,21 @@ builder MUST read the stored slug directly and fail on a missing, invalid, or du
 Category, year, and winner segments use one standard-library slug function:
 
 1. normalize with Unicode NFKD;
-2. encode to ASCII while dropping combining marks, then decode and lowercase;
+2. encode to ASCII with errors ignored, discarding every remaining non-ASCII character, then decode and lowercase;
 3. replace each run of characters outside `a-z` and `0-9` with one hyphen;
 4. trim leading and trailing hyphens;
 5. reject an empty result.
 
 Examples include `Physics` to `physics`, `1983/1984` to `1983-1984`, `2013 (special)` to `2013-special`, and
-`Ngô Bao Châu` to `ngo-bao-chau`.
+`Ngô Bao Châu` to `ngo-bao-chau`. Characters that NFKD does not decompose are intentionally removed, so `Søren`
+becomes `sren` and `Frank H. Shu (徐遐生)` becomes `frank-h-shu`.
 
 Within each prize, category values are grouped by their base slug. If more than one distinct value shares a base,
 sort the original values by Unicode code point and assign the base slug to the first, then `-2`, `-3`, and so on.
 This preserves all 98 current categories, including the two Japan Prize labels that both reduce to
-`electronics-information-and-communication`. A duplicate winner slug within one year route remains an error.
+`electronics-information-and-communication`. Distinct year labels that reduce to the same slug within one
+prize/category route MUST fail before generation; `1983/1984` and `1983-1984` are the canonical collision fixture.
+A duplicate winner slug within one year route remains an error.
 
 For a prize with more than one distinct nonblank category, the site MUST generate a category landing page and put
 the category between prize and year. For a prize with zero or one distinct nonblank category, the category segment
@@ -135,7 +136,9 @@ record gets one winner page below its year route, such as
 `/nobel-prize/physics/1939/ernest-orlando-lawrence/`. Winner slugs need only be unique within that year route; a
 collision MUST fail before any output is published. There is no `/winners/` namespace.
 
-All internal links MUST be relative so the site works at a domain root or under a hosting subpath.
+All internal links MUST be relative so the site works at a domain root or under a hosting subpath. Every navigation,
+breadcrumb, and stylesheet `href` MUST be computed from the current output page's directory depth to its target;
+hard-coded root-relative paths are forbidden. Canonical and sitemap URLs remain absolute.
 
 ## Content
 
@@ -155,6 +158,10 @@ descending by Unicode code point, then `award_record_id`, and link to their cont
 prizes MUST show each record's category. When older records exist, they MUST appear in a native `<details>` element
 whose `<summary>` is `More winners`; when no older records exist, the disclosure MUST be omitted. This is static HTML
 and MUST NOT require JavaScript.
+
+The limit counts numeric prefixes, not source-year labels. Every label sharing one prefix MUST enter the same visible
+or `More winners` bucket—for example, `2013` and `2013 (special)` cannot be split across the boundary. Records inside
+`More winners` MUST continue the same numeric-prefix, source-label, and record-ID ordering.
 
 Before an official URL is inserted into `href`, the builder MUST require an HTTPS scheme, a nonblank hostname, and no
 embedded username or password.
@@ -184,6 +191,10 @@ Each award record's winner page MUST use a simple Wikipedia-style article layout
 The page MUST preserve source values verbatim, omit empty facts and sections, and MUST NOT generate biography prose,
 fetch an image, combine other award records, or call Wikipedia or Wikidata.
 
+The facts panel MUST render whenever at least one contracted fact is nonblank. An Organization row with only
+`laureate_type = "Organization"` therefore renders a one-row panel; the panel is omitted only when every contracted
+fact is blank.
+
 Templates MUST use semantic HTML. Jinja autoescaping and `StrictUndefined` MUST be enabled. Database text is
 untrusted content and MUST never be marked safe.
 
@@ -209,28 +220,44 @@ ornamental Scandinavian motifs.
 
 ## SEO titles and headings
 
-Every HTML page MUST contain exactly one nonblank `<title>`, one `<meta name="description">`, one absolute
-`<link rel="canonical">`, and one `h1`. The canonical URL MUST equal that page's sitemap URL. Titles, descriptions,
-headings, and breadcrumbs MUST be rendered from escaped source values using these templates:
+Every HTML page MUST use `<html lang="en">` and contain `<meta charset="utf-8">`,
+`<meta name="viewport" content="width=device-width, initial-scale=1">`, exactly one nonblank `<title>`, exactly one
+`<meta name="description">`, one absolute `<link rel="canonical">`, and one `h1`. The canonical URL MUST equal that
+page's sitemap URL. Titles, descriptions, and headings MUST be rendered from escaped values using these exact
+templates:
 
-| Page | `<title>` and `h1` |
-| --- | --- |
-| Homepage | `Prestigious Awards and Winners` |
-| Prize | `{Prize Name}: Winners by Year` |
-| Category | `{Prize Name} for {Category}: Winners by Year` |
-| Year with category | `{Prize Name} for {Category} {Year}: Winners` |
-| Year without category | `{Prize Name} {Year}: Winners` |
-| Winner with category | `{Prize Name} for {Category} {Year} — {Full Name}` |
-| Winner without category | `{Prize Name} {Year} — {Full Name}` |
+| Page | `<title>` and `h1` | Meta description |
+| --- | --- | --- |
+| Homepage | `Prestigious Awards and Winners` | `Ranked international prizes and winners whose work has made a proven impact on human knowledge.` |
+| Prize | `{Prize Name}: Winners by Year` | `Explore {Prize Name} winners, categories, years, and award information.` |
+| Category | `{Prize Name} for {Category}: Winners by Year` | `Explore {Prize Name} for {Category} winners by year.` |
+| Year with category | `{Prize Name} for {Category} {Year}: Winners` | `Meet the {Prize Name} for {Category} winners in {Year}.` |
+| Year without category | `{Prize Name} {Year}: Winners` | `Meet the {Prize Name} winners in {Year}.` |
+| Winner with category | `{Prize Name} for {Category} {Year} — {Full Name}` | `{Full Name}, winner of the {Prize Name} for {Category} in {Year}.` |
+| Winner without category | `{Prize Name} {Year} — {Full Name}` | `{Full Name}, winner of the {Prize Name} in {Year}.` |
 
 Thus the contextual winner heading is `Nobel Prize for Physics 1939 — Ernest Orlando Lawrence`; a Turing winner uses
-`Turing Award 1989 — {Full Name}`. Descriptions MUST use the same factual prize, category, year, and winner values in
-one short sentence. Pages below the homepage MUST render relative breadcrumbs for every ancestor route. The site
-MUST NOT emit `meta keywords`, repeated hidden headings, or generated keyword lists.
+`Turing Award 1989 — {Full Name}`. The site MUST NOT emit `meta keywords`, repeated hidden headings, or generated
+keyword lists.
 
 In these templates, “with category” means any nonblank source `category`, even when that single category is omitted
 from the URL. For example, an Economics title still contains `for Economics`; only a blank source category uses the
 without-category form.
+
+Pages below the homepage MUST render `<nav aria-label="Breadcrumb">` with these labels in order:
+
+| Page | Breadcrumb labels |
+| --- | --- |
+| Prize | `Home`, `{Prize Name}` |
+| Category | `Home`, `{Prize Name}`, `{Category}` |
+| Year with routed category | `Home`, `{Prize Name}`, `{Category}`, `{Year}` |
+| Year without routed category | `Home`, `{Prize Name}`, `{Year}` |
+| Winner with routed category | `Home`, `{Prize Name}`, `{Category}`, `{Year}`, `{Full Name}` |
+| Winner without routed category | `Home`, `{Prize Name}`, `{Year}`, `{Full Name}` |
+
+Every label except the last MUST link to its ancestor route; the last MUST be plain text with `aria-current="page"`.
+Breadcrumb category presence follows the URL hierarchy, while title and description category presence follows the
+nonblank source value.
 
 ## Sitemap
 
@@ -338,6 +365,7 @@ other prose.
 - WHEN a prize has award records across more than 30 distinct four-digit year prefixes
 - THEN winners from the 30 highest prefixes are visible in descending year groups
 - AND every older winner remains available inside `More winners`
+- AND every label sharing a prefix remains in the same bucket
 
 #### Scenario: prize with 30 or fewer years
 - WHEN a prize has award records across at most 30 distinct four-digit year prefixes
@@ -365,6 +393,11 @@ other prose.
 - THEN the path segment is `1983-1984` or `2013-special`
 - AND the rendered heading preserves the original year label
 
+#### Scenario: colliding year slugs
+- WHEN one parent route contains both `1983/1984` and `1983-1984`
+- THEN the build returns status 1 before page generation
+- AND the previous output remains unchanged
+
 #### Scenario: missing prize slug
 - WHEN a live ranking row has no valid stored prize slug
 - THEN the build returns status 1 before page generation
@@ -383,6 +416,11 @@ other prose.
 - THEN each record has one page below its own award route
 - AND no record is merged into another award page
 
+#### Scenario: organization facts
+- WHEN an Organization record has no birth, citizenship, or death facts
+- THEN its facts panel contains only `Organization`
+- AND the panel remains present
+
 #### Scenario: duplicate winner slug in one year route
 - WHEN two records in the same routed year derive the same winner slug
 - THEN the build returns status 1 before page generation
@@ -392,9 +430,15 @@ other prose.
 
 #### Scenario: rendered winner page
 - WHEN a winner page is rendered
-- THEN it has exactly one contextual title, meta description, canonical URL, and `h1`
-- AND its breadcrumbs link to the homepage, prize, optional category, and year ancestors
+- THEN it uses `lang="en"`, UTF-8 charset, the exact mobile viewport, and exactly one contextual title, exact meta
+  description, canonical URL, and `h1`
+- AND its breadcrumbs use the contracted labels and link to the homepage, prize, optional routed category, and year
+  ancestors
 - AND its canonical URL equals its sitemap location
+
+#### Scenario: every page type
+- WHEN homepage, prize, category, year, and winner fixtures are rendered
+- THEN each title, `h1`, description, and breadcrumb sequence exactly matches its template
 
 ### Requirement: Responsive flat presentation — every page MUST work on mobile and desktop
 
@@ -434,6 +478,13 @@ other prose.
 - THEN the builder submits all jobs to `ThreadPoolExecutor(max_workers=8)`
 - AND any worker exception makes the command fail
 
+### Requirement: Depth-safe links — every internal `href` MUST resolve from its page directory
+
+#### Scenario: deepest winner page
+- WHEN a winner page is nested below prize, category, and year
+- THEN its stylesheet, breadcrumb, and navigation links use the correct relative depth
+- AND every resolved target remains inside `website/dist/`
+
 ### Requirement: Safe rendering — database prose MUST be escaped
 
 #### Scenario: markup in a fixture value
@@ -469,11 +520,12 @@ Implementation is complete when:
 4. the tests decode a single sitemap and a synthetic indexed sitemap and prove their unique absolute page locations
    equal the supplied public HTML routes.
 5. ranking and route fixtures prove all 14 stored SEO prize slugs, conditional category segments, scoped category
-   disambiguation, scoped winner collisions, special-year slugs, Unicode transliteration, and absence of `/winners/`.
-6. rendered-page fixtures prove the exact SEO title and `h1` templates, descriptions, canonicals, breadcrumbs,
-   escaping, blank-section omission, and record-specific award content.
-7. prize fixtures prove the 30-year split, numeric and source-label descending order, conditional `More winners`,
-   category labels, complete record links, and invalid-year failure.
+   disambiguation, scoped year and winner collisions, special-year slugs, ASCII-loss behavior, and absence of
+   `/winners/`.
+6. rendered-page fixtures prove `lang`, charset, viewport, exact title, `h1`, description, canonical, and breadcrumb
+   templates, escaping, blank-section omission, organization fact-panel behavior, and record-specific award content.
+7. prize fixtures prove the 30-prefix split, same-prefix label bucketing, numeric and source-label ordering on both
+   sides of `More winners`, category labels, complete record links, and invalid-year failure.
 8. manual browser checks recorded in the implementation handoff at 360 and 1,280 CSS pixels prove the responsive and
    flat-style scenarios without horizontal scrolling.
 9. a second build produces the same file paths and bytes.

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">An editorial ranking</p>
+  <h1>{{ title }}</h1>
+  <p>Explore international prizes and the people and organizations recognized by them.</p>
+</header>
+<ol class="ranking">
+  {% for prize, route in prizes %}
+  <li>
+    <article>
+      <div class="rank">{{ loop.index }}</div>
+      <div>
+        <h2><a href="{{ href(route) }}">{{ prize.prize_name }}</a></h2>
+        <p>{{ prize.blurb }}</p>
+      </div>
+      <p class="score"><span>Score</span> {{ prize.score }}</p>
+    </article>
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}

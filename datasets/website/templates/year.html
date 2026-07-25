@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">{{ prize.prize_name }}{% if category %} · {{ category }}{% endif %}</p>
+  <h1>{{ title }}</h1>
+</header>
+<section>
+  <h2>Recipients</h2>
+  <ol class="recipient-list">
+    {% for record, route in winners %}
+    <li>
+      <h3><a href="{{ href(route) }}">{{ record.full_name }}</a></h3>
+      {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

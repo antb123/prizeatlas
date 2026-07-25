@@ -40,6 +40,10 @@ places - use todays name, country, location
   `award_record_id`.
 - The SQLite table preserves all 26 CSV columns and adds `prize_name`,
   `award_wikidata_qid`, and `laureate_wikidata_qid`.
+- `award_ranking` stores one curated website slug, official URL, prestige score, blurb, and reasoning entry per award
+  family.
+  `award_ranking.toml` is its complete source; load it with
+  `uv run scripts/load_award_ranking.py` after backing up the database.
 - Finish research before opening a write transaction. Keep transactions short and update
   blank cells only; guard each update against the cell's current blank value.
 - Back up before any bulk run. There is no rebuild path — a lost database is lost work:
@@ -53,6 +57,20 @@ places - use todays name, country, location
   The required result is exactly `ok`. This proves the file is not corrupt and says nothing
   about whether the data is right — for that see `scripts/check_coordinates.sql` and
   `docs/birth-coordinates-validation-20260725.md`.
+
+## static awards website
+
+Run the website build from this `datasets/` directory:
+
+`uv run website/build.py --base-url https://example.org/awards/`
+
+- `awards.sqlite3` is read-only during website generation. Award records come from `awards`; stored prize routes and
+  ranking copy come from `award_ranking`, whose complete seed is `award_ranking.toml`.
+- `--base-url` is required and may include a deployment subpath. It supplies absolute canonical and sitemap URLs.
+- Generated HTML, CSS, and sitemap output is written to `website/dist/`. Numbered sitemap files and a sitemap index
+  are generated only when the single-sitemap limits are exceeded.
+- `website/dist/`, `.dist-staging-*`, and `.dist-backup-*` are generated local state and MUST NOT be versioned.
+- The builder uses only static files; it does not run an application server or modify the database.
 
 ## local lookup and enrichment tools
 
@@ -171,6 +189,8 @@ under `old/`; the live data for each is the matching `award_record_id` prefix in
 - nobel.csv
   official:   https://www.nobelprize.org
   wikipedia:  https://en.wikipedia.org/wiki/List_of_Nobel_laureates
+  Economics rows use prize family `Sveriges Riksbank Prize in Economic Sciences`
+  and award QID `Q47170`, not `Nobel Prize` / `Q7191`.
 - shaw_prize.csv
   official:   https://www.shawprize.org
   wikipedia:  https://en.wikipedia.org/wiki/Shaw_Prize

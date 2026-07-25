@@ -1,0 +1,111 @@
+[Q7191]
+prize_name = "Nobel Prize"
+slug = "nobel-prize"
+url = "https://www.nobelprize.org/prizes/"
+score = 100
+blurb = "International prizes recognizing major contributions to physics, chemistry, medicine, literature, and peace."
+reasoning = "Its recipients have an unmatched long-term record of changing human knowledge across multiple fields."
+
+[Q28835]
+prize_name = "Fields Medal"
+slug = "fields-medal"
+url = "https://www.mathunion.org/imu-awards/fields-medal"
+score = 96
+blurb = "An international mathematics award presented at the International Congress of Mathematicians."
+reasoning = "Its recipients have an exceptional record of foundational and lasting contributions to mathematics."
+
+[Q185667]
+prize_name = "Turing Award"
+slug = "turing-award"
+url = "https://amturing.acm.org/"
+score = 94
+blurb = "An international award recognizing contributions of lasting importance to computing."
+reasoning = "Its recipients define much of the theoretical and practical foundation of modern computing."
+
+[Q317038]
+prize_name = "Max Planck Medal"
+slug = "max-planck-medal"
+url = "https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille"
+score = 92
+blurb = "An international physics award recognizing outstanding achievements in theoretical physics."
+reasoning = "Its historic recipient list represents an extraordinary concentration of lasting impact on physical knowledge."
+
+[Q188184]
+prize_name = "Abel Prize"
+slug = "abel-prize"
+url = "https://abelprize.no/"
+score = 90
+blurb = "An international annual prize recognizing outstanding scientific work in mathematics."
+reasoning = "Its recipients are mathematicians whose work has already demonstrated deep and lasting influence."
+
+[Q921415]
+prize_name = "Lasker Award"
+slug = "lasker-award"
+url = "https://laskerfoundation.org/awards/"
+score = 87
+blurb = "International awards recognizing major contributions to medical science and public health."
+reasoning = "Its long recipient record captures discoveries with proven influence on medicine and human knowledge."
+
+[Q1031994]
+prize_name = "Canada Gairdner International Award"
+slug = "canada-gairdner-international-award"
+url = "https://www.gairdner.org/awards/canada-gairdner-international-award"
+score = 84
+blurb = "An international award recognizing biomedical research that advances understanding of human biology and disease."
+reasoning = "Its recipients have a strong record of discoveries with lasting impact on medical knowledge."
+
+[Q739936]
+prize_name = "Wolf Prize"
+slug = "wolf-prize"
+url = "https://wolffund.org.il/the-wolf-prize/"
+score = 81
+blurb = "International prizes recognizing achievements in science and the arts."
+reasoning = "Its recipients include major contributors across several fields, supported by a substantial international record."
+
+[Q658444]
+prize_name = "Kyoto Prize"
+slug = "kyoto-prize"
+url = "https://www.kyotoprize.org/en/"
+score = 78
+blurb = "An international prize recognizing contributions to science, technology, philosophy, and the arts."
+reasoning = "Its broad recipient record demonstrates lasting contributions to knowledge and culture."
+
+[Q583069]
+prize_name = "Crafoord Prize"
+slug = "crafoord-prize"
+url = "https://www.crafoordprize.se/"
+score = 75
+blurb = "An international science prize covering disciplines outside the original Nobel categories."
+reasoning = "Its recipients show sustained impact in mathematics, astronomy, geosciences, and biosciences."
+
+[Q584250]
+prize_name = "Shaw Prize"
+slug = "shaw-prize"
+url = "https://www.shawprize.org/en"
+score = 72
+blurb = "International prizes in astronomy, life science and medicine, and mathematical sciences."
+reasoning = "Its recipients have a strong impact record, but the award has less history than those ranked above it."
+
+[Q908745]
+prize_name = "Japan Prize"
+slug = "japan-prize"
+url = "https://www.japanprize.jp/en/"
+score = 69
+blurb = "An international prize recognizing achievements in science and technology."
+reasoning = "Its recipients have made substantial contributions, with a shorter record of demonstrated influence than higher-ranked awards."
+
+[Q17278140]
+prize_name = "Breakthrough Prize"
+slug = "breakthrough-prize"
+url = "https://breakthroughprize.org/"
+score = 66
+blurb = "International prizes recognizing achievements in fundamental physics, life sciences, and mathematics."
+reasoning = "Its recipients are strong, but the award is too young to show comparable lasting impact as an institution."
+
+[Q47170]
+prize_name = "Sveriges Riksbank Prize in Economic Sciences"
+slug = "sveriges-riksbank-prize-in-economic-sciences"
+url = "https://www.nobelprize.org/prizes/economic-sciences/"
+score = 60
+blurb = "An international economics prize established by Sveriges Riksbank and awarded by the Royal Swedish Academy of Sciences."
+reasoning = "Its recipients have influenced economic knowledge, but it is a separate and younger award than the Nobel Prizes."

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}">
+  <link rel="canonical" href="{{ canonical }}">
+  <link rel="stylesheet" href="{{ style_href }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-name" href="{{ home_href }}">Awards</a>
+    <p>Recognition for work with lasting impact</p>
+  </header>
+  {% if breadcrumbs %}
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+      {% for crumb in breadcrumbs %}
+      <li>
+        {% if crumb.route is not none %}<a href="{{ href(crumb.route) }}">{{ crumb.label }}</a>{% else %}<span aria-current="page">{{ crumb.label }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>A static guide to international awards and their recipients.</p>
+  </footer>
+</body>
+</html>

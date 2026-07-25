@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">{{ prize.prize_name }}</p>
+  <h1>{{ title }}</h1>
+  <p>Browse every recorded award year in {{ category }}.</p>
+</header>
+<section>
+  <h2>Award years</h2>
+  <ul class="route-list year-grid">
+    {% for year, route, prefix in years %}
+    <li><a href="{{ href(route) }}">{{ year }}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
