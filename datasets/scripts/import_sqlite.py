@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
 """Import the canonical award CSVs into one SQLite database."""
+
+DONT RUN - will destroy db!!
 
 from __future__ import annotations
 

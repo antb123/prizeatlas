@@ -34,20 +34,25 @@ places - use todays name, country, location
 
 ## current data target
 
+- `awards.sqlite3` is the sole source of truth. The CSV snapshots are archived under `old/`
+  and are no longer written to or read during enrichment.
 - Data verification/retrieval agents write to `awards.sqlite3`, table `awards`, by exact
-  `award_record_id`. The CSV files are read-only source snapshots during enrichment.
+  `award_record_id`.
 - The SQLite table preserves all 26 CSV columns and adds `prize_name`,
   `award_wikidata_qid`, and `laureate_wikidata_qid`.
 - Finish research before opening a write transaction. Keep transactions short and update
   blank cells only; guard each update against the cell's current blank value.
-- `uv run scripts/import_sqlite.py` atomically replaces `awards.sqlite3` from the CSV
-  snapshots. Do not run it after SQLite enrichment begins unless a maintainer explicitly
-  authorizes discarding or exporting the SQLite-only changes first.
+- Back up before any bulk run. There is no rebuild path — a lost database is lost work:
+
+  `cp awards.sqlite3 awards.sqlite3.$(date +%Y%m%d).bak`
+
 - Verify database health after writes:
 
   `sqlite3 awards.sqlite3 "PRAGMA integrity_check;"`
 
-  The required result is exactly `ok`.
+  The required result is exactly `ok`. This proves the file is not corrupt and says nothing
+  about whether the data is right — for that see `scripts/check_coordinates.sql` and
+  `docs/birth-coordinates-validation-20260725.md`.
 
 ## local lookup and enrichment tools
 
@@ -56,12 +61,15 @@ Run these commands from this `datasets/` directory.
 ### `scripts/lookup_coordinates.py`
 
 Read-only lookup for one city or institution. It resolves an exact English Wikipedia title
-to its Wikidata item, or accepts a verified Wikidata QID directly:
+to its Wikidata item, or accepts a verified Wikidata QID directly. `--country` is required:
 
-`uv run scripts/lookup_coordinates.py "University of Cambridge"`
+`uv run scripts/lookup_coordinates.py "University of Cambridge" --country "United Kingdom"`
 
-`uv run scripts/lookup_coordinates.py Q35794`
+`uv run scripts/lookup_coordinates.py Q35794 --country "United Kingdom"`
 
+- `--country` is appended to the query, so `Ottawa --country "United States"` fails rather
+  than silently returning Ontario. Expect roughly three quarters of bare city names to fail;
+  read the error, find the QID, and rerun with it. Failing is the tool working.
 - The command prints one GeoJSON feature and does not modify a CSV or the database.
 - `properties.wikidata_id` is the matched place QID.
 - `properties.dataset_coordinates` is ready for the dataset and is always
@@ -117,23 +125,11 @@ The dataset-specific `scripts/enrich_breakthrough.py`, `scripts/enrich_crafoord.
 `scripts/enrich_fields.py` also write CSVs and are legacy helpers. Do not run them during
 SQLite enrichment.
 
-### `scripts/import_sqlite.py`
+### `scripts/import_sqlite.py` — DISABLED
 
-Builds `awards.sqlite3` from all 13 canonical CSV snapshots:
-
-`uv run scripts/import_sqlite.py`
-
-- Validates the exact CSV header, field counts, required identity fields, ID prefixes, and
-  global ID uniqueness before replacing the database.
-- Preserves every CSV value as text.
-- Adds the normalized prize family name and verified award QID.
-- Copies QID-shaped legacy `source_laureate_id` values into `laureate_wikidata_qid` without
-  deleting the original source value.
-- Builds indexes for prize/category/year, name, and nonblank laureate QID.
-- Writes a temporary database, runs `PRAGMA integrity_check`, and replaces the target only
-  after a successful import.
-- This is a rebuild tool, not an enrichment tool. Do not run it after agents begin writing
-  verified data directly to SQLite.
+Do not run. It rebuilds `awards.sqlite3` from the CSV snapshots and would destroy every
+coordinate and correction made since enrichment moved to SQLite. It is deliberately broken at
+the top of the file and kept only as a record of how the database was originally built.
 
 ### Other references
 
@@ -141,10 +137,13 @@ Builds `awards.sqlite3` from all 13 canonical CSV snapshots:
   structured Wikidata claims first, Wikipedia API text second, and model extraction only
   for facts still embedded in prose.
 - `scripts/audit_deep.py` audits CSV snapshots only. It does not validate SQLite changes.
+- `scripts/check_coordinates.sql` reports birth coordinates that point at the wrong place.
+  Run it after every enrichment batch: `sqlite3 awards.sqlite3 < scripts/check_coordinates.sql`
 - Use `sqlite3 awards.sqlite3` for read-only inspection and exact row updates. Select rows by
   `award_record_id`, never by name alone.
 
-main award files (sources under each — read these instead of searching):
+award families (sources under each — read these instead of searching). The CSVs are archived
+under `old/`; the live data for each is the matching `award_record_id` prefix in SQLite:
 - abel_prize.csv
   official:   https://abelprize.no
   wikipedia:  https://en.wikipedia.org/wiki/Abel_Prize
