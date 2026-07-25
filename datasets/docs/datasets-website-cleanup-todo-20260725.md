@@ -8,11 +8,24 @@ and `grep -c '<loc>' dist/sitemap.xml` matches `find dist -name index.html | wc 
 
 Order below is the spec's suggested order. `CLEAN-1` is blocked; start at `CLEAN-2` if the QID work has not landed.
 
-## CLEAN-1 — Person pages and laureate index
+## CLEAN-1 — Person pages and laureate index — DONE 20260725
 
 ID: `CLEAN-1` — Add `/people/<slug>/` and a paginated `/people/` index. Spec §3.1, §3.2.
 
-Depends-on: name/QID correctness work (tracked separately, out of scope here)
+Depends-on: name/QID correctness work — landed before implementation.
+
+Outcome: 2,367 person pages and 12 index pages; site grew 4,858 → 7,237 pages. Verified 81,453 internal links
+resolve with none broken, every laureate listed exactly once, and exactly 5 winner pages without a person link
+(the 5 rows with no laureate QID).
+
+Two data findings surfaced during the build, both from the name normalization rather than the website code:
+
+1. `breakthrough-000041` was `laureate_type='Organization'` all along — the Sudbury Neutrino Observatory team
+   record. Normalization overwrote its name with Q710597's label ("Arthur B. McDonald"), duplicating the individual
+   record and breaking the winner-slug uniqueness check. Split into the observatory (`Q176822`, person fields
+   cleared) and the individual, per review. Backed up as `awards.sqlite3.*.sno-org-split.bak`.
+2. **Still open:** those two rows have swapped affiliations — McDonald carries "Iwate Prefectural University, Japan"
+   and the observatory carries "Queen's University, Canada". Left alone; not part of this task.
 
 Files:
 

@@ -208,6 +208,130 @@ class WebsiteBuildTests(unittest.TestCase):
                 target = resolved / "index.html" if href.endswith("/") else resolved
                 self.assertIn(target, generated, f"{html_path}: {href}")
 
+    def test_person_pages_merge_awards_by_laureate_qid(self) -> None:
+        rankings = [
+            ("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
+            ("Q2", "Wolf Prize", "wolf-prize", "https://example.org/wolf", 90),
+        ]
+        records = [
+            {
+                "award_record_id": "wolf-1",
+                "award_wikidata_qid": "Q2",
+                "prize_name": "Wolf Prize",
+                "category": "Medicine",
+                "year": "2011",
+                "full_name": "Shinya Yamanaka",
+                "laureate_wikidata_qid": "Q188345",
+            },
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Medicine",
+                "year": "2012",
+                "full_name": "Shinya Yamanaka",
+                "laureate_wikidata_qid": "Q188345",
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2012",
+                "full_name": "Unlinked Laureate",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        plan = build.build_site(database, "https://example.org/", self.website)
+
+        self.assertEqual(1, plan.person_count)
+        person = self.website / "dist/people/shinya-yamanaka/index.html"
+        person_html = person.read_text()
+        # Awards ascend by year, so a career reads in the order it happened.
+        self.assertLess(person_html.index("Wolf Prize"), person_html.index("Nobel Prize"))
+        # Wolf Prize has a single category here, so it is not category-routed; Nobel has two and is.
+        self.assertIn('href="../../wolf-prize/2011/shinya-yamanaka/"', person_html)
+        self.assertIn('href="../../nobel-prize/medicine/2012/shinya-yamanaka/"', person_html)
+
+        linked = (self.website / "dist/nobel-prize/medicine/2012/shinya-yamanaka/index.html").read_text()
+        self.assertIn("All awards won by Shinya Yamanaka", linked)
+        # A record without a laureate QID cannot be merged, so it gets no person page and no link.
+        unlinked = (self.website / "dist/nobel-prize/physics/2012/unlinked-laureate/index.html").read_text()
+        self.assertNotIn("All awards won by", unlinked)
+        self.assertFalse((self.website / "dist/people/unlinked-laureate").exists())
+
+        index_html = (self.website / "dist/people/index.html").read_text()
+        self.assertIn('href="shinya-yamanaka/"', index_html)
+        # The header People link resolves from every depth.
+        self.assertIn('href="people/"', (self.website / "dist/index.html").read_text())
+        self.assertIn('href="../people/"', (self.website / "dist/nobel-prize/index.html").read_text())
+        self.assertIn('href="../../../../people/"', linked)
+
+    def test_ambiguous_laureate_identity_fails_the_build(self) -> None:
+        shared_qid = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "year": "1962",
+                "full_name": "Francis Harry Compton Crick",
+                "laureate_wikidata_qid": "Q123280",
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "year": "1963",
+                "full_name": "F.H.C. Crick",
+                "laureate_wikidata_qid": "Q123280",
+            },
+        ]
+        with self.assertRaises(build.BuildFailure) as caught:
+            build.person_routes([build.AwardRecord(*(record.get(column, "") for column in build.AWARD_COLUMNS)) for record in shared_qid])
+        self.assertIn("two names", str(caught.exception))
+
+        colliding = [
+            {**shared_qid[0], "laureate_wikidata_qid": "Q1000", "full_name": "Renée Descartes"},
+            {**shared_qid[1], "laureate_wikidata_qid": "Q2000", "full_name": "Renee Descartes"},
+        ]
+        with self.assertRaises(build.BuildFailure) as caught:
+            build.person_routes([build.AwardRecord(*(record.get(column, "") for column in build.AWARD_COLUMNS)) for record in colliding])
+        self.assertIn("duplicate person slug", str(caught.exception))
+
+    def test_people_index_paginates_and_lists_everyone_once(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": f"record-{number:03d}",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": f"Laureate Number{number:03d}",
+                "laureate_wikidata_qid": f"Q{number}",
+            }
+            for number in range(1, 251)
+        ]
+        database = self.create_database(rankings, records)
+
+        with mock.patch.object(build, "PEOPLE_PER_PAGE", 100):
+            plan = build.build_site(database, "https://example.org/", self.website)
+
+        self.assertEqual(250, plan.person_count)
+        first = (self.website / "dist/people/index.html").read_text()
+        third = (self.website / "dist/people/page-3/index.html").read_text()
+        self.assertIn('href="page-2/"', first)
+        self.assertNotIn("rel=\"prev\"", first)
+        self.assertIn('href="../"', third)
+        self.assertNotIn("rel=\"next\"", third)
+
+        listed = []
+        for page in (self.website / "dist/people/index.html", *sorted((self.website / "dist/people").glob("page-*/index.html"))):
+            body = page.read_text().split('class="people-index"')[1].split("</ul>")[0]
+            listed.extend(re.findall(r'href="([^"]+)"', body))
+        self.assertEqual(250, len(listed))
+        self.assertEqual(250, len(set(listed)))
+
     def test_error_page_and_robots_serve_from_the_deployment_root(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
         records = [

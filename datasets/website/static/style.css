@@ -71,6 +71,12 @@ footer p {
   color: var(--muted);
 }
 
+.site-nav {
+  display: flex;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
 .breadcrumbs {
   padding-block: 1rem;
 }
@@ -263,6 +269,75 @@ h3 {
 
 .recipient-list h3 {
   margin-bottom: 0.5rem;
+}
+
+.person-awards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.person-awards > li {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.person-award-year {
+  margin: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.person-awards h3 {
+  margin: 0 0 0.35rem;
+}
+
+.person-awards p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.person-link {
+  font-weight: 700;
+}
+
+.people-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 3rem;
+}
+
+.people-index li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+  break-inside: avoid;
+}
+
+.people-index span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+.pagination span {
+  color: var(--muted);
 }
 
 details {

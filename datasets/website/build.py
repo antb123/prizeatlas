@@ -32,7 +32,19 @@ SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 YEAR_PREFIX = re.compile(r"([0-9]{4})")
 SITEMAP_URL_LIMIT = 50_000
 SITEMAP_BYTE_LIMIT = 52_428_800
-TEMPLATES = ("base.html", "index.html", "prize.html", "category.html", "year.html", "winner.html", "404.html")
+TEMPLATES = (
+    "base.html",
+    "index.html",
+    "prize.html",
+    "category.html",
+    "year.html",
+    "winner.html",
+    "person.html",
+    "people.html",
+    "404.html",
+)
+PEOPLE_ROUTE = "/people/"
+PEOPLE_PER_PAGE = 200
 FACT_FIELDS = (
     ("Type", "laureate_type"),
     ("Born", "birth_date"),
@@ -53,6 +65,7 @@ AWARD_COLUMNS = (
     "award_wikidata_qid",
     "motivation",
     "prize_share",
+    "laureate_wikidata_qid",
     "laureate_type",
     "full_name",
     "birth_date",
@@ -95,6 +108,7 @@ class AwardRecord:
     award_wikidata_qid: str
     motivation: str
     prize_share: str
+    laureate_wikidata_qid: str
     laureate_type: str
     full_name: str
     birth_date: str
@@ -128,6 +142,14 @@ class PageJob:
 
 
 @dataclass(frozen=True, slots=True)
+class Laureate:
+    qid: str
+    name: str
+    route: str
+    awards: tuple[tuple[AwardRecord, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
 class SitePlan:
     jobs: tuple[PageJob, ...]
     prize_count: int
@@ -135,6 +157,7 @@ class SitePlan:
     year_count: int
     winner_count: int
     recipient_count: int
+    person_count: int
 
 
 def slugify(value: str) -> str:
@@ -263,6 +286,59 @@ def _page(
     return PageJob(template, route, title, description, tuple(breadcrumbs), context)
 
 
+def _surname_key(name: str) -> tuple[str, str]:
+    """Order people by the last word of their name, then the whole name."""
+    slug = slugify(name)
+    return (slug.rsplit("-", 1)[-1], slug)
+
+
+def person_routes(records: list[AwardRecord]) -> dict[str, str]:
+    """Map each laureate QID to its page route.
+
+    The QID is the identity: one person holds one route no matter how many awards they won. Records without a QID get
+    no person page — they cannot be merged with confidence, and a wrong merge is worse than a missing page.
+    """
+    names: dict[str, str] = {}
+    for record in records:
+        if not _nonblank(record.laureate_wikidata_qid):
+            continue
+        previous = names.setdefault(record.laureate_wikidata_qid, record.full_name)
+        if previous != record.full_name:
+            raise BuildFailure(f"laureate recorded under two names qid={record.laureate_wikidata_qid} names={previous!r} {record.full_name!r}")
+
+    routes: dict[str, str] = {}
+    owners: dict[str, str] = {}
+    for qid, name in names.items():
+        slug = slugify(name)
+        if slug in owners:
+            raise BuildFailure(f"duplicate person slug slug={slug} qid={qid} other_qid={owners[slug]}")
+        owners[slug] = qid
+        routes[qid] = f"{PEOPLE_ROUTE}{slug}/"
+    return routes
+
+
+def plan_people(records: list[AwardRecord], routes: dict[str, str], record_routes: dict[str, str]) -> list[Laureate]:
+    grouped: dict[str, list[AwardRecord]] = {}
+    for record in records:
+        if _nonblank(record.laureate_wikidata_qid):
+            grouped.setdefault(record.laureate_wikidata_qid, []).append(record)
+
+    people = [
+        Laureate(
+            qid,
+            awards[0].full_name,
+            routes[qid],
+            tuple(
+                (record, record_routes[record.award_record_id])
+                for record in sorted(awards, key=lambda record: (_year_prefix(record.year, record.award_record_id), record.award_record_id))
+            ),
+        )
+        for qid, awards in grouped.items()
+    ]
+    people.sort(key=lambda person: _surname_key(person.name))
+    return people
+
+
 def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_url: str) -> SitePlan:
     if not rankings or not records:
         raise BuildFailure("ranking or awards table is empty")
@@ -328,6 +404,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
     year_page_count = 0
     winner_page_count = 0
     all_record_routes: dict[str, str] = {}
+    routes_by_laureate = person_routes(records)
 
     for ranking in rankings:
         prize_records = records_by_qid[ranking.qid]
@@ -514,10 +591,50 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                         record=record,
                         facts=facts,
                         year_route=route,
+                        person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
                         wikipedia_url=wikipedia_search_url(record.full_name),
                     )
                 )
                 winner_page_count += 1
+
+    people = plan_people(records, routes_by_laureate, all_record_routes)
+    for person in people:
+        jobs.append(
+            _page(
+                "person.html",
+                person.route,
+                f"{person.name}: awards and recognition",
+                f"Every recorded award won by {person.name}, with the year, category, and citation for each.",
+                (Breadcrumb("Home", "/"), Breadcrumb("People", PEOPLE_ROUTE), Breadcrumb(person.name, None)),
+                person=person,
+            )
+        )
+
+    page_count = max(1, -(-len(people) // PEOPLE_PER_PAGE))
+    for number in range(1, page_count + 1):
+        page_people = people[(number - 1) * PEOPLE_PER_PAGE : number * PEOPLE_PER_PAGE]
+        route = PEOPLE_ROUTE if number == 1 else f"{PEOPLE_ROUTE}page-{number}/"
+        crumbs = [Breadcrumb("Home", "/")]
+        if number == 1:
+            title = "Laureates A-Z"
+        else:
+            title = f"Laureates A-Z: page {number}"
+            crumbs.append(Breadcrumb("People", PEOPLE_ROUTE))
+        crumbs.append(Breadcrumb(title if number == 1 else f"Page {number}", None))
+        jobs.append(
+            _page(
+                "people.html",
+                route,
+                title,
+                f"Browse every laureate on record, listed by surname. Page {number} of {page_count}.",
+                crumbs,
+                people=tuple(page_people),
+                page_number=number,
+                page_count=page_count,
+                previous_route=("" if number == 1 else PEOPLE_ROUTE if number == 2 else f"{PEOPLE_ROUTE}page-{number - 1}/"),
+                next_route=("" if number == page_count else f"{PEOPLE_ROUTE}page-{number + 1}/"),
+            )
+        )
 
     routes = [job.route for job in jobs]
     if len(routes) != len(set(routes)):
@@ -529,6 +646,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         year_page_count,
         winner_page_count,
         len(records),
+        len(people),
     )
 
 
@@ -612,6 +730,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         home_href=relative_route(job.route, "/"),
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
+        people_route=PEOPLE_ROUTE,
         href=lambda target: relative_route(job.route, target),
         **job.context,
     )
@@ -634,6 +753,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         home_href=root,
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
+        people_route=PEOPLE_ROUTE,
         href=lambda target: root + target.lstrip("/"),
     )
     (output / "404.html").write_text(html, encoding="utf-8")
@@ -711,7 +831,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         "website build complete "
         f"prizes={plan.prize_count} categories={plan.category_count} year_pages={plan.year_count} "
-        f"winner_pages={plan.winner_count} recipients={plan.recipient_count} "
+        f"winner_pages={plan.winner_count} people={plan.person_count} recipients={plan.recipient_count} "
         f"sitemap_urls={len(plan.jobs)} generated_pages={len(plan.jobs)}"
     )
     return 0

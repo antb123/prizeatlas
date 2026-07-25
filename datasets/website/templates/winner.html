@@ -6,6 +6,7 @@
       <p class="eyebrow">{{ prize.prize_name }}</p>
       <h1>{{ title }}</h1>
       {% if record.biographical_note %}<p class="lead">{{ record.biographical_note }}</p>{% endif %}
+      {% if person_route %}<p><a class="person-link" href="{{ href(person_route) }}">All awards won by {{ record.full_name }}</a></p>{% endif %}
       <p><a class="external-source" href="{{ wikipedia_url }}">Find {{ record.full_name }} on Wikipedia <span aria-hidden="true">↗</span></a></p>
     </header>
     {% if record.affiliation_name or record.affiliation_city or record.affiliation_country %}
