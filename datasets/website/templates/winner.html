@@ -5,9 +5,12 @@
     <header class="page-intro">
       <p class="eyebrow">{{ prize.prize_name }}{% if record.category %} · {{ record.category }}{% endif %} · {{ record.year }}</p>
       <h1>{{ record.full_name }}</h1>
+      {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if record.biographical_note %}<p class="lead">{{ record.biographical_note }}</p>{% endif %}
-      {% if person_route %}<p><a class="person-link" href="{{ href(person_route) }}">All awards won by {{ record.full_name }}</a></p>{% endif %}
-      <p><a class="external-source" href="{{ wikipedia_url }}">Find {{ record.full_name }} on Wikipedia <span aria-hidden="true">↗</span></a></p>
+      <p class="winner-links">
+        {% if person_route %}<a class="person-link" href="{{ href(person_route) }}">All awards won by {{ record.full_name }}</a>{% endif %}
+        <a class="external-source" href="{{ wikipedia_url }}">Find {{ record.full_name }} on Wikipedia <span aria-hidden="true">↗</span></a>
+      </p>
     </header>
     {% if record.affiliation_name or record.affiliation_city or record.affiliation_country %}
     <section>
@@ -28,21 +31,12 @@
       </ul>
     </section>
     {% endif %}
-    <section>
-      <h2>Award</h2>
-      <dl class="award-facts">
-        <div><dt>Prize</dt><dd>{{ record.prize_name }}</dd></div>
-        {% if record.category %}<div><dt>Category</dt><dd>{{ record.category }}</dd></div>{% endif %}
-        <div><dt>Year</dt><dd><a href="{{ href(year_route) }}">{{ record.year }}</a></dd></div>
-        {% if record.motivation %}<div><dt>Motivation</dt><dd>{{ record.motivation }}</dd></div>{% endif %}
-        {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_share }}</dd></div>{% endif %}
-      </dl>
-    </section>
   </div>
-  {% if facts %}
+  {% if facts or record.prize_share %}
   <aside class="facts" aria-label="Facts">
     <h2>Facts</h2>
     <dl>
+      {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_share }}</dd></div>{% endif %}
       {% for label, value in facts %}
       <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
       {% endfor %}

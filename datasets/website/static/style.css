@@ -405,6 +405,20 @@ h3 {
   font-size: 1.2rem;
 }
 
+/* The citation is the reason the page exists, so it sits directly under the name. */
+.page-intro > p.citation {
+  max-width: 44rem;
+  margin: 0 0 1.25rem;
+  font-size: 1.3rem;
+  line-height: 1.45;
+}
+
+.winner-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+}
+
 .external-source {
   font-weight: 700;
 }

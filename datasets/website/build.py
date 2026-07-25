@@ -707,7 +707,6 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                         prize=ranking,
                         record=record,
                         facts=facts,
-                        year_route=route,
                         co_laureates=tuple(
                             (other, all_record_routes[other.award_record_id])
                             for other in ordered_group
