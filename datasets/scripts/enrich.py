@@ -348,9 +348,15 @@ def resolve_award_qids(rows: list[dict], delay: float) -> set[str]:
 # ----------------------------------------------------------------------------
 # Writing: fill empty cells only.
 # ----------------------------------------------------------------------------
-def fill_row(row: dict, qid: str, ent: dict, verdict: str, delay: float) -> None:
+def fill_row(row: dict, qid: str, ent: dict, verdict: str, delay: float, overwrite: frozenset[str] = frozenset()) -> None:
+    """Fill empty cells from Wikidata, and replace the cells named in `overwrite` even when they already hold a value.
+
+    Enrichment fills gaps by default so a hand-corrected cell is never silently undone. Overwriting is for the case
+    where the stored value is known to be wrong, such as a birth country that disagrees between a laureate's records.
+    """
+
     def put(field: str, value: str) -> None:
-        if value and not row[field].strip():
+        if value and (field in overwrite or not row[field].strip()):
             row[field] = value
 
     put("source_laureate_id", qid)
@@ -429,8 +435,13 @@ def read_database_rows(path: str) -> list[dict[str, str]]:
         connection.close()
 
 
-def apply_database_updates(path: str, results: list[dict]) -> int:
-    """Apply nonblank allowlisted result updates atomically."""
+def apply_database_updates(path: str, results: list[dict], overwrite: frozenset[str] = frozenset()) -> int:
+    """Apply nonblank allowlisted result updates atomically.
+
+    A populated cell is left alone unless its field is named in `overwrite`, so a routine enrichment run can never
+    undo a hand correction. This guard is deliberately separate from the one in fill_row: both must agree before a
+    stored value is replaced.
+    """
     if not os.path.isfile(path):
         raise DatabaseUpdateError(f"database not found: {path}")
 
@@ -455,7 +466,9 @@ def apply_database_updates(path: str, results: list[dict]) -> int:
                 continue
 
             assignments = [
-                f'"{field}" = ?' if field == "laureate_wikidata_qid" else f'"{field}" = COALESCE(NULLIF("{field}", \'\'), ?)'
+                f'"{field}" = ?'
+                if field == "laureate_wikidata_qid" or field in overwrite
+                else f'"{field}" = COALESCE(NULLIF("{field}", \'\'), ?)'
                 for field, _ in updates
             ]
             values = [value for _, value in updates]
@@ -487,7 +500,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--record-id", action="append", default=[], help="process this exact award_record_id (repeatable)")
     ap.add_argument("--all", action="store_true", help="explicitly process every target row")
     ap.add_argument("--delay", type=float, default=0.1, help="seconds to pause before each request")
+    ap.add_argument("--overwrite", action="append", default=[], metavar="FIELD",
+                    help="replace this field from Wikidata even when it already holds a value (repeatable)")
     args = ap.parse_args(argv)
+
+    overwrite = frozenset(args.overwrite)
+    if unknown_fields := sorted(overwrite - set(WRITE_FIELDS)):
+        ap.error(f"--overwrite accepts only enriched fields; not {', '.join(unknown_fields)}")
 
     if args.db and args.csv:
         ap.error("CSV input cannot be combined with --db")
@@ -575,7 +594,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         before = row.copy()
-        fill_row(row, qid, ent, verdict, args.delay)
+        fill_row(row, qid, ent, verdict, args.delay, overwrite)
         cache[name] = qid
         stats[verdict] += 1
         results.append({
@@ -605,7 +624,7 @@ def main(argv: list[str] | None = None) -> int:
     exit_code = 0
     if args.db:
         try:
-            applied = apply_database_updates(args.db, results)
+            applied = apply_database_updates(args.db, results, overwrite)
             report["database_apply"] = {"status": "applied", "rows": applied}
             log(f"database apply: path={args.db} rows={applied} outcome=applied")
         except (DatabaseUpdateError, OSError, sqlite3.Error) as error:

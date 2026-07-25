@@ -72,6 +72,22 @@ COUNTRY_ALIASES = {
     "East Timor": "Timor-Leste",
     "Turkey": "Türkiye",
 }
+# A vanished empire spans several modern countries, so where one is recorded the city decides, not the empire.
+# Enrichment reintroduces these from Wikidata P17, which answers with the polity of the day.
+POLITY_NAMES = frozenset(
+    {"Roman Empire", "Russian Empire", "Duchy of Moscow", "Margraviate of Brandenburg", "Francia", "Kievan Rus'",
+     "Tashkent Khanate", "Austria-Hungary", "Austrian Empire", "Prussia", "Czechoslovakia", "Soviet Union", "USSR"}
+)
+HISTORICAL_BY_CITY = {
+    "London": "United Kingdom",
+    "Berlin": "Germany",
+    "Frankfurt": "Germany",
+    "Moscow": "Russia",
+    "Odesa": "Ukraine",
+    "Odessa": "Ukraine",
+    "Kyiv": "Ukraine",
+    "Tashkent": "Uzbekistan",
+}
 # Names we keep even though ISO 3166 lists them differently. "Russian Federation" is the ISO name; "Russia" is what
 # English readers expect and pycountry carries no common_name for it.
 DISPLAY_EXCEPTIONS = frozenset({"Russia", "Democratic Republic of the Congo"})
@@ -99,13 +115,15 @@ def clean_text(value: str) -> str:
     return SPACE_BEFORE_PUNCTUATION.sub(r"\1", collapsed).strip()
 
 
-def modern_country(value: str) -> str:
-    """The country holding this birthplace today."""
+def modern_country(value: str, city: str = "") -> str:
+    """The country holding this birthplace today, using the city to disambiguate a multi-country empire."""
     name = clean_text(value)
     if name.endswith(")") and "(" in name:
         opening = name.rindex("(")
         inner = name[opening + 1 : -1].strip()
         name = name[:opening].strip() if inner in HISTORICAL_STATES else inner
+    if name in POLITY_NAMES and (from_city := HISTORICAL_BY_CITY.get(clean_text(city))):
+        return from_city
     return COUNTRY_ALIASES.get(name, name)
 
 
@@ -124,7 +142,8 @@ def plan(database: Path) -> list[tuple[str, str, str, str]]:
                 changes.append((row["award_record_id"], column, old, new))
         for column in COUNTRY_COLUMNS:
             old = row[column] or ""
-            if (new := modern_country(old)) != old:
+            city = row["birth_city"] if column == "birth_country" else ""
+            if (new := modern_country(old, city)) != old:
                 changes.append((row["award_record_id"], column, old, new))
         for column, new in RECORD_FIXES.get(row["award_record_id"], {}).items():
             if (old := row[column] or "") != new:
