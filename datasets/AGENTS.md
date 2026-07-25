@@ -143,11 +143,16 @@ The dataset-specific `scripts/enrich_breakthrough.py`, `scripts/enrich_crafoord.
 `scripts/enrich_fields.py` also write CSVs and are legacy helpers. Do not run them during
 SQLite enrichment.
 
-### `scripts/import_sqlite.py` — DISABLED
+### `scripts/import_sqlite.py` — DELETED
 
-Do not run. It rebuilds `awards.sqlite3` from the CSV snapshots and would destroy every
-coordinate and correction made since enrichment moved to SQLite. It is deliberately broken at
-the top of the file and kept only as a record of how the database was originally built.
+Removed. It rebuilt `awards.sqlite3` from the CSV snapshots and would have destroyed every
+coordinate and correction made since enrichment moved to SQLite. `awards.sqlite3` is the source
+of truth and there is no import path back from CSV. The original build is recorded in git
+history at `95e431d`; the CSV snapshots are archived under `old/`.
+
+The schema therefore lives only in the database. Read it with
+`sqlite3 awards.sqlite3 ".schema awards"`. `tests/test_enrich_json.py` keeps a local fixture
+copy for its temporary databases.
 
 ### Other references
 

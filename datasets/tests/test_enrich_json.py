@@ -14,13 +14,39 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts import enrich
-from scripts import import_sqlite
+
+# The database is the source of truth; no importer defines these any more. Held here as a test
+# fixture only, mirroring the live `awards` table.
+CSV_COLUMNS = (
+    "award_record_id", "year", "category", "prize", "motivation", "prize_share", "source_laureate_id",
+    "laureate_type", "full_name", "birth_date", "birth_year", "birth_city", "birth_country",
+    "birth_coordinates", "citizenship_countries", "sex", "affiliation_name", "affiliation_city",
+    "affiliation_country", "affiliation_coordinates", "death_date", "death_city", "death_country",
+    "field_language", "biographical_note", "remarks",
+)
+
+AWARDS_COLUMNS = (
+    "award_record_id", "year", "category", "prize", "prize_name", "award_wikidata_qid", "motivation",
+    "prize_share", "source_laureate_id", "laureate_wikidata_qid", "laureate_type", "full_name",
+    "birth_date", "birth_year", "birth_city", "birth_country", "birth_coordinates",
+    "citizenship_countries", "sex", "affiliation_name", "affiliation_city", "affiliation_country",
+    "affiliation_coordinates", "death_date", "death_city", "death_country", "field_language",
+    "biographical_note", "remarks",
+)
+
+
+def create_schema(connection: sqlite3.Connection) -> None:
+    definitions = ", ".join(
+        f'"{column}" TEXT{" PRIMARY KEY" if column == "award_record_id" else ""}'
+        for column in AWARDS_COLUMNS
+    )
+    connection.execute(f"CREATE TABLE awards ({definitions}) STRICT")
 
 
 class EnrichJsonTests(unittest.TestCase):
     def create_database(self, path: Path, record_id: str, **values: str) -> None:
         with sqlite3.connect(path) as connection:
-            import_sqlite.create_schema(connection)
+            create_schema(connection)
             columns = ("award_record_id", *values)
             placeholders = ", ".join("?" for _ in columns)
             connection.execute(
@@ -37,7 +63,7 @@ class EnrichJsonTests(unittest.TestCase):
     def test_dry_run_returns_sqlite_ready_json_without_writing_csv(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "abel_prize.csv"
-            row = {column: "" for column in import_sqlite.CSV_COLUMNS}
+            row = {column: "" for column in CSV_COLUMNS}
             row.update({
                 "award_record_id": "abel_prize-000001",
                 "year": "2000",
@@ -45,7 +71,7 @@ class EnrichJsonTests(unittest.TestCase):
                 "full_name": "Example Person",
             })
             with path.open("w", newline="") as target:
-                writer = csv.DictWriter(target, fieldnames=import_sqlite.CSV_COLUMNS)
+                writer = csv.DictWriter(target, fieldnames=CSV_COLUMNS)
                 writer.writeheader()
                 writer.writerow(row)
             original = path.read_bytes()
