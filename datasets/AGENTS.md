@@ -72,6 +72,23 @@ Run the website build from this `datasets/` directory:
 - `website/dist/`, `.dist-staging-*`, and `.dist-backup-*` are generated local state and MUST NOT be versioned.
 - The builder uses only static files; it does not run an application server or modify the database.
 
+## data explorer
+
+- The explorer is part of the static awards website at `/explorer/` and is built by `website/build.py` with every
+  other page. Its template is `website/templates/explorer.html`, and its population snapshot is
+  `website/population.json`.
+- Scoring: a laureate's points = sum of `award_ranking.score` / 100 over their award rows (a Nobel = 1.00, so two
+  Nobels = 2.00). Prize shares are not discounted. Organizations are ranked alongside people with a badge.
+- Identity follows `laureate_wikidata_qid`; the five rows without a QID stay unmerged as single-award entries.
+- The country chart counts distinct merged laureates per modern country, switchable between
+  birth/death/affiliation/citizenship; affiliation and citizenship count a laureate under each listed country.
+  A "Laureates per million" view divides birth-country laureates by the World Bank SP.POP.TOTL snapshot, counting
+  each person once regardless of award count; Taiwan, Tibet, and Northern Cyprus have no figure and are skipped.
+- The under-40 chart ranks laureates who won at least one award before 40 (age = award year − birth year) by
+  total points.
+- The leaderboard shows the top 7 (`TOP_N` in `website/templates/explorer.html`); search reveals all rows with true
+  ranks.
+
 ## local lookup and enrichment tools
 
 Run these commands from this `datasets/` directory.

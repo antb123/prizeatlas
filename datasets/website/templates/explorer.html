@@ -1,30 +1,22 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Awards Data Explorer</title>
-<meta name="description" content="Ranked laureates across fourteen international prize families, scored by the number and weight of their awards.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%230f766e'/%3E%3C/svg%3E">
+{% extends "base.html" %}
+{% block head %}
 <style>
-  :root {
+  .explorer {
     --ink: #1c1b1a;
     --muted: #6f6a63;
     --line: #e4e1da;
-    --accent: #0f766e;
-    --accent-soft: #d7e9e6;
+    --accent: #526a55;
+    --accent-soft: #e4ebe3;
     --bg: #fbfaf7;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
     background: var(--bg);
     color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     line-height: 1.5;
   }
-  main { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem 4rem; }
-  .eyebrow {
+  .explorer .eyebrow {
     margin: 0 0 .5rem;
     font-size: .72rem;
     letter-spacing: .18em;
@@ -32,82 +24,83 @@
     color: var(--accent);
     font-weight: 600;
   }
-  h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 .75rem; letter-spacing: -.01em; }
-  h2 { font-size: 1.3rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
-  .lede { color: var(--muted); max-width: 46rem; margin: 0 0 1.5rem; }
-  .hero { padding: 3.5rem 0 2rem; border-bottom: 1px solid var(--line); }
-  .stats {
+  .explorer h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 .75rem; letter-spacing: -.01em; }
+  .explorer h2 { font-size: 1.3rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+  .explorer .lede { color: var(--muted); max-width: 46rem; margin: 0 0 1.5rem; }
+  .explorer .hero { padding: 3.5rem 0 2rem; border-bottom: 1px solid var(--line); }
+  .explorer .stats {
     display: flex; flex-wrap: wrap; gap: 2.5rem;
     margin: 1.75rem 0 0; padding: 0; list-style: none;
   }
-  .stats b { display: block; font-size: 1.6rem; font-weight: 650; }
-  .stats span { font-size: .8rem; color: var(--muted); }
-  section { padding: 2.75rem 0 0; }
-  .section-note { color: var(--muted); font-size: .9rem; margin: 0 0 1.5rem; max-width: 44rem; }
+  .explorer .stats b { display: block; font-size: 1.6rem; font-weight: 650; }
+  .explorer .stats span { font-size: .8rem; color: var(--muted); }
+  .explorer section { padding: 2.75rem 0 0; }
+  .explorer .section-note { color: var(--muted); font-size: .9rem; margin: 0 0 1.5rem; max-width: 44rem; }
 
   /* leaderboard */
-  .board-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .75rem; }
-  #q {
+  .explorer .board-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .75rem; }
+  .explorer #q {
     width: 100%; max-width: 22rem; padding: .5rem .75rem;
     border: 1px solid var(--line); border-radius: 6px; background: #fff;
     font: inherit;
   }
-  #q:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
-  #hits { font-size: .8rem; color: var(--muted); white-space: nowrap; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
+  .explorer #q:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .explorer #hits { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  .explorer table { width: 100%; border-collapse: collapse; }
+  .explorer thead th {
     text-align: left; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
     color: var(--muted); border-bottom: 1px solid var(--line); padding: .4rem .5rem;
   }
-  th button {
+  .explorer th button {
     all: unset; cursor: pointer; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
   }
-  th button:hover { color: var(--accent); }
-  th .dir { color: var(--accent); }
-  tbody tr.person { cursor: pointer; border-bottom: 1px solid var(--line); }
-  tbody tr.person:hover, tbody tr.person.open { background: #fff; }
-  td { padding: .45rem .5rem; font-size: .92rem; vertical-align: top; }
-  td.rank { color: var(--muted); width: 3.5rem; font-variant-numeric: tabular-nums; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; width: 6rem; }
-  td.pts { font-weight: 600; }
-  .badge {
+  .explorer th button:hover { color: var(--accent); }
+  .explorer th .dir { color: var(--accent); }
+  .explorer tbody tr.person { cursor: pointer; border-bottom: 1px solid var(--line); }
+  .explorer tbody tr.person:hover, .explorer tbody tr.person.open { background: #fff; }
+  .explorer td { padding: .45rem .5rem; font-size: .92rem; vertical-align: top; }
+  .explorer td.rank { color: var(--muted); width: 3.5rem; font-variant-numeric: tabular-nums; }
+  .explorer td.num { text-align: right; font-variant-numeric: tabular-nums; width: 6rem; }
+  .explorer td.pts { font-weight: 600; }
+  .explorer .badge {
     display: inline-block; margin-left: .5rem; padding: 0 .4em;
     border: 1px solid var(--line); border-radius: 999px;
     font-size: .68rem; color: var(--muted); vertical-align: .1em;
   }
-  tr.detail td { background: #fff; padding: .25rem .5rem .9rem 4rem; }
-  tr.detail ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 3rem; }
-  tr.detail li { padding: .15rem 0; font-size: .85rem; break-inside: avoid; }
-  tr.detail .y { color: var(--muted); display: inline-block; width: 2.6rem; font-variant-numeric: tabular-nums; }
-  tr.detail .gain { float: right; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .explorer tr.detail td { background: #fff; padding: .25rem .5rem .9rem 4rem; }
+  .explorer tr.detail ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 3rem; }
+  .explorer tr.detail li { padding: .15rem 0; font-size: .85rem; break-inside: avoid; }
+  .explorer tr.detail .y { color: var(--muted); display: inline-block; width: 2.6rem; font-variant-numeric: tabular-nums; }
+  .explorer tr.detail .gain { float: right; color: var(--accent); font-variant-numeric: tabular-nums; }
 
   /* charts */
-  figure { margin: 0; }
-  svg { display: block; width: 100%; height: auto; }
-  .axis { font-size: 11px; fill: var(--muted); }
-  .grid { stroke: var(--line); stroke-width: 1; }
-  .bar { fill: var(--accent); }
-  .bar-label { font-size: 12px; fill: var(--ink); }
-  .bar-value { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
-  .dot { fill: var(--accent); fill-opacity: .45; stroke: var(--bg); stroke-width: 1; }
-  .dot.org { fill: #b45309; }
-  .chart-select {
+  .explorer figure { margin: 0; }
+  .explorer svg { display: block; width: 100%; height: auto; }
+  .explorer .axis { font-size: 11px; fill: var(--muted); }
+  .explorer .grid { stroke: var(--line); stroke-width: 1; }
+  .explorer .bar { fill: var(--accent); }
+  .explorer .bar-label { font-size: 12px; fill: var(--ink); }
+  .explorer .bar-value { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .explorer .dot { fill: var(--accent); fill-opacity: .45; stroke: var(--bg); stroke-width: 1; }
+  .explorer .dot.org { fill: #b45309; }
+  .explorer .chart-select {
     margin: 0 0 1rem; padding: .4rem .6rem; font: inherit;
     border: 1px solid var(--line); border-radius: 6px; background: #fff;
   }
-  footer {
+  .explorer .explorer-note {
     margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
     color: var(--muted); font-size: .82rem; max-width: 46rem;
   }
   @media (max-width: 640px) {
-    h1 { font-size: 1.8rem; }
-    tr.detail ul { columns: 1; }
-    td.num { width: 4rem; }
+    .explorer h1 { font-size: 1.8rem; }
+    .explorer tr.detail ul { columns: 1; }
+    .explorer td.num { width: 4rem; }
   }
+
 </style>
-</head>
-<body>
-<main>
+{% endblock %}
+{% block content %}
+<div class="explorer">
   <header class="hero">
     <p class="eyebrow">Data explorer</p>
     <h1>The most awarded people in science and beyond</h1>
@@ -189,19 +182,17 @@
     <figure id="scatter-chart"></figure>
   </section>
 
-  <footer>
-    <p>
+  <p class="explorer-note">
       Scoring: points = &Sigma; (prize prestige score &divide; 100) over a laureate's recorded awards; prize shares are not discounted.
       Identity follows the Wikidata QID in the source data, so the same person is merged across prize families.
-      Built from <code>awards.sqlite3</code> as of __GENERATED__. A standalone page, independent of the main awards website.
-    </p>
-  </footer>
-</main>
+      Built from <code>awards.sqlite3</code> as of {{ generated }}.
+  </p>
+</div>
 
-<script id="data" type="application/json">__DATA__</script>
+<script id="explorer-data" type="application/json">{{ payload|safe }}</script>
 <script>
 "use strict";
-const DATA = JSON.parse(document.getElementById("data").textContent);
+const DATA = JSON.parse(document.getElementById("explorer-data").textContent);
 const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
@@ -475,5 +466,4 @@ function text(parent, x, y, content, cls, anchor) {
 
 renderBoard();
 </script>
-</body>
-</html>
+{% endblock %}

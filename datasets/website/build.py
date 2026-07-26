@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import posixpath
 import re
@@ -45,6 +46,7 @@ TEMPLATES = (
     "countries.html",
     "country.html",
     "affiliations.html",
+    "explorer.html",
     "404.html",
 )
 PEOPLE_ROUTE = "/people/"
@@ -52,6 +54,8 @@ PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 AFFILIATIONS_ROUTE = "/affiliations/"
+EXPLORER_ROUTE = "/explorer/"
+POPULATION_FILE = SCRIPT_DIR / "population.json"
 AFFILIATION_ROWS = 40
 # Recorded in the affiliation column but not an institution.
 AFFILIATION_BLOCKLIST = frozenset({"Freelance"})
@@ -258,6 +262,90 @@ def _year_prefix(value: str, record_id: str) -> int:
     if not match:
         raise BuildFailure(f"invalid year record_id={record_id}")
     return int(match.group(1))
+
+
+def load_population(country_names: list[str], population_file: Path = POPULATION_FILE) -> list[int | None]:
+    """Return population figures aligned positionally with country_names."""
+    snapshot = json.loads(population_file.read_text(encoding="utf-8"))
+    figures = snapshot["population"]
+    return [figures.get(name) for name in country_names]
+
+
+def explorer_payload(rankings: list[Ranking], records: list[AwardRecord], population_file: Path = POPULATION_FILE) -> dict[str, Any]:
+    family_index = {ranking.prize_name: index for index, ranking in enumerate(rankings)}
+    people: dict[str, dict[str, Any]] = {}
+    countries: dict[str, int] = {}
+
+    def country_index(name: str) -> int:
+        if name not in countries:
+            countries[name] = len(countries)
+        return countries[name]
+
+    for record in records:
+        year = _year_prefix(record.year, record.award_record_id)
+        if record.prize_name not in family_index:
+            raise BuildFailure(f"prize missing from award_ranking record_id={record.award_record_id}")
+        key = record.laureate_wikidata_qid or f"row:{record.award_record_id}"
+        person = people.setdefault(
+            key,
+            {
+                "n": record.full_name,
+                "o": 1 if record.laureate_type == "Organization" else 0,
+                "a": [],
+                "bc": None,
+                "dc": None,
+                "ac": set(),
+                "cc": set(),
+                "by": None,
+            },
+        )
+        person["a"].append([year, family_index[record.prize_name], record.category or ""])
+        if person["by"] is None:
+            birth_match = YEAR_PREFIX.match(record.birth_date or "") or YEAR_PREFIX.match(record.birth_year or "")
+            if birth_match:
+                person["by"] = int(birth_match.group(1))
+        if record.birth_country and person["bc"] is None:
+            person["bc"] = country_index(record.birth_country)
+        if record.death_country and person["dc"] is None:
+            person["dc"] = country_index(record.death_country)
+        for name in record.affiliation_country.split(";"):
+            if name.strip():
+                person["ac"].add(country_index(name.strip()))
+        for name in record.citizenship_countries.split(";"):
+            if name.strip():
+                person["cc"].add(country_index(name.strip()))
+
+    ranked: list[dict[str, Any]] = []
+    for person in people.values():
+        person["a"].sort()
+        points = round(sum(rankings[family].score / 100 for _, family, _ in person["a"]), 2)
+        ranked.append(
+            {
+                "n": person["n"],
+                "o": person["o"],
+                "c": len(person["a"]),
+                "p": points,
+                "a": person["a"],
+                "bc": person["bc"],
+                "dc": person["dc"],
+                "ac": sorted(person["ac"]),
+                "cc": sorted(person["cc"]),
+                "by": person["by"],
+            }
+        )
+    ranked.sort(key=lambda person: (-person["p"], -person["c"], person["n"]))
+
+    country_names = list(countries)
+    return {
+        "families": [{"name": ranking.prize_name, "score": ranking.score} for ranking in rankings],
+        "countries": country_names,
+        "population": load_population(country_names, population_file),
+        "people": ranked,
+    }
+
+
+def explorer_json(payload: dict[str, Any]) -> str:
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
 
 def _descending_records(records: Iterable[AwardRecord]) -> list[AwardRecord]:
@@ -528,7 +616,7 @@ def plan_people(records: list[AwardRecord], routes: dict[str, str], record_route
     return people
 
 
-def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_url: str) -> SitePlan:
+def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_url: str, generated: str) -> SitePlan:
     if not rankings or not records:
         raise BuildFailure("ranking or awards table is empty")
 
@@ -955,6 +1043,18 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             )
         )
 
+    jobs.append(
+        _page(
+            "explorer.html",
+            EXPLORER_ROUTE,
+            "Awards Data Explorer",
+            "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
+            (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
+            payload=explorer_json(explorer_payload(rankings, records)),
+            generated=generated,
+        )
+    )
+
     routes = [job.route for job in jobs]
     if len(routes) != len(set(routes)):
         raise BuildFailure("duplicate public route")
@@ -1053,6 +1153,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
+        explorer_route=EXPLORER_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
         **job.context,
@@ -1079,6 +1180,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
+        explorer_route=EXPLORER_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
     )
@@ -1115,7 +1217,8 @@ def _promote(staging: Path, dist: Path) -> None:
 def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:
     normalized_base_url = normalize_base_url(base_url)
     rankings, records = read_database(database)
-    plan = create_site_plan(rankings, records, normalized_base_url)
+    generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
+    plan = create_site_plan(rankings, records, normalized_base_url, generated)
     environment = _environment(website_dir)
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
     dist = website_dir / "dist"

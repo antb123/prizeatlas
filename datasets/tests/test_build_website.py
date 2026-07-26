@@ -85,6 +85,117 @@ class WebsiteBuildTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(build.BuildFailure):
                 build.normalize_base_url(value)
 
+    def test_explorer_payload_serialization_and_route(self) -> None:
+        rankings = [
+            build.Ranking("Q1", "First Prize", "first-prize", "https://example.org/first", 100, "Blurb.", "Reasoning."),
+            build.Ranking("Q2", "Second Prize", "second-prize", "https://example.org/second", 60, "Blurb.", "Reasoning."),
+        ]
+
+        def award(**values: str) -> build.AwardRecord:
+            return build.AwardRecord(*(values.get(column, "") for column in build.AWARD_COLUMNS))
+
+        records = [
+            award(
+                award_record_id="first-1",
+                year="2001",
+                category="Physics",
+                prize_name="First Prize",
+                award_wikidata_qid="Q1",
+                laureate_wikidata_qid="Q100",
+                laureate_type="Individual",
+                full_name="Alice Example",
+                birth_date="1970-04-03",
+                birth_country="Belgium",
+                death_country="France",
+                affiliation_country="United States; Belgium",
+                citizenship_countries="Belgium; Canada",
+            ),
+            award(
+                award_record_id="second-1",
+                year="1999",
+                prize_name="Second Prize",
+                award_wikidata_qid="Q2",
+                laureate_wikidata_qid="Q100",
+                laureate_type="Individual",
+                full_name="Alice Example",
+                birth_country="Germany",
+                death_country="Germany",
+                affiliation_country="Canada; Switzerland",
+                citizenship_countries="France",
+            ),
+            award(
+                award_record_id="second-2",
+                year="2002",
+                category="Peace",
+                prize_name="Second Prize",
+                award_wikidata_qid="Q2",
+                laureate_type="Organization",
+                full_name="Example </script> Institute",
+                birth_date="unknown",
+                birth_year="unknown",
+                affiliation_country="Japan",
+            ),
+        ]
+        population_file = self.directory / "population.json"
+        population_file.write_text(
+            json.dumps(
+                {
+                    "population": {
+                        "Belgium": 11,
+                        "France": 22,
+                        "United States": 33,
+                        "Canada": 44,
+                        "Switzerland": 55,
+                        "Japan": 66,
+                    }
+                }
+            )
+        )
+
+        payload = build.explorer_payload(rankings, records, population_file)
+
+        self.assertEqual(
+            {
+                "families": [{"name": "First Prize", "score": 100}, {"name": "Second Prize", "score": 60}],
+                "countries": ["Belgium", "France", "United States", "Canada", "Switzerland", "Japan"],
+                "population": [11, 22, 33, 44, 55, 66],
+                "people": [
+                    {
+                        "n": "Alice Example",
+                        "o": 0,
+                        "c": 2,
+                        "p": 1.6,
+                        "a": [[1999, 1, ""], [2001, 0, "Physics"]],
+                        "bc": 0,
+                        "dc": 1,
+                        "ac": [0, 2, 3, 4],
+                        "cc": [0, 1, 3],
+                        "by": 1970,
+                    },
+                    {
+                        "n": "Example </script> Institute",
+                        "o": 1,
+                        "c": 1,
+                        "p": 0.6,
+                        "a": [[2002, 1, "Peace"]],
+                        "bc": None,
+                        "dc": None,
+                        "ac": [5],
+                        "cc": [],
+                        "by": None,
+                    },
+                ],
+            },
+            payload,
+        )
+        serialized = build.explorer_json(payload)
+        self.assertNotIn("<", serialized)
+        self.assertEqual("Example </script> Institute", json.loads(serialized)["people"][1]["n"])
+
+        plan = build.create_site_plan(rankings, records, "https://example.org/", "2026-07-26")
+        explorer = next(job for job in plan.jobs if job.route == build.EXPLORER_ROUTE)
+        self.assertEqual("explorer.html", explorer.template)
+
     def test_complete_build_routes_metadata_escaping_and_relative_links(self) -> None:
         rankings = [
             ("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
