@@ -183,6 +183,7 @@ class Affiliation:
     count: int
     units: tuple[tuple[str, int], ...]
     awards: tuple[tuple[AwardRecord, str], ...]
+    subjects: tuple[tuple[str, str], ...]
     profile: AffiliationProfile | None
 
 
@@ -662,6 +663,13 @@ def plan_places(
             key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id),
             reverse=True,
         )
+        subject_counts: dict[str, int] = {}
+        for record, _ in awards:
+            subject_counts[record.high_school_subject] = subject_counts.get(record.high_school_subject, 0) + 1
+        subjects = tuple(
+            (subject, f"{SUBJECTS_ROUTE}{slugify(subject)}/")
+            for subject in sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject))
+        )
         qids = {record.affiliation_wikidata_qid for record, _ in awards if _nonblank(record.affiliation_wikidata_qid)}
         matched_profiles = [profiles_by_qid[qid] for qid in qids if qid in profiles_by_qid]
         if matched_profiles and len(qids) != 1:
@@ -674,6 +682,7 @@ def plan_places(
                 len(laureates),
                 _ranked(units),
                 tuple(awards),
+                subjects,
                 matched_profiles[0] if matched_profiles else None,
             )
         )

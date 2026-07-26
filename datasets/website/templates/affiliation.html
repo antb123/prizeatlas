@@ -6,6 +6,9 @@
   <img class="award-logo award-logo-large" src="{{ affiliation.profile.logo_url }}" alt="{{ affiliation.name }} logo">
   {% endif %}
   <h1>{{ affiliation.name }}</h1>
+  <p class="subject-badges">
+    {% for name, route in affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+  </p>
   {% if affiliation.profile and affiliation.profile.description %}
   <p>{{ affiliation.profile.description }}</p>
   {% endif %}
