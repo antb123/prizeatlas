@@ -26,6 +26,9 @@ Small product roadmap. Each item needs a brief approved specification before imp
 - [ ] Evaluate and select a CDN-backed static deployment platform, such as Cloudflare Pages/CDN or an equivalent. Compare
   custom-domain and HTTPS support, caching and invalidation, preview deployments, CI integration, logs, cost, portability,
   and rollback before documenting the production deployment workflow.
+- [ ] Add privacy-preserving visitor analytics for aggregate country, popular-page, referral-source, device-class, and
+  traffic-trend reporting. Prefer a cookieless approach; specify consent requirements, IP handling, data retention, bot
+  filtering, access controls, and public privacy disclosures before deployment.
 - [ ] Add a weekly update agent that checks official award sources for newly announced winners, prepares reviewed and
   guarded database updates, backs up and validates `awards.sqlite3`, rebuilds and tests the website, redeploys only after
   every check passes, and records an auditable update report with rollback details.
