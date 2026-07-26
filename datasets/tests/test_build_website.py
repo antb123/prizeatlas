@@ -54,6 +54,15 @@ class WebsiteBuildTests(unittest.TestCase):
                 ) STRICT
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE affiliations (
+                    affiliation_wikidata_qid TEXT PRIMARY KEY,
+                    logo_url TEXT NOT NULL DEFAULT '',
+                    description TEXT NOT NULL DEFAULT ''
+                ) STRICT
+                """
+            )
             connection.executemany(
                 "INSERT INTO award_ranking VALUES (?, ?, ?, ?, ?, 'Blurb.', 'Reasoning.')",
                 rankings,

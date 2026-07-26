@@ -33,6 +33,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DATASET_DIR = SCRIPT_DIR.parent
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 YEAR_PREFIX = re.compile(r"([0-9]{4})")
+WIKIDATA_QID = re.compile(r"Q[1-9][0-9]*")
 SITEMAP_URL_LIMIT = 50_000
 SITEMAP_BYTE_LIMIT = 52_428_800
 TEMPLATES = (
@@ -104,6 +105,7 @@ AWARD_COLUMNS = (
     "citizenship_countries",
     "affiliation_name",
     "affiliation_sub_name",
+    "affiliation_wikidata_qid",
     "affiliation_city",
     "affiliation_country",
     "death_date",
@@ -150,6 +152,7 @@ class AwardRecord:
     citizenship_countries: str
     affiliation_name: str
     affiliation_sub_name: str
+    affiliation_wikidata_qid: str
     affiliation_city: str
     affiliation_country: str
     death_date: str
@@ -157,6 +160,17 @@ class AwardRecord:
     death_country: str
     biographical_note: str
     high_school_subject: str
+
+
+@dataclass(frozen=True, slots=True)
+class AffiliationProfile:
+    qid: str
+    logo_url: str
+    description: str
+
+    @property
+    def wikidata_url(self) -> str:
+        return f"https://www.wikidata.org/wiki/{self.qid}"
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,7 +183,7 @@ class Affiliation:
     count: int
     units: tuple[tuple[str, int], ...]
     awards: tuple[tuple[AwardRecord, str], ...]
-    profile: None = None
+    profile: AffiliationProfile | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -410,7 +424,7 @@ def _category_slugs(categories: set[str]) -> dict[str, str]:
     return result
 
 
-def read_database(database: Path) -> tuple[list[Ranking], list[AwardRecord]]:
+def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfile], list[AwardRecord]]:
     if not database.is_file():
         raise BuildFailure("database is missing")
     with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True) as connection:
@@ -422,6 +436,9 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AwardRecord]]:
             FROM award_ranking
             ORDER BY score DESC
             """
+        ).fetchall()
+        profile_rows = connection.execute(
+            "SELECT affiliation_wikidata_qid, logo_url, description FROM affiliations ORDER BY affiliation_wikidata_qid"
         ).fetchall()
         award_rows = connection.execute(f"SELECT {', '.join(AWARD_COLUMNS)} FROM awards").fetchall()
         connection.commit()
@@ -454,8 +471,16 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AwardRecord]]:
         )
         for row in ranking_rows
     ]
+    profiles = [
+        AffiliationProfile(
+            qid=_text(row["affiliation_wikidata_qid"]),
+            logo_url=_text(row["logo_url"]),
+            description=_text(row["description"]),
+        )
+        for row in profile_rows
+    ]
     records = [AwardRecord(*(_text(row[field.name]) for field in fields(AwardRecord))) for row in award_rows]
-    return rankings, records
+    return rankings, profiles, records
 
 
 def _page(
@@ -578,6 +603,7 @@ def plan_places(
     people: list[Laureate],
     records: list[AwardRecord],
     record_routes: dict[str, str],
+    profiles_by_qid: dict[str, AffiliationProfile],
 ) -> tuple[list[Place], list[Affiliation]]:
     """Rank birth countries and affiliations by laureate, never by award record.
 
@@ -633,8 +659,20 @@ def plan_places(
                 units.setdefault(unit, set()).update(members)
             awards.extend(awards_by_name.get(name, ()))
         awards.sort(key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id))
+        qids = {record.affiliation_wikidata_qid for record, _ in awards if _nonblank(record.affiliation_wikidata_qid)}
+        matched_profiles = [profiles_by_qid[qid] for qid in qids if qid in profiles_by_qid]
+        if matched_profiles and len(qids) != 1:
+            raise BuildFailure(f"conflicting affiliation metadata route={AFFILIATIONS_ROUTE}{slug}/ qids={','.join(sorted(qids))}")
         affiliations.append(
-            Affiliation(display, slug, f"{AFFILIATIONS_ROUTE}{slug}/", len(laureates), _ranked(units), tuple(awards))
+            Affiliation(
+                display,
+                slug,
+                f"{AFFILIATIONS_ROUTE}{slug}/",
+                len(laureates),
+                _ranked(units),
+                tuple(awards),
+                matched_profiles[0] if matched_profiles else None,
+            )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
     return countries, affiliations
@@ -722,7 +760,13 @@ def plan_subjects(people: list[Laureate], subject_counts: dict[str, int]) -> lis
     return subjects
 
 
-def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_url: str, generated: str) -> SitePlan:
+def create_site_plan(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    base_url: str,
+    generated: str,
+    profiles: Iterable[AffiliationProfile] = (),
+) -> SitePlan:
     if not rankings or not records:
         raise BuildFailure("ranking or awards table is empty")
 
@@ -772,6 +816,14 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
     for qid, prize_name in live_names.items():
         if ranking_by_qid[qid].prize_name != prize_name:
             raise BuildFailure(f"ranking prize mismatch qid={qid}")
+
+    profiles_by_qid: dict[str, AffiliationProfile] = {}
+    for profile in profiles:
+        if not WIKIDATA_QID.fullmatch(profile.qid):
+            raise BuildFailure(f"invalid affiliation QID qid={profile.qid}")
+        if profile.qid in profiles_by_qid:
+            raise BuildFailure(f"duplicate affiliation profile qid={profile.qid}")
+        profiles_by_qid[profile.qid] = profile
 
     rankings = sorted(rankings, key=lambda ranking: ranking.score, reverse=True)
     jobs: list[PageJob] = []
@@ -1052,7 +1104,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             )
         )
 
-    countries, affiliations = plan_places(people, records, all_record_routes)
+    countries, affiliations = plan_places(people, records, all_record_routes, profiles_by_qid)
     subjects = plan_subjects(people, subject_counts)
     jobs.append(
         _page(
@@ -1399,9 +1451,9 @@ def _promote(staging: Path, dist: Path) -> None:
 
 def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:
     normalized_base_url = normalize_base_url(base_url)
-    rankings, records = read_database(database)
+    rankings, profiles, records = read_database(database)
     generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
-    plan = create_site_plan(rankings, records, normalized_base_url, generated)
+    plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
     environment = _environment(website_dir)
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
     dist = website_dir / "dist"
