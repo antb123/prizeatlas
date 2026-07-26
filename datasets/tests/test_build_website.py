@@ -690,12 +690,15 @@ class WebsiteBuildTests(unittest.TestCase):
 
         build.build_site(database, "https://example.org/", self.website)
 
+        country_views = (self.website / "dist/countries/index.html").read_text()
         people = (self.website / "dist/countries/born/index.html").read_text()
         institutions = (self.website / "dist/countries/affiliations/index.html").read_text()
         belgium = (self.website / "dist/countries/affiliations/belgium/index.html").read_text()
         canada = (self.website / "dist/countries/affiliations/canada/index.html").read_text()
         switzerland = (self.website / "dist/countries/affiliations/switzerland/index.html").read_text()
 
+        self.assertIn('href="born/">People</a>', country_views)
+        self.assertIn('href="affiliations/">Institutions</a>', country_views)
         self.assertIn('href="../affiliations/">Institutions</a>', people)
         self.assertIn('href="../born/">People</a>', institutions)
         self.assertIn('aria-current="page">Institutions</a>', institutions)

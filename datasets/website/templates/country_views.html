@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="country-tabs" aria-label="Country views">
+  <a href="{{ href(countries_route) }}">People</a>
+  <a href="{{ href(country_affiliations_route) }}">Institutions</a>
+</nav>
+<header class="page-intro">
+  <p class="eyebrow">Countries</p>
+  <h1>{{ title }}</h1>
+  <p>Choose People to browse laureates by birthplace, or Institutions to browse countries by their distinct
+  recorded award institutions.</p>
+</header>
+{% endblock %}

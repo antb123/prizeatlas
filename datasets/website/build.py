@@ -45,6 +45,7 @@ TEMPLATES = (
     "winner.html",
     "person.html",
     "people.html",
+    "country_views.html",
     "countries.html",
     "country.html",
     "affiliation_countries.html",
@@ -59,6 +60,7 @@ TEMPLATES = (
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
+COUNTRY_ROOT_ROUTE = "/countries/"
 COUNTRIES_ROUTE = "/countries/born/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
 AFFILIATIONS_ROUTE = "/affiliations/"
@@ -1189,6 +1191,15 @@ def create_site_plan(
             )
         )
     recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
+    jobs.append(
+        _page(
+            "country_views.html",
+            COUNTRY_ROOT_ROUTE,
+            "Browse countries",
+            "Browse countries by laureate birthplace or by recorded award institutions.",
+            (Breadcrumb("Home", "/"), Breadcrumb("Countries", None)),
+        )
+    )
     jobs.append(
         _page(
             "countries.html",
