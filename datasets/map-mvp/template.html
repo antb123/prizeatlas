@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Awards Atlas — where big ideas begin</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #07111f;
+      --panel: rgba(13, 28, 47, .9);
+      --line: rgba(255, 255, 255, .13);
+      --ink: #f7fbff;
+      --muted: #a9bdd0;
+      --birth: #ffb347;
+      --birth-glow: #ff7a18;
+      --institution: #56d8ff;
+      --institution-glow: #4776ff;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--night);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #map { position: absolute; inset: 0; background: #0c1826; }
+    .shade {
+      position: absolute;
+      z-index: 500;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(3, 9, 18, .72) 0, transparent 40%, transparent 78%, rgba(3, 9, 18, .2));
+    }
+    .hero {
+      position: absolute;
+      z-index: 800;
+      top: 1.25rem;
+      left: 1.25rem;
+      width: min(25rem, calc(100% - 2.5rem));
+      padding: 1.1rem 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      background: var(--panel);
+      box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, .35);
+      backdrop-filter: blur(18px);
+    }
+    .eyebrow {
+      margin: 0 0 .25rem;
+      color: var(--institution);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.7rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    .intro {
+      margin: .65rem 0 .9rem;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .55rem;
+      margin-bottom: .8rem;
+    }
+    .stat {
+      padding: .65rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: .75rem;
+      background: rgba(255, 255, 255, .04);
+    }
+    .stat strong { display: block; font-size: 1.25rem; line-height: 1; }
+    .stat span { color: var(--muted); font-size: .7rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .map-filter {
+      display: flex;
+      gap: .55rem;
+      align-items: center;
+      width: 100%;
+      padding: .55rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: .75rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .04);
+      font-size: .75rem;
+      font-weight: 750;
+    }
+    .map-filter select {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      color: var(--ink);
+      background: transparent;
+      font: inherit;
+      font-size: .85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .map-filter option { color: #122033; background: white; }
+    button {
+      min-height: 2.45rem;
+      padding: .5rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .06);
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .18s ease, opacity .18s ease, background .18s ease;
+    }
+    button:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .12); }
+    button:focus-visible { outline: 3px solid white; outline-offset: 2px; }
+    button[aria-pressed="false"] { opacity: .46; }
+    .dot {
+      display: inline-block;
+      width: .65rem;
+      height: .65rem;
+      margin-right: .35rem;
+      border-radius: 50%;
+      vertical-align: -.02rem;
+    }
+    .birth .dot { background: var(--birth); box-shadow: 0 0 .65rem var(--birth-glow); }
+    .institution .dot { background: var(--institution); box-shadow: 0 0 .65rem var(--institution-glow); }
+    .surprise { margin-left: auto; }
+    .legend {
+      position: absolute;
+      z-index: 800;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      max-width: 17rem;
+      padding: .8rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+      color: var(--muted);
+      background: var(--panel);
+      font-size: .75rem;
+      line-height: 1.4;
+      backdrop-filter: blur(18px);
+    }
+    .legend strong { color: var(--ink); }
+    .legend p { margin: .25rem 0 0; }
+    .fallback {
+      position: absolute;
+      z-index: 900;
+      inset: auto 1rem 1rem;
+      display: none;
+      padding: 1rem;
+      border-radius: .75rem;
+      background: #381721;
+      text-align: center;
+    }
+    .leaflet-container { font: inherit; }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      color: #122033;
+      background: #fff;
+    }
+    .place-card { min-width: 13rem; }
+    .place-card .kind {
+      margin: 0 0 .2rem;
+      color: #587084;
+      font-size: .65rem;
+      font-weight: 850;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .place-card h2 { margin: 0; font-size: 1.05rem; line-height: 1.15; }
+    .place-card .where { margin: .25rem 0 .65rem; color: #587084; }
+    .place-card .award-count { margin: 0; font-weight: 800; }
+    .place-card .also { margin: .35rem 0 0; color: #587084; font-size: .75rem; }
+    @media (max-width: 640px) {
+      .hero { top: .65rem; left: .65rem; width: calc(100% - 1.3rem); }
+      .intro { display: none; }
+      .legend { right: .65rem; bottom: .65rem; max-width: calc(100% - 1.3rem); }
+      .leaflet-control-zoom { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="map" role="region" aria-label="Interactive world map of award birthplaces and institutions"></div>
+    <div class="shade" aria-hidden="true"></div>
+    <section class="hero" aria-labelledby="map-title">
+      <p class="eyebrow">Interactive experiment</p>
+      <h1 id="map-title">Awards Atlas</h1>
+      <p class="intro">Where were award winners born—and where did they do their work? Bigger circles mean more recorded awards. This preview uses current dataset coordinates and may reveal locations that still need correction.</p>
+      <div class="stats" aria-live="polite">
+        <div class="stat"><strong id="location-total">—</strong><span>visible locations</span></div>
+        <div class="stat"><strong id="award-total">—</strong><span>mapped awards</span></div>
+      </div>
+      <div class="controls" aria-label="Map layers">
+        <label class="map-filter" for="subject-filter">
+          <span>High-school subject</span>
+          <select id="subject-filter"><option value="">All subjects</option></select>
+        </label>
+        <label class="map-filter" for="decade-filter">
+          <span>Award decade</span>
+          <select id="decade-filter"><option value="">All decades</option></select>
+        </label>
+        <button class="birth" id="birth-toggle" type="button" aria-pressed="true"><span class="dot"></span>Birthplaces</button>
+        <button class="institution" id="institution-toggle" type="button" aria-pressed="true"><span class="dot"></span>Institutions</button>
+        <button class="surprise" id="surprise" type="button">Surprise me ↗</button>
+      </div>
+    </section>
+    <aside class="legend">
+      <strong>Circle area = recorded awards</strong>
+      <p><span class="dot" style="background:var(--birth)"></span> birthplace &nbsp; <span class="dot" style="background:var(--institution)"></span> institution</p>
+    </aside>
+    <p class="fallback" id="fallback">The interactive map could not load. Check your internet connection and reload.</p>
+  </main>
+
+  <script id="map-data" type="application/json">__MAP_DATA__</script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    (() => {
+      "use strict";
+      const fallback = document.getElementById("fallback");
+      if (!window.L) {
+        fallback.style.display = "block";
+        return;
+      }
+
+      const data = JSON.parse(document.getElementById("map-data").textContent);
+      const compact = window.matchMedia("(max-width: 640px)").matches;
+      const map = L.map("map", {zoomControl: false, worldCopyJump: true, minZoom: 1}).setView([20, 5], compact ? 1 : 2);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      L.control.zoom({position: "bottomleft"}).addTo(map);
+
+      const definitions = {
+        birth: {label: "Birthplace", color: "#ffb347", fill: "#ff7a18"},
+        affiliation: {label: "Institution", color: "#56d8ff", fill: "#4776ff"}
+      };
+      const layers = {};
+      const circles = [];
+      const enabled = {birth: true, affiliation: true};
+      let selectedSubject = "";
+      let selectedDecade = "";
+
+      function popup(item) {
+        const {marker, kind, visibleCount} = item;
+        const card = document.createElement("article");
+        card.className = "place-card";
+        const type = document.createElement("p");
+        type.className = "kind";
+        type.textContent = definitions[kind].label;
+        const title = document.createElement("h2");
+        title.textContent = marker.title;
+        const place = document.createElement("p");
+        place.className = "where";
+        if (kind === "birth") {
+          place.textContent = marker.city && marker.country ? marker.country : (marker.country || "Country not recorded");
+        } else {
+          place.textContent = [marker.city, marker.country].filter(Boolean).join(" · ") || "Location details not recorded";
+        }
+        const count = document.createElement("p");
+        count.className = "award-count";
+        const filterLabel = [selectedSubject, selectedDecade].filter(Boolean).join(" · ");
+        count.textContent = `${visibleCount.toLocaleString()} recorded ${visibleCount === 1 ? "award" : "awards"}${filterLabel ? ` · ${filterLabel}` : ""}`;
+        card.append(type, title, place, count);
+        if (marker.extra_labels) {
+          const also = document.createElement("p");
+          also.className = "also";
+          also.textContent = `Also represents ${marker.extra_labels} other recorded ${marker.extra_labels === 1 ? "label" : "labels"} at this point.`;
+          card.append(also);
+        }
+        return card;
+      }
+
+      for (const kind of Object.keys(definitions)) {
+        const layer = L.layerGroup().addTo(map);
+        layers[kind] = layer;
+        for (const marker of data[kind]) {
+          const circle = L.circleMarker([marker.lat, marker.lng], {
+            radius: 2.5 * Math.sqrt(marker.count),
+            color: definitions[kind].color,
+            weight: 1.5,
+            opacity: .9,
+            fillColor: definitions[kind].fill,
+            fillOpacity: .42
+          });
+          const item = {circle, marker, kind, visibleCount: marker.count};
+          circle.bindPopup(() => popup(item));
+          circle.on("mouseover", () => circle.setStyle({fillOpacity: .78, weight: 2.5}));
+          circle.on("mouseout", () => circle.setStyle({fillOpacity: .42, weight: 1.5}));
+          circle.addTo(layer);
+          circles.push(item);
+        }
+      }
+
+      function updateTotals() {
+        const visible = circles.filter(item => enabled[item.kind] && item.visibleCount > 0);
+        document.getElementById("location-total").textContent = visible.length.toLocaleString();
+        document.getElementById("award-total").textContent =
+          visible.reduce((total, item) => total + item.visibleCount, 0).toLocaleString();
+      }
+
+      function applyFilters() {
+        for (const item of circles) {
+          if (selectedSubject && selectedDecade) {
+            item.visibleCount = item.marker.subject_decades[selectedSubject]?.[selectedDecade] || 0;
+          } else if (selectedSubject) {
+            item.visibleCount = item.marker.subjects[selectedSubject] || 0;
+          } else if (selectedDecade) {
+            item.visibleCount = item.marker.decades[selectedDecade] || 0;
+          } else {
+            item.visibleCount = item.marker.count;
+          }
+          const layer = layers[item.kind];
+          if (item.visibleCount) {
+            item.circle.setRadius(2.5 * Math.sqrt(item.visibleCount));
+            if (!layer.hasLayer(item.circle)) item.circle.addTo(layer);
+          } else if (layer.hasLayer(item.circle)) {
+            layer.removeLayer(item.circle);
+          }
+        }
+        updateTotals();
+      }
+
+      function bindToggle(kind, buttonName) {
+        const button = document.getElementById(`${buttonName}-toggle`);
+        button.addEventListener("click", () => {
+          enabled[kind] = !enabled[kind];
+          button.setAttribute("aria-pressed", String(enabled[kind]));
+          if (enabled[kind]) layers[kind].addTo(map);
+          else layers[kind].removeFrom(map);
+          updateTotals();
+        });
+      }
+      bindToggle("birth", "birth");
+      bindToggle("affiliation", "institution");
+
+      const subjectSelect = document.getElementById("subject-filter");
+      const subjectNames = new Set();
+      for (const item of circles) {
+        for (const subject of Object.keys(item.marker.subjects)) subjectNames.add(subject);
+      }
+      const preferred = ["Biology", "Physics", "Chemistry", "Math", "CS", "History", "Lit", "Arts", "Economics", "Earth Science"];
+      const orderedSubjects = [...subjectNames].sort((a, b) => {
+        const ai = preferred.indexOf(a);
+        const bi = preferred.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
+      for (const subject of orderedSubjects) {
+        const option = document.createElement("option");
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.append(option);
+      }
+      subjectSelect.addEventListener("change", () => {
+        selectedSubject = subjectSelect.value;
+        applyFilters();
+      });
+
+      const decadeSelect = document.getElementById("decade-filter");
+      const decadeNames = new Set();
+      for (const item of circles) {
+        for (const decade of Object.keys(item.marker.decades)) decadeNames.add(decade);
+      }
+      for (const decade of [...decadeNames].sort().reverse()) {
+        const option = document.createElement("option");
+        option.value = decade;
+        option.textContent = decade;
+        decadeSelect.append(option);
+      }
+      decadeSelect.addEventListener("change", () => {
+        selectedDecade = decadeSelect.value;
+        applyFilters();
+      });
+
+      const routeSlug = window.location.pathname.split("/").filter(Boolean).at(-1) || "";
+      const routedSubject = orderedSubjects.find(subject =>
+        subject.toLowerCase().match(/[a-z0-9]+/g)?.join("-") === routeSlug
+      );
+      if (routedSubject) {
+        subjectSelect.value = routedSubject;
+        selectedSubject = routedSubject;
+        applyFilters();
+      }
+
+      document.getElementById("surprise").addEventListener("click", () => {
+        const choices = circles.filter(item => enabled[item.kind] && item.visibleCount > 0);
+        if (!choices.length) return;
+        const interesting = choices.filter(item => item.marker.count >= 3);
+        const pool = interesting.length ? interesting : choices;
+        const chosen = pool[Math.floor(Math.random() * pool.length)];
+        map.flyTo(chosen.circle.getLatLng(), Math.max(map.getZoom(), 6), {duration: 1.2});
+        window.setTimeout(() => chosen.circle.openPopup(), 850);
+      });
+
+      updateTotals();
+      window.setTimeout(() => map.invalidateSize(), 0);
+    })();
+  </script>
+</body>
+</html>
