@@ -20,6 +20,9 @@ Small product roadmap. Each item needs a brief approved specification before imp
   public-facing README, contribution, security, and governance guidance.
 - [ ] Choose the site’s public name and domain, then prepare production launch infrastructure: static hosting, DNS, HTTPS,
   canonical URLs and redirects, automated deployment, basic availability monitoring, and a documented rollback path.
+- [ ] Evaluate and select a CDN-backed static deployment platform, such as Cloudflare Pages/CDN or an equivalent. Compare
+  custom-domain and HTTPS support, caching and invalidation, preview deployments, CI integration, logs, cost, portability,
+  and rollback before documenting the production deployment workflow.
 - [ ] Add a weekly update agent that checks official award sources for newly announced winners, prepares reviewed and
   guarded database updates, backs up and validates `awards.sqlite3`, rebuilds and tests the website, redeploys only after
   every check passes, and records an auditable update report with rollback details.
