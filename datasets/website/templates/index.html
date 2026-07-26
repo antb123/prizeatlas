@@ -8,8 +8,8 @@
 <dl class="totals">
   {% for value, label in totals %}
   <div>
-    <dt>{% if label == "prizes" %}<a href="#ranked-awards">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
-    <dd>{% if label == "prizes" %}<a href="#ranked-awards">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
+    <dt>{% if label == "prizes" %}<a href="#ranked-awards">{{ value }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
+    <dd>{% if label == "prizes" %}<a href="#ranked-awards">{{ label }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
   </div>
   {% endfor %}
 </dl>
