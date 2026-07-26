@@ -11,3 +11,6 @@ Small product roadmap. Each item needs a brief approved specification before imp
 - [ ] Add a “Learn more” page with short descriptions and curated links to reliable introductory material, including the Feynman Lectures and suitable books.
 - [ ] Add a “Will AI change research?” page based on clearly attributed primary material from Demis Hassabis and other research leaders; separate sourced claims from editorial explanation.
 - [ ] Add an optional “Explain this” action beside selected award text. It should give a high-school-level explanation without replacing or altering the source text, and clearly identify AI-generated output.
+- [ ] Prepare the repository for public release: choose appropriate code, data, and content licensing; audit third-party
+  assets and attribution; remove secrets, private data, backups, and generated files from tracked history; and add
+  public-facing README, contribution, security, and governance guidance.
