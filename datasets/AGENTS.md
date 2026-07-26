@@ -79,7 +79,7 @@ Run the website build from this `datasets/` directory:
   `website/population.json`.
 - Scoring: a laureate's points = sum of `award_ranking.score` / 100 over their award rows (a Nobel = 1.00, so two
   Nobels = 2.00). Prize shares are not discounted. Organizations are ranked alongside people with a badge.
-- Identity follows `laureate_wikidata_qid`; the five rows without a QID stay unmerged as single-award entries.
+- Identity follows `laureate_wikidata_qid`; any row without a QID stays unmerged as a single-award entry.
 - The country chart counts distinct merged laureates per modern country, switchable between
   birth/death/affiliation/citizenship; affiliation and citizenship count a laureate under each listed country.
   A "Laureates per million" view divides birth-country laureates by the World Bank SP.POP.TOTL snapshot, counting
@@ -88,6 +88,9 @@ Run the website build from this `datasets/` directory:
   total points.
 - The leaderboard shows the top 7 (`TOP_N` in `website/templates/explorer.html`); search reveals all rows with true
   ranks.
+- The explorer makes one optional browser request to `https://api.country.is/` to show the top laureates born in the
+  visitor's detected country. Failure leaves an unavailable note and does not affect the rest of the page; a
+  `?country=BE` query parameter overrides detection for testing.
 
 ## local lookup and enrichment tools
 

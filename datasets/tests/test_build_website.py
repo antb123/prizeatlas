@@ -152,7 +152,7 @@ class WebsiteBuildTests(unittest.TestCase):
             )
         )
 
-        payload = build.explorer_payload(rankings, records, population_file)
+        payload = build.explorer_payload(rankings, records, {"Q100": "/people/alice-example/"}, population_file)
 
         self.assertEqual(
             {
@@ -163,6 +163,7 @@ class WebsiteBuildTests(unittest.TestCase):
                     {
                         "n": "Alice Example",
                         "o": 0,
+                        "r": "../people/alice-example/",
                         "c": 2,
                         "p": 1.6,
                         "a": [[1999, 1, ""], [2001, 0, "Physics"]],
@@ -175,6 +176,7 @@ class WebsiteBuildTests(unittest.TestCase):
                     {
                         "n": "Example </script> Institute",
                         "o": 1,
+                        "r": "",
                         "c": 1,
                         "p": 0.6,
                         "a": [[2002, 1, "Peace"]],
@@ -309,7 +311,8 @@ class WebsiteBuildTests(unittest.TestCase):
         generated = {path.resolve() for path in dist.rglob("*") if path.is_file()}
         for html_path in dist.rglob("*.html"):
             document = html_path.read_text()
-            for href in re.findall(r'href="([^"]+)"', document):
+            static_html = re.sub(r"<script\b[^>]*>.*?</script>", "", document, flags=re.DOTALL)
+            for href in re.findall(r'href="([^"]+)"', static_html):
                 if urlsplit(href).scheme:
                     continue
                 if href.startswith("/"):

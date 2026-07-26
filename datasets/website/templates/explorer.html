@@ -58,6 +58,8 @@
   .explorer th .dir { color: var(--accent); }
   .explorer tbody tr.person { cursor: pointer; border-bottom: 1px solid var(--line); }
   .explorer tbody tr.person:hover, .explorer tbody tr.person.open { background: #fff; }
+  .explorer .person-profile { color: inherit; text-decoration-color: var(--accent); text-underline-offset: .15em; }
+  .explorer .person-profile:hover { color: var(--accent); }
   .explorer td { padding: .45rem .5rem; font-size: .92rem; vertical-align: top; }
   .explorer td.rank { color: var(--muted); width: 3.5rem; font-variant-numeric: tabular-nums; }
   .explorer td.num { text-align: right; font-variant-numeric: tabular-nums; width: 6rem; }
@@ -80,6 +82,8 @@
   .explorer .grid { stroke: var(--line); stroke-width: 1; }
   .explorer .bar { fill: var(--accent); }
   .explorer .bar-label { font-size: 12px; fill: var(--ink); }
+  .explorer .chart-person-link { cursor: pointer; }
+  .explorer .chart-person-link:hover .bar-label { fill: var(--accent); text-decoration: underline; }
   .explorer .bar-value { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
   .explorer .dot { fill: var(--accent); fill-opacity: .45; stroke: var(--bg); stroke-width: 1; }
   .explorer .dot.org { fill: #b45309; }
@@ -132,10 +136,10 @@
     </table>
   </section>
 
-  <section aria-labelledby="top-h">
-    <h2 id="top-h">Top 25 by points</h2>
-    <p class="section-note">The heaviest combined records across all fourteen prize families.</p>
-    <figure id="top-chart"></figure>
+  <section id="local-winners" aria-labelledby="local-winners-h">
+    <h2 id="local-winners-h">Top winners in your country</h2>
+    <p class="section-note" id="local-winners-note">Detecting your country…</p>
+    <figure id="local-winners-chart"></figure>
   </section>
 
   <section aria-labelledby="young-h">
@@ -196,7 +200,7 @@ const DATA = JSON.parse(document.getElementById("explorer-data").textContent);
 const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
-const PEOPLE = DATA.people;               // [{n, o, c, p, a:[[year, familyIdx, category], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
+const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -248,10 +252,11 @@ function renderBoard() {
     : `top ${TOP_N} of ${PEOPLE.length.toLocaleString("en")} — search to see all`;
   const html = [];
   rows.forEach((p) => {
+    const name = p.r ? `<a class="person-profile" href="${esc(p.r)}">${esc(p.n)}</a>` : esc(p.n);
     html.push(
       `<tr class="person${p.open ? " open" : ""}" data-id="${p.id}" tabindex="0" aria-expanded="${p.open ? "true" : "false"}">` +
       `<td class="rank">${rankOf.get(p.id)}</td>` +
-      `<td>${esc(p.n)}${p.o ? '<span class="badge">Organization</span>' : ""}</td>` +
+      `<td>${name}${p.o ? '<span class="badge">Organization</span>' : ""}</td>` +
       `<td class="num">${p.c}</td>` +
       `<td class="num pts">${p.p.toFixed(2)}</td></tr>`
     );
@@ -274,6 +279,7 @@ document.querySelectorAll("th button").forEach((button) =>
   })
 );
 function toggleRow(target) {
+  if (target.closest("a")) return;
   const row = target.closest("tr.person");
   if (!row) return;
   const person = PEOPLE[Number(row.dataset.id)];
@@ -298,23 +304,63 @@ function text(parent, x, y, content, cls, anchor) {
   return node;
 }
 
-/* ---------- top 25 bar chart ---------- */
-{
-  const top = PEOPLE.slice(0, 25);                    // payload arrives sorted by points
-  const rowH = 24, labelW = 215, valueW = 48, width = 860, height = top.length * rowH + 8;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Top 25 laureates by points" });
-  const max = top[0].p;
-  top.forEach((p, i) => {
-    const y = i * rowH + 4;
-    const barW = Math.max(2, (p.p / max) * (width - labelW - valueW - 12));
-    text(svg, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
-    const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
-    const tip = el("title", {}, rect);
-    tip.textContent = `${p.n} — ${p.c} awards, ${p.p.toFixed(2)} points`;
-    text(svg, labelW + barW + 6, y + 14, p.p.toFixed(2), "bar-value");
-  });
-  document.getElementById("top-chart").appendChild(svg);
+function personChartLink(parent, route) {
+  if (!route) return parent;
+  const link = el("a", { href: route, class: "chart-person-link" }, parent);
+  link.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", route);
+  return link;
 }
+
+/* ---------- top winners in the visitor's country ---------- */
+const requestedCountry = new URLSearchParams(window.location.search).get("country");
+const countryLookup = requestedCountry
+  ? Promise.resolve({ country: requestedCountry.toUpperCase() })
+  : fetch("https://api.country.is/", { referrerPolicy: "no-referrer" })
+  .then((response) => {
+    if (!response.ok) throw new Error("country lookup failed");
+    return response.json();
+  });
+countryLookup
+  .then(({ country }) => {
+    const aliases = {
+      CD: "Democratic Republic of the Congo",
+      CZ: "Czech Republic",
+      KR: "South Korea",
+      MM: "Myanmar",
+      RU: "Russia",
+      TL: "Timor-Leste",
+      TR: "Turkey",
+      TW: "Taiwan",
+      TZ: "Tanzania",
+    };
+    const countryName = aliases[country] || new Intl.DisplayNames(["en"], { type: "region" }).of(country);
+    const countryIdx = COUNTRIES.indexOf(countryName);
+    if (countryIdx < 0) throw new Error("country is not represented");
+    const local = PEOPLE.filter((p) => p.bc === countryIdx).slice(0, 25);
+    if (!local.length) throw new Error("country has no birth records");
+
+    const rowH = 24, labelW = 215, valueW = 48, width = 860, height = local.length * rowH + 8;
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `Top winners born in ${countryName}` });
+    const max = local[0].p;
+    local.forEach((p, i) => {
+      const y = i * rowH + 4;
+      const barW = Math.max(2, (p.p / max) * (width - labelW - valueW - 12));
+      const label = personChartLink(svg, p.r);
+      text(label, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
+      const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
+      const tip = el("title", {}, rect);
+      tip.textContent = `${p.n} — ${p.c} awards, ${p.p.toFixed(2)} points`;
+      text(svg, labelW + barW + 6, y + 14, p.p.toFixed(2), "bar-value");
+    });
+    document.getElementById("local-winners-h").textContent = `Top winners in ${countryName}`;
+    document.getElementById("local-winners-note").textContent =
+      "Ranked by total points across all prize families, using birth country.";
+    document.getElementById("local-winners-chart").appendChild(svg);
+  })
+  .catch(() => {
+    document.getElementById("local-winners-note").textContent = "Country detection is unavailable.";
+    console.warn("explorer country lookup failed");
+  });
 
 /* ---------- top winners under 40 ---------- */
 {
@@ -326,7 +372,8 @@ function text(parent, x, y, content, cls, anchor) {
     const firstAge = Math.min(...p.a.map(([year]) => year - p.by));
     const y = i * rowH + 4;
     const barW = Math.max(2, (p.p / max) * (width - labelW - valueW - 12));
-    text(svg, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
+    const label = personChartLink(svg, p.r);
+    text(label, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
     const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
     const tip = el("title", {}, rect);
     tip.textContent = `${p.n} — first won at ${firstAge}, ${p.c} awards, ${p.p.toFixed(2)} points`;

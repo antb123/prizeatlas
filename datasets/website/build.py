@@ -271,7 +271,12 @@ def load_population(country_names: list[str], population_file: Path = POPULATION
     return [figures.get(name) for name in country_names]
 
 
-def explorer_payload(rankings: list[Ranking], records: list[AwardRecord], population_file: Path = POPULATION_FILE) -> dict[str, Any]:
+def explorer_payload(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    routes_by_laureate: dict[str, str],
+    population_file: Path = POPULATION_FILE,
+) -> dict[str, Any]:
     family_index = {ranking.prize_name: index for index, ranking in enumerate(rankings)}
     people: dict[str, dict[str, Any]] = {}
     countries: dict[str, int] = {}
@@ -291,6 +296,9 @@ def explorer_payload(rankings: list[Ranking], records: list[AwardRecord], popula
             {
                 "n": record.full_name,
                 "o": 1 if record.laureate_type == "Organization" else 0,
+                "r": relative_route(EXPLORER_ROUTE, routes_by_laureate[record.laureate_wikidata_qid])
+                if record.laureate_wikidata_qid
+                else "",
                 "a": [],
                 "bc": None,
                 "dc": None,
@@ -323,6 +331,7 @@ def explorer_payload(rankings: list[Ranking], records: list[AwardRecord], popula
             {
                 "n": person["n"],
                 "o": person["o"],
+                "r": person["r"],
                 "c": len(person["a"]),
                 "p": points,
                 "a": person["a"],
@@ -1050,7 +1059,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             "Awards Data Explorer",
             "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
             (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
-            payload=explorer_json(explorer_payload(rankings, records)),
+            payload=explorer_json(explorer_payload(rankings, records, routes_by_laureate)),
             generated=generated,
         )
     )
