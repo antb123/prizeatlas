@@ -14,3 +14,5 @@ Small product roadmap. Each item needs a brief approved specification before imp
 - [ ] Prepare the repository for public release: choose appropriate code, data, and content licensing; audit third-party
   assets and attribution; remove secrets, private data, backups, and generated files from tracked history; and add
   public-facing README, contribution, security, and governance guidance.
+- [ ] Choose the site’s public name and domain, then prepare production launch infrastructure: static hosting, DNS, HTTPS,
+  canonical URLs and redirects, automated deployment, basic availability monitoring, and a documented rollback path.
