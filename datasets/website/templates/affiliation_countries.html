@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% from "_view_tabs.html" import view_tabs with context %}
 {% block content %}
-<nav class="country-tabs" aria-label="Country views">
-  <a href="{{ href(countries_route) }}">People</a>
-  <span aria-hidden="true">|</span>
-  <a href="{{ href(country_affiliations_route) }}" aria-current="page">Institutions</a>
-</nav>
+{{ view_tabs(countries_route, country_affiliations_route, "institutions") }}
 <header class="page-intro">
   <p class="eyebrow">Institutions in</p>
   <h1>{{ title }}</h1>
@@ -18,7 +15,7 @@
   <li>
     <span class="rank-position">{{ loop.index }}</span>
     <a href="{{ href(place.route) }}">{{ place.name }}</a>
-    <span class="rank-count" style="--share: {{ (place.institutions | length) * 100 // leader }}">{{ place.institutions | length }}</span>
+    <span class="rank-count" style="--share: {{ (place.members | length) * 100 // leader }}">{{ place.members | length }}</span>
   </li>
   {% endfor %}
 </ol>

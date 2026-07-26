@@ -1,0 +1,7 @@
+{% macro view_tabs(people_route, institutions_route, current) %}
+<nav class="view-tabs" aria-label="Views">
+  <a href="{{ href(people_route) }}"{% if current == "people" %} aria-current="page"{% endif %}>People</a>
+  <span aria-hidden="true">|</span>
+  <a href="{{ href(institutions_route) }}"{% if current == "institutions" %} aria-current="page"{% endif %}>Institutions</a>
+</nav>
+{% endmacro %}

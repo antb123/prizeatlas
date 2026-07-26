@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% from "_view_tabs.html" import view_tabs with context %}
 {% block content %}
-<nav class="country-tabs" aria-label="Country views">
-  <a href="{{ href(countries_route) }}" aria-current="page">People</a>
-  <span aria-hidden="true">|</span>
-  <a href="{{ href(country_affiliations_route) }}">Institutions</a>
-</nav>
+{{ view_tabs(countries_route, country_affiliations_route, "people") }}
 <header class="page-intro">
   <p class="eyebrow">Born in</p>
   <h1>{{ place.name }}</h1>

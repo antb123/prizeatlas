@@ -283,24 +283,24 @@ h3 {
   font-size: 0.9375rem;
 }
 
-.country-tabs {
+.view-tabs {
   display: flex;
   gap: 1.25rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--rule);
 }
 
-.country-tabs span {
+.view-tabs span {
   color: var(--rule);
 }
 
-.country-tabs a {
+.view-tabs a {
   padding-block: 0.4rem;
   color: var(--muted);
   text-decoration: none;
 }
 
-.country-tabs a[aria-current="page"] {
+.view-tabs a[aria-current="page"] {
   margin-bottom: -1px;
   border-bottom: 3px solid var(--accent);
   color: var(--ink);
@@ -344,6 +344,17 @@ h3 {
 
 .rank-unit-count {
   font-variant-numeric: tabular-nums;
+}
+
+/* Second line of a ranked institution: where it is, what it is known for, and how to apply. */
+.rank-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 .rank-position {

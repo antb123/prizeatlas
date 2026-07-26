@@ -47,7 +47,7 @@ TEMPLATES = (
     "winner.html",
     "person.html",
     "people.html",
-    "country_views.html",
+    "_view_tabs.html",
     "countries.html",
     "country.html",
     "affiliation_countries.html",
@@ -56,6 +56,7 @@ TEMPLATES = (
     "affiliation.html",
     "subjects.html",
     "subject.html",
+    "subject_affiliations.html",
     "explorer.html",
     "map.html",
     "404.html",
@@ -63,9 +64,9 @@ TEMPLATES = (
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
-COUNTRY_ROOT_ROUTE = "/countries/"
-COUNTRIES_ROUTE = "/countries/born/"
+COUNTRIES_ROUTE = "/countries/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
+COUNTRY_AFFILIATIONS_SEGMENT = "affiliations"
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
@@ -235,19 +236,32 @@ class Place:
 
 
 @dataclass(frozen=True, slots=True)
-class InstitutionCountry:
+class RankedAffiliation:
+    """An institution ranked inside one country or one subject. `count` is laureates within that slice, never the
+    institution's worldwide total, so the rows of a page can be compared with each other."""
+    affiliation: Affiliation
+    count: int
+    place: str
+
+
+@dataclass(frozen=True, slots=True)
+class AffiliationCountry:
     name: str
     slug: str
     route: str
-    institutions: tuple[Affiliation, ...]
+    members: tuple[RankedAffiliation, ...]
+    laureates: int
+    cities: int
 
 
 @dataclass(frozen=True, slots=True)
 class Subject:
     name: str
     route: str
+    affiliations_route: str
     award_count: int
     people: tuple[Laureate, ...]
+    affiliations: tuple[RankedAffiliation, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -746,8 +760,8 @@ def plan_places(
     records: list[AwardRecord],
     record_routes: dict[str, str],
     profiles_by_qid: dict[str, AffiliationProfile],
-) -> tuple[list[Place], list[Affiliation], list[InstitutionCountry]]:
-    """Rank birth countries and affiliations by laureate, then group institutions by their recorded countries.
+) -> tuple[list[Place], list[Affiliation]]:
+    """Rank birth countries and affiliations by laureate, never by award record.
 
     A laureate with seven awards is one person born in one country. Counting records would rank a country by how
     decorated its emigrants were rather than how many laureates it produced.
@@ -775,6 +789,8 @@ def plan_places(
         slug = slugify(name)
         if slug in slugs:
             raise BuildFailure(f"duplicate country slug slug={slug} name={name!r} other={slugs[slug]!r}")
+        if slug == COUNTRY_AFFILIATIONS_SEGMENT:
+            raise BuildFailure(f"country slug collides with the institutions tab slug={slug} name={name!r}")
         slugs[slug] = name
         countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
     countries.sort(key=lambda place: (-len(place.people), place.name))
@@ -828,36 +844,83 @@ def plan_places(
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
+    return countries, affiliations
 
-    affiliations_by_country: dict[str, list[Affiliation]] = {}
-    country_slugs: dict[str, str] = {}
+
+def plan_affiliation_countries(affiliations: list[Affiliation]) -> list[AffiliationCountry]:
+    """Group institutions under the countries their awards were recorded in.
+
+    Every count here is scoped to the country. An institution recorded in two countries contributes only the laureates
+    recorded there to each page, so the rows of one page can be compared with each other and the country's own laureate
+    total is the union of its rows rather than their sum.
+    """
+    members_by_country: dict[str, list[RankedAffiliation]] = {}
+    laureates_by_country: dict[str, set[str]] = {}
+    cities_by_country: dict[str, set[str]] = {}
+    slugs: dict[str, str] = {}
     for affiliation in affiliations:
-        names = {
-            country.strip()
-            for record, _ in affiliation.awards
-            for country in record.affiliation_country.split(";")
-            if _nonblank(country)
-        }
-        for name in names:
+        laureates: dict[str, set[str]] = {}
+        cities: dict[str, list[str]] = {}
+        for record, _ in affiliation.awards:
+            for country in record.affiliation_country.split(";"):
+                if not _nonblank(country):
+                    continue
+                name = country.strip()
+                laureates.setdefault(name, set()).add(record.laureate_wikidata_qid)
+                if _nonblank(record.affiliation_city):
+                    cities.setdefault(name, []).append(record.affiliation_city.strip())
+        for name, qids in laureates.items():
             slug = slugify(name)
-            if slug in country_slugs and country_slugs[slug] != name:
-                raise BuildFailure(
-                    f"duplicate affiliation country slug slug={slug} name={name!r} other={country_slugs[slug]!r}"
-                )
-            country_slugs[slug] = name
-            affiliations_by_country.setdefault(name, []).append(affiliation)
+            if slugs.setdefault(slug, name) != name:
+                raise BuildFailure(f"duplicate affiliation country slug slug={slug} name={name!r} other={slugs[slug]!r}")
+            city = _commonest(cities.get(name, ()))
+            members_by_country.setdefault(name, []).append(RankedAffiliation(affiliation, len(qids), city))
+            laureates_by_country.setdefault(name, set()).update(qids)
+            if city:
+                cities_by_country.setdefault(name, set()).add(city)
 
-    institution_countries = [
-        InstitutionCountry(
+    countries = [
+        AffiliationCountry(
             name,
             slugify(name),
             f"{COUNTRY_AFFILIATIONS_ROUTE}{slugify(name)}/",
-            tuple(members),
+            tuple(sorted(members, key=lambda row: (-row.count, row.affiliation.name))),
+            len(laureates_by_country[name]),
+            len(cities_by_country.get(name, ())),
         )
-        for name, members in affiliations_by_country.items()
+        for name, members in members_by_country.items()
     ]
-    institution_countries.sort(key=lambda place: (-len(place.institutions), place.name))
-    return countries, affiliations, institution_countries
+    countries.sort(key=lambda country: (-len(country.members), country.name))
+    return countries
+
+
+def plan_subject_affiliations(affiliations: list[Affiliation]) -> dict[str, tuple[RankedAffiliation, ...]]:
+    """Rank institutions per subject, counting laureates within the subject rather than across the institution."""
+    members: dict[str, list[RankedAffiliation]] = {}
+    for affiliation in affiliations:
+        laureates: dict[str, set[str]] = {}
+        cities: dict[str, list[str]] = {}
+        for record, _ in affiliation.awards:
+            laureates.setdefault(record.high_school_subject, set()).add(record.laureate_wikidata_qid)
+            if _nonblank(record.affiliation_city) or _nonblank(record.affiliation_country):
+                cities.setdefault(record.high_school_subject, []).append(_place_label(record))
+        for subject, qids in laureates.items():
+            members.setdefault(subject, []).append(RankedAffiliation(affiliation, len(qids), _commonest(cities.get(subject, ()))))
+    return {
+        subject: tuple(sorted(rows, key=lambda row: (-row.count, row.affiliation.name)))
+        for subject, rows in members.items()
+    }
+
+
+def _place_label(record: AwardRecord) -> str:
+    """City and country as a reader sees them, dropping whichever half is missing."""
+    city, country = record.affiliation_city.strip(), record.affiliation_country.strip()
+    return ", ".join(part for part in (city, country) if part)
+
+
+def _commonest(values: Iterable[str]) -> str:
+    counts = Counter(values)
+    return max(counts, key=lambda value: (counts[value], value)) if counts else ""
 
 
 def _ranked(units: dict[str, set[str]]) -> tuple[tuple[str, int], ...]:
@@ -929,7 +992,8 @@ def plan_people(
     return people
 
 
-def plan_subjects(people: list[Laureate], subject_counts: dict[str, int]) -> list[Subject]:
+def plan_subjects(people: list[Laureate], subject_counts: dict[str, int], affiliations: list[Affiliation]) -> list[Subject]:
+    by_subject = plan_subject_affiliations(affiliations)
     subjects: list[Subject] = []
     for name in sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)):
         members: list[Laureate] = []
@@ -938,7 +1002,17 @@ def plan_subjects(people: list[Laureate], subject_counts: dict[str, int]) -> lis
             if awards:
                 members.append(Laureate(person.qid, person.name, person.route, awards, person.subjects))
         members.sort(key=lambda person: (-len(person.awards), _surname_key(person.name)))
-        subjects.append(Subject(name, f"{SUBJECTS_ROUTE}{slugify(name)}/", subject_counts[name], tuple(members)))
+        route = f"{SUBJECTS_ROUTE}{slugify(name)}/"
+        subjects.append(
+            Subject(
+                name,
+                route,
+                f"{route}{COUNTRY_AFFILIATIONS_SEGMENT}/",
+                subject_counts[name],
+                tuple(members),
+                by_subject.get(name, ()),
+            )
+        )
     return subjects
 
 
@@ -1286,8 +1360,9 @@ def create_site_plan(
             )
         )
 
-    countries, affiliations, institution_countries = plan_places(people, records, all_record_routes, profiles_by_qid)
-    subjects = plan_subjects(people, subject_counts)
+    countries, affiliations = plan_places(people, records, all_record_routes, profiles_by_qid)
+    affiliation_countries = plan_affiliation_countries(affiliations)
+    subjects = plan_subjects(people, subject_counts, affiliations)
     jobs.append(
         _page(
             "subjects.html",
@@ -1314,16 +1389,28 @@ def create_site_plan(
                 subject=subject,
             )
         )
-    recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
-    jobs.append(
-        _page(
-            "country_views.html",
-            COUNTRY_ROOT_ROUTE,
-            "Browse countries",
-            "Browse countries by laureate birthplace or by recorded award institutions.",
-            (Breadcrumb("Home", "/"), Breadcrumb("Countries", None)),
+        jobs.append(
+            _page(
+                "subject_affiliations.html",
+                subject.affiliations_route,
+                f"Where {subject.name} laureates worked",
+                _clamp(
+                    f"{len(subject.affiliations)} recorded "
+                    f"{'institution' if len(subject.affiliations) == 1 else 'institutions'} behind "
+                    f"{subject.award_count} {subject.name} {'award' if subject.award_count == 1 else 'awards'}, "
+                    f"ranked by laureates."
+                ),
+                (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb("Subjects", SUBJECTS_ROUTE),
+                    Breadcrumb(subject.name, subject.route),
+                    Breadcrumb("Institutions", None),
+                ),
+                subject=subject,
+                leader=subject.affiliations[0].count if subject.affiliations else 0,
+            )
         )
-    )
+    recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
     jobs.append(
         _page(
             "countries.html",
@@ -1359,32 +1446,35 @@ def create_site_plan(
             COUNTRY_AFFILIATIONS_ROUTE,
             "Countries by recorded institutions",
             _clamp(
-                f"{len(institution_countries)} countries ranked by distinct institutions recorded for "
+                f"{len(affiliation_countries)} countries ranked by distinct institutions recorded for "
                 f"{recorded_affiliation_countries:,} of {len(records):,} awards."
             ),
-            (Breadcrumb("Home", "/"), Breadcrumb("Countries / Institutions", None)),
-            countries=tuple(institution_countries),
-            leader=len(institution_countries[0].institutions) if institution_countries else 0,
+            (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb("Institutions", None)),
+            countries=tuple(affiliation_countries),
+            leader=len(affiliation_countries[0].members) if affiliation_countries else 0,
             recorded=recorded_affiliation_countries,
             total=len(records),
         )
     )
-    for place in institution_countries:
+    for place in affiliation_countries:
         jobs.append(
             _page(
                 "affiliation_country.html",
                 place.route,
-                f"Institutions in {place.name}",
+                f"Where {place.name}'s laureates worked",
                 _clamp(
-                    f"{len(place.institutions)} recorded "
-                    f"{'institution' if len(place.institutions) == 1 else 'institutions'} in {place.name}."
+                    f"{len(place.members)} recorded "
+                    f"{'institution' if len(place.members) == 1 else 'institutions'} in {place.name}, "
+                    f"ranked by laureates, with the city of each."
                 ),
                 (
                     Breadcrumb("Home", "/"),
-                    Breadcrumb("Countries / Institutions", COUNTRY_AFFILIATIONS_ROUTE),
+                    Breadcrumb("Countries", COUNTRIES_ROUTE),
+                    Breadcrumb("Institutions", COUNTRY_AFFILIATIONS_ROUTE),
                     Breadcrumb(place.name, None),
                 ),
                 place=place,
+                leader=place.members[0].count if place.members else 0,
             )
         )
     jobs.append(

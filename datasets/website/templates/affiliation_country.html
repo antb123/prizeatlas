@@ -1,23 +1,29 @@
 {% extends "base.html" %}
+{% from "_view_tabs.html" import view_tabs with context %}
 {% block content %}
-<nav class="country-tabs" aria-label="Country views">
-  <a href="{{ href(countries_route) }}">People</a>
-  <span aria-hidden="true">|</span>
-  <a href="{{ href(country_affiliations_route) }}" aria-current="page">Institutions</a>
-</nav>
+{{ view_tabs(countries_route, country_affiliations_route, "institutions") }}
 <header class="page-intro">
   <p class="eyebrow">Institutions in</p>
   <h1>{{ place.name }}</h1>
-  <p>{{ place.institutions | length }} distinct recorded
-    {{ "institution" if place.institutions | length == 1 else "institutions" }}.</p>
+  <p>{{ place.members | length }} {{ "institution" if place.members | length == 1 else "institutions" }} ·
+    {{ place.laureates }} {{ "laureate" if place.laureates == 1 else "laureates" }} ·
+    {{ place.cities }} {{ "city" if place.cities == 1 else "cities" }}.</p>
+  <p class="caveat">An institution is the one recorded at the time of the award, not a whole career, and each count
+  is the laureates recorded here rather than the institution's worldwide total.</p>
 </header>
-<ul class="people-index">
-  {% for affiliation in place.institutions %}
+<ol class="rank-list">
+  {% for row in place.members %}
   <li>
-    <a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
-    <span>{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }}</span>
+    <span class="rank-position">{{ loop.index }}</span>
+    <span><a href="{{ href(row.affiliation.route) }}">{{ row.affiliation.name }}</a>
+      <span class="rank-meta">
+        {% if row.place %}{{ row.place }}{% endif %}
+        {% for name, route in row.affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+      </span>
+    </span>
+    <span class="rank-count" style="--share: {{ row.count * 100 // leader }}">{{ row.count }}</span>
   </li>
   {% endfor %}
-</ul>
+</ol>
 <p><a href="{{ href(country_affiliations_route) }}">All countries</a></p>
 {% endblock %}

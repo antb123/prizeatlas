@@ -801,22 +801,32 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "Joint Institute; Partner Lab",
                 "affiliation_country": "Canada; Switzerland",
             },
+            {
+                "award_record_id": "dave",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2004",
+                "full_name": "Dave Delta",
+                "laureate_wikidata_qid": "Q400",
+                "birth_country": "Canada",
+                "affiliation_name": "University One",
+                "affiliation_city": "Boston",
+                "affiliation_country": "United States",
+            },
         ]
         database = self.create_database(rankings, records)
 
         build.build_site(database, "https://example.org/", self.website)
 
-        country_views = (self.website / "dist/countries/index.html").read_text()
-        people = (self.website / "dist/countries/born/index.html").read_text()
+        people = (self.website / "dist/countries/index.html").read_text()
         institutions = (self.website / "dist/countries/affiliations/index.html").read_text()
         belgium = (self.website / "dist/countries/affiliations/belgium/index.html").read_text()
         canada = (self.website / "dist/countries/affiliations/canada/index.html").read_text()
         switzerland = (self.website / "dist/countries/affiliations/switzerland/index.html").read_text()
+        united_states = (self.website / "dist/countries/affiliations/united-states/index.html").read_text()
 
-        self.assertIn('href="born/">People</a>', country_views)
-        self.assertIn('href="affiliations/">Institutions</a>', country_views)
-        self.assertIn('href="../affiliations/">Institutions</a>', people)
-        self.assertIn('href="../born/">People</a>', institutions)
+        self.assertIn('href="affiliations/">Institutions</a>', people)
+        self.assertIn('href="../">People</a>', institutions)
         self.assertIn('aria-current="page">Institutions</a>', institutions)
         self.assertLess(institutions.index(">Belgium</a>"), institutions.index(">Canada</a>"))
         self.assertIn(">2</span>", institutions)
@@ -824,8 +834,89 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Belgian Academy</a>", belgium)
         self.assertIn(">Joint Institute; Partner Lab</a>", canada)
         self.assertIn(">Joint Institute; Partner Lab</a>", switzerland)
-        self.assertTrue((self.website / "dist/countries/born/canada/index.html").is_file())
+        # The base country route is the people view, so the pre-split URLs still resolve.
+        self.assertTrue((self.website / "dist/countries/canada/index.html").is_file())
         self.assertTrue((self.website / "dist/affiliations/university-one/index.html").is_file())
+        # Counts are scoped to the country: University One holds two laureates in the US but only one in Belgium.
+        self.assertRegex(united_states, r"(?s)>University One</a>.*?rank-count[^>]*>2<")
+        self.assertRegex(belgium, r"(?s)>University One</a>.*?rank-count[^>]*>1<")
+        # The city recorded for the institution in this country rides on the row.
+        self.assertIn("Boston", united_states)
+        self.assertRegex(united_states, r"(?s)1 institution ·\s*2 laureates ·\s*1 city")
+
+    def test_subject_institutions_tab_ranks_by_in_subject_laureates(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "bio-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "high_school_subject": "Biology",
+                "affiliation_name": "University One",
+                "affiliation_city": "Boston",
+                "affiliation_country": "United States",
+            },
+            {
+                "award_record_id": "bio-two",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q200",
+                "high_school_subject": "Biology",
+                "affiliation_name": "University One",
+                "affiliation_city": "Boston",
+                "affiliation_country": "United States",
+            },
+            {
+                "award_record_id": "physics-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2002",
+                "full_name": "Carol Gamma",
+                "laureate_wikidata_qid": "Q300",
+                "high_school_subject": "Physics",
+                "affiliation_name": "University One",
+                "affiliation_city": "Boston",
+                "affiliation_country": "United States",
+            },
+            {
+                "award_record_id": "bio-three",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2003",
+                "full_name": "Dave Delta",
+                "laureate_wikidata_qid": "Q400",
+                "high_school_subject": "Biology",
+                "affiliation_name": "Second Institute",
+                "affiliation_city": "Oslo",
+                "affiliation_country": "Norway",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        biology = (self.website / "dist/subjects/biology/index.html").read_text()
+        biology_institutions = (self.website / "dist/subjects/biology/affiliations/index.html").read_text()
+        physics_institutions = (self.website / "dist/subjects/physics/affiliations/index.html").read_text()
+
+        self.assertIn('href="affiliations/">Institutions</a>', biology)
+        self.assertIn('href="../">People</a>', biology_institutions)
+        self.assertIn('aria-current="page">Institutions</a>', biology_institutions)
+        # Ranked by laureates within the subject, so the two-laureate institution leads.
+        self.assertLess(
+            biology_institutions.index(">University One</a>"),
+            biology_institutions.index(">Second Institute</a>"),
+        )
+        self.assertRegex(biology_institutions, r"(?s)>University One</a>.*?rank-count[^>]*>2<")
+        # The same institution holds one laureate in Physics, never its worldwide three.
+        self.assertRegex(physics_institutions, r"(?s)>University One</a>.*?rank-count[^>]*>1<")
+        self.assertIn("Boston, United States", biology_institutions)
+        self.assertNotIn(">Second Institute</a>", physics_institutions)
 
     def test_subject_pages_and_badges(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

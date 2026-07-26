@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_view_tabs.html" import view_tabs with context %}
+{% block content %}
+{{ view_tabs(subject.route, subject.affiliations_route, "institutions") }}
+<header class="page-intro">
+  <p class="eyebrow">Institutions</p>
+  <h1>{{ subject.name }}</h1>
+  <p>{{ subject.affiliations | length }} recorded
+    {{ "institution" if subject.affiliations | length == 1 else "institutions" }} behind
+    {{ subject.award_count }} {{ "award" if subject.award_count == 1 else "awards" }}, ranked by laureates.</p>
+  <p class="caveat">An institution is the one recorded at the time of the award, not a whole career, and each count is
+  the laureates it holds in {{ subject.name }} rather than across every subject.</p>
+</header>
+<ol class="rank-list">
+  {% for row in subject.affiliations %}
+  <li>
+    <span class="rank-position">{{ loop.index }}</span>
+    <span><a href="{{ href(row.affiliation.route) }}">{{ row.affiliation.name }}</a>
+      <span class="rank-meta">
+        {% if row.place %}{{ row.place }}{% endif %}
+        {% if row.affiliation.profile and row.affiliation.profile.application_url %}<a class="external-source" href="{{ row.affiliation.profile.application_url }}">How to Apply <span aria-hidden="true">↗</span></a>{% endif %}
+      </span>
+    </span>
+    <span class="rank-count" style="--share: {{ row.count * 100 // leader }}">{{ row.count }}</span>
+  </li>
+  {% endfor %}
+</ol>
+<p><a href="{{ href(subjects_route) }}">All subjects</a></p>
+{% endblock %}
