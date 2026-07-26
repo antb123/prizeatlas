@@ -15,12 +15,20 @@ Small product roadmap. Each item needs a brief approved specification before imp
   [`website-map-integration-20260726.md`](website-map-integration-20260726.md), merged into `master` at `ef61d52`;
   the standalone MVP remains available for comparison.
 - [ ] Add an “About this site” page covering its purpose, audience, data sources, methodology, limitations, and update process.
+- [ ] Show the dataset’s last-updated date in the shared footer, sourced automatically from the published database snapshot
+  or build metadata so it cannot drift from the deployed data.
+- [ ] Add a clearly labelled “Fix this data” action for missing or incorrect information. Open a submission form prefilled
+  with the page URL and stable record ID; request the proposed correction and supporting source, make contact details
+  optional, protect against spam, and queue submissions for human review without writing directly to the database.
 - [ ] Add a “Learn more” page with short descriptions and curated links to reliable introductory material, including the Feynman Lectures and suitable books.
 - [ ] Add a “Will AI change research?” page based on clearly attributed primary material from Demis Hassabis and other research leaders; separate sourced claims from editorial explanation.
 - [ ] Add an optional “Explain this” action beside selected award text. It should give a high-school-level explanation without replacing or altering the source text, and clearly identify AI-generated output.
 - [ ] Prepare the repository for public release: choose appropriate code, data, and content licensing; audit third-party
   assets and attribution; remove secrets, private data, backups, and generated files from tracked history; and add
   public-facing README, contribution, security, and governance guidance.
+- [ ] Generate a concise `/llms.txt` at build time with the site’s purpose, audience, update date, limitations, and links to
+  the About, methodology, licensing, explorer, map, prize, and dataset entry points; treat it as optional agent guidance,
+  not as a replacement for accessible HTML, structured data, the sitemap, or `robots.txt`.
 - [ ] Choose the site’s public name and domain, then prepare production launch infrastructure: static hosting, DNS, HTTPS,
   canonical URLs and redirects, automated deployment, basic availability monitoring, and a documented rollback path.
 - [ ] Evaluate and select a CDN-backed static deployment platform, such as Cloudflare Pages/CDN or an equivalent. Compare
