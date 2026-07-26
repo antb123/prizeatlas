@@ -4,7 +4,9 @@ Small product roadmap. Each item needs a brief approved specification before imp
 
 - [ ] Rework the site's text and styling for a high-school audience: plain language, clear explanations, strong visual hierarchy, and accessible mobile presentation.
 - [ ] Add Spanish, French, and German translations. Follow [`datasets-multilingual-20260726.md`](datasets-multilingual-20260726.md) and its execution TODO; extend both to specify German before implementation.
-- [ ] Integrate the map MVP into the static website after its layout is accepted. Use [`map-standalone-mvp-20260726.md`](map-standalone-mvp-20260726.md) and branch `feat/map-mvp` as the reference implementation.
+- [x] Integrate the map MVP into the static website. Completed in
+  [`website-map-integration-20260726.md`](website-map-integration-20260726.md), merged into `master` at `ef61d52`;
+  the standalone MVP remains available for comparison.
 - [ ] Add an “About this site” page covering its purpose, audience, data sources, methodology, limitations, and update process.
 - [ ] Add a “Learn more” page with short descriptions and curated links to reliable introductory material, including the Feynman Lectures and suitable books.
 - [ ] Add a “Will AI change research?” page based on clearly attributed primary material from Demis Hassabis and other research leaders; separate sourced claims from editorial explanation.
