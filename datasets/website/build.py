@@ -658,7 +658,10 @@ def plan_places(
             for unit, members in units_by_name.get(name, {}).items():
                 units.setdefault(unit, set()).update(members)
             awards.extend(awards_by_name.get(name, ()))
-        awards.sort(key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id))
+        awards.sort(
+            key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id),
+            reverse=True,
+        )
         qids = {record.affiliation_wikidata_qid for record, _ in awards if _nonblank(record.affiliation_wikidata_qid)}
         matched_profiles = [profiles_by_qid[qid] for qid in qids if qid in profiles_by_qid]
         if matched_profiles and len(qids) != 1:
