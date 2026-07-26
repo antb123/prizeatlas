@@ -60,7 +60,10 @@ class WebsiteBuildTests(unittest.TestCase):
             )
             connection.executemany(
                 f"INSERT INTO awards VALUES ({placeholders})",
-                [tuple(record.get(column, "") for column in build.AWARD_COLUMNS) for record in records],
+                [
+                    tuple(record.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
+                    for record in records
+                ],
             )
         return database
 
@@ -92,7 +95,9 @@ class WebsiteBuildTests(unittest.TestCase):
         ]
 
         def award(**values: str) -> build.AwardRecord:
-            return build.AwardRecord(*(values.get(column, "") for column in build.AWARD_COLUMNS))
+            return build.AwardRecord(
+                *(values.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
+            )
 
         records = [
             award(
@@ -291,6 +296,8 @@ class WebsiteBuildTests(unittest.TestCase):
             'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
             home_html,
         )
+        self.assertIn('src="static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
+        self.assertTrue((self.website / "dist/static/logos/nobel-prize.png").is_file())
         turing_html = turing.read_text()
         self.assertIn("<title>Organization Example — Turing Award for Computer science, 1989</title>", turing_html)
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)
@@ -616,9 +623,105 @@ class WebsiteBuildTests(unittest.TestCase):
         listed = []
         for page in (self.website / "dist/people/index.html", *sorted((self.website / "dist/people").glob("page-*/index.html"))):
             body = page.read_text().split('class="people-index"')[1].split("</ul>")[0]
-            listed.extend(re.findall(r'href="([^"]+)"', body))
+            listed.extend(re.findall(r'<li>\s*<a href="([^"]+)"', body))
         self.assertEqual(250, len(listed))
         self.assertEqual(250, len(set(listed)))
+
+    def test_subject_pages_and_badges(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "math-alice",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "computer-alice",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "high_school_subject": "CS",
+            },
+            {
+                "award_record_id": "math-bob-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2002",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q200",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-bob-two",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2003",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q200",
+                "high_school_subject": "Math",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        plan = build.build_site(database, "https://example.org/awards/", self.website)
+
+        self.assertEqual(2, plan.subject_count)
+        index = (self.website / "dist/subjects/index.html").read_text()
+        self.assertLess(index.index("Math"), index.index("CS"))
+        math = (self.website / "dist/subjects/math/index.html").read_text()
+        self.assertLess(math.index("Bob Beta"), math.index("Alice Alpha"))
+        self.assertIn("2 awards", math)
+        alice = (self.website / "dist/people/alice-alpha/index.html").read_text()
+        self.assertIn('href="../../subjects/math/"', alice)
+        self.assertIn('href="../../subjects/cs/"', alice)
+        locations = [element.text for element in ElementTree.parse(self.website / "dist/sitemap.xml").getroot().findall(".//{*}loc")]
+        self.assertIn("https://example.org/awards/subjects/", locations)
+        self.assertIn("https://example.org/awards/subjects/math/", locations)
+        self.assertIn("https://example.org/awards/subjects/cs/", locations)
+
+    def test_invalid_subject_fails_the_build(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        database = self.create_database(
+            rankings,
+            [
+                {
+                    "award_record_id": "record-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Example Winner",
+                    "high_school_subject": "Geography",
+                }
+            ],
+        )
+
+        with self.assertRaisesRegex(build.BuildFailure, "invalid subject record_id=record-1"):
+            build.build_site(database, "https://example.org/", self.website)
+
+    def test_missing_subject_fails_the_build(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        database = self.create_database(
+            rankings,
+            [
+                {
+                    "award_record_id": "record-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Example Winner",
+                    "high_school_subject": "",
+                }
+            ],
+        )
+
+        with self.assertRaisesRegex(build.BuildFailure, "missing subject record_id=record-1"):
+            build.build_site(database, "https://example.org/", self.website)
 
     def test_error_page_and_robots_serve_from_the_deployment_root(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

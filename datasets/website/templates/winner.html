@@ -3,7 +3,9 @@
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
-      <p class="eyebrow">{{ prize.prize_name }}{% if record.category %} · {{ record.category }}{% endif %} · {{ record.year }}</p>
+      <p class="eyebrow">{{ prize.prize_name }}{% if record.category %} · {{ record.category }}{% endif %} · {{ record.year }}
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
+      </p>
       <h1>{{ record.full_name }}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if record.biographical_note %}<p class="lead">{{ record.biographical_note }}</p>{% endif %}

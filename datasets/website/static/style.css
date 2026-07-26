@@ -179,8 +179,9 @@ h3 {
 
 .ranking article {
   display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
+  grid-template-columns: 3.25rem minmax(0, 1fr);
   gap: 1rem;
+  align-items: start;
   padding-block: 1.5rem;
   border-bottom: 1px solid var(--rule);
 }
@@ -192,6 +193,23 @@ h3 {
 
 .ranking h3 {
   font-size: 1.25rem;
+}
+
+.award-logo {
+  display: block;
+  width: 3.25rem;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.award-identity {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: center;
+}
+
+.award-identity .rank {
+  font-size: 0.75rem;
 }
 
 .totals {
@@ -495,6 +513,34 @@ h3 {
   color: var(--muted);
 }
 
+.subject-badges,
+.person-index-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.subject-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.4;
+  text-decoration: none;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.eyebrow .subject-badge {
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
 .person-link {
   font-weight: 700;
 }
@@ -519,6 +565,41 @@ h3 {
 .people-index span {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+.subject-people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.subject-people > li {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.subject-people header {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.subject-people h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.subject-people header span {
+  color: var(--muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.subject-people ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
 }
 
 .pagination {

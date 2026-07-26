@@ -46,6 +46,8 @@ TEMPLATES = (
     "countries.html",
     "country.html",
     "affiliations.html",
+    "subjects.html",
+    "subject.html",
     "explorer.html",
     "404.html",
 )
@@ -54,7 +56,12 @@ PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 AFFILIATIONS_ROUTE = "/affiliations/"
+SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
+SUBJECTS = (
+    "Biology", "Physics", "Chemistry", "Math", "CS",
+    "History", "Lit", "Arts", "Economics", "Earth Science",
+)
 POPULATION_FILE = SCRIPT_DIR / "population.json"
 AFFILIATION_ROWS = 40
 # Recorded in the affiliation column but not an institution.
@@ -100,6 +107,7 @@ AWARD_COLUMNS = (
     "death_city",
     "death_country",
     "biographical_note",
+    "high_school_subject",
 )
 
 
@@ -116,6 +124,7 @@ class Ranking:
     score: int
     blurb: str
     reasoning: str
+    logo: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -144,6 +153,7 @@ class AwardRecord:
     death_city: str
     death_country: str
     biographical_note: str
+    high_school_subject: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -177,6 +187,7 @@ class Laureate:
     name: str
     route: str
     awards: tuple[tuple[AwardRecord, str], ...]
+    subjects: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,6 +195,14 @@ class Place:
     name: str
     slug: str
     route: str
+    people: tuple[Laureate, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class Subject:
+    name: str
+    route: str
+    award_count: int
     people: tuple[Laureate, ...]
 
 
@@ -197,6 +216,7 @@ class SitePlan:
     recipient_count: int
     person_count: int
     country_count: int
+    subject_count: int
 
 
 def slugify(value: str) -> str:
@@ -400,6 +420,22 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AwardRecord]]:
             score=row["score"],
             blurb=_text(row["blurb"]),
             reasoning=_text(row["reasoning"]),
+            logo={
+                "nobel-prize": "static/logos/nobel-prize.png",
+                "fields-medal": "static/logos/fields-medal.jpg",
+                "turing-award": "static/logos/turing-award.jpg",
+                "max-planck-medal": "static/logos/max-planck-medal.png",
+                "abel-prize": "static/logos/abel-prize.ico",
+                "lasker-award": "static/logos/lasker-award.svg",
+                "canada-gairdner-international-award": "static/logos/canada-gairdner-international-award.ico",
+                "wolf-prize": "static/logos/wolf-prize.png",
+                "kyoto-prize": "static/logos/kyoto-prize.png",
+                "crafoord-prize": "static/logos/crafoord-prize.svg",
+                "shaw-prize": "static/logos/shaw-prize.ico",
+                "japan-prize": "static/logos/japan-prize.png",
+                "breakthrough-prize": "static/logos/breakthrough-prize.png",
+                "sveriges-riksbank-prize-in-economic-sciences": "static/logos/sveriges-riksbank-prize-in-economic-sciences.png",
+            }.get(_text(row["slug"]), ""),
         )
         for row in ranking_rows
     ]
@@ -603,7 +639,12 @@ def person_routes(records: list[AwardRecord]) -> dict[str, str]:
     return routes
 
 
-def plan_people(records: list[AwardRecord], routes: dict[str, str], record_routes: dict[str, str]) -> list[Laureate]:
+def plan_people(
+    records: list[AwardRecord],
+    routes: dict[str, str],
+    record_routes: dict[str, str],
+    subject_order: dict[str, int],
+) -> list[Laureate]:
     grouped: dict[str, list[AwardRecord]] = {}
     for record in records:
         if _nonblank(record.laureate_wikidata_qid):
@@ -618,11 +659,31 @@ def plan_people(records: list[AwardRecord], routes: dict[str, str], record_route
                 (record, record_routes[record.award_record_id])
                 for record in sorted(awards, key=lambda record: (_year_prefix(record.year, record.award_record_id), record.award_record_id))
             ),
+            tuple(
+                (subject, f"{SUBJECTS_ROUTE}{slugify(subject)}/")
+                for subject in sorted(
+                    {record.high_school_subject for record in awards if _nonblank(record.high_school_subject)},
+                    key=subject_order.__getitem__,
+                )
+            ),
         )
         for qid, awards in grouped.items()
     ]
     people.sort(key=lambda person: _surname_key(person.name))
     return people
+
+
+def plan_subjects(people: list[Laureate], subject_counts: dict[str, int]) -> list[Subject]:
+    subjects: list[Subject] = []
+    for name in sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)):
+        members: list[Laureate] = []
+        for person in people:
+            awards = tuple((record, route) for record, route in person.awards if record.high_school_subject == name)
+            if awards:
+                members.append(Laureate(person.qid, person.name, person.route, awards, person.subjects))
+        members.sort(key=lambda person: (-len(person.awards), _surname_key(person.name)))
+        subjects.append(Subject(name, f"{SUBJECTS_ROUTE}{slugify(name)}/", subject_counts[name], tuple(members)))
+    return subjects
 
 
 def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_url: str, generated: str) -> SitePlan:
@@ -660,6 +721,10 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         seen_record_ids.add(record.award_record_id)
         if not _nonblank(record.full_name):
             raise BuildFailure(f"missing winner name record_id={record.award_record_id}")
+        if not _nonblank(record.high_school_subject):
+            raise BuildFailure(f"missing subject record_id={record.award_record_id}")
+        if record.high_school_subject not in SUBJECTS:
+            raise BuildFailure(f"invalid subject record_id={record.award_record_id}")
         _year_prefix(record.year, record.award_record_id)
         previous_name = live_names.setdefault(record.award_wikidata_qid, record.prize_name)
         if previous_name != record.prize_name:
@@ -908,7 +973,13 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 )
                 winner_page_count += 1
 
-    people = plan_people(records, routes_by_laureate, all_record_routes)
+    subject_counts: dict[str, int] = {}
+    for record in records:
+        subject_counts[record.high_school_subject] = subject_counts.get(record.high_school_subject, 0) + 1
+    subject_order = {
+        name: index for index, name in enumerate(sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)))
+    }
+    people = plan_people(records, routes_by_laureate, all_record_routes, subject_order)
     for person in people:
         prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
         span = _year_span([record.year for record, _ in person.awards])
@@ -932,6 +1003,33 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         )
 
     countries, affiliations = plan_places(people)
+    subjects = plan_subjects(people, subject_counts)
+    jobs.append(
+        _page(
+            "subjects.html",
+            SUBJECTS_ROUTE,
+            "Awards by subject",
+            "Browse awards and laureates by high school subject.",
+            (Breadcrumb("Home", "/"), Breadcrumb("Subjects", None)),
+            subjects=tuple(subjects),
+            leader=subjects[0].award_count if subjects else 0,
+        )
+    )
+    for subject in subjects:
+        jobs.append(
+            _page(
+                "subject.html",
+                subject.route,
+                f"{subject.name} awards and laureates",
+                _clamp(
+                    f"{subject.award_count} recorded {'award' if subject.award_count == 1 else 'awards'} in "
+                    f"{subject.name}, received by {len(subject.people)} "
+                    f"{'laureate' if len(subject.people) == 1 else 'laureates'}."
+                ),
+                (Breadcrumb("Home", "/"), Breadcrumb("Subjects", SUBJECTS_ROUTE), Breadcrumb(subject.name, None)),
+                subject=subject,
+            )
+        )
     recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
     jobs.append(
         _page(
@@ -1076,6 +1174,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         len(records),
         len(people),
         len(countries),
+        len(subjects),
     )
 
 
@@ -1142,6 +1241,7 @@ def _environment(website_dir: Path) -> Environment:
         autoescape=select_autoescape(("html", "xml")),
         undefined=StrictUndefined,
     )
+    environment.filters["slugify"] = slugify
     for name in TEMPLATES:
         environment.get_template(name)
     return environment
@@ -1159,9 +1259,11 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         home_href=relative_route(job.route, "/"),
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
+        asset_href=lambda target: relative_file(job.route, target) if target else "",
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
+        subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
@@ -1189,6 +1291,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
+        subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
@@ -1232,9 +1335,8 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
     dist = website_dir / "dist"
     try:
-        (staging / "static").mkdir()
+        shutil.copytree(website_dir / "static", staging / "static")
         shutil.copyfile(website_dir / "static" / "favicon.svg", staging / "favicon.svg")
-        shutil.copyfile(website_dir / "static" / "style.css", staging / "static" / "style.css")
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
                 lambda job: _render_job(environment, staging, normalized_base_url, job),
@@ -1269,7 +1371,8 @@ def main(argv: list[str] | None = None) -> int:
     print(
         "website build complete "
         f"prizes={plan.prize_count} categories={plan.category_count} year_pages={plan.year_count} "
-        f"winner_pages={plan.winner_count} people={plan.person_count} countries={plan.country_count} recipients={plan.recipient_count} "
+        f"winner_pages={plan.winner_count} people={plan.person_count} countries={plan.country_count} subjects={plan.subject_count} "
+        f"recipients={plan.recipient_count} "
         f"sitemap_urls={len(plan.jobs)} generated_pages={len(plan.jobs)}"
     )
     return 0

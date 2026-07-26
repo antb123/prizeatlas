@@ -3,6 +3,11 @@
 <header class="page-intro">
   <p class="eyebrow">Laureate</p>
   <h1>{{ person.name }}</h1>
+  {% if person.subjects %}
+  <p class="subject-badges">
+    {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+  </p>
+  {% endif %}
   <p>{{ person.awards | length }} recorded {{ "award" if person.awards | length == 1 else "awards" }}.</p>
 </header>
 <section>
@@ -13,6 +18,7 @@
       <p class="person-award-year">{{ record.year }}</p>
       <div>
         <h3><a href="{{ href(route) }}">{{ record.prize_name }}{% if record.category %} — {{ record.category }}{% endif %}</a></h3>
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
         {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
       </div>
     </li>

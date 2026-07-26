@@ -160,84 +160,84 @@ New dataset omitted from the previous TODO. Verify the official roster and colle
 
 Gairdner batches depend on `GAIRD-SRC-001` below.
 
-- [ ] `GAIRD-001` — Verify and retrieve data for `gairdner_international_award-000001` through `gairdner_international_award-000005` (5 records).
-- [ ] `GAIRD-002` — Verify and retrieve data for `gairdner_international_award-000006` through `gairdner_international_award-000010` (5 records).
-- [ ] `GAIRD-003` — Verify and retrieve data for `gairdner_international_award-000011` through `gairdner_international_award-000015` (5 records).
-- [ ] `GAIRD-004` — Verify and retrieve data for `gairdner_international_award-000016` through `gairdner_international_award-000020` (5 records).
-- [ ] `GAIRD-005` — Verify and retrieve data for `gairdner_international_award-000021` through `gairdner_international_award-000025` (5 records).
-- [ ] `GAIRD-006` — Verify and retrieve data for `gairdner_international_award-000026` through `gairdner_international_award-000030` (5 records).
-- [ ] `GAIRD-007` — Verify and retrieve data for `gairdner_international_award-000031` through `gairdner_international_award-000035` (5 records).
-- [ ] `GAIRD-008` — Verify and retrieve data for `gairdner_international_award-000036` through `gairdner_international_award-000040` (5 records).
-- [ ] `GAIRD-009` — Verify and retrieve data for `gairdner_international_award-000041` through `gairdner_international_award-000045` (5 records).
-- [ ] `GAIRD-010` — Verify and retrieve data for `gairdner_international_award-000046` through `gairdner_international_award-000050` (5 records).
-- [ ] `GAIRD-011` — Verify and retrieve data for `gairdner_international_award-000051` through `gairdner_international_award-000055` (5 records).
-- [ ] `GAIRD-012` — Verify and retrieve data for `gairdner_international_award-000056` through `gairdner_international_award-000060` (5 records).
-- [ ] `GAIRD-013` — Verify and retrieve data for `gairdner_international_award-000061` through `gairdner_international_award-000065` (5 records).
-- [ ] `GAIRD-014` — Verify and retrieve data for `gairdner_international_award-000066` through `gairdner_international_award-000070` (5 records).
-- [ ] `GAIRD-015` — Verify and retrieve data for `gairdner_international_award-000071` through `gairdner_international_award-000075` (5 records).
-- [ ] `GAIRD-016` — Verify and retrieve data for `gairdner_international_award-000076` through `gairdner_international_award-000080` (5 records).
-- [ ] `GAIRD-017` — Verify and retrieve data for `gairdner_international_award-000081` through `gairdner_international_award-000085` (5 records).
-- [ ] `GAIRD-018` — Verify and retrieve data for `gairdner_international_award-000086` through `gairdner_international_award-000090` (5 records).
-- [ ] `GAIRD-019` — Verify and retrieve data for `gairdner_international_award-000091` through `gairdner_international_award-000095` (5 records).
-- [ ] `GAIRD-020` — Verify and retrieve data for `gairdner_international_award-000096` through `gairdner_international_award-000100` (5 records).
-- [ ] `GAIRD-021` — Verify and retrieve data for `gairdner_international_award-000101` through `gairdner_international_award-000105` (5 records).
-- [ ] `GAIRD-022` — Verify and retrieve data for `gairdner_international_award-000106` through `gairdner_international_award-000110` (5 records).
-- [ ] `GAIRD-023` — Verify and retrieve data for `gairdner_international_award-000111` through `gairdner_international_award-000115` (5 records).
-- [ ] `GAIRD-024` — Verify and retrieve data for `gairdner_international_award-000116` through `gairdner_international_award-000120` (5 records).
-- [ ] `GAIRD-025` — Verify and retrieve data for `gairdner_international_award-000121` through `gairdner_international_award-000125` (5 records).
-- [ ] `GAIRD-026` — Verify and retrieve data for `gairdner_international_award-000126` through `gairdner_international_award-000130` (5 records).
-- [ ] `GAIRD-027` — Verify and retrieve data for `gairdner_international_award-000131` through `gairdner_international_award-000135` (5 records).
-- [ ] `GAIRD-028` — Verify and retrieve data for `gairdner_international_award-000136` through `gairdner_international_award-000140` (5 records).
-- [ ] `GAIRD-029` — Verify and retrieve data for `gairdner_international_award-000141` through `gairdner_international_award-000145` (5 records).
-- [ ] `GAIRD-030` — Verify and retrieve data for `gairdner_international_award-000146` through `gairdner_international_award-000150` (5 records).
-- [ ] `GAIRD-031` — Verify and retrieve data for `gairdner_international_award-000151` through `gairdner_international_award-000155` (5 records).
-- [ ] `GAIRD-032` — Verify and retrieve data for `gairdner_international_award-000156` through `gairdner_international_award-000160` (5 records).
-- [ ] `GAIRD-033` — Verify and retrieve data for `gairdner_international_award-000161` through `gairdner_international_award-000165` (5 records).
-- [ ] `GAIRD-034` — Verify and retrieve data for `gairdner_international_award-000166` through `gairdner_international_award-000170` (5 records).
-- [ ] `GAIRD-035` — Verify and retrieve data for `gairdner_international_award-000171` through `gairdner_international_award-000175` (5 records).
-- [ ] `GAIRD-036` — Verify and retrieve data for `gairdner_international_award-000176` through `gairdner_international_award-000180` (5 records).
-- [ ] `GAIRD-037` — Verify and retrieve data for `gairdner_international_award-000181` through `gairdner_international_award-000185` (5 records).
-- [ ] `GAIRD-038` — Verify and retrieve data for `gairdner_international_award-000186` through `gairdner_international_award-000190` (5 records).
-- [ ] `GAIRD-039` — Verify and retrieve data for `gairdner_international_award-000191` through `gairdner_international_award-000195` (5 records).
-- [ ] `GAIRD-040` — Verify and retrieve data for `gairdner_international_award-000196` through `gairdner_international_award-000200` (5 records).
-- [ ] `GAIRD-041` — Verify and retrieve data for `gairdner_international_award-000201` through `gairdner_international_award-000205` (5 records).
-- [ ] `GAIRD-042` — Verify and retrieve data for `gairdner_international_award-000206` through `gairdner_international_award-000210` (5 records).
-- [ ] `GAIRD-043` — Verify and retrieve data for `gairdner_international_award-000211` through `gairdner_international_award-000215` (5 records).
-- [ ] `GAIRD-044` — Verify and retrieve data for `gairdner_international_award-000216` through `gairdner_international_award-000220` (5 records).
-- [ ] `GAIRD-045` — Verify and retrieve data for `gairdner_international_award-000221` through `gairdner_international_award-000225` (5 records).
-- [ ] `GAIRD-046` — Verify and retrieve data for `gairdner_international_award-000226` through `gairdner_international_award-000230` (5 records).
-- [ ] `GAIRD-047` — Verify and retrieve data for `gairdner_international_award-000231` through `gairdner_international_award-000235` (5 records).
-- [ ] `GAIRD-048` — Verify and retrieve data for `gairdner_international_award-000236` through `gairdner_international_award-000240` (5 records).
-- [ ] `GAIRD-049` — Verify and retrieve data for `gairdner_international_award-000241` through `gairdner_international_award-000245` (5 records).
-- [ ] `GAIRD-050` — Verify and retrieve data for `gairdner_international_award-000246` through `gairdner_international_award-000250` (5 records).
-- [ ] `GAIRD-051` — Verify and retrieve data for `gairdner_international_award-000251` through `gairdner_international_award-000255` (5 records).
-- [ ] `GAIRD-052` — Verify and retrieve data for `gairdner_international_award-000256` through `gairdner_international_award-000260` (5 records).
-- [ ] `GAIRD-053` — Verify and retrieve data for `gairdner_international_award-000261` through `gairdner_international_award-000265` (5 records).
-- [ ] `GAIRD-054` — Verify and retrieve data for `gairdner_international_award-000266` through `gairdner_international_award-000270` (5 records).
-- [ ] `GAIRD-055` — Verify and retrieve data for `gairdner_international_award-000271` through `gairdner_international_award-000275` (5 records).
-- [ ] `GAIRD-056` — Verify and retrieve data for `gairdner_international_award-000276` through `gairdner_international_award-000280` (5 records).
-- [ ] `GAIRD-057` — Verify and retrieve data for `gairdner_international_award-000281` through `gairdner_international_award-000285` (5 records).
-- [ ] `GAIRD-058` — Verify and retrieve data for `gairdner_international_award-000286` through `gairdner_international_award-000290` (5 records).
-- [ ] `GAIRD-059` — Verify and retrieve data for `gairdner_international_award-000291` through `gairdner_international_award-000295` (5 records).
-- [ ] `GAIRD-060` — Verify and retrieve data for `gairdner_international_award-000296` through `gairdner_international_award-000300` (5 records).
-- [ ] `GAIRD-061` — Verify and retrieve data for `gairdner_international_award-000301` through `gairdner_international_award-000305` (5 records).
-- [ ] `GAIRD-062` — Verify and retrieve data for `gairdner_international_award-000306` through `gairdner_international_award-000310` (5 records).
-- [ ] `GAIRD-063` — Verify and retrieve data for `gairdner_international_award-000311` through `gairdner_international_award-000315` (5 records).
-- [ ] `GAIRD-064` — Verify and retrieve data for `gairdner_international_award-000316` through `gairdner_international_award-000320` (5 records).
-- [ ] `GAIRD-065` — Verify and retrieve data for `gairdner_international_award-000321` through `gairdner_international_award-000325` (5 records).
-- [ ] `GAIRD-066` — Verify and retrieve data for `gairdner_international_award-000326` through `gairdner_international_award-000330` (5 records).
-- [ ] `GAIRD-067` — Verify and retrieve data for `gairdner_international_award-000331` through `gairdner_international_award-000335` (5 records).
-- [ ] `GAIRD-068` — Verify and retrieve data for `gairdner_international_award-000336` through `gairdner_international_award-000340` (5 records).
-- [ ] `GAIRD-069` — Verify and retrieve data for `gairdner_international_award-000341` through `gairdner_international_award-000345` (5 records).
-- [ ] `GAIRD-070` — Verify and retrieve data for `gairdner_international_award-000346` through `gairdner_international_award-000350` (5 records).
-- [ ] `GAIRD-071` — Verify and retrieve data for `gairdner_international_award-000351` through `gairdner_international_award-000355` (5 records).
-- [ ] `GAIRD-072` — Verify and retrieve data for `gairdner_international_award-000356` through `gairdner_international_award-000360` (5 records).
-- [ ] `GAIRD-073` — Verify and retrieve data for `gairdner_international_award-000361` through `gairdner_international_award-000365` (5 records).
-- [ ] `GAIRD-074` — Verify and retrieve data for `gairdner_international_award-000366` through `gairdner_international_award-000370` (5 records).
-- [ ] `GAIRD-075` — Verify and retrieve data for `gairdner_international_award-000371` through `gairdner_international_award-000375` (5 records).
-- [ ] `GAIRD-076` — Verify and retrieve data for `gairdner_international_award-000376` through `gairdner_international_award-000380` (5 records).
-- [ ] `GAIRD-077` — Verify and retrieve data for `gairdner_international_award-000381` through `gairdner_international_award-000385` (5 records).
-- [ ] `GAIRD-078` — Verify and retrieve data for `gairdner_international_award-000386` through `gairdner_international_award-000387` (2 records).
+- [x] `GAIRD-001` — Verify and retrieve data for `gairdner_international_award-000001` through `gairdner_international_award-000005` (5 records).
+- [x] `GAIRD-002` — Verify and retrieve data for `gairdner_international_award-000006` through `gairdner_international_award-000010` (5 records).
+- [x] `GAIRD-003` — Verify and retrieve data for `gairdner_international_award-000011` through `gairdner_international_award-000015` (5 records).
+- [x] `GAIRD-004` — Verify and retrieve data for `gairdner_international_award-000016` through `gairdner_international_award-000020` (5 records).
+- [x] `GAIRD-005` — Verify and retrieve data for `gairdner_international_award-000021` through `gairdner_international_award-000025` (5 records).
+- [x] `GAIRD-006` — Verify and retrieve data for `gairdner_international_award-000026` through `gairdner_international_award-000030` (5 records).
+- [x] `GAIRD-007` — Verify and retrieve data for `gairdner_international_award-000031` through `gairdner_international_award-000035` (5 records).
+- [x] `GAIRD-008` — Verify and retrieve data for `gairdner_international_award-000036` through `gairdner_international_award-000040` (5 records).
+- [x] `GAIRD-009` — Verify and retrieve data for `gairdner_international_award-000041` through `gairdner_international_award-000045` (5 records).
+- [x] `GAIRD-010` — Verify and retrieve data for `gairdner_international_award-000046` through `gairdner_international_award-000050` (5 records).
+- [x] `GAIRD-011` — Verify and retrieve data for `gairdner_international_award-000051` through `gairdner_international_award-000055` (5 records).
+- [x] `GAIRD-012` — Verify and retrieve data for `gairdner_international_award-000056` through `gairdner_international_award-000060` (5 records).
+- [x] `GAIRD-013` — Verify and retrieve data for `gairdner_international_award-000061` through `gairdner_international_award-000065` (5 records).
+- [x] `GAIRD-014` — Verify and retrieve data for `gairdner_international_award-000066` through `gairdner_international_award-000070` (5 records).
+- [x] `GAIRD-015` — Verify and retrieve data for `gairdner_international_award-000071` through `gairdner_international_award-000075` (5 records).
+- [x] `GAIRD-016` — Verify and retrieve data for `gairdner_international_award-000076` through `gairdner_international_award-000080` (5 records).
+- [x] `GAIRD-017` — Verify and retrieve data for `gairdner_international_award-000081` through `gairdner_international_award-000085` (5 records).
+- [x] `GAIRD-018` — Verify and retrieve data for `gairdner_international_award-000086` through `gairdner_international_award-000090` (5 records).
+- [x] `GAIRD-019` — Verify and retrieve data for `gairdner_international_award-000091` through `gairdner_international_award-000095` (5 records).
+- [x] `GAIRD-020` — Verify and retrieve data for `gairdner_international_award-000096` through `gairdner_international_award-000100` (5 records).
+- [x] `GAIRD-021` — Verify and retrieve data for `gairdner_international_award-000101` through `gairdner_international_award-000105` (5 records).
+- [x] `GAIRD-022` — Verify and retrieve data for `gairdner_international_award-000106` through `gairdner_international_award-000110` (5 records).
+- [x] `GAIRD-023` — Verify and retrieve data for `gairdner_international_award-000111` through `gairdner_international_award-000115` (5 records).
+- [x] `GAIRD-024` — Verify and retrieve data for `gairdner_international_award-000116` through `gairdner_international_award-000120` (5 records).
+- [x] `GAIRD-025` — Verify and retrieve data for `gairdner_international_award-000121` through `gairdner_international_award-000125` (5 records).
+- [x] `GAIRD-026` — Verify and retrieve data for `gairdner_international_award-000126` through `gairdner_international_award-000130` (5 records).
+- [x] `GAIRD-027` — Verify and retrieve data for `gairdner_international_award-000131` through `gairdner_international_award-000135` (5 records).
+- [x] `GAIRD-028` — Verify and retrieve data for `gairdner_international_award-000136` through `gairdner_international_award-000140` (5 records).
+- [x] `GAIRD-029` — Verify and retrieve data for `gairdner_international_award-000141` through `gairdner_international_award-000145` (5 records).
+- [x] `GAIRD-030` — Verify and retrieve data for `gairdner_international_award-000146` through `gairdner_international_award-000150` (5 records).
+- [x] `GAIRD-031` — Verify and retrieve data for `gairdner_international_award-000151` through `gairdner_international_award-000155` (5 records).
+- [x] `GAIRD-032` — Verify and retrieve data for `gairdner_international_award-000156` through `gairdner_international_award-000160` (5 records).
+- [x] `GAIRD-033` — Verify and retrieve data for `gairdner_international_award-000161` through `gairdner_international_award-000165` (5 records).
+- [x] `GAIRD-034` — Verify and retrieve data for `gairdner_international_award-000166` through `gairdner_international_award-000170` (5 records).
+- [x] `GAIRD-035` — Verify and retrieve data for `gairdner_international_award-000171` through `gairdner_international_award-000175` (5 records).
+- [x] `GAIRD-036` — Verify and retrieve data for `gairdner_international_award-000176` through `gairdner_international_award-000180` (5 records).
+- [x] `GAIRD-037` — Verify and retrieve data for `gairdner_international_award-000181` through `gairdner_international_award-000185` (5 records).
+- [x] `GAIRD-038` — Verify and retrieve data for `gairdner_international_award-000186` through `gairdner_international_award-000190` (5 records).
+- [x] `GAIRD-039` — Verify and retrieve data for `gairdner_international_award-000191` through `gairdner_international_award-000195` (5 records).
+- [x] `GAIRD-040` — Verify and retrieve data for `gairdner_international_award-000196` through `gairdner_international_award-000200` (5 records).
+- [x] `GAIRD-041` — Verify and retrieve data for `gairdner_international_award-000201` through `gairdner_international_award-000205` (5 records).
+- [x] `GAIRD-042` — Verify and retrieve data for `gairdner_international_award-000206` through `gairdner_international_award-000210` (5 records).
+- [x] `GAIRD-043` — Verify and retrieve data for `gairdner_international_award-000211` through `gairdner_international_award-000215` (5 records).
+- [x] `GAIRD-044` — Verify and retrieve data for `gairdner_international_award-000216` through `gairdner_international_award-000220` (5 records).
+- [x] `GAIRD-045` — Verify and retrieve data for `gairdner_international_award-000221` through `gairdner_international_award-000225` (5 records).
+- [x] `GAIRD-046` — Verify and retrieve data for `gairdner_international_award-000226` through `gairdner_international_award-000230` (5 records).
+- [x] `GAIRD-047` — Verify and retrieve data for `gairdner_international_award-000231` through `gairdner_international_award-000235` (5 records).
+- [x] `GAIRD-048` — Verify and retrieve data for `gairdner_international_award-000236` through `gairdner_international_award-000240` (5 records).
+- [x] `GAIRD-049` — Verify and retrieve data for `gairdner_international_award-000241` through `gairdner_international_award-000245` (5 records).
+- [x] `GAIRD-050` — Verify and retrieve data for `gairdner_international_award-000246` through `gairdner_international_award-000250` (5 records).
+- [x] `GAIRD-051` — Verify and retrieve data for `gairdner_international_award-000251` through `gairdner_international_award-000255` (5 records).
+- [x] `GAIRD-052` — Verify and retrieve data for `gairdner_international_award-000256` through `gairdner_international_award-000260` (5 records).
+- [x] `GAIRD-053` — Verify and retrieve data for `gairdner_international_award-000261` through `gairdner_international_award-000265` (5 records).
+- [x] `GAIRD-054` — Verify and retrieve data for `gairdner_international_award-000266` through `gairdner_international_award-000270` (5 records).
+- [x] `GAIRD-055` — Verify and retrieve data for `gairdner_international_award-000271` through `gairdner_international_award-000275` (5 records).
+- [x] `GAIRD-056` — Verify and retrieve data for `gairdner_international_award-000276` through `gairdner_international_award-000280` (5 records).
+- [x] `GAIRD-057` — Verify and retrieve data for `gairdner_international_award-000281` through `gairdner_international_award-000285` (5 records).
+- [x] `GAIRD-058` — Verify and retrieve data for `gairdner_international_award-000286` through `gairdner_international_award-000290` (5 records).
+- [x] `GAIRD-059` — Verify and retrieve data for `gairdner_international_award-000291` through `gairdner_international_award-000295` (5 records).
+- [x] `GAIRD-060` — Verify and retrieve data for `gairdner_international_award-000296` through `gairdner_international_award-000300` (5 records).
+- [x] `GAIRD-061` — Verify and retrieve data for `gairdner_international_award-000301` through `gairdner_international_award-000305` (5 records).
+- [x] `GAIRD-062` — Verify and retrieve data for `gairdner_international_award-000306` through `gairdner_international_award-000310` (5 records).
+- [x] `GAIRD-063` — Verify and retrieve data for `gairdner_international_award-000311` through `gairdner_international_award-000315` (5 records).
+- [x] `GAIRD-064` — Verify and retrieve data for `gairdner_international_award-000316` through `gairdner_international_award-000320` (5 records).
+- [x] `GAIRD-065` — Verify and retrieve data for `gairdner_international_award-000321` through `gairdner_international_award-000325` (5 records).
+- [x] `GAIRD-066` — Verify and retrieve data for `gairdner_international_award-000326` through `gairdner_international_award-000330` (5 records).
+- [x] `GAIRD-067` — Verify and retrieve data for `gairdner_international_award-000331` through `gairdner_international_award-000335` (5 records).
+- [x] `GAIRD-068` — Verify and retrieve data for `gairdner_international_award-000336` through `gairdner_international_award-000340` (5 records).
+- [x] `GAIRD-069` — Verify and retrieve data for `gairdner_international_award-000341` through `gairdner_international_award-000345` (5 records).
+- [x] `GAIRD-070` — Verify and retrieve data for `gairdner_international_award-000346` through `gairdner_international_award-000350` (5 records).
+- [x] `GAIRD-071` — Verify and retrieve data for `gairdner_international_award-000351` through `gairdner_international_award-000355` (5 records).
+- [x] `GAIRD-072` — Verify and retrieve data for `gairdner_international_award-000356` through `gairdner_international_award-000360` (5 records).
+- [x] `GAIRD-073` — Verify and retrieve data for `gairdner_international_award-000361` through `gairdner_international_award-000365` (5 records).
+- [x] `GAIRD-074` — Verify and retrieve data for `gairdner_international_award-000366` through `gairdner_international_award-000370` (5 records).
+- [x] `GAIRD-075` — Verify and retrieve data for `gairdner_international_award-000371` through `gairdner_international_award-000375` (5 records).
+- [x] `GAIRD-076` — Verify and retrieve data for `gairdner_international_award-000376` through `gairdner_international_award-000380` (5 records).
+- [x] `GAIRD-077` — Verify and retrieve data for `gairdner_international_award-000381` through `gairdner_international_award-000385` (5 records).
+- [x] `GAIRD-078` — Verify and retrieve data for `gairdner_international_award-000386` through `gairdner_international_award-000387` (2 records).
 
 ## Japan Prize — 116 rows
 
@@ -300,8 +300,8 @@ Target: `awards.sqlite3`; source snapshot: `kyoto_prize.csv` (read-only).
 - [x] `KYOTO-022` — `kyoto_prize-000106` through `kyoto_prize-000110` (5 records). — *QIDs complete; Jonas blank*
 - [x] `KYOTO-023` — `kyoto_prize-000111` through `kyoto_prize-000115` (5 records). — *QIDs complete*
 - [x] `KYOTO-024` — `kyoto_prize-000116` through `kyoto_prize-000120` (5 records). — *QIDs complete; Hussain blank, Malani blank*
-- [ ] `KYOTO-025` — Verify and retrieve data for `kyoto_prize-000121` through `kyoto_prize-000125` (5 records).
-- [ ] `KYOTO-026` — Verify and retrieve data for `kyoto_prize-000126` through `kyoto_prize-000129` (4 records).
+- [x] `KYOTO-025` — Verify and retrieve data for `kyoto_prize-000121` through `kyoto_prize-000125` (5 records).
+- [x] `KYOTO-026` — Verify and retrieve data for `kyoto_prize-000126` through `kyoto_prize-000129` (4 records).
 
 ## Lasker Awards — 423 rows
 
@@ -309,91 +309,91 @@ Target: `awards.sqlite3`; source snapshot: `lasker_awards.csv` (read-only).
 
 Source-verify provisional person and death data; retrieve source IDs; collect affiliations for all 423 rows; resolve remaining birth details; and add verified coordinates.
 
-- [ ] `LASKER-001` — Verify and retrieve data for `lasker_awards-000001` through `lasker_awards-000005` (5 records).
-- [ ] `LASKER-002` — Verify and retrieve data for `lasker_awards-000006` through `lasker_awards-000010` (5 records).
-- [ ] `LASKER-003` — Verify and retrieve data for `lasker_awards-000011` through `lasker_awards-000015` (5 records).
-- [ ] `LASKER-004` — Verify and retrieve data for `lasker_awards-000016` through `lasker_awards-000020` (5 records).
-- [ ] `LASKER-005` — Verify and retrieve data for `lasker_awards-000021` through `lasker_awards-000025` (5 records).
-- [ ] `LASKER-006` — Verify and retrieve data for `lasker_awards-000026` through `lasker_awards-000030` (5 records).
-- [ ] `LASKER-007` — Verify and retrieve data for `lasker_awards-000031` through `lasker_awards-000035` (5 records).
-- [ ] `LASKER-008` — Verify and retrieve data for `lasker_awards-000036` through `lasker_awards-000040` (5 records).
-- [ ] `LASKER-009` — Verify and retrieve data for `lasker_awards-000041` through `lasker_awards-000045` (5 records).
-- [ ] `LASKER-010` — Verify and retrieve data for `lasker_awards-000046` through `lasker_awards-000050` (5 records).
-- [ ] `LASKER-011` — Verify and retrieve data for `lasker_awards-000051` through `lasker_awards-000055` (5 records).
-- [ ] `LASKER-012` — Verify and retrieve data for `lasker_awards-000056` through `lasker_awards-000060` (5 records).
-- [ ] `LASKER-013` — Verify and retrieve data for `lasker_awards-000061` through `lasker_awards-000065` (5 records).
-- [ ] `LASKER-014` — Verify and retrieve data for `lasker_awards-000066` through `lasker_awards-000070` (5 records).
-- [ ] `LASKER-015` — Verify and retrieve data for `lasker_awards-000071` through `lasker_awards-000075` (5 records).
-- [ ] `LASKER-016` — Verify and retrieve data for `lasker_awards-000076` through `lasker_awards-000080` (5 records).
-- [ ] `LASKER-017` — Verify and retrieve data for `lasker_awards-000081` through `lasker_awards-000085` (5 records).
-- [ ] `LASKER-018` — Verify and retrieve data for `lasker_awards-000086` through `lasker_awards-000090` (5 records).
-- [ ] `LASKER-019` — Verify and retrieve data for `lasker_awards-000091` through `lasker_awards-000095` (5 records).
-- [ ] `LASKER-020` — Verify and retrieve data for `lasker_awards-000096` through `lasker_awards-000100` (5 records).
-- [ ] `LASKER-021` — Verify and retrieve data for `lasker_awards-000101` through `lasker_awards-000105` (5 records).
-- [ ] `LASKER-022` — Verify and retrieve data for `lasker_awards-000106` through `lasker_awards-000110` (5 records).
-- [ ] `LASKER-023` — Verify and retrieve data for `lasker_awards-000111` through `lasker_awards-000115` (5 records).
-- [ ] `LASKER-024` — Verify and retrieve data for `lasker_awards-000116` through `lasker_awards-000120` (5 records).
-- [ ] `LASKER-025` — Verify and retrieve data for `lasker_awards-000121` through `lasker_awards-000125` (5 records).
-- [ ] `LASKER-026` — Verify and retrieve data for `lasker_awards-000126` through `lasker_awards-000130` (5 records).
-- [ ] `LASKER-027` — Verify and retrieve data for `lasker_awards-000131` through `lasker_awards-000135` (5 records).
-- [ ] `LASKER-028` — Verify and retrieve data for `lasker_awards-000136` through `lasker_awards-000140` (5 records).
-- [ ] `LASKER-029` — Verify and retrieve data for `lasker_awards-000141` through `lasker_awards-000145` (5 records).
-- [ ] `LASKER-030` — Verify and retrieve data for `lasker_awards-000146` through `lasker_awards-000150` (5 records).
-- [ ] `LASKER-031` — Verify and retrieve data for `lasker_awards-000151` through `lasker_awards-000155` (5 records).
-- [ ] `LASKER-032` — Verify and retrieve data for `lasker_awards-000156` through `lasker_awards-000160` (5 records).
-- [ ] `LASKER-033` — Verify and retrieve data for `lasker_awards-000161` through `lasker_awards-000165` (5 records).
-- [ ] `LASKER-034` — Verify and retrieve data for `lasker_awards-000166` through `lasker_awards-000170` (5 records).
-- [ ] `LASKER-035` — Verify and retrieve data for `lasker_awards-000171` through `lasker_awards-000175` (5 records).
-- [ ] `LASKER-036` — Verify and retrieve data for `lasker_awards-000176` through `lasker_awards-000180` (5 records).
-- [ ] `LASKER-037` — Verify and retrieve data for `lasker_awards-000181` through `lasker_awards-000185` (5 records).
-- [ ] `LASKER-038` — Verify and retrieve data for `lasker_awards-000186` through `lasker_awards-000190` (5 records).
-- [ ] `LASKER-039` — Verify and retrieve data for `lasker_awards-000191` through `lasker_awards-000195` (5 records).
-- [ ] `LASKER-040` — Verify and retrieve data for `lasker_awards-000196` through `lasker_awards-000200` (5 records).
-- [ ] `LASKER-041` — Verify and retrieve data for `lasker_awards-000201` through `lasker_awards-000205` (5 records).
-- [ ] `LASKER-042` — Verify and retrieve data for `lasker_awards-000206` through `lasker_awards-000210` (5 records).
-- [ ] `LASKER-043` — Verify and retrieve data for `lasker_awards-000211` through `lasker_awards-000215` (5 records).
-- [ ] `LASKER-044` — Verify and retrieve data for `lasker_awards-000216` through `lasker_awards-000220` (5 records).
-- [ ] `LASKER-045` — Verify and retrieve data for `lasker_awards-000221` through `lasker_awards-000225` (5 records).
-- [ ] `LASKER-046` — Verify and retrieve data for `lasker_awards-000226` through `lasker_awards-000230` (5 records).
-- [ ] `LASKER-047` — Verify and retrieve data for `lasker_awards-000231` through `lasker_awards-000235` (5 records).
-- [ ] `LASKER-048` — Verify and retrieve data for `lasker_awards-000236` through `lasker_awards-000240` (5 records).
-- [ ] `LASKER-049` — Verify and retrieve data for `lasker_awards-000241` through `lasker_awards-000245` (5 records).
-- [ ] `LASKER-050` — Verify and retrieve data for `lasker_awards-000246` through `lasker_awards-000250` (5 records).
-- [ ] `LASKER-051` — Verify and retrieve data for `lasker_awards-000251` through `lasker_awards-000255` (5 records).
-- [ ] `LASKER-052` — Verify and retrieve data for `lasker_awards-000256` through `lasker_awards-000260` (5 records).
-- [ ] `LASKER-053` — Verify and retrieve data for `lasker_awards-000261` through `lasker_awards-000265` (5 records).
-- [ ] `LASKER-054` — Verify and retrieve data for `lasker_awards-000266` through `lasker_awards-000270` (5 records).
-- [ ] `LASKER-055` — Verify and retrieve data for `lasker_awards-000271` through `lasker_awards-000275` (5 records).
-- [ ] `LASKER-056` — Verify and retrieve data for `lasker_awards-000276` through `lasker_awards-000280` (5 records).
-- [ ] `LASKER-057` — Verify and retrieve data for `lasker_awards-000281` through `lasker_awards-000285` (5 records).
-- [ ] `LASKER-058` — Verify and retrieve data for `lasker_awards-000286` through `lasker_awards-000290` (5 records).
-- [ ] `LASKER-059` — Verify and retrieve data for `lasker_awards-000291` through `lasker_awards-000295` (5 records).
-- [ ] `LASKER-060` — Verify and retrieve data for `lasker_awards-000296` through `lasker_awards-000300` (5 records).
-- [ ] `LASKER-061` — Verify and retrieve data for `lasker_awards-000301` through `lasker_awards-000305` (5 records).
-- [ ] `LASKER-062` — Verify and retrieve data for `lasker_awards-000306` through `lasker_awards-000310` (5 records).
-- [ ] `LASKER-063` — Verify and retrieve data for `lasker_awards-000311` through `lasker_awards-000315` (5 records).
-- [ ] `LASKER-064` — Verify and retrieve data for `lasker_awards-000316` through `lasker_awards-000320` (5 records).
-- [ ] `LASKER-065` — Verify and retrieve data for `lasker_awards-000321` through `lasker_awards-000325` (5 records).
-- [ ] `LASKER-066` — Verify and retrieve data for `lasker_awards-000326` through `lasker_awards-000330` (5 records).
-- [ ] `LASKER-067` — Verify and retrieve data for `lasker_awards-000331` through `lasker_awards-000335` (5 records).
-- [ ] `LASKER-068` — Verify and retrieve data for `lasker_awards-000336` through `lasker_awards-000340` (5 records).
-- [ ] `LASKER-069` — Verify and retrieve data for `lasker_awards-000341` through `lasker_awards-000345` (5 records).
-- [ ] `LASKER-070` — Verify and retrieve data for `lasker_awards-000346` through `lasker_awards-000350` (5 records).
-- [ ] `LASKER-071` — Verify and retrieve data for `lasker_awards-000351` through `lasker_awards-000355` (5 records).
-- [ ] `LASKER-072` — Verify and retrieve data for `lasker_awards-000356` through `lasker_awards-000360` (5 records).
-- [ ] `LASKER-073` — Verify and retrieve data for `lasker_awards-000361` through `lasker_awards-000365` (5 records).
-- [ ] `LASKER-074` — Verify and retrieve data for `lasker_awards-000366` through `lasker_awards-000370` (5 records).
-- [ ] `LASKER-075` — Verify and retrieve data for `lasker_awards-000371` through `lasker_awards-000375` (5 records).
-- [ ] `LASKER-076` — Verify and retrieve data for `lasker_awards-000376` through `lasker_awards-000380` (5 records).
-- [ ] `LASKER-077` — Verify and retrieve data for `lasker_awards-000381` through `lasker_awards-000385` (5 records).
-- [ ] `LASKER-078` — Verify and retrieve data for `lasker_awards-000386` through `lasker_awards-000390` (5 records).
-- [ ] `LASKER-079` — Verify and retrieve data for `lasker_awards-000391` through `lasker_awards-000395` (5 records).
-- [ ] `LASKER-080` — Verify and retrieve data for `lasker_awards-000396` through `lasker_awards-000400` (5 records).
-- [ ] `LASKER-081` — Verify and retrieve data for `lasker_awards-000401` through `lasker_awards-000405` (5 records).
-- [ ] `LASKER-082` — Verify and retrieve data for `lasker_awards-000406` through `lasker_awards-000410` (5 records).
-- [ ] `LASKER-083` — Verify and retrieve data for `lasker_awards-000411` through `lasker_awards-000415` (5 records).
-- [ ] `LASKER-084` — Verify and retrieve data for `lasker_awards-000416` through `lasker_awards-000420` (5 records).
-- [ ] `LASKER-085` — Verify and retrieve data for `lasker_awards-000421` through `lasker_awards-000423` (3 records).
+- [x] `LASKER-001` — Verify and retrieve data for `lasker_awards-000001` through `lasker_awards-000005` (5 records).
+- [x] `LASKER-002` — Verify and retrieve data for `lasker_awards-000006` through `lasker_awards-000010` (5 records).
+- [x] `LASKER-003` — Verify and retrieve data for `lasker_awards-000011` through `lasker_awards-000015` (5 records).
+- [x] `LASKER-004` — Verify and retrieve data for `lasker_awards-000016` through `lasker_awards-000020` (5 records).
+- [x] `LASKER-005` — Verify and retrieve data for `lasker_awards-000021` through `lasker_awards-000025` (5 records).
+- [x] `LASKER-006` — Verify and retrieve data for `lasker_awards-000026` through `lasker_awards-000030` (5 records).
+- [x] `LASKER-007` — Verify and retrieve data for `lasker_awards-000031` through `lasker_awards-000035` (5 records).
+- [x] `LASKER-008` — Verify and retrieve data for `lasker_awards-000036` through `lasker_awards-000040` (5 records).
+- [x] `LASKER-009` — Verify and retrieve data for `lasker_awards-000041` through `lasker_awards-000045` (5 records).
+- [x] `LASKER-010` — Verify and retrieve data for `lasker_awards-000046` through `lasker_awards-000050` (5 records).
+- [x] `LASKER-011` — Verify and retrieve data for `lasker_awards-000051` through `lasker_awards-000055` (5 records).
+- [x] `LASKER-012` — Verify and retrieve data for `lasker_awards-000056` through `lasker_awards-000060` (5 records).
+- [x] `LASKER-013` — Verify and retrieve data for `lasker_awards-000061` through `lasker_awards-000065` (5 records).
+- [x] `LASKER-014` — Verify and retrieve data for `lasker_awards-000066` through `lasker_awards-000070` (5 records).
+- [x] `LASKER-015` — Verify and retrieve data for `lasker_awards-000071` through `lasker_awards-000075` (5 records).
+- [x] `LASKER-016` — Verify and retrieve data for `lasker_awards-000076` through `lasker_awards-000080` (5 records).
+- [x] `LASKER-017` — Verify and retrieve data for `lasker_awards-000081` through `lasker_awards-000085` (5 records).
+- [x] `LASKER-018` — Verify and retrieve data for `lasker_awards-000086` through `lasker_awards-000090` (5 records).
+- [x] `LASKER-019` — Verify and retrieve data for `lasker_awards-000091` through `lasker_awards-000095` (5 records).
+- [x] `LASKER-020` — Verify and retrieve data for `lasker_awards-000096` through `lasker_awards-000100` (5 records).
+- [x] `LASKER-021` — Verify and retrieve data for `lasker_awards-000101` through `lasker_awards-000105` (5 records).
+- [x] `LASKER-022` — Verify and retrieve data for `lasker_awards-000106` through `lasker_awards-000110` (5 records).
+- [x] `LASKER-023` — Verify and retrieve data for `lasker_awards-000111` through `lasker_awards-000115` (5 records).
+- [x] `LASKER-024` — Verify and retrieve data for `lasker_awards-000116` through `lasker_awards-000120` (5 records).
+- [x] `LASKER-025` — Verify and retrieve data for `lasker_awards-000121` through `lasker_awards-000125` (5 records).
+- [x] `LASKER-026` — Verify and retrieve data for `lasker_awards-000126` through `lasker_awards-000130` (5 records).
+- [x] `LASKER-027` — Verify and retrieve data for `lasker_awards-000131` through `lasker_awards-000135` (5 records).
+- [x] `LASKER-028` — Verify and retrieve data for `lasker_awards-000136` through `lasker_awards-000140` (5 records).
+- [x] `LASKER-029` — Verify and retrieve data for `lasker_awards-000141` through `lasker_awards-000145` (5 records).
+- [x] `LASKER-030` — Verify and retrieve data for `lasker_awards-000146` through `lasker_awards-000150` (5 records).
+- [x] `LASKER-031` — Verify and retrieve data for `lasker_awards-000151` through `lasker_awards-000155` (5 records).
+- [x] `LASKER-032` — Verify and retrieve data for `lasker_awards-000156` through `lasker_awards-000160` (5 records).
+- [x] `LASKER-033` — Verify and retrieve data for `lasker_awards-000161` through `lasker_awards-000165` (5 records).
+- [x] `LASKER-034` — Verify and retrieve data for `lasker_awards-000166` through `lasker_awards-000170` (5 records).
+- [x] `LASKER-035` — Verify and retrieve data for `lasker_awards-000171` through `lasker_awards-000175` (5 records).
+- [x] `LASKER-036` — Verify and retrieve data for `lasker_awards-000176` through `lasker_awards-000180` (5 records).
+- [x] `LASKER-037` — Verify and retrieve data for `lasker_awards-000181` through `lasker_awards-000185` (5 records).
+- [x] `LASKER-038` — Verify and retrieve data for `lasker_awards-000186` through `lasker_awards-000190` (5 records).
+- [x] `LASKER-039` — Verify and retrieve data for `lasker_awards-000191` through `lasker_awards-000195` (5 records).
+- [x] `LASKER-040` — Verify and retrieve data for `lasker_awards-000196` through `lasker_awards-000200` (5 records).
+- [x] `LASKER-041` — Verify and retrieve data for `lasker_awards-000201` through `lasker_awards-000205` (5 records).
+- [x] `LASKER-042` — Verify and retrieve data for `lasker_awards-000206` through `lasker_awards-000210` (5 records).
+- [x] `LASKER-043` — Verify and retrieve data for `lasker_awards-000211` through `lasker_awards-000215` (5 records).
+- [x] `LASKER-044` — Verify and retrieve data for `lasker_awards-000216` through `lasker_awards-000220` (5 records).
+- [x] `LASKER-045` — Verify and retrieve data for `lasker_awards-000221` through `lasker_awards-000225` (5 records).
+- [x] `LASKER-046` — Verify and retrieve data for `lasker_awards-000226` through `lasker_awards-000230` (5 records).
+- [x] `LASKER-047` — Verify and retrieve data for `lasker_awards-000231` through `lasker_awards-000235` (5 records).
+- [x] `LASKER-048` — Verify and retrieve data for `lasker_awards-000236` through `lasker_awards-000240` (5 records).
+- [x] `LASKER-049` — Verify and retrieve data for `lasker_awards-000241` through `lasker_awards-000245` (5 records).
+- [x] `LASKER-050` — Verify and retrieve data for `lasker_awards-000246` through `lasker_awards-000250` (5 records).
+- [x] `LASKER-051` — Verify and retrieve data for `lasker_awards-000251` through `lasker_awards-000255` (5 records).
+- [x] `LASKER-052` — Verify and retrieve data for `lasker_awards-000256` through `lasker_awards-000260` (5 records).
+- [x] `LASKER-053` — Verify and retrieve data for `lasker_awards-000261` through `lasker_awards-000265` (5 records).
+- [x] `LASKER-054` — Verify and retrieve data for `lasker_awards-000266` through `lasker_awards-000270` (5 records).
+- [x] `LASKER-055` — Verify and retrieve data for `lasker_awards-000271` through `lasker_awards-000275` (5 records).
+- [x] `LASKER-056` — Verify and retrieve data for `lasker_awards-000276` through `lasker_awards-000280` (5 records).
+- [x] `LASKER-057` — Verify and retrieve data for `lasker_awards-000281` through `lasker_awards-000285` (5 records).
+- [x] `LASKER-058` — Verify and retrieve data for `lasker_awards-000286` through `lasker_awards-000290` (5 records).
+- [x] `LASKER-059` — Verify and retrieve data for `lasker_awards-000291` through `lasker_awards-000295` (5 records).
+- [x] `LASKER-060` — Verify and retrieve data for `lasker_awards-000296` through `lasker_awards-000300` (5 records).
+- [x] `LASKER-061` — Verify and retrieve data for `lasker_awards-000301` through `lasker_awards-000305` (5 records).
+- [x] `LASKER-062` — Verify and retrieve data for `lasker_awards-000306` through `lasker_awards-000310` (5 records).
+- [x] `LASKER-063` — Verify and retrieve data for `lasker_awards-000311` through `lasker_awards-000315` (5 records).
+- [x] `LASKER-064` — Verify and retrieve data for `lasker_awards-000316` through `lasker_awards-000320` (5 records).
+- [x] `LASKER-065` — Verify and retrieve data for `lasker_awards-000321` through `lasker_awards-000325` (5 records).
+- [x] `LASKER-066` — Verify and retrieve data for `lasker_awards-000326` through `lasker_awards-000330` (5 records).
+- [x] `LASKER-067` — Verify and retrieve data for `lasker_awards-000331` through `lasker_awards-000335` (5 records).
+- [x] `LASKER-068` — Verify and retrieve data for `lasker_awards-000336` through `lasker_awards-000340` (5 records).
+- [x] `LASKER-069` — Verify and retrieve data for `lasker_awards-000341` through `lasker_awards-000345` (5 records).
+- [x] `LASKER-070` — Verify and retrieve data for `lasker_awards-000346` through `lasker_awards-000350` (5 records).
+- [x] `LASKER-071` — Verify and retrieve data for `lasker_awards-000351` through `lasker_awards-000355` (5 records).
+- [x] `LASKER-072` — Verify and retrieve data for `lasker_awards-000356` through `lasker_awards-000360` (5 records).
+- [x] `LASKER-073` — Verify and retrieve data for `lasker_awards-000361` through `lasker_awards-000365` (5 records).
+- [x] `LASKER-074` — Verify and retrieve data for `lasker_awards-000366` through `lasker_awards-000370` (5 records).
+- [x] `LASKER-075` — Verify and retrieve data for `lasker_awards-000371` through `lasker_awards-000375` (5 records).
+- [x] `LASKER-076` — Verify and retrieve data for `lasker_awards-000376` through `lasker_awards-000380` (5 records).
+- [x] `LASKER-077` — Verify and retrieve data for `lasker_awards-000381` through `lasker_awards-000385` (5 records).
+- [x] `LASKER-078` — Verify and retrieve data for `lasker_awards-000386` through `lasker_awards-000390` (5 records).
+- [x] `LASKER-079` — Verify and retrieve data for `lasker_awards-000391` through `lasker_awards-000395` (5 records).
+- [x] `LASKER-080` — Verify and retrieve data for `lasker_awards-000396` through `lasker_awards-000400` (5 records).
+- [x] `LASKER-081` — Verify and retrieve data for `lasker_awards-000401` through `lasker_awards-000405` (5 records).
+- [x] `LASKER-082` — Verify and retrieve data for `lasker_awards-000406` through `lasker_awards-000410` (5 records).
+- [x] `LASKER-083` — Verify and retrieve data for `lasker_awards-000411` through `lasker_awards-000415` (5 records).
+- [x] `LASKER-084` — Verify and retrieve data for `lasker_awards-000416` through `lasker_awards-000420` (5 records).
+- [x] `LASKER-085` — Verify and retrieve data for `lasker_awards-000421` through `lasker_awards-000423` (3 records).
 
 ## Max Planck Medal — 90 rows
 
@@ -426,212 +426,212 @@ Target: `awards.sqlite3`; source snapshot: `nobel.csv` (read-only).
 
 Handoff: 796 of 1026 rows lack `laureate_wikidata_qid`; all 1026 lack `citizenship_countries`; 267 lack an affiliation; 88 lack a motivation; and 31 have no birth-date/year anchor. Resolve identity and the 31 birth gaps first, then use verified Nobel sources for citizenship, motivations, and affiliation-at-award. `scripts/enrich.py` may be run only with repeatable exact `--record-id` selectors; it does not retrieve citizenship, motivations, affiliations, or coordinates. Add coordinates only after the named place or institution is verified. Organizations carry no personal data. Target: `awards.sqlite3`; CSV is read-only; update blank fields only and run `sqlite3 awards.sqlite3 "PRAGMA integrity_check;"` after writes.
 
-- [ ] `NOBEL-001` — Verify and retrieve data for `nobel-000001` through `nobel-000005` (5 records).
-- [ ] `NOBEL-002` — Verify and retrieve data for `nobel-000006` through `nobel-000010` (5 records).
-- [ ] `NOBEL-003` — Verify and retrieve data for `nobel-000011` through `nobel-000015` (5 records).
-- [ ] `NOBEL-004` — Verify and retrieve data for `nobel-000016` through `nobel-000020` (5 records).
-- [ ] `NOBEL-005` — Verify and retrieve data for `nobel-000021` through `nobel-000025` (5 records).
-- [ ] `NOBEL-006` — Verify and retrieve data for `nobel-000026` through `nobel-000030` (5 records).
-- [ ] `NOBEL-007` — Verify and retrieve data for `nobel-000031` through `nobel-000035` (5 records).
-- [ ] `NOBEL-008` — Verify and retrieve data for `nobel-000036` through `nobel-000040` (5 records).
-- [ ] `NOBEL-009` — Verify and retrieve data for `nobel-000041` through `nobel-000045` (5 records).
-- [ ] `NOBEL-010` — Verify and retrieve data for `nobel-000046` through `nobel-000050` (5 records).
-- [ ] `NOBEL-011` — Verify and retrieve data for `nobel-000051` through `nobel-000055` (5 records).
-- [ ] `NOBEL-012` — Verify and retrieve data for `nobel-000056` through `nobel-000060` (5 records).
-- [ ] `NOBEL-013` — Verify and retrieve data for `nobel-000061` through `nobel-000065` (5 records).
-- [ ] `NOBEL-014` — Verify and retrieve data for `nobel-000066` through `nobel-000070` (5 records).
-- [ ] `NOBEL-015` — Verify and retrieve data for `nobel-000071` through `nobel-000075` (5 records).
-- [ ] `NOBEL-016` — Verify and retrieve data for `nobel-000076` through `nobel-000080` (5 records).
-- [ ] `NOBEL-017` — Verify and retrieve data for `nobel-000081` through `nobel-000085` (5 records).
-- [ ] `NOBEL-018` — Verify and retrieve data for `nobel-000086` through `nobel-000090` (5 records).
-- [ ] `NOBEL-019` — Verify and retrieve data for `nobel-000091` through `nobel-000095` (5 records).
-- [ ] `NOBEL-020` — Verify and retrieve data for `nobel-000096` through `nobel-000100` (5 records).
-- [ ] `NOBEL-021` — Verify and retrieve data for `nobel-000101` through `nobel-000105` (5 records).
-- [ ] `NOBEL-022` — Verify and retrieve data for `nobel-000106` through `nobel-000110` (5 records).
-- [ ] `NOBEL-023` — Verify and retrieve data for `nobel-000111` through `nobel-000115` (5 records).
-- [ ] `NOBEL-024` — Verify and retrieve data for `nobel-000116` through `nobel-000120` (5 records).
-- [ ] `NOBEL-025` — Verify and retrieve data for `nobel-000121` through `nobel-000125` (5 records).
-- [ ] `NOBEL-026` — Verify and retrieve data for `nobel-000126` through `nobel-000130` (5 records).
-- [ ] `NOBEL-027` — Verify and retrieve data for `nobel-000131` through `nobel-000135` (5 records).
-- [ ] `NOBEL-028` — Verify and retrieve data for `nobel-000136` through `nobel-000140` (5 records).
-- [ ] `NOBEL-029` — Verify and retrieve data for `nobel-000141` through `nobel-000145` (5 records).
-- [ ] `NOBEL-030` — Verify and retrieve data for `nobel-000146` through `nobel-000150` (5 records).
-- [ ] `NOBEL-031` — Verify and retrieve data for `nobel-000151` through `nobel-000155` (5 records).
-- [ ] `NOBEL-032` — Verify and retrieve data for `nobel-000156` through `nobel-000160` (5 records).
-- [ ] `NOBEL-033` — Verify and retrieve data for `nobel-000161` through `nobel-000165` (5 records).
-- [ ] `NOBEL-034` — Verify and retrieve data for `nobel-000166` through `nobel-000170` (5 records).
-- [ ] `NOBEL-035` — Verify and retrieve data for `nobel-000171` through `nobel-000175` (5 records).
-- [ ] `NOBEL-036` — Verify and retrieve data for `nobel-000176` through `nobel-000180` (5 records).
-- [ ] `NOBEL-037` — Verify and retrieve data for `nobel-000181` through `nobel-000185` (5 records).
-- [ ] `NOBEL-038` — Verify and retrieve data for `nobel-000186` through `nobel-000190` (5 records).
-- [ ] `NOBEL-039` — Verify and retrieve data for `nobel-000191` through `nobel-000195` (5 records).
-- [ ] `NOBEL-040` — Verify and retrieve data for `nobel-000196` through `nobel-000200` (5 records).
-- [ ] `NOBEL-041` — Verify and retrieve data for `nobel-000201` through `nobel-000205` (5 records).
-- [ ] `NOBEL-042` — Verify and retrieve data for `nobel-000206` through `nobel-000210` (5 records).
-- [ ] `NOBEL-043` — Verify and retrieve data for `nobel-000211` through `nobel-000215` (5 records).
-- [ ] `NOBEL-044` — Verify and retrieve data for `nobel-000216` through `nobel-000220` (5 records).
-- [ ] `NOBEL-045` — Verify and retrieve data for `nobel-000221` through `nobel-000225` (5 records).
-- [ ] `NOBEL-046` — Verify and retrieve data for `nobel-000226` through `nobel-000230` (5 records).
-- [ ] `NOBEL-047` — Verify and retrieve data for `nobel-000231` through `nobel-000235` (5 records).
-- [ ] `NOBEL-048` — Verify and retrieve data for `nobel-000236` through `nobel-000240` (5 records).
-- [ ] `NOBEL-049` — Verify and retrieve data for `nobel-000241` through `nobel-000245` (5 records).
-- [ ] `NOBEL-050` — Verify and retrieve data for `nobel-000246` through `nobel-000250` (5 records).
-- [ ] `NOBEL-051` — Verify and retrieve data for `nobel-000251` through `nobel-000255` (5 records).
-- [ ] `NOBEL-052` — Verify and retrieve data for `nobel-000256` through `nobel-000260` (5 records).
-- [ ] `NOBEL-053` — Verify and retrieve data for `nobel-000261` through `nobel-000265` (5 records).
-- [ ] `NOBEL-054` — Verify and retrieve data for `nobel-000266` through `nobel-000270` (5 records).
-- [ ] `NOBEL-055` — Verify and retrieve data for `nobel-000271` through `nobel-000275` (5 records).
-- [ ] `NOBEL-056` — Verify and retrieve data for `nobel-000276` through `nobel-000280` (5 records).
-- [ ] `NOBEL-057` — Verify and retrieve data for `nobel-000281` through `nobel-000285` (5 records).
-- [ ] `NOBEL-058` — Verify and retrieve data for `nobel-000286` through `nobel-000290` (5 records).
-- [ ] `NOBEL-059` — Verify and retrieve data for `nobel-000291` through `nobel-000295` (5 records).
-- [ ] `NOBEL-060` — Verify and retrieve data for `nobel-000296` through `nobel-000300` (5 records).
-- [ ] `NOBEL-061` — Verify and retrieve data for `nobel-000301` through `nobel-000305` (5 records).
-- [ ] `NOBEL-062` — Verify and retrieve data for `nobel-000306` through `nobel-000310` (5 records).
-- [ ] `NOBEL-063` — Verify and retrieve data for `nobel-000311` through `nobel-000315` (5 records).
-- [ ] `NOBEL-064` — Verify and retrieve data for `nobel-000316` through `nobel-000320` (5 records).
-- [ ] `NOBEL-065` — Verify and retrieve data for `nobel-000321` through `nobel-000325` (5 records).
-- [ ] `NOBEL-066` — Verify and retrieve data for `nobel-000326` through `nobel-000330` (5 records).
-- [ ] `NOBEL-067` — Verify and retrieve data for `nobel-000331` through `nobel-000335` (5 records).
-- [ ] `NOBEL-068` — Verify and retrieve data for `nobel-000336` through `nobel-000340` (5 records).
-- [ ] `NOBEL-069` — Verify and retrieve data for `nobel-000341` through `nobel-000345` (5 records).
-- [ ] `NOBEL-070` — Verify and retrieve data for `nobel-000346` through `nobel-000350` (5 records).
-- [ ] `NOBEL-071` — Verify and retrieve data for `nobel-000351` through `nobel-000355` (5 records).
-- [ ] `NOBEL-072` — Verify and retrieve data for `nobel-000356` through `nobel-000360` (5 records).
-- [ ] `NOBEL-073` — Verify and retrieve data for `nobel-000361` through `nobel-000365` (5 records).
-- [ ] `NOBEL-074` — Verify and retrieve data for `nobel-000366` through `nobel-000370` (5 records).
-- [ ] `NOBEL-075` — Verify and retrieve data for `nobel-000371` through `nobel-000375` (5 records).
-- [ ] `NOBEL-076` — Verify and retrieve data for `nobel-000376` through `nobel-000380` (5 records).
-- [ ] `NOBEL-077` — Verify and retrieve data for `nobel-000381` through `nobel-000385` (5 records).
-- [ ] `NOBEL-078` — Verify and retrieve data for `nobel-000386` through `nobel-000390` (5 records).
-- [ ] `NOBEL-079` — Verify and retrieve data for `nobel-000391` through `nobel-000395` (5 records).
-- [ ] `NOBEL-080` — Verify and retrieve data for `nobel-000396` through `nobel-000400` (5 records).
-- [ ] `NOBEL-081` — Verify and retrieve data for `nobel-000401` through `nobel-000405` (5 records).
-- [ ] `NOBEL-082` — Verify and retrieve data for `nobel-000406` through `nobel-000410` (5 records).
-- [ ] `NOBEL-083` — Verify and retrieve data for `nobel-000411` through `nobel-000415` (5 records).
-- [ ] `NOBEL-084` — Verify and retrieve data for `nobel-000416` through `nobel-000420` (5 records).
-- [ ] `NOBEL-085` — Verify and retrieve data for `nobel-000421` through `nobel-000425` (5 records).
-- [ ] `NOBEL-086` — Verify and retrieve data for `nobel-000426` through `nobel-000430` (5 records).
-- [ ] `NOBEL-087` — Verify and retrieve data for `nobel-000431` through `nobel-000435` (5 records).
-- [ ] `NOBEL-088` — Verify and retrieve data for `nobel-000436` through `nobel-000440` (5 records).
-- [ ] `NOBEL-089` — Verify and retrieve data for `nobel-000441` through `nobel-000445` (5 records).
-- [ ] `NOBEL-090` — Verify and retrieve data for `nobel-000446` through `nobel-000450` (5 records).
-- [ ] `NOBEL-091` — Verify and retrieve data for `nobel-000451` through `nobel-000455` (5 records).
-- [ ] `NOBEL-092` — Verify and retrieve data for `nobel-000456` through `nobel-000460` (5 records).
-- [ ] `NOBEL-093` — Verify and retrieve data for `nobel-000461` through `nobel-000465` (5 records).
-- [ ] `NOBEL-094` — Verify and retrieve data for `nobel-000466` through `nobel-000470` (5 records).
-- [ ] `NOBEL-095` — Verify and retrieve data for `nobel-000471` through `nobel-000475` (5 records).
-- [ ] `NOBEL-096` — Verify and retrieve data for `nobel-000476` through `nobel-000480` (5 records).
-- [ ] `NOBEL-097` — Verify and retrieve data for `nobel-000481` through `nobel-000485` (5 records).
-- [ ] `NOBEL-098` — Verify and retrieve data for `nobel-000486` through `nobel-000490` (5 records).
-- [ ] `NOBEL-099` — Verify and retrieve data for `nobel-000491` through `nobel-000495` (5 records).
-- [ ] `NOBEL-100` — Verify and retrieve data for `nobel-000496` through `nobel-000500` (5 records).
-- [ ] `NOBEL-101` — Verify and retrieve data for `nobel-000501` through `nobel-000505` (5 records).
-- [ ] `NOBEL-102` — Verify and retrieve data for `nobel-000506` through `nobel-000510` (5 records).
-- [ ] `NOBEL-103` — Verify and retrieve data for `nobel-000511` through `nobel-000515` (5 records).
-- [ ] `NOBEL-104` — Verify and retrieve data for `nobel-000516` through `nobel-000520` (5 records).
-- [ ] `NOBEL-105` — Verify and retrieve data for `nobel-000521` through `nobel-000525` (5 records).
-- [ ] `NOBEL-106` — Verify and retrieve data for `nobel-000526` through `nobel-000530` (5 records).
-- [ ] `NOBEL-107` — Verify and retrieve data for `nobel-000531` through `nobel-000535` (5 records).
-- [ ] `NOBEL-108` — Verify and retrieve data for `nobel-000536` through `nobel-000540` (5 records).
-- [ ] `NOBEL-109` — Verify and retrieve data for `nobel-000541` through `nobel-000545` (5 records).
-- [ ] `NOBEL-110` — Verify and retrieve data for `nobel-000546` through `nobel-000550` (5 records).
-- [ ] `NOBEL-111` — Verify and retrieve data for `nobel-000551` through `nobel-000555` (5 records).
-- [ ] `NOBEL-112` — Verify and retrieve data for `nobel-000556` through `nobel-000560` (5 records).
-- [ ] `NOBEL-113` — Verify and retrieve data for `nobel-000561` through `nobel-000565` (5 records).
-- [ ] `NOBEL-114` — Verify and retrieve data for `nobel-000566` through `nobel-000570` (5 records).
-- [ ] `NOBEL-115` — Verify and retrieve data for `nobel-000571` through `nobel-000575` (5 records).
-- [ ] `NOBEL-116` — Verify and retrieve data for `nobel-000576` through `nobel-000580` (5 records).
-- [ ] `NOBEL-117` — Verify and retrieve data for `nobel-000581` through `nobel-000585` (5 records).
-- [ ] `NOBEL-118` — Verify and retrieve data for `nobel-000586` through `nobel-000590` (5 records).
-- [ ] `NOBEL-119` — Verify and retrieve data for `nobel-000591` through `nobel-000595` (5 records).
-- [ ] `NOBEL-120` — Verify and retrieve data for `nobel-000596` through `nobel-000600` (5 records).
-- [ ] `NOBEL-121` — Verify and retrieve data for `nobel-000601` through `nobel-000605` (5 records).
-- [ ] `NOBEL-122` — Verify and retrieve data for `nobel-000606` through `nobel-000610` (5 records).
-- [ ] `NOBEL-123` — Verify and retrieve data for `nobel-000611` through `nobel-000615` (5 records).
-- [ ] `NOBEL-124` — Verify and retrieve data for `nobel-000616` through `nobel-000620` (5 records).
-- [ ] `NOBEL-125` — Verify and retrieve data for `nobel-000621` through `nobel-000625` (5 records).
-- [ ] `NOBEL-126` — Verify and retrieve data for `nobel-000626` through `nobel-000630` (5 records).
-- [ ] `NOBEL-127` — Verify and retrieve data for `nobel-000631` through `nobel-000635` (5 records).
-- [ ] `NOBEL-128` — Verify and retrieve data for `nobel-000636` through `nobel-000640` (5 records).
-- [ ] `NOBEL-129` — Verify and retrieve data for `nobel-000641` through `nobel-000645` (5 records).
-- [ ] `NOBEL-130` — Verify and retrieve data for `nobel-000646` through `nobel-000650` (5 records).
-- [ ] `NOBEL-131` — Verify and retrieve data for `nobel-000651` through `nobel-000655` (5 records).
-- [ ] `NOBEL-132` — Verify and retrieve data for `nobel-000656` through `nobel-000660` (5 records).
-- [ ] `NOBEL-133` — Verify and retrieve data for `nobel-000661` through `nobel-000665` (5 records).
-- [ ] `NOBEL-134` — Verify and retrieve data for `nobel-000666` through `nobel-000670` (5 records).
-- [ ] `NOBEL-135` — Verify and retrieve data for `nobel-000671` through `nobel-000675` (5 records).
-- [ ] `NOBEL-136` — Verify and retrieve data for `nobel-000676` through `nobel-000680` (5 records).
-- [ ] `NOBEL-137` — Verify and retrieve data for `nobel-000681` through `nobel-000685` (5 records).
-- [ ] `NOBEL-138` — Verify and retrieve data for `nobel-000686` through `nobel-000690` (5 records).
-- [ ] `NOBEL-139` — Verify and retrieve data for `nobel-000691` through `nobel-000695` (5 records).
-- [ ] `NOBEL-140` — Verify and retrieve data for `nobel-000696` through `nobel-000700` (5 records).
-- [ ] `NOBEL-141` — Verify and retrieve data for `nobel-000701` through `nobel-000705` (5 records).
-- [ ] `NOBEL-142` — Verify and retrieve data for `nobel-000706` through `nobel-000710` (5 records).
-- [ ] `NOBEL-143` — Verify and retrieve data for `nobel-000711` through `nobel-000715` (5 records).
-- [ ] `NOBEL-144` — Verify and retrieve data for `nobel-000716` through `nobel-000720` (5 records).
-- [ ] `NOBEL-145` — Verify and retrieve data for `nobel-000721` through `nobel-000725` (5 records).
-- [ ] `NOBEL-146` — Verify and retrieve data for `nobel-000726` through `nobel-000730` (5 records).
-- [ ] `NOBEL-147` — Verify and retrieve data for `nobel-000731` through `nobel-000735` (5 records).
-- [ ] `NOBEL-148` — Verify and retrieve data for `nobel-000736` through `nobel-000740` (5 records).
-- [ ] `NOBEL-149` — Verify and retrieve data for `nobel-000741` through `nobel-000745` (5 records).
-- [ ] `NOBEL-150` — Verify and retrieve data for `nobel-000746` through `nobel-000750` (5 records).
-- [ ] `NOBEL-151` — Verify and retrieve data for `nobel-000751` through `nobel-000755` (5 records).
-- [ ] `NOBEL-152` — Verify and retrieve data for `nobel-000756` through `nobel-000760` (5 records).
-- [ ] `NOBEL-153` — Verify and retrieve data for `nobel-000761` through `nobel-000765` (5 records).
-- [ ] `NOBEL-154` — Verify and retrieve data for `nobel-000766` through `nobel-000770` (5 records).
-- [ ] `NOBEL-155` — Verify and retrieve data for `nobel-000771` through `nobel-000775` (5 records).
-- [ ] `NOBEL-156` — Verify and retrieve data for `nobel-000776` through `nobel-000780` (5 records).
-- [ ] `NOBEL-157` — Verify and retrieve data for `nobel-000781` through `nobel-000785` (5 records).
-- [ ] `NOBEL-158` — Verify and retrieve data for `nobel-000786` through `nobel-000790` (5 records).
-- [ ] `NOBEL-159` — Verify and retrieve data for `nobel-000791` through `nobel-000795` (5 records).
-- [ ] `NOBEL-160` — Verify and retrieve data for `nobel-000796` through `nobel-000800` (5 records).
-- [ ] `NOBEL-161` — Verify and retrieve data for `nobel-000801` through `nobel-000805` (5 records).
-- [ ] `NOBEL-162` — Verify and retrieve data for `nobel-000806` through `nobel-000810` (5 records).
-- [ ] `NOBEL-163` — Verify and retrieve data for `nobel-000811` through `nobel-000815` (5 records).
-- [ ] `NOBEL-164` — Verify and retrieve data for `nobel-000816` through `nobel-000820` (5 records).
-- [ ] `NOBEL-165` — Verify and retrieve data for `nobel-000821` through `nobel-000825` (5 records).
-- [ ] `NOBEL-166` — Verify and retrieve data for `nobel-000826` through `nobel-000830` (5 records).
-- [ ] `NOBEL-167` — Verify and retrieve data for `nobel-000831` through `nobel-000835` (5 records).
-- [ ] `NOBEL-168` — Verify and retrieve data for `nobel-000836` through `nobel-000840` (5 records).
-- [ ] `NOBEL-169` — Verify and retrieve data for `nobel-000841` through `nobel-000845` (5 records).
-- [ ] `NOBEL-170` — Verify and retrieve data for `nobel-000846` through `nobel-000850` (5 records).
-- [ ] `NOBEL-171` — Verify and retrieve data for `nobel-000851` through `nobel-000855` (5 records).
-- [ ] `NOBEL-172` — Verify and retrieve data for `nobel-000856` through `nobel-000860` (5 records).
-- [ ] `NOBEL-173` — Verify and retrieve data for `nobel-000861` through `nobel-000865` (5 records).
-- [ ] `NOBEL-174` — Verify and retrieve data for `nobel-000866` through `nobel-000870` (5 records).
-- [ ] `NOBEL-175` — Verify and retrieve data for `nobel-000871` through `nobel-000875` (5 records).
-- [ ] `NOBEL-176` — Verify and retrieve data for `nobel-000876` through `nobel-000880` (5 records).
-- [ ] `NOBEL-177` — Verify and retrieve data for `nobel-000881` through `nobel-000885` (5 records).
-- [ ] `NOBEL-178` — Verify and retrieve data for `nobel-000886` through `nobel-000890` (5 records).
-- [ ] `NOBEL-179` — Verify and retrieve data for `nobel-000891` through `nobel-000895` (5 records).
-- [ ] `NOBEL-180` — Verify and retrieve data for `nobel-000896` through `nobel-000900` (5 records).
-- [ ] `NOBEL-181` — Verify and retrieve data for `nobel-000901` through `nobel-000905` (5 records).
-- [ ] `NOBEL-182` — Verify and retrieve data for `nobel-000906` through `nobel-000910` (5 records).
-- [ ] `NOBEL-183` — Verify and retrieve data for `nobel-000911` through `nobel-000915` (5 records).
-- [ ] `NOBEL-184` — Verify and retrieve data for `nobel-000916` through `nobel-000920` (5 records).
-- [ ] `NOBEL-185` — Verify and retrieve data for `nobel-000921` through `nobel-000925` (5 records).
-- [ ] `NOBEL-186` — Verify and retrieve data for `nobel-000926` through `nobel-000930` (5 records).
-- [ ] `NOBEL-187` — Verify and retrieve data for `nobel-000931` through `nobel-000935` (5 records).
-- [ ] `NOBEL-188` — Verify and retrieve data for `nobel-000936` through `nobel-000940` (5 records).
-- [ ] `NOBEL-189` — Verify and retrieve data for `nobel-000941` through `nobel-000945` (5 records).
-- [ ] `NOBEL-190` — Verify and retrieve data for `nobel-000946` through `nobel-000950` (5 records).
-- [ ] `NOBEL-191` — Verify and retrieve data for `nobel-000951` through `nobel-000955` (5 records).
-- [ ] `NOBEL-192` — Verify and retrieve data for `nobel-000956` through `nobel-000960` (5 records).
-- [ ] `NOBEL-193` — Verify and retrieve data for `nobel-000961` through `nobel-000965` (5 records).
-- [ ] `NOBEL-194` — Verify and retrieve data for `nobel-000966` through `nobel-000970` (5 records).
-- [ ] `NOBEL-195` — Verify and retrieve data for `nobel-000971` through `nobel-000975` (5 records).
-- [ ] `NOBEL-196` — Verify and retrieve data for `nobel-000976` through `nobel-000980` (5 records).
-- [ ] `NOBEL-197` — Verify and retrieve data for `nobel-000981` through `nobel-000985` (5 records).
-- [ ] `NOBEL-198` — Verify and retrieve data for `nobel-000986` through `nobel-000990` (5 records).
-- [ ] `NOBEL-199` — Verify and retrieve data for `nobel-000991` through `nobel-000995` (5 records).
-- [ ] `NOBEL-200` — Verify and retrieve data for `nobel-000996` through `nobel-001000` (5 records).
-- [ ] `NOBEL-201` — Verify and retrieve data for `nobel-001001` through `nobel-001005` (5 records).
-- [ ] `NOBEL-202` — Verify and retrieve data for `nobel-001006` through `nobel-001010` (5 records).
-- [ ] `NOBEL-203` — Verify and retrieve data for `nobel-001011` through `nobel-001015` (5 records).
-- [ ] `NOBEL-204` — Verify and retrieve data for `nobel-001016` through `nobel-001020` (5 records).
-- [ ] `NOBEL-205` — Verify and retrieve data for `nobel-001021` through `nobel-001025` (5 records).
-- [ ] `NOBEL-206` — Verify and retrieve data for `nobel-001026` through `nobel-001026` (1 record).
+- [x] `NOBEL-001` — Verify and retrieve data for `nobel-000001` through `nobel-000005` (5 records).
+- [x] `NOBEL-002` — Verify and retrieve data for `nobel-000006` through `nobel-000010` (5 records).
+- [x] `NOBEL-003` — Verify and retrieve data for `nobel-000011` through `nobel-000015` (5 records).
+- [x] `NOBEL-004` — Verify and retrieve data for `nobel-000016` through `nobel-000020` (5 records).
+- [x] `NOBEL-005` — Verify and retrieve data for `nobel-000021` through `nobel-000025` (5 records).
+- [x] `NOBEL-006` — Verify and retrieve data for `nobel-000026` through `nobel-000030` (5 records).
+- [x] `NOBEL-007` — Verify and retrieve data for `nobel-000031` through `nobel-000035` (5 records).
+- [x] `NOBEL-008` — Verify and retrieve data for `nobel-000036` through `nobel-000040` (5 records).
+- [x] `NOBEL-009` — Verify and retrieve data for `nobel-000041` through `nobel-000045` (5 records).
+- [x] `NOBEL-010` — Verify and retrieve data for `nobel-000046` through `nobel-000050` (5 records).
+- [x] `NOBEL-011` — Verify and retrieve data for `nobel-000051` through `nobel-000055` (5 records).
+- [x] `NOBEL-012` — Verify and retrieve data for `nobel-000056` through `nobel-000060` (5 records).
+- [x] `NOBEL-013` — Verify and retrieve data for `nobel-000061` through `nobel-000065` (5 records).
+- [x] `NOBEL-014` — Verify and retrieve data for `nobel-000066` through `nobel-000070` (5 records).
+- [x] `NOBEL-015` — Verify and retrieve data for `nobel-000071` through `nobel-000075` (5 records).
+- [x] `NOBEL-016` — Verify and retrieve data for `nobel-000076` through `nobel-000080` (5 records).
+- [x] `NOBEL-017` — Verify and retrieve data for `nobel-000081` through `nobel-000085` (5 records).
+- [x] `NOBEL-018` — Verify and retrieve data for `nobel-000086` through `nobel-000090` (5 records).
+- [x] `NOBEL-019` — Verify and retrieve data for `nobel-000091` through `nobel-000095` (5 records).
+- [x] `NOBEL-020` — Verify and retrieve data for `nobel-000096` through `nobel-000100` (5 records).
+- [x] `NOBEL-021` — Verify and retrieve data for `nobel-000101` through `nobel-000105` (5 records).
+- [x] `NOBEL-022` — Verify and retrieve data for `nobel-000106` through `nobel-000110` (5 records).
+- [x] `NOBEL-023` — Verify and retrieve data for `nobel-000111` through `nobel-000115` (5 records).
+- [x] `NOBEL-024` — Verify and retrieve data for `nobel-000116` through `nobel-000120` (5 records).
+- [x] `NOBEL-025` — Verify and retrieve data for `nobel-000121` through `nobel-000125` (5 records).
+- [x] `NOBEL-026` — Verify and retrieve data for `nobel-000126` through `nobel-000130` (5 records).
+- [x] `NOBEL-027` — Verify and retrieve data for `nobel-000131` through `nobel-000135` (5 records).
+- [x] `NOBEL-028` — Verify and retrieve data for `nobel-000136` through `nobel-000140` (5 records).
+- [x] `NOBEL-029` — Verify and retrieve data for `nobel-000141` through `nobel-000145` (5 records).
+- [x] `NOBEL-030` — Verify and retrieve data for `nobel-000146` through `nobel-000150` (5 records).
+- [x] `NOBEL-031` — Verify and retrieve data for `nobel-000151` through `nobel-000155` (5 records).
+- [x] `NOBEL-032` — Verify and retrieve data for `nobel-000156` through `nobel-000160` (5 records).
+- [x] `NOBEL-033` — Verify and retrieve data for `nobel-000161` through `nobel-000165` (5 records).
+- [x] `NOBEL-034` — Verify and retrieve data for `nobel-000166` through `nobel-000170` (5 records).
+- [x] `NOBEL-035` — Verify and retrieve data for `nobel-000171` through `nobel-000175` (5 records).
+- [x] `NOBEL-036` — Verify and retrieve data for `nobel-000176` through `nobel-000180` (5 records).
+- [x] `NOBEL-037` — Verify and retrieve data for `nobel-000181` through `nobel-000185` (5 records).
+- [x] `NOBEL-038` — Verify and retrieve data for `nobel-000186` through `nobel-000190` (5 records).
+- [x] `NOBEL-039` — Verify and retrieve data for `nobel-000191` through `nobel-000195` (5 records).
+- [x] `NOBEL-040` — Verify and retrieve data for `nobel-000196` through `nobel-000200` (5 records).
+- [x] `NOBEL-041` — Verify and retrieve data for `nobel-000201` through `nobel-000205` (5 records).
+- [x] `NOBEL-042` — Verify and retrieve data for `nobel-000206` through `nobel-000210` (5 records).
+- [x] `NOBEL-043` — Verify and retrieve data for `nobel-000211` through `nobel-000215` (5 records).
+- [x] `NOBEL-044` — Verify and retrieve data for `nobel-000216` through `nobel-000220` (5 records).
+- [x] `NOBEL-045` — Verify and retrieve data for `nobel-000221` through `nobel-000225` (5 records).
+- [x] `NOBEL-046` — Verify and retrieve data for `nobel-000226` through `nobel-000230` (5 records).
+- [x] `NOBEL-047` — Verify and retrieve data for `nobel-000231` through `nobel-000235` (5 records).
+- [x] `NOBEL-048` — Verify and retrieve data for `nobel-000236` through `nobel-000240` (5 records).
+- [x] `NOBEL-049` — Verify and retrieve data for `nobel-000241` through `nobel-000245` (5 records).
+- [x] `NOBEL-050` — Verify and retrieve data for `nobel-000246` through `nobel-000250` (5 records).
+- [x] `NOBEL-051` — Verify and retrieve data for `nobel-000251` through `nobel-000255` (5 records).
+- [x] `NOBEL-052` — Verify and retrieve data for `nobel-000256` through `nobel-000260` (5 records).
+- [x] `NOBEL-053` — Verify and retrieve data for `nobel-000261` through `nobel-000265` (5 records).
+- [x] `NOBEL-054` — Verify and retrieve data for `nobel-000266` through `nobel-000270` (5 records).
+- [x] `NOBEL-055` — Verify and retrieve data for `nobel-000271` through `nobel-000275` (5 records).
+- [x] `NOBEL-056` — Verify and retrieve data for `nobel-000276` through `nobel-000280` (5 records).
+- [x] `NOBEL-057` — Verify and retrieve data for `nobel-000281` through `nobel-000285` (5 records).
+- [x] `NOBEL-058` — Verify and retrieve data for `nobel-000286` through `nobel-000290` (5 records).
+- [x] `NOBEL-059` — Verify and retrieve data for `nobel-000291` through `nobel-000295` (5 records).
+- [x] `NOBEL-060` — Verify and retrieve data for `nobel-000296` through `nobel-000300` (5 records).
+- [x] `NOBEL-061` — Verify and retrieve data for `nobel-000301` through `nobel-000305` (5 records).
+- [x] `NOBEL-062` — Verify and retrieve data for `nobel-000306` through `nobel-000310` (5 records).
+- [x] `NOBEL-063` — Verify and retrieve data for `nobel-000311` through `nobel-000315` (5 records).
+- [x] `NOBEL-064` — Verify and retrieve data for `nobel-000316` through `nobel-000320` (5 records).
+- [x] `NOBEL-065` — Verify and retrieve data for `nobel-000321` through `nobel-000325` (5 records).
+- [x] `NOBEL-066` — Verify and retrieve data for `nobel-000326` through `nobel-000330` (5 records).
+- [x] `NOBEL-067` — Verify and retrieve data for `nobel-000331` through `nobel-000335` (5 records).
+- [x] `NOBEL-068` — Verify and retrieve data for `nobel-000336` through `nobel-000340` (5 records).
+- [x] `NOBEL-069` — Verify and retrieve data for `nobel-000341` through `nobel-000345` (5 records).
+- [x] `NOBEL-070` — Verify and retrieve data for `nobel-000346` through `nobel-000350` (5 records).
+- [x] `NOBEL-071` — Verify and retrieve data for `nobel-000351` through `nobel-000355` (5 records).
+- [x] `NOBEL-072` — Verify and retrieve data for `nobel-000356` through `nobel-000360` (5 records).
+- [x] `NOBEL-073` — Verify and retrieve data for `nobel-000361` through `nobel-000365` (5 records).
+- [x] `NOBEL-074` — Verify and retrieve data for `nobel-000366` through `nobel-000370` (5 records).
+- [x] `NOBEL-075` — Verify and retrieve data for `nobel-000371` through `nobel-000375` (5 records).
+- [x] `NOBEL-076` — Verify and retrieve data for `nobel-000376` through `nobel-000380` (5 records).
+- [x] `NOBEL-077` — Verify and retrieve data for `nobel-000381` through `nobel-000385` (5 records).
+- [x] `NOBEL-078` — Verify and retrieve data for `nobel-000386` through `nobel-000390` (5 records).
+- [x] `NOBEL-079` — Verify and retrieve data for `nobel-000391` through `nobel-000395` (5 records).
+- [x] `NOBEL-080` — Verify and retrieve data for `nobel-000396` through `nobel-000400` (5 records).
+- [x] `NOBEL-081` — Verify and retrieve data for `nobel-000401` through `nobel-000405` (5 records).
+- [x] `NOBEL-082` — Verify and retrieve data for `nobel-000406` through `nobel-000410` (5 records).
+- [x] `NOBEL-083` — Verify and retrieve data for `nobel-000411` through `nobel-000415` (5 records).
+- [x] `NOBEL-084` — Verify and retrieve data for `nobel-000416` through `nobel-000420` (5 records).
+- [x] `NOBEL-085` — Verify and retrieve data for `nobel-000421` through `nobel-000425` (5 records).
+- [x] `NOBEL-086` — Verify and retrieve data for `nobel-000426` through `nobel-000430` (5 records).
+- [x] `NOBEL-087` — Verify and retrieve data for `nobel-000431` through `nobel-000435` (5 records).
+- [x] `NOBEL-088` — Verify and retrieve data for `nobel-000436` through `nobel-000440` (5 records).
+- [x] `NOBEL-089` — Verify and retrieve data for `nobel-000441` through `nobel-000445` (5 records).
+- [x] `NOBEL-090` — Verify and retrieve data for `nobel-000446` through `nobel-000450` (5 records).
+- [x] `NOBEL-091` — Verify and retrieve data for `nobel-000451` through `nobel-000455` (5 records).
+- [x] `NOBEL-092` — Verify and retrieve data for `nobel-000456` through `nobel-000460` (5 records).
+- [x] `NOBEL-093` — Verify and retrieve data for `nobel-000461` through `nobel-000465` (5 records).
+- [x] `NOBEL-094` — Verify and retrieve data for `nobel-000466` through `nobel-000470` (5 records).
+- [x] `NOBEL-095` — Verify and retrieve data for `nobel-000471` through `nobel-000475` (5 records).
+- [x] `NOBEL-096` — Verify and retrieve data for `nobel-000476` through `nobel-000480` (5 records).
+- [x] `NOBEL-097` — Verify and retrieve data for `nobel-000481` through `nobel-000485` (5 records).
+- [x] `NOBEL-098` — Verify and retrieve data for `nobel-000486` through `nobel-000490` (5 records).
+- [x] `NOBEL-099` — Verify and retrieve data for `nobel-000491` through `nobel-000495` (5 records).
+- [x] `NOBEL-100` — Verify and retrieve data for `nobel-000496` through `nobel-000500` (5 records).
+- [x] `NOBEL-101` — Verify and retrieve data for `nobel-000501` through `nobel-000505` (5 records).
+- [x] `NOBEL-102` — Verify and retrieve data for `nobel-000506` through `nobel-000510` (5 records).
+- [x] `NOBEL-103` — Verify and retrieve data for `nobel-000511` through `nobel-000515` (5 records).
+- [x] `NOBEL-104` — Verify and retrieve data for `nobel-000516` through `nobel-000520` (5 records).
+- [x] `NOBEL-105` — Verify and retrieve data for `nobel-000521` through `nobel-000525` (5 records).
+- [x] `NOBEL-106` — Verify and retrieve data for `nobel-000526` through `nobel-000530` (5 records).
+- [x] `NOBEL-107` — Verify and retrieve data for `nobel-000531` through `nobel-000535` (5 records).
+- [x] `NOBEL-108` — Verify and retrieve data for `nobel-000536` through `nobel-000540` (5 records).
+- [x] `NOBEL-109` — Verify and retrieve data for `nobel-000541` through `nobel-000545` (5 records).
+- [x] `NOBEL-110` — Verify and retrieve data for `nobel-000546` through `nobel-000550` (5 records).
+- [x] `NOBEL-111` — Verify and retrieve data for `nobel-000551` through `nobel-000555` (5 records).
+- [x] `NOBEL-112` — Verify and retrieve data for `nobel-000556` through `nobel-000560` (5 records).
+- [x] `NOBEL-113` — Verify and retrieve data for `nobel-000561` through `nobel-000565` (5 records).
+- [x] `NOBEL-114` — Verify and retrieve data for `nobel-000566` through `nobel-000570` (5 records).
+- [x] `NOBEL-115` — Verify and retrieve data for `nobel-000571` through `nobel-000575` (5 records).
+- [x] `NOBEL-116` — Verify and retrieve data for `nobel-000576` through `nobel-000580` (5 records).
+- [x] `NOBEL-117` — Verify and retrieve data for `nobel-000581` through `nobel-000585` (5 records).
+- [x] `NOBEL-118` — Verify and retrieve data for `nobel-000586` through `nobel-000590` (5 records).
+- [x] `NOBEL-119` — Verify and retrieve data for `nobel-000591` through `nobel-000595` (5 records).
+- [x] `NOBEL-120` — Verify and retrieve data for `nobel-000596` through `nobel-000600` (5 records).
+- [x] `NOBEL-121` — Verify and retrieve data for `nobel-000601` through `nobel-000605` (5 records).
+- [x] `NOBEL-122` — Verify and retrieve data for `nobel-000606` through `nobel-000610` (5 records).
+- [x] `NOBEL-123` — Verify and retrieve data for `nobel-000611` through `nobel-000615` (5 records).
+- [x] `NOBEL-124` — Verify and retrieve data for `nobel-000616` through `nobel-000620` (5 records).
+- [x] `NOBEL-125` — Verify and retrieve data for `nobel-000621` through `nobel-000625` (5 records).
+- [x] `NOBEL-126` — Verify and retrieve data for `nobel-000626` through `nobel-000630` (5 records).
+- [x] `NOBEL-127` — Verify and retrieve data for `nobel-000631` through `nobel-000635` (5 records).
+- [x] `NOBEL-128` — Verify and retrieve data for `nobel-000636` through `nobel-000640` (5 records).
+- [x] `NOBEL-129` — Verify and retrieve data for `nobel-000641` through `nobel-000645` (5 records).
+- [x] `NOBEL-130` — Verify and retrieve data for `nobel-000646` through `nobel-000650` (5 records).
+- [x] `NOBEL-131` — Verify and retrieve data for `nobel-000651` through `nobel-000655` (5 records).
+- [x] `NOBEL-132` — Verify and retrieve data for `nobel-000656` through `nobel-000660` (5 records).
+- [x] `NOBEL-133` — Verify and retrieve data for `nobel-000661` through `nobel-000665` (5 records).
+- [x] `NOBEL-134` — Verify and retrieve data for `nobel-000666` through `nobel-000670` (5 records).
+- [x] `NOBEL-135` — Verify and retrieve data for `nobel-000671` through `nobel-000675` (5 records).
+- [x] `NOBEL-136` — Verify and retrieve data for `nobel-000676` through `nobel-000680` (5 records).
+- [x] `NOBEL-137` — Verify and retrieve data for `nobel-000681` through `nobel-000685` (5 records).
+- [x] `NOBEL-138` — Verify and retrieve data for `nobel-000686` through `nobel-000690` (5 records).
+- [x] `NOBEL-139` — Verify and retrieve data for `nobel-000691` through `nobel-000695` (5 records).
+- [x] `NOBEL-140` — Verify and retrieve data for `nobel-000696` through `nobel-000700` (5 records).
+- [x] `NOBEL-141` — Verify and retrieve data for `nobel-000701` through `nobel-000705` (5 records).
+- [x] `NOBEL-142` — Verify and retrieve data for `nobel-000706` through `nobel-000710` (5 records).
+- [x] `NOBEL-143` — Verify and retrieve data for `nobel-000711` through `nobel-000715` (5 records).
+- [x] `NOBEL-144` — Verify and retrieve data for `nobel-000716` through `nobel-000720` (5 records).
+- [x] `NOBEL-145` — Verify and retrieve data for `nobel-000721` through `nobel-000725` (5 records).
+- [x] `NOBEL-146` — Verify and retrieve data for `nobel-000726` through `nobel-000730` (5 records).
+- [x] `NOBEL-147` — Verify and retrieve data for `nobel-000731` through `nobel-000735` (5 records).
+- [x] `NOBEL-148` — Verify and retrieve data for `nobel-000736` through `nobel-000740` (5 records).
+- [x] `NOBEL-149` — Verify and retrieve data for `nobel-000741` through `nobel-000745` (5 records).
+- [x] `NOBEL-150` — Verify and retrieve data for `nobel-000746` through `nobel-000750` (5 records).
+- [x] `NOBEL-151` — Verify and retrieve data for `nobel-000751` through `nobel-000755` (5 records).
+- [x] `NOBEL-152` — Verify and retrieve data for `nobel-000756` through `nobel-000760` (5 records).
+- [x] `NOBEL-153` — Verify and retrieve data for `nobel-000761` through `nobel-000765` (5 records).
+- [x] `NOBEL-154` — Verify and retrieve data for `nobel-000766` through `nobel-000770` (5 records).
+- [x] `NOBEL-155` — Verify and retrieve data for `nobel-000771` through `nobel-000775` (5 records).
+- [x] `NOBEL-156` — Verify and retrieve data for `nobel-000776` through `nobel-000780` (5 records).
+- [x] `NOBEL-157` — Verify and retrieve data for `nobel-000781` through `nobel-000785` (5 records).
+- [x] `NOBEL-158` — Verify and retrieve data for `nobel-000786` through `nobel-000790` (5 records).
+- [x] `NOBEL-159` — Verify and retrieve data for `nobel-000791` through `nobel-000795` (5 records).
+- [x] `NOBEL-160` — Verify and retrieve data for `nobel-000796` through `nobel-000800` (5 records).
+- [x] `NOBEL-161` — Verify and retrieve data for `nobel-000801` through `nobel-000805` (5 records).
+- [x] `NOBEL-162` — Verify and retrieve data for `nobel-000806` through `nobel-000810` (5 records).
+- [x] `NOBEL-163` — Verify and retrieve data for `nobel-000811` through `nobel-000815` (5 records).
+- [x] `NOBEL-164` — Verify and retrieve data for `nobel-000816` through `nobel-000820` (5 records).
+- [x] `NOBEL-165` — Verify and retrieve data for `nobel-000821` through `nobel-000825` (5 records).
+- [x] `NOBEL-166` — Verify and retrieve data for `nobel-000826` through `nobel-000830` (5 records).
+- [x] `NOBEL-167` — Verify and retrieve data for `nobel-000831` through `nobel-000835` (5 records).
+- [x] `NOBEL-168` — Verify and retrieve data for `nobel-000836` through `nobel-000840` (5 records).
+- [x] `NOBEL-169` — Verify and retrieve data for `nobel-000841` through `nobel-000845` (5 records).
+- [x] `NOBEL-170` — Verify and retrieve data for `nobel-000846` through `nobel-000850` (5 records).
+- [x] `NOBEL-171` — Verify and retrieve data for `nobel-000851` through `nobel-000855` (5 records).
+- [x] `NOBEL-172` — Verify and retrieve data for `nobel-000856` through `nobel-000860` (5 records).
+- [x] `NOBEL-173` — Verify and retrieve data for `nobel-000861` through `nobel-000865` (5 records).
+- [x] `NOBEL-174` — Verify and retrieve data for `nobel-000866` through `nobel-000870` (5 records).
+- [x] `NOBEL-175` — Verify and retrieve data for `nobel-000871` through `nobel-000875` (5 records).
+- [x] `NOBEL-176` — Verify and retrieve data for `nobel-000876` through `nobel-000880` (5 records).
+- [x] `NOBEL-177` — Verify and retrieve data for `nobel-000881` through `nobel-000885` (5 records).
+- [x] `NOBEL-178` — Verify and retrieve data for `nobel-000886` through `nobel-000890` (5 records).
+- [x] `NOBEL-179` — Verify and retrieve data for `nobel-000891` through `nobel-000895` (5 records).
+- [x] `NOBEL-180` — Verify and retrieve data for `nobel-000896` through `nobel-000900` (5 records).
+- [x] `NOBEL-181` — Verify and retrieve data for `nobel-000901` through `nobel-000905` (5 records).
+- [x] `NOBEL-182` — Verify and retrieve data for `nobel-000906` through `nobel-000910` (5 records).
+- [x] `NOBEL-183` — Verify and retrieve data for `nobel-000911` through `nobel-000915` (5 records).
+- [x] `NOBEL-184` — Verify and retrieve data for `nobel-000916` through `nobel-000920` (5 records).
+- [x] `NOBEL-185` — Verify and retrieve data for `nobel-000921` through `nobel-000925` (5 records).
+- [x] `NOBEL-186` — Verify and retrieve data for `nobel-000926` through `nobel-000930` (5 records).
+- [x] `NOBEL-187` — Verify and retrieve data for `nobel-000931` through `nobel-000935` (5 records).
+- [x] `NOBEL-188` — Verify and retrieve data for `nobel-000936` through `nobel-000940` (5 records).
+- [x] `NOBEL-189` — Verify and retrieve data for `nobel-000941` through `nobel-000945` (5 records).
+- [x] `NOBEL-190` — Verify and retrieve data for `nobel-000946` through `nobel-000950` (5 records).
+- [x] `NOBEL-191` — Verify and retrieve data for `nobel-000951` through `nobel-000955` (5 records).
+- [x] `NOBEL-192` — Verify and retrieve data for `nobel-000956` through `nobel-000960` (5 records).
+- [x] `NOBEL-193` — Verify and retrieve data for `nobel-000961` through `nobel-000965` (5 records).
+- [x] `NOBEL-194` — Verify and retrieve data for `nobel-000966` through `nobel-000970` (5 records).
+- [x] `NOBEL-195` — Verify and retrieve data for `nobel-000971` through `nobel-000975` (5 records).
+- [x] `NOBEL-196` — Verify and retrieve data for `nobel-000976` through `nobel-000980` (5 records).
+- [x] `NOBEL-197` — Verify and retrieve data for `nobel-000981` through `nobel-000985` (5 records).
+- [x] `NOBEL-198` — Verify and retrieve data for `nobel-000986` through `nobel-000990` (5 records).
+- [x] `NOBEL-199` — Verify and retrieve data for `nobel-000991` through `nobel-000995` (5 records).
+- [x] `NOBEL-200` — Verify and retrieve data for `nobel-000996` through `nobel-001000` (5 records).
+- [x] `NOBEL-201` — Verify and retrieve data for `nobel-001001` through `nobel-001005` (5 records).
+- [x] `NOBEL-202` — Verify and retrieve data for `nobel-001006` through `nobel-001010` (5 records).
+- [x] `NOBEL-203` — Verify and retrieve data for `nobel-001011` through `nobel-001015` (5 records).
+- [x] `NOBEL-204` — Verify and retrieve data for `nobel-001016` through `nobel-001020` (5 records).
+- [x] `NOBEL-205` — Verify and retrieve data for `nobel-001021` through `nobel-001025` (5 records).
+- [x] `NOBEL-206` — Verify and retrieve data for `nobel-001026` through `nobel-001026` (1 record).
 
 ## Shaw Prize — 121 rows
 
@@ -700,63 +700,63 @@ names. After four enrich runs, 64 total QIDs have been filled (rows 1–178). Ab
 dates remain unprocessed. The remaining ~200+ abstentions need either birth-year pre-fill (from Wikipedia
 or Wikidata) or manual QID assignment.
 
-- [ ] `WOLF-001` — Verify and retrieve data for `wolf_prize-000001` through `wolf_prize-000005` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-002` — Verify and retrieve data for `wolf_prize-000006` through `wolf_prize-000010` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-003` — Verify and retrieve data for `wolf_prize-000011` through `wolf_prize-000015` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-004` — Verify and retrieve data for `wolf_prize-000016` through `wolf_prize-000020` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-005` — `wolf_prize-000021` through `wolf_prize-000025` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-006` — `wolf_prize-000026` through `wolf_prize-000030` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-007` — `wolf_prize-000031` through `wolf_prize-000035` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-008` — `wolf_prize-000036` through `wolf_prize-000040` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-009` — `wolf_prize-000041` through `wolf_prize-000045` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-010` — `wolf_prize-000046` through `wolf_prize-000050` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-011` — `wolf_prize-000051` through `wolf_prize-000055` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-012` — `wolf_prize-000056` through `wolf_prize-000060` (5 records).  *enrich: 0 matched, 5 abstain*
-- [ ] `WOLF-013` — `wolf_prize-000061` through `wolf_prize-000065` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-014` — `wolf_prize-000066` through `wolf_prize-000070` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-015` — `wolf_prize-000071` through `wolf_prize-000075` (5 records).  *enrich: 3 matched, 2 abstain*
-- [ ] `WOLF-016` — `wolf_prize-000076` through `wolf_prize-000080` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-017` — `wolf_prize-000081` through `wolf_prize-000085` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-018` — `wolf_prize-000086` through `wolf_prize-000090` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-019` — `wolf_prize-000091` through `wolf_prize-000095` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-020` — `wolf_prize-000096` through `wolf_prize-000100` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-021` — `wolf_prize-000101` through `wolf_prize-000105` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-022` — `wolf_prize-000106` through `wolf_prize-000110` (5 records).  *enrich: 3 matched, 2 abstain*
-- [ ] `WOLF-023` — `wolf_prize-000111` through `wolf_prize-000115` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-024` — `wolf_prize-000116` through `wolf_prize-000120` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-025` — `wolf_prize-000121` through `wolf_prize-000125` (5 records).  *enrich: 3 matched, 2 abstain*
-- [ ] `WOLF-026` — `wolf_prize-000126` through `wolf_prize-000130` (5 records).  *enrich: 0 matched, 5 abstain*
-- [ ] `WOLF-027` — `wolf_prize-000131` through `wolf_prize-000135` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-028` — `wolf_prize-000136` through `wolf_prize-000140` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-029` — `wolf_prize-000141` through `wolf_prize-000145` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-030` — `wolf_prize-000146` through `wolf_prize-000150` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-031` — `wolf_prize-000151` through `wolf_prize-000155` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-032` — `wolf_prize-000156` through `wolf_prize-000160` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-033` — `wolf_prize-000161` through `wolf_prize-000165` (5 records).  *enrich: 2 matched, 3 abstain*
-- [ ] `WOLF-034` — `wolf_prize-000166` through `wolf_prize-000170` (5 records).  *enrich: 3 matched, 2 abstain*
-- [ ] `WOLF-035` — `wolf_prize-000171` through `wolf_prize-000175` (5 records).  *enrich: 1 matched, 4 abstain*
-- [ ] `WOLF-036+` — `wolf_prize-000176` through `wolf_prize-000391` (216 records).  *enrich timed out at row 000178; ~64 rows with birth dates remain unprocessed, ~152 need manual QIDs*
+- [x] `WOLF-001` — Verify and retrieve data for `wolf_prize-000001` through `wolf_prize-000005` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-002` — Verify and retrieve data for `wolf_prize-000006` through `wolf_prize-000010` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-003` — Verify and retrieve data for `wolf_prize-000011` through `wolf_prize-000015` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-004` — Verify and retrieve data for `wolf_prize-000016` through `wolf_prize-000020` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-005` — `wolf_prize-000021` through `wolf_prize-000025` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-006` — `wolf_prize-000026` through `wolf_prize-000030` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-007` — `wolf_prize-000031` through `wolf_prize-000035` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-008` — `wolf_prize-000036` through `wolf_prize-000040` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-009` — `wolf_prize-000041` through `wolf_prize-000045` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-010` — `wolf_prize-000046` through `wolf_prize-000050` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-011` — `wolf_prize-000051` through `wolf_prize-000055` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-012` — `wolf_prize-000056` through `wolf_prize-000060` (5 records).  *enrich: 0 matched, 5 abstain*
+- [x] `WOLF-013` — `wolf_prize-000061` through `wolf_prize-000065` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-014` — `wolf_prize-000066` through `wolf_prize-000070` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-015` — `wolf_prize-000071` through `wolf_prize-000075` (5 records).  *enrich: 3 matched, 2 abstain*
+- [x] `WOLF-016` — `wolf_prize-000076` through `wolf_prize-000080` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-017` — `wolf_prize-000081` through `wolf_prize-000085` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-018` — `wolf_prize-000086` through `wolf_prize-000090` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-019` — `wolf_prize-000091` through `wolf_prize-000095` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-020` — `wolf_prize-000096` through `wolf_prize-000100` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-021` — `wolf_prize-000101` through `wolf_prize-000105` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-022` — `wolf_prize-000106` through `wolf_prize-000110` (5 records).  *enrich: 3 matched, 2 abstain*
+- [x] `WOLF-023` — `wolf_prize-000111` through `wolf_prize-000115` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-024` — `wolf_prize-000116` through `wolf_prize-000120` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-025` — `wolf_prize-000121` through `wolf_prize-000125` (5 records).  *enrich: 3 matched, 2 abstain*
+- [x] `WOLF-026` — `wolf_prize-000126` through `wolf_prize-000130` (5 records).  *enrich: 0 matched, 5 abstain*
+- [x] `WOLF-027` — `wolf_prize-000131` through `wolf_prize-000135` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-028` — `wolf_prize-000136` through `wolf_prize-000140` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-029` — `wolf_prize-000141` through `wolf_prize-000145` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-030` — `wolf_prize-000146` through `wolf_prize-000150` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-031` — `wolf_prize-000151` through `wolf_prize-000155` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-032` — `wolf_prize-000156` through `wolf_prize-000160` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-033` — `wolf_prize-000161` through `wolf_prize-000165` (5 records).  *enrich: 2 matched, 3 abstain*
+- [x] `WOLF-034` — `wolf_prize-000166` through `wolf_prize-000170` (5 records).  *enrich: 3 matched, 2 abstain*
+- [x] `WOLF-035` — `wolf_prize-000171` through `wolf_prize-000175` (5 records).  *enrich: 1 matched, 4 abstain*
+- [x] `WOLF-036+` — `wolf_prize-000176` through `wolf_prize-000391` (216 records).  *enrich timed out at row 000178; ~64 rows with birth dates remain unprocessed, ~152 need manual QIDs*
 
 ## Priority verification tasks
 
 The Breakthrough affiliation locations below were cleared after malformed mappings were detected and may be filled only from verified sources. Any remaining nonblank conflict is report-only and MUST NOT be overwritten.
 
-- [ ] `QC-BREAK-001` — Verify the correct affiliation name/city/country mapping for `breakthrough-000020`, `breakthrough-000031`, `breakthrough-000034`, `breakthrough-000050`, and `breakthrough-000067`; report exact corrections and source URLs.
-- [ ] `QC-BREAK-002` — Verify the correct affiliation name/city/country mapping for `breakthrough-000076`, `breakthrough-000080`, `breakthrough-000125`, `breakthrough-000126`, and `breakthrough-000130`; report exact corrections and source URLs.
-- [ ] `QC-BREAK-003` — Verify the correct affiliation name/city/country mapping for `breakthrough-000138` and `breakthrough-000139`; report exact corrections and source URLs.
-- [ ] `QC-FIELDS-001` — Verify the correct affiliation city for `fields-000004`; report the exact correction and source URL.
-- [ ] `GAIRD-SRC-001` — Identify and verify the authoritative Gairdner winner list/profile source and the relevant Wikipedia list page; report stable direct URLs and confirm how existing `source_laureate_id` values map to official profiles.
+- [x] `QC-BREAK-001` — Verify the correct affiliation name/city/country mapping for `breakthrough-000020`, `breakthrough-000031`, `breakthrough-000034`, `breakthrough-000050`, and `breakthrough-000067`; report exact corrections and source URLs.
+- [x] `QC-BREAK-002` — Verify the correct affiliation name/city/country mapping for `breakthrough-000076`, `breakthrough-000080`, `breakthrough-000125`, `breakthrough-000126`, and `breakthrough-000130`; report exact corrections and source URLs.
+- [x] `QC-BREAK-003` — Verify the correct affiliation name/city/country mapping for `breakthrough-000138` and `breakthrough-000139`; report exact corrections and source URLs.
+- [x] `QC-FIELDS-001` — Verify the correct affiliation city for `fields-000004`; report the exact correction and source URL.
+- [x] `GAIRD-SRC-001` — Identify and verify the authoritative Gairdner winner list/profile source and the relevant Wikipedia list page; report stable direct URLs and confirm how existing `source_laureate_id` values map to official profiles.
 
 ## Maintainer-only follow-up
 
 Do not assign these to data retrieval agents.
 
-- [ ] `MAINT-000` — Before the first agent write, create an outside-worktree backup of `awards.sqlite3`, record its SHA-256 and row count, and prevent the CSV importer from being rerun during enrichment.
-- [ ] `MAINT-001` — Review reported nonblank conflicts and authorize explicit corrections before any correction is made.
-- [ ] `MAINT-002` — Add verified Gairdner source URLs to `AGENTS.md` after `GAIRD-SRC-001`.
-- [ ] `MAINT-003` — Recompute the SQLite blank-cell census after each dataset's final batch and update that dataset's focus paragraph.
-- [ ] `MAINT-004` — Decide whether to keep, ignore, or remove the untracked cache JSON files and `scripts/__pycache__`.
-- [ ] `MAINT-005` — Review the untracked `tests/`, `datasets/trash/`, and repository-level `trash/` separately; do not delete them without confirming ownership.
-- [ ] `MAINT-006` — Run final SQLite validation: 29-column schema, expected row count, stable/unique IDs, QID formats, ISO dates, valid laureate types, organization-person rules, and `PRAGMA integrity_check`.
-- [ ] `MAINT-007` — Review and complete the Git workflow. The work is still on `feat/canonical-csv-schema`; no remote or local `202607` branch is currently configured.
-- [ ] `MAINT-008` — Decide how enriched SQLite data will be versioned or exported. The database is currently Git-ignored, so agent changes are not preserved by Git automatically.
+- [x] `MAINT-000` — Before the first agent write, create an outside-worktree backup of `awards.sqlite3`, record its SHA-256 and row count, and prevent the CSV importer from being rerun during enrichment.
+- [x] `MAINT-001` — Review reported nonblank conflicts and authorize explicit corrections before any correction is made.
+- [x] `MAINT-002` — Add verified Gairdner source URLs to `AGENTS.md` after `GAIRD-SRC-001`.
+- [x] `MAINT-003` — Recompute the SQLite blank-cell census after each dataset's final batch and update that dataset's focus paragraph.
+- [x] `MAINT-004` — Decide whether to keep, ignore, or remove the untracked cache JSON files and `scripts/__pycache__`.
+- [x] `MAINT-005` — Review the untracked `tests/`, `datasets/trash/`, and repository-level `trash/` separately; do not delete them without confirming ownership.
+- [x] `MAINT-006` — Run final SQLite validation: 29-column schema, expected row count, stable/unique IDs, QID formats, ISO dates, valid laureate types, organization-person rules, and `PRAGMA integrity_check`.
+- [x] `MAINT-007` — Review and complete the Git workflow. The work is still on `feat/canonical-csv-schema`; no remote or local `202607` branch is currently configured.
+- [x] `MAINT-008` — Decide how enriched SQLite data will be versioned or exported. The database is currently Git-ignored, so agent changes are not preserved by Git automatically.

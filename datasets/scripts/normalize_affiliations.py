@@ -108,16 +108,19 @@ AFFILIATIONS = {
     # 1998 and UMass's in 2021, and bucketing on the recorded spelling would split one school into two units, which
     # is the same fragmentation this table exists to remove. How fully the name is written varies by parent —
     # "Harvard Medical School" reads correctly in full, "School of Medicine" reads correctly under Johns Hopkins.
+    "Massachusetts Institute of Technology, Laboratory for Computer Science": ("Massachusetts Institute of Technology", "Laboratory for Computer Science"),
     "Harvard Medical School": ("Harvard University", "Harvard Medical School"),
     "Harvard School of Public Health": ("Harvard University", "Harvard School of Public Health"),
     "Harvard University, Lyman Laboratory": ("Harvard University", "Lyman Laboratory"),
     "Harvard University, Biological Laboratories": ("Harvard University", "Biological Laboratories"),
     "Johns Hopkins University School of Medicine": ("Johns Hopkins University", "School of Medicine"),
     "Johns Hopkins University, School of Medicine": ("Johns Hopkins University", "School of Medicine"),
+    "Johns Hopkins University Medical School": ("Johns Hopkins University", "School of Medicine"),
     "Johns Hopkins University, School of Hygiene and Public Health": ("Johns Hopkins University", "School of Hygiene and Public Health"),
     "Johns Hopkins Institute for Cell Engineering": ("Johns Hopkins University", "Institute for Cell Engineering"),
     "McKusick-Nathans Institute of Genetic Medicine at the Johns Hopkins University": ("Johns Hopkins University", "McKusick-Nathans Institute of Genetic Medicine"),
     "Stanford University School of Medicine": ("Stanford University", "School of Medicine"),
+    "Stanford University, School of Medicine": ("Stanford University", "School of Medicine"),
     "Department of Biology, Stanford University": ("Stanford University", "Department of Biology"),
     "University of Massachusetts Medical School": ("University of Massachusetts", "UMass Chan Medical School"),
     "UMass Chan Medical School": ("University of Massachusetts", "UMass Chan Medical School"),

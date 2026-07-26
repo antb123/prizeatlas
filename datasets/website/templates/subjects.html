@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Subjects</p>
+  <h1>Awards by subject</h1>
+  <p>Browse these awards by the high school class their work belongs to.</p>
+</header>
+{% if subjects %}
+<ol class="rank-list">
+  {% for subject in subjects %}
+  <li>
+    <span class="rank-position">{{ loop.index }}</span>
+    <a href="{{ href(subject.route) }}">{{ subject.name }}</a>
+    <span class="rank-count" style="--share: {{ subject.award_count * 100 // leader }}">{{ subject.award_count }} {{ "award" if subject.award_count == 1 else "awards" }}</span>
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<p>No awards have been assigned a subject yet.</p>
+{% endif %}
+{% endblock %}

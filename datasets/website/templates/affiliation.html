@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Institution</p>
+  {% if affiliation.profile and affiliation.profile.logo_url %}
+  <img class="award-logo award-logo-large" src="{{ affiliation.profile.logo_url }}" alt="{{ affiliation.name }} logo">
+  {% endif %}
+  <h1>{{ affiliation.name }}</h1>
+  {% if affiliation.profile and affiliation.profile.description %}
+  <p>{{ affiliation.profile.description }}</p>
+  {% endif %}
+  <p>{% if affiliation.count %}{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }} · {% endif %}{{ affiliation.awards | length }} recorded awards.</p>
+  {% if affiliation.profile %}
+  <p><a class="external-source" href="{{ affiliation.profile.wikidata_url }}">Wikidata <span aria-hidden="true">↗</span></a></p>
+  {% endif %}
+</header>
+<section>
+  <h2>Awards</h2>
+  <ol class="person-awards">
+    {% for record, route in affiliation.awards %}
+    <li>
+      <p class="person-award-year">{{ record.year }}</p>
+      <div>
+        <h3><a href="{{ href(route) }}">{{ record.full_name }}</a></h3>
+        <p>{{ record.prize_name }}{% if record.category %} — {{ record.category }}{% endif %}{% if record.affiliation_sub_name %} · {{ record.affiliation_sub_name }}{% endif %}</p>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+<p><a href="{{ href(affiliations_route) }}">All institutions</a></p>
+{% endblock %}

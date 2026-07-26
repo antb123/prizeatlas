@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">Subject</p>
+  <h1>{{ subject.name }}</h1>
+  <p>{{ subject.award_count }} recorded {{ "award" if subject.award_count == 1 else "awards" }} ·
+    {{ subject.people | length }} {{ "laureate" if subject.people | length == 1 else "laureates" }}.</p>
+</header>
+<ol class="subject-people">
+  {% for person in subject.people %}
+  <li>
+    <header>
+      <h2><a href="{{ href(person.route) }}">{{ person.name }}</a></h2>
+      <span>{{ person.awards | length }} {{ "award" if person.awards | length == 1 else "awards" }}</span>
+    </header>
+    <ul>
+      {% for record, route in person.awards %}
+      <li><a href="{{ href(route) }}">{{ record.prize_name }} · {{ record.year }}</a></li>
+      {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ol>
+<p><a href="{{ href(subjects_route) }}">All subjects</a></p>
+{% endblock %}
