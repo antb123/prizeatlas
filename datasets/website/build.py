@@ -1000,6 +1000,11 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                             if other.award_record_id != record.award_record_id
                         ),
                         person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
+                        affiliation_route=(
+                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(record.affiliation_name)}/"
+                            if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST
+                            else ""
+                        ),
                         schema={
                             **_laureate_schema(record, public_url(base_url, all_record_routes[record.award_record_id])),
                             "award": f"{award_label}, {record.year}",
