@@ -86,7 +86,9 @@ footer p {
 
 .site-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.25rem;
+  justify-content: flex-end;
   margin-left: auto;
 }
 

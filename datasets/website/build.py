@@ -12,6 +12,7 @@ import argparse
 import datetime
 import hashlib
 import json
+import math
 import posixpath
 import re
 import shutil
@@ -19,6 +20,7 @@ import sqlite3
 import sys
 import tempfile
 import unicodedata
+from collections import Counter
 from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, fields
@@ -55,6 +57,7 @@ TEMPLATES = (
     "subjects.html",
     "subject.html",
     "explorer.html",
+    "map.html",
     "404.html",
 )
 PEOPLE_ROUTE = "/people/"
@@ -67,6 +70,7 @@ AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
+MAP_ROUTE = "/map/"
 SUBJECTS = (
     "Biology", "Physics", "Chemistry", "Math", "CS",
     "History", "Lit", "Arts", "Economics", "Earth Science",
@@ -107,12 +111,14 @@ AWARD_COLUMNS = (
     "birth_year",
     "birth_city",
     "birth_country",
+    "birth_coordinates",
     "citizenship_countries",
     "affiliation_name",
     "affiliation_sub_name",
     "affiliation_wikidata_qid",
     "affiliation_city",
     "affiliation_country",
+    "affiliation_coordinates",
     "death_date",
     "death_city",
     "death_country",
@@ -154,12 +160,14 @@ class AwardRecord:
     birth_year: str
     birth_city: str
     birth_country: str
+    birth_coordinates: str
     citizenship_countries: str
     affiliation_name: str
     affiliation_sub_name: str
     affiliation_wikidata_qid: str
     affiliation_city: str
     affiliation_country: str
+    affiliation_coordinates: str
     death_date: str
     death_city: str
     death_country: str
@@ -420,6 +428,122 @@ def explorer_payload(
 
 def explorer_json(payload: dict[str, Any]) -> str:
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+
+
+def parse_map_points(value: str, record_id: str, field: str, multiple: bool) -> tuple[tuple[float, float], ...]:
+    segments = value.split(";") if multiple else [value]
+    if not multiple and ";" in value:
+        raise BuildFailure(f"invalid coordinate record_id={record_id} field={field}")
+
+    points: list[tuple[float, float]] = []
+    for segment in segments:
+        parts = segment.strip().split(",")
+        if len(parts) != 2:
+            raise BuildFailure(f"invalid coordinate record_id={record_id} field={field}")
+        try:
+            longitude, latitude = (float(part.strip()) for part in parts)
+        except ValueError as error:
+            raise BuildFailure(f"invalid coordinate record_id={record_id} field={field}") from error
+        if (
+            not math.isfinite(longitude)
+            or not math.isfinite(latitude)
+            or not -180 <= longitude <= 180
+            or not -90 <= latitude <= 90
+        ):
+            raise BuildFailure(f"invalid coordinate record_id={record_id} field={field}")
+        points.append((longitude, latitude))
+    return tuple(points)
+
+
+def _map_display_label(kind: str, label: tuple[str, ...]) -> str:
+    if kind == "birth":
+        city, country = label
+        return city or country or "Unnamed birthplace"
+    name, city, country = label
+    return name or city or country or "Unnamed institution"
+
+
+def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]]:
+    labels: dict[str, dict[tuple[float, float], Counter[tuple[str, ...]]]] = {
+        "birth": {},
+        "affiliation": {},
+    }
+    subjects: dict[str, dict[tuple[float, float], Counter[str]]] = {"birth": {}, "affiliation": {}}
+    decades: dict[str, dict[tuple[float, float], Counter[str]]] = {"birth": {}, "affiliation": {}}
+    subject_decades: dict[str, dict[tuple[float, float], Counter[tuple[str, str]]]] = {
+        "birth": {},
+        "affiliation": {},
+    }
+
+    def add(kind: str, point: tuple[float, float], label: tuple[str, ...], subject: str, decade: str) -> None:
+        labels[kind].setdefault(point, Counter())[label] += 1
+        subjects[kind].setdefault(point, Counter())[subject] += 1
+        decades[kind].setdefault(point, Counter())[decade] += 1
+        subject_decades[kind].setdefault(point, Counter())[(subject, decade)] += 1
+
+    for record in records:
+        subject = record.high_school_subject
+        decade = f"{_year_prefix(record.year, record.award_record_id) // 10 * 10}s"
+        if _nonblank(record.birth_coordinates):
+            point = parse_map_points(
+                record.birth_coordinates,
+                record.award_record_id,
+                "birth_coordinates",
+                multiple=False,
+            )[0]
+            add("birth", point, (record.birth_city.strip(), record.birth_country.strip()), subject, decade)
+
+        if _nonblank(record.affiliation_coordinates):
+            points = parse_map_points(
+                record.affiliation_coordinates,
+                record.award_record_id,
+                "affiliation_coordinates",
+                multiple=True,
+            )
+            label = (
+                ("Multiple recorded institutions", "", "")
+                if len(points) > 1
+                else (
+                    record.affiliation_name.strip(),
+                    record.affiliation_city.strip(),
+                    record.affiliation_country.strip(),
+                )
+            )
+            for point in points:
+                add("affiliation", point, label, subject, decade)
+
+    result: dict[str, list[dict[str, object]]] = {"birth": [], "affiliation": []}
+    for kind, points in labels.items():
+        for point, point_labels in sorted(points.items()):
+            ordered_labels = sorted(point_labels.items(), key=lambda item: (-item[1], item[0]))
+            primary = ordered_labels[0][0]
+            marker: dict[str, object] = {
+                "lng": point[0],
+                "lat": point[1],
+                "count": sum(point_labels.values()),
+                "title": _map_display_label(kind, primary),
+                "extra_labels": len(point_labels) - 1,
+                "subjects": dict(sorted(subjects[kind][point].items())),
+                "decades": dict(sorted(decades[kind][point].items())),
+                "subject_decades": {
+                    subject_name: dict(sorted(
+                        (decade_name, count)
+                        for (bucket_subject, decade_name), count in subject_decades[kind][point].items()
+                        if bucket_subject == subject_name
+                    ))
+                    for subject_name in sorted(subjects[kind][point])
+                },
+            }
+            if kind == "birth":
+                marker["city"], marker["country"] = primary
+            else:
+                marker["name"], marker["city"], marker["country"] = primary
+            result[kind].append(marker)
+    return result
+
+
+def map_json(payload: dict[str, list[dict[str, object]]]) -> str:
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False).replace("<", "\\u003c")
 
 
 def _descending_records(records: Iterable[AwardRecord]) -> list[AwardRecord]:
@@ -1376,6 +1500,31 @@ def create_site_plan(
             )
         )
 
+    atlas_payload = map_json(map_payload(records))
+    jobs.append(
+        _page(
+            "map.html",
+            MAP_ROUTE,
+            "Awards Atlas: Birthplaces and Institutions",
+            "Explore where international award recipients were born and the institutions where they worked.",
+            (),
+            payload=atlas_payload,
+            initial_subject="",
+        )
+    )
+    for subject_name in SUBJECTS:
+        jobs.append(
+            _page(
+                "map.html",
+                f"{MAP_ROUTE}{slugify(subject_name)}/",
+                f"{subject_name} Awards Atlas: Birthplaces and Institutions",
+                f"Map recorded birthplaces and affiliated institutions for international awards classified under {subject_name}.",
+                (),
+                payload=atlas_payload,
+                initial_subject=subject_name,
+            )
+        )
+
     jobs.append(
         _page(
             "explorer.html",
@@ -1492,6 +1641,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
+        map_route=MAP_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
         **job.context,
@@ -1521,6 +1671,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
+        map_route=MAP_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
     )

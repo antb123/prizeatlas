@@ -214,6 +214,98 @@ class WebsiteBuildTests(unittest.TestCase):
         explorer = next(job for job in plan.jobs if job.route == build.EXPLORER_ROUTE)
         self.assertEqual("explorer.html", explorer.template)
 
+    def test_map_coordinates_aggregation_serialization_and_routes(self) -> None:
+        def award(**values: str) -> build.AwardRecord:
+            return build.AwardRecord(
+                *(values.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
+            )
+
+        self.assertEqual(((-180.0, -90.0), (180.0, 90.0)), build.parse_map_points("-180,-90;180,90", "r1", "affiliation_coordinates", True))
+        self.assertEqual(((-73.9, 40.7),), build.parse_map_points("-73.9,40.7", "r1", "birth_coordinates", False))
+        for value in ("181,0", "0,91", "nan,0", "1", "1,2,3", "1,2;3,4"):
+            with self.subTest(value=value), self.assertRaisesRegex(
+                build.BuildFailure,
+                "record_id=safe-id field=birth_coordinates",
+            ):
+                build.parse_map_points(value, "safe-id", "birth_coordinates", False)
+
+        records = [
+            award(
+                award_record_id="r1",
+                year="1999",
+                high_school_subject="Math",
+                birth_city="Paris",
+                birth_country="France",
+                birth_coordinates="2.35,48.86",
+                affiliation_name="Two institutes",
+                affiliation_city="Paris; Boston",
+                affiliation_country="France; United States",
+                affiliation_coordinates="2.35,48.86;-71.06,42.36",
+            ),
+            award(
+                award_record_id="r2",
+                year="2001",
+                high_school_subject="Physics",
+                birth_city="Paris",
+                birth_country="France",
+                birth_coordinates="2.35,48.86",
+                affiliation_name="Paris Institute",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2.35,48.86",
+            ),
+            award(
+                award_record_id="r3",
+                year="2024",
+                high_school_subject="Biology",
+                birth_country="Belgium",
+                birth_coordinates="4.35,50.85",
+            ),
+        ]
+
+        payload = build.map_payload(records)
+        paris_birth = next(marker for marker in payload["birth"] if marker["title"] == "Paris")
+        self.assertEqual(2, paris_birth["count"])
+        self.assertEqual({"Math": 1, "Physics": 1}, paris_birth["subjects"])
+        self.assertEqual({"1990s": 1, "2000s": 1}, paris_birth["decades"])
+        self.assertEqual({"1990s": 1}, paris_birth["subject_decades"]["Math"])
+        belgium_birth = next(marker for marker in payload["birth"] if marker["country"] == "Belgium")
+        self.assertEqual("", belgium_birth["city"])
+        self.assertEqual("Belgium", belgium_birth["title"])
+
+        self.assertEqual(2, len(payload["affiliation"]))
+        paris_institution = next(marker for marker in payload["affiliation"] if marker["count"] == 2)
+        self.assertEqual("Multiple recorded institutions", paris_institution["title"])
+        self.assertEqual(1, paris_institution["extra_labels"])
+        boston_institution = next(marker for marker in payload["affiliation"] if marker["count"] == 1)
+        self.assertEqual("Multiple recorded institutions", boston_institution["title"])
+
+        serialized = build.map_json({"birth": [{"title": "</script>"}], "affiliation": []})
+        self.assertNotIn("<", serialized)
+        self.assertEqual("</script>", json.loads(serialized)["birth"][0]["title"])
+
+        rankings = [build.Ranking("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100, "Blurb.", "Reasoning.")]
+        routed_records = [
+            award(
+                award_record_id="r4",
+                award_wikidata_qid="Q1",
+                prize_name="Test Prize",
+                year="2024",
+                high_school_subject="Biology",
+                full_name="Example Winner",
+                birth_coordinates="4.35,50.85",
+            )
+        ]
+        plan = build.create_site_plan(rankings, routed_records, "https://example.org/", "2026-07-26")
+        map_jobs = [job for job in plan.jobs if job.route.startswith(build.MAP_ROUTE)]
+        self.assertEqual(1 + len(build.SUBJECTS), len(map_jobs))
+        self.assertEqual(len(map_jobs), len({job.route for job in map_jobs}))
+        self.assertEqual(len(map_jobs), len({job.title for job in map_jobs}))
+        self.assertEqual(len(map_jobs), len({job.description for job in map_jobs}))
+        biology = next(job for job in map_jobs if job.route == "/map/biology/")
+        self.assertEqual("map.html", biology.template)
+        self.assertEqual("Biology", biology.context["initial_subject"])
+
     def test_complete_build_routes_metadata_escaping_and_relative_links(self) -> None:
         rankings = [
             ("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
@@ -230,6 +322,11 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "1939",
                 "full_name": "Ernest Orlando Lawrence",
                 "laureate_type": "Individual",
+                "high_school_subject": "Biology",
+                "birth_city": "Canton",
+                "birth_country": "United States",
+                "birth_coordinates": "-81.3784,40.7989",
+                "affiliation_coordinates": "-122.2583,37.8719",
                 "motivation": "<em>unsafe</em>",
             },
             {
@@ -314,6 +411,23 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)
         self.assertNotIn("/computer-science/", turing_html)
 
+        map_html = (self.website / "dist/map/index.html").read_text()
+        biology_map_html = (self.website / "dist/map/biology/index.html").read_text()
+        self.assertIn('<body class="map-layout">', map_html)
+        self.assertIn('href="../static/style.css"', map_html)
+        self.assertIn('href="./">Map</a>', map_html)
+        self.assertIn("leaflet@1.9.4", map_html)
+        self.assertIn("sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=", map_html)
+        self.assertIn("tile.openstreetmap.org", map_html)
+        self.assertIn("OpenStreetMap", map_html)
+        self.assertIn("mapped points", map_html)
+        self.assertIn("<noscript>", map_html)
+        self.assertIn("document.createElement", map_html)
+        self.assertIn('element.setAttribute("tabindex", "0")', map_html)
+        self.assertIn('event.key !== "Enter" && event.key !== " "', map_html)
+        self.assertIn("prefers-reduced-motion: reduce", map_html)
+        self.assertIn('const plannedSubject = "Biology";', biology_map_html)
+
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
         self.assertEqual(len(plan.jobs), len(locations))
@@ -321,6 +435,8 @@ class WebsiteBuildTests(unittest.TestCase):
             "https://example.org/awards/nobel-prize/physics/1939/ernest-orlando-lawrence/",
             locations,
         )
+        self.assertIn("https://example.org/awards/map/", locations)
+        self.assertIn("https://example.org/awards/map/biology/", locations)
         for path in (self.website / "dist", *(self.website / "dist").rglob("*")):
             mode = stat.S_IMODE(path.stat().st_mode)
             self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)
@@ -831,6 +947,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="/awards/static/style.css"', error_html)
         self.assertIn('href="/awards/favicon.svg"', error_html)
         self.assertIn('href="/awards/"', error_html)
+        self.assertIn('href="/awards/map/">Map</a>', error_html)
         self.assertNotIn("<link rel=\"canonical\"", error_html)
 
         # The error page is not a route: it must stay out of the sitemap and the page counts.

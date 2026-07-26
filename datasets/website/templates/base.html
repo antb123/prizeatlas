@@ -17,7 +17,7 @@
   {% if structured_data %}<script type="application/ld+json">{{ structured_data|safe }}</script>{% endif %}
   {% block head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
   <header class="site-header">
     <a class="site-name" href="{{ home_href }}">Awards</a>
     <p>Recognition for work with lasting impact</p>
@@ -27,6 +27,7 @@
       <a href="{{ href(subjects_route) }}">Subjects</a>
       <a href="{{ href(countries_route) }}">Countries</a>
       <a href="{{ href(affiliations_route) }}">Institutions</a>
+      <a href="{{ href(map_route) }}">Map</a>
       <a href="{{ href(explorer_route) }}">Explorer</a>
     </nav>
   </header>
