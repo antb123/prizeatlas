@@ -7,7 +7,6 @@
   <p class="lifespan">{% if lifespan %}{{ lifespan }}{% elif birth_year %}Born {{ birth_year }}{% endif %}{% if birth_country %}{% if lifespan or birth_year %} · {% endif %}
     <a class="birth-country" href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}</p>
   {% endif %}
-  <p>{{ person.awards | length }} recorded {{ "award" if person.awards | length == 1 else "awards" }}.</p>
 </header>
 <section>
   <h2>Awards</h2>
