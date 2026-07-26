@@ -2,6 +2,7 @@
 {% block content %}
 <nav class="country-tabs" aria-label="Country views">
   <a href="{{ href(countries_route) }}" aria-current="page">People</a>
+  <span aria-hidden="true">|</span>
   <a href="{{ href(country_affiliations_route) }}">Institutions</a>
 </nav>
 <header class="page-intro">

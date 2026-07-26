@@ -283,9 +283,13 @@ h3 {
 
 .country-tabs {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.25rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--rule);
+}
+
+.country-tabs span {
+  color: var(--rule);
 }
 
 .country-tabs a {
