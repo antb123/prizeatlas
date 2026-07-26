@@ -9,7 +9,10 @@
   {% for person in place.people %}
   <li>
     <a href="{{ href(person.route) }}">{{ person.name }}</a>
-    <span>{{ person.awards | length }}</span>
+    <span class="person-index-meta">
+      {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+      <span>{{ person.awards | length }}</span>
+    </span>
   </li>
   {% endfor %}
 </ul>
