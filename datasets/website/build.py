@@ -47,6 +47,8 @@ TEMPLATES = (
     "people.html",
     "countries.html",
     "country.html",
+    "affiliation_countries.html",
+    "affiliation_country.html",
     "affiliations.html",
     "affiliation.html",
     "subjects.html",
@@ -57,7 +59,8 @@ TEMPLATES = (
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
-COUNTRIES_ROUTE = "/countries/"
+COUNTRIES_ROUTE = "/countries/born/"
+COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
@@ -222,6 +225,14 @@ class Place:
 
 
 @dataclass(frozen=True, slots=True)
+class InstitutionCountry:
+    name: str
+    slug: str
+    route: str
+    institutions: tuple[Affiliation, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class Subject:
     name: str
     route: str
@@ -261,8 +272,9 @@ def affiliation_slug(name: str) -> str:
 
 def normalize_base_url(value: str) -> str:
     parsed = urlsplit(value)
+    allowed_scheme = parsed.scheme == "https" or (parsed.scheme == "http" and parsed.hostname == "localhost")
     if (
-        parsed.scheme != "https"
+        not allowed_scheme
         or not parsed.hostname
         or parsed.username is not None
         or parsed.password is not None
@@ -608,8 +620,8 @@ def plan_places(
     records: list[AwardRecord],
     record_routes: dict[str, str],
     profiles_by_qid: dict[str, AffiliationProfile],
-) -> tuple[list[Place], list[Affiliation]]:
-    """Rank birth countries and affiliations by laureate, never by award record.
+) -> tuple[list[Place], list[Affiliation], list[InstitutionCountry]]:
+    """Rank birth countries and affiliations by laureate, then group institutions by their recorded countries.
 
     A laureate with seven awards is one person born in one country. Counting records would rank a country by how
     decorated its emigrants were rather than how many laureates it produced.
@@ -690,7 +702,36 @@ def plan_places(
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
-    return countries, affiliations
+
+    affiliations_by_country: dict[str, list[Affiliation]] = {}
+    country_slugs: dict[str, str] = {}
+    for affiliation in affiliations:
+        names = {
+            country.strip()
+            for record, _ in affiliation.awards
+            for country in record.affiliation_country.split(";")
+            if _nonblank(country)
+        }
+        for name in names:
+            slug = slugify(name)
+            if slug in country_slugs and country_slugs[slug] != name:
+                raise BuildFailure(
+                    f"duplicate affiliation country slug slug={slug} name={name!r} other={country_slugs[slug]!r}"
+                )
+            country_slugs[slug] = name
+            affiliations_by_country.setdefault(name, []).append(affiliation)
+
+    institution_countries = [
+        InstitutionCountry(
+            name,
+            slugify(name),
+            f"{COUNTRY_AFFILIATIONS_ROUTE}{slugify(name)}/",
+            tuple(members),
+        )
+        for name, members in affiliations_by_country.items()
+    ]
+    institution_countries.sort(key=lambda place: (-len(place.institutions), place.name))
+    return countries, affiliations, institution_countries
 
 
 def _ranked(units: dict[str, set[str]]) -> tuple[tuple[str, int], ...]:
@@ -1119,7 +1160,7 @@ def create_site_plan(
             )
         )
 
-    countries, affiliations = plan_places(people, records, all_record_routes, profiles_by_qid)
+    countries, affiliations, institution_countries = plan_places(people, records, all_record_routes, profiles_by_qid)
     subjects = plan_subjects(people, subject_counts)
     jobs.append(
         _page(
@@ -1173,6 +1214,41 @@ def create_site_plan(
                     f"born in {place.name}, with every prize each of them won."
                 ),
                 (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(place.name, None)),
+                place=place,
+            )
+        )
+    recorded_affiliation_countries = sum(1 for record in records if _nonblank(record.affiliation_country))
+    jobs.append(
+        _page(
+            "affiliation_countries.html",
+            COUNTRY_AFFILIATIONS_ROUTE,
+            "Countries by recorded institutions",
+            _clamp(
+                f"{len(institution_countries)} countries ranked by distinct institutions recorded for "
+                f"{recorded_affiliation_countries:,} of {len(records):,} awards."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("Countries / Institutions", None)),
+            countries=tuple(institution_countries),
+            leader=len(institution_countries[0].institutions) if institution_countries else 0,
+            recorded=recorded_affiliation_countries,
+            total=len(records),
+        )
+    )
+    for place in institution_countries:
+        jobs.append(
+            _page(
+                "affiliation_country.html",
+                place.route,
+                f"Institutions in {place.name}",
+                _clamp(
+                    f"{len(place.institutions)} recorded "
+                    f"{'institution' if len(place.institutions) == 1 else 'institutions'} in {place.name}."
+                ),
+                (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb("Countries / Institutions", COUNTRY_AFFILIATIONS_ROUTE),
+                    Breadcrumb(place.name, None),
+                ),
                 place=place,
             )
         )
@@ -1401,6 +1477,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         asset_href=lambda target: relative_file(job.route, target) if target else "",
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
+        country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
@@ -1429,6 +1506,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         style_href=root + "static/style.css",
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
+        country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,

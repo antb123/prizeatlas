@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="country-tabs" aria-label="Country views">
+  <a href="{{ href(countries_route) }}">People</a>
+  <a href="{{ href(country_affiliations_route) }}" aria-current="page">Institutions</a>
+</nav>
+<header class="page-intro">
+  <p class="eyebrow">Institutions in</p>
+  <h1>{{ place.name }}</h1>
+  <p>{{ place.institutions | length }} distinct recorded
+    {{ "institution" if place.institutions | length == 1 else "institutions" }}.</p>
+</header>
+<ul class="people-index">
+  {% for affiliation in place.institutions %}
+  <li>
+    <a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
+    <span>{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }}</span>
+  </li>
+  {% endfor %}
+</ul>
+<p><a href="{{ href(country_affiliations_route) }}">All countries</a></p>
+{% endblock %}

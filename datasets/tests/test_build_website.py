@@ -88,6 +88,7 @@ class WebsiteBuildTests(unittest.TestCase):
             build.wikipedia_search_url("Ngô Bảo Châu"),
         )
         self.assertEqual("https://example.org/awards/", build.normalize_base_url("https://example.org/awards"))
+        self.assertEqual("http://localhost:8000/", build.normalize_base_url("http://localhost:8000"))
         for value in (
             "http://example.org/",
             "https:///awards/",
@@ -330,7 +331,7 @@ class WebsiteBuildTests(unittest.TestCase):
             document = html_path.read_text()
             static_html = re.sub(r"<script\b[^>]*>.*?</script>", "", document, flags=re.DOTALL)
             for href in re.findall(r'href="([^"]+)"', static_html):
-                if urlsplit(href).scheme:
+                if urlsplit(href).scheme or href.startswith("#"):
                     continue
                 if href.startswith("/"):
                     # Only the error page links absolutely; its links carry the deployment path prefix.
@@ -636,6 +637,76 @@ class WebsiteBuildTests(unittest.TestCase):
             listed.extend(re.findall(r'<li>\s*<a href="([^"]+)"', body))
         self.assertEqual(250, len(listed))
         self.assertEqual(250, len(set(listed)))
+
+    def test_country_tabs_split_people_and_recorded_institutions(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "alice-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "birth_country": "Belgium",
+                "affiliation_name": "University One",
+                "affiliation_country": "United States; Belgium",
+            },
+            {
+                "award_record_id": "alice-two",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "birth_country": "Belgium",
+                "affiliation_name": "University One",
+                "affiliation_country": "United States; Belgium",
+            },
+            {
+                "award_record_id": "bob",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2002",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q200",
+                "birth_country": "Canada",
+                "affiliation_name": "Belgian Academy",
+                "affiliation_country": "Belgium",
+            },
+            {
+                "award_record_id": "carol",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2003",
+                "full_name": "Carol Gamma",
+                "laureate_wikidata_qid": "Q300",
+                "birth_country": "Canada",
+                "affiliation_name": "Joint Institute; Partner Lab",
+                "affiliation_country": "Canada; Switzerland",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        people = (self.website / "dist/countries/born/index.html").read_text()
+        institutions = (self.website / "dist/countries/affiliations/index.html").read_text()
+        belgium = (self.website / "dist/countries/affiliations/belgium/index.html").read_text()
+        canada = (self.website / "dist/countries/affiliations/canada/index.html").read_text()
+        switzerland = (self.website / "dist/countries/affiliations/switzerland/index.html").read_text()
+
+        self.assertIn('href="../affiliations/">Institutions</a>', people)
+        self.assertIn('href="../born/">People</a>', institutions)
+        self.assertIn('aria-current="page">Institutions</a>', institutions)
+        self.assertLess(institutions.index(">Belgium</a>"), institutions.index(">Canada</a>"))
+        self.assertIn(">2</span>", institutions)
+        self.assertEqual(1, belgium.count(">University One</a>"))
+        self.assertIn(">Belgian Academy</a>", belgium)
+        self.assertIn(">Joint Institute; Partner Lab</a>", canada)
+        self.assertIn(">Joint Institute; Partner Lab</a>", switzerland)
+        self.assertTrue((self.website / "dist/countries/born/canada/index.html").is_file())
+        self.assertTrue((self.website / "dist/affiliations/university-one/index.html").is_file())
 
     def test_subject_pages_and_badges(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
