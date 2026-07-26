@@ -3,6 +3,9 @@
 Small product roadmap. Each item needs a brief approved specification before implementation.
 
 - [ ] Rework the site's text and styling for a high-school audience: plain language, clear explanations, strong visual hierarchy, and accessible mobile presentation.
+- [ ] Get structured feedback from high-school teachers on clarity, usefulness, classroom fit, accessibility, and missing
+  context. Recruit through appropriate educator networks or communities such as Reddit, obtain consent, avoid collecting
+  unnecessary personal data, and record findings and resulting roadmap changes.
 - [ ] Add Spanish, French, and German translations. Follow
   [`datasets-multilingual-20260726.md`](datasets-multilingual-20260726.md) and its execution TODO; extend both to specify
   German before implementation.
