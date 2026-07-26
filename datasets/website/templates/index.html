@@ -7,7 +7,10 @@
 </header>
 <dl class="totals">
   {% for value, label in totals %}
-  <div><dt>{{ value }}</dt><dd>{{ label }}</dd></div>
+  <div>
+    <dt>{% if label == "prizes" %}<a href="#ranked-awards">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
+    <dd>{% if label == "prizes" %}<a href="#ranked-awards">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
+  </div>
   {% endfor %}
 </dl>
 {% if decorated %}
@@ -43,7 +46,7 @@
   </ol>
 </section>
 {% endif %}
-<section>
+<section id="ranked-awards">
   <h2>Ranked awards</h2>
   <ol class="ranking">
     {% for prize, route in prizes %}

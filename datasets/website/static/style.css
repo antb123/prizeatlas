@@ -239,6 +239,11 @@ h3 {
   text-transform: uppercase;
 }
 
+.totals a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .highlights {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
