@@ -13,6 +13,9 @@
   <p>{{ affiliation.profile.description }}</p>
   {% endif %}
   <p>{% if affiliation.count %}{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }} · {% endif %}{{ affiliation.awards | length }} recorded awards.</p>
+  {% if affiliation.profile and affiliation.profile.application_url %}
+  <p><a class="external-source" href="{{ affiliation.profile.application_url }}">How to Apply <span aria-hidden="true">↗</span></a></p>
+  {% endif %}
   {% if affiliation.profile %}
   <p><a class="external-source" href="{{ affiliation.profile.wikidata_url }}">Wikidata <span aria-hidden="true">↗</span></a></p>
   {% endif %}

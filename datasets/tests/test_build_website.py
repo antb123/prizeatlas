@@ -59,7 +59,8 @@ class WebsiteBuildTests(unittest.TestCase):
                 CREATE TABLE affiliations (
                     affiliation_wikidata_qid TEXT PRIMARY KEY,
                     logo_url TEXT NOT NULL DEFAULT '',
-                    description TEXT NOT NULL DEFAULT ''
+                    description TEXT NOT NULL DEFAULT '',
+                    application_url TEXT NOT NULL DEFAULT ''
                 ) STRICT
                 """
             )

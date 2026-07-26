@@ -167,6 +167,7 @@ class AffiliationProfile:
     qid: str
     logo_url: str
     description: str
+    application_url: str
 
     @property
     def wikidata_url(self) -> str:
@@ -439,7 +440,8 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             """
         ).fetchall()
         profile_rows = connection.execute(
-            "SELECT affiliation_wikidata_qid, logo_url, description FROM affiliations ORDER BY affiliation_wikidata_qid"
+            "SELECT affiliation_wikidata_qid, logo_url, description, application_url "
+            "FROM affiliations ORDER BY affiliation_wikidata_qid"
         ).fetchall()
         award_rows = connection.execute(f"SELECT {', '.join(AWARD_COLUMNS)} FROM awards").fetchall()
         connection.commit()
@@ -477,6 +479,7 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             qid=_text(row["affiliation_wikidata_qid"]),
             logo_url=_text(row["logo_url"]),
             description=_text(row["description"]),
+            application_url=_text(row["application_url"]),
         )
         for row in profile_rows
     ]
