@@ -1021,9 +1021,11 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         span = _year_span([record.year for record, _ in person.awards])
         latest = person.awards[-1][0]
         birth_date = next((record.birth_date for record, _ in person.awards if _nonblank(record.birth_date)), "")
+        recorded_birth_year = next((record.birth_year for record, _ in person.awards if _nonblank(record.birth_year)), "")
+        birth_year = birth_date[:4] if len(birth_date) >= 4 else recorded_birth_year
         birth_country = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
         death_date = next((record.death_date for record, _ in person.awards if _nonblank(record.death_date)), "")
-        lifespan = f"{birth_date[:4]}–{death_date[:4]}" if len(birth_date) >= 4 and len(death_date) >= 4 else ""
+        lifespan = f"{birth_year}–{death_date[:4]}" if birth_year and len(death_date) >= 4 else ""
         jobs.append(
             _page(
                 "person.html",
@@ -1035,7 +1037,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 ),
                 (Breadcrumb("Home", "/"), Breadcrumb("People", PEOPLE_ROUTE), Breadcrumb(person.name, None)),
                 person=person,
-                birth_date=birth_date,
+                birth_year=birth_year,
                 birth_country=birth_country,
                 lifespan=lifespan,
                 schema={

@@ -541,6 +541,10 @@ h3 {
   vertical-align: middle;
 }
 
+.birth-country {
+  text-decoration: none;
+}
+
 .person-link {
   font-weight: 700;
 }

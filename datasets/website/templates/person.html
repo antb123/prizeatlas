@@ -3,12 +3,11 @@
 <header class="page-intro">
   <p class="eyebrow">Laureate</p>
   <h1>{{ person.name }}</h1>
-  {% if lifespan %}<p class="lifespan">{{ lifespan }}</p>{% endif %}
-  <p>{{ person.awards | length }} recorded {{ "award" if person.awards | length == 1 else "awards" }}.</p>
-  {% if birth_date or birth_country %}
-  <p>Born{% if birth_date %} {{ birth_date }}{% endif %}{% if birth_country %} ·
-    <a href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}</p>
+  {% if lifespan or birth_year or birth_country %}
+  <p class="lifespan">{% if lifespan %}{{ lifespan }}{% elif birth_year %}Born {{ birth_year }}{% endif %}{% if birth_country %}{% if lifespan or birth_year %} · {% endif %}
+    <a class="birth-country" href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}</p>
   {% endif %}
+  <p>{{ person.awards | length }} recorded {{ "award" if person.awards | length == 1 else "awards" }}.</p>
 </header>
 <section>
   <h2>Awards</h2>
