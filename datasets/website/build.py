@@ -1211,6 +1211,7 @@ def create_site_plan(
                     Breadcrumb(affiliation.name, None),
                 ),
                 affiliation=affiliation,
+                wikipedia_url=wikipedia_search_url(affiliation.name),
             )
         )
 
