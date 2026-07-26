@@ -3,7 +3,11 @@
 Small product roadmap. Each item needs a brief approved specification before implementation.
 
 - [ ] Rework the site's text and styling for a high-school audience: plain language, clear explanations, strong visual hierarchy, and accessible mobile presentation.
-- [ ] Add Spanish, French, and German translations. Follow [`datasets-multilingual-20260726.md`](datasets-multilingual-20260726.md) and its execution TODO; extend both to specify German before implementation.
+- [ ] Add Spanish, French, and German translations. Follow
+  [`datasets-multilingual-20260726.md`](datasets-multilingual-20260726.md) and its execution TODO; extend both to specify
+  German before implementation.
+- [ ] Add Japanese and Chinese support after the Latin-language rollout. Specify translation scope, locale metadata,
+  language navigation, search behavior, and appropriate CJK typography and line breaking before implementation.
 - [x] Integrate the map MVP into the static website. Completed in
   [`website-map-integration-20260726.md`](website-map-integration-20260726.md), merged into `master` at `ef61d52`;
   the standalone MVP remains available for comparison.
