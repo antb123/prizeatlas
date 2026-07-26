@@ -12,7 +12,7 @@
   {% for affiliation in affiliations %}
   <li>
     <span class="rank-position">{{ loop.index }}</span>
-    <span>{{ affiliation.name }}
+    <span><a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
       {% if affiliation.units %}
       <ul class="rank-units">
         {% for unit, unit_count in affiliation.units %}

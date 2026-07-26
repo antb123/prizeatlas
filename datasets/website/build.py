@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import posixpath
 import re
@@ -46,6 +47,7 @@ TEMPLATES = (
     "countries.html",
     "country.html",
     "affiliations.html",
+    "affiliation.html",
     "subjects.html",
     "subject.html",
     "explorer.html",
@@ -56,6 +58,7 @@ PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 AFFILIATIONS_ROUTE = "/affiliations/"
+AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
 SUBJECTS = (
@@ -161,8 +164,12 @@ class Affiliation:
     """An institution and the constituent units recorded under it. `count` is laureates, not awards, so it is the
     size of the union of the units' members and is never their sum."""
     name: str
+    slug: str
+    route: str
     count: int
     units: tuple[tuple[str, int], ...]
+    awards: tuple[tuple[AwardRecord, str], ...]
+    profile: None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -226,6 +233,14 @@ def slugify(value: str) -> str:
     if not slug:
         raise BuildFailure("derived slug is empty")
     return slug
+
+
+def affiliation_slug(name: str) -> str:
+    base = slugify(name)
+    if len(base) <= AFFILIATION_SLUG_MAX:
+        return base
+    digest = hashlib.sha1(name.encode()).hexdigest()[:8]
+    return f"{base[: AFFILIATION_SLUG_MAX - 9].rstrip('-')}-{digest}"
 
 
 def normalize_base_url(value: str) -> str:
@@ -559,7 +574,11 @@ def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str,
     return tuple((motivation, tuple(members)) for motivation, members in groups.items())
 
 
-def plan_places(people: list[Laureate]) -> tuple[list[Place], list[Affiliation]]:
+def plan_places(
+    people: list[Laureate],
+    records: list[AwardRecord],
+    record_routes: dict[str, str],
+) -> tuple[list[Place], list[Affiliation]]:
     """Rank birth countries and affiliations by laureate, never by award record.
 
     A laureate with seven awards is one person born in one country. Counting records would rank a country by how
@@ -570,14 +589,17 @@ def plan_places(people: list[Laureate]) -> tuple[list[Place], list[Affiliation]]
     Harvard's own count, which is why a parent's count is a union and not a sum.
     """
     by_country: dict[str, list[Laureate]] = {}
-    by_affiliation: dict[tuple[str, str], set[str]] = {}
+    laureates_by_name: dict[str, set[str]] = {}
+    units_by_name: dict[str, dict[str, set[str]]] = {}
     for person in people:
         birth = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
         if country := birth.strip():
             by_country.setdefault(country, []).append(person)
         for record, _ in person.awards:
             if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST:
-                by_affiliation.setdefault((record.affiliation_name, record.affiliation_sub_name), set()).add(person.qid)
+                laureates_by_name.setdefault(record.affiliation_name, set()).add(person.qid)
+                if record.affiliation_sub_name:
+                    units_by_name.setdefault(record.affiliation_name, {}).setdefault(record.affiliation_sub_name, set()).add(person.qid)
 
     countries: list[Place] = []
     slugs: dict[str, str] = {}
@@ -589,17 +611,31 @@ def plan_places(people: list[Laureate]) -> tuple[list[Place], list[Affiliation]]
         countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
     countries.sort(key=lambda place: (-len(place.people), place.name))
 
-    members_by_name: dict[str, set[str]] = {}
-    units_by_name: dict[str, dict[str, set[str]]] = {}
-    for (name, unit), members in by_affiliation.items():
-        members_by_name.setdefault(name, set()).update(members)
-        if unit:
-            units_by_name.setdefault(name, {}).setdefault(unit, set()).update(members)
+    awards_by_name: dict[str, list[tuple[AwardRecord, str]]] = {}
+    for record in records:
+        if not _nonblank(record.affiliation_name) or record.affiliation_name in AFFILIATION_BLOCKLIST:
+            continue
+        awards_by_name.setdefault(record.affiliation_name, []).append((record, record_routes[record.award_record_id]))
 
-    affiliations = [
-        Affiliation(name, len(members), _ranked(units_by_name.get(name, {})))
-        for name, members in members_by_name.items()
-    ]
+    names_by_slug: dict[str, list[str]] = {}
+    for name in set(awards_by_name) | set(laureates_by_name):
+        names_by_slug.setdefault(affiliation_slug(name), []).append(name)
+
+    affiliations: list[Affiliation] = []
+    for slug, names in names_by_slug.items():
+        display = max(names, key=lambda name: (len(awards_by_name.get(name, ())), name))
+        laureates: set[str] = set()
+        units: dict[str, set[str]] = {}
+        awards: list[tuple[AwardRecord, str]] = []
+        for name in names:
+            laureates.update(laureates_by_name.get(name, ()))
+            for unit, members in units_by_name.get(name, {}).items():
+                units.setdefault(unit, set()).update(members)
+            awards.extend(awards_by_name.get(name, ()))
+        awards.sort(key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id))
+        affiliations.append(
+            Affiliation(display, slug, f"{AFFILIATIONS_ROUTE}{slug}/", len(laureates), _ranked(units), tuple(awards))
+        )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
     return countries, affiliations
 
@@ -984,6 +1020,10 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
         prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
         span = _year_span([record.year for record, _ in person.awards])
         latest = person.awards[-1][0]
+        birth_date = next((record.birth_date for record, _ in person.awards if _nonblank(record.birth_date)), "")
+        birth_country = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
+        death_date = next((record.death_date for record, _ in person.awards if _nonblank(record.death_date)), "")
+        lifespan = f"{birth_date[:4]}–{death_date[:4]}" if len(birth_date) >= 4 and len(death_date) >= 4 else ""
         jobs.append(
             _page(
                 "person.html",
@@ -995,6 +1035,9 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
                 ),
                 (Breadcrumb("Home", "/"), Breadcrumb("People", PEOPLE_ROUTE), Breadcrumb(person.name, None)),
                 person=person,
+                birth_date=birth_date,
+                birth_country=birth_country,
+                lifespan=lifespan,
                 schema={
                     **_laureate_schema(latest, public_url(base_url, person.route)),
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
@@ -1002,7 +1045,7 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             )
         )
 
-    countries, affiliations = plan_places(people)
+    countries, affiliations = plan_places(people, records, all_record_routes)
     subjects = plan_subjects(people, subject_counts)
     jobs.append(
         _page(
@@ -1075,6 +1118,27 @@ def create_site_plan(rankings: list[Ranking], records: list[AwardRecord], base_u
             total=len(records),
         )
     )
+    for affiliation in affiliations:
+        span = _year_span([record.year for record, _ in affiliation.awards])
+        award_count = len(affiliation.awards)
+        jobs.append(
+            _page(
+                "affiliation.html",
+                affiliation.route,
+                f"{affiliation.name}: laureate awards",
+                _clamp(
+                    f"{affiliation.name} records {award_count} "
+                    f"{'award' if award_count == 1 else 'awards'} ({span}) across {affiliation.count} "
+                    f"{'laureate' if affiliation.count == 1 else 'laureates'}."
+                ),
+                (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb("Institutions", AFFILIATIONS_ROUTE),
+                    Breadcrumb(affiliation.name, None),
+                ),
+                affiliation=affiliation,
+            )
+        )
 
     # The homepage is planned last: it reports on the whole site, so it needs the laureates and their routes.
     year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]

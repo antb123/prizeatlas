@@ -3,12 +3,17 @@
 <header class="page-intro">
   <p class="eyebrow">Laureate</p>
   <h1>{{ person.name }}</h1>
+  {% if lifespan %}<p class="lifespan">{{ lifespan }}</p>{% endif %}
   {% if person.subjects %}
   <p class="subject-badges">
     {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
   </p>
   {% endif %}
   <p>{{ person.awards | length }} recorded {{ "award" if person.awards | length == 1 else "awards" }}.</p>
+  {% if birth_date or birth_country %}
+  <p>Born{% if birth_date %} {{ birth_date }}{% endif %}{% if birth_country %} ·
+    <a href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}</p>
+  {% endif %}
 </header>
 <section>
   <h2>Awards</h2>
