@@ -99,7 +99,8 @@ AFFILIATIONS = {
     "Salk Institute of Biological Studies": ("Salk Institute for Biological Studies", ""),
     "Basel Institute of Immunology": ("Basel Institute for Immunology", ""),
     "National Institute of Information and Communications Technology (NICT)": ("National Institute of Information and Communications Technology", ""),
-    "Kavli Institute for the Physics and Mathematics of the Universe, University of Tokyo, Japan": ("Kavli Institute for the Physics and Mathematics of the Universe, University of Tokyo", ""),
+    "Kavli Institute for the Physics and Mathematics of the Universe, University of Tokyo, Japan":
+        ("Kavli Institute for the Physics and Mathematics of the Universe, University of Tokyo", ""),
     "Institute of Genetics and Molecular Cellular Biology": ("Institute of Genetics and Molecular and Cellular Biology", ""),
     "National Heart, Lung and Blood Institute, National Institutes of Health": ("National Heart, Lung, and Blood Institute, National Institutes of Health", ""),
 
@@ -127,7 +128,8 @@ AFFILIATIONS = {
     "University of California School of Medicine": ("University of California (campus unspecified)", "School of Medicine"),
     "University of Pennsylvania School of Medicine": ("University of Pennsylvania", "School of Medicine"),
     "Perelman School of Medicine, University of Pennsylvania": ("University of Pennsylvania", "Perelman School of Medicine"),
-    "University of Pennsylvania, Department of Landscape Architecture and Regional Planning": ("University of Pennsylvania", "Department of Landscape Architecture and Regional Planning"),
+    "University of Pennsylvania, Department of Landscape Architecture and Regional Planning":
+        ("University of Pennsylvania", "Department of Landscape Architecture and Regional Planning"),
     "Cornell University Medical College": ("Cornell University", "Weill Cornell Medical College"),
     "Weill Cornell Medical College": ("Cornell University", "Weill Cornell Medical College"),
     "Emory University School of Medicine": ("Emory University", "School of Medicine"),
@@ -162,7 +164,8 @@ AFFILIATIONS = {
     # Title case: the lowercase "École normale supérieure" does not exist in the database, and SQLite's BINARY
     # collation would make using it a second spelling of the same school.
     "École normale supérieure, Department of Geology": ("École Normale Supérieure", "Department of Geology"),
-    "Weizmann Institute of Science, Department of Computer Science and Applied Mathematics": ("Weizmann Institute of Science", "Department of Computer Science and Applied Mathematics"),
+    "Weizmann Institute of Science, Department of Computer Science and Applied Mathematics":
+        ("Weizmann Institute of Science", "Department of Computer Science and Applied Mathematics"),
     "University of California San Diego, School of Medicine, Department of Pediatrics": ("University of California, San Diego", "School of Medicine, Department of Pediatrics"),
     "Ruijin Hospital, School of Medicine, Shanghai Jiao Tong University": ("Shanghai Jiao Tong University", "Ruijin Hospital, School of Medicine"),
 }
