@@ -1,6 +1,11 @@
 /awards.sqlite3
 /awards.sqlite3-shm
 /awards.sqlite3-wal
+/awards.sqlite3.*
+*.bak
 /website/dist/
 /website/.dist-staging-*/
 /website/.dist-backup-*/
+/map-mvp/dist/
+__pycache__/
+*~
