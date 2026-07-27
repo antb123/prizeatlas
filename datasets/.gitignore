@@ -9,3 +9,6 @@
 /map-mvp/dist/
 __pycache__/
 *~
+/old/
+/trash/
+/.nominatim-cache.json
