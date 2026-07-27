@@ -1,0 +1,4369 @@
+[
+  {
+    "qid": "Q101251452",
+    "name": "Hahnemann Medical College",
+    "city": "Philadelphia",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q1016927",
+    "name": "Burroughs Wellcome & Company",
+    "city": "Tuckahoe",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q110636214",
+    "name": "Max Planck Institute for Multidisciplinary Sciences",
+    "city": "Göttingen",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 140052983,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 253918008,
+        "lat": "51.5626382",
+        "lon": "9.9706114",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.3298727163953751,
+        "addresstype": "amenity",
+        "name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+        "display_name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften, Am Faßberg, Weende, Nikolausberg, Göttingen, Radolfshausen, Landkreis Göttingen, Niedersachsen, 37077, Deutschland",
+        "address": {
+          "amenity": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "road": "Am Faßberg",
+          "neighbourhood": "Weende",
+          "suburb": "Nikolausberg",
+          "city": "Göttingen",
+          "municipality": "Radolfshausen",
+          "county": "Landkreis Göttingen",
+          "state": "Niedersachsen",
+          "ISO3166-2-lvl4": "DE-NI",
+          "postcode": "37077",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "wikidata": "Q836125",
+          "architect": "Walter Henn",
+          "wikipedia": "de:Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "start_date": "1971",
+          "contact:website": "https://www.mpinat.mpg.de/"
+        },
+        "namedetails": {
+          "name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "name:de": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "name:en": "Max Planck Institute for Multidisciplinary Sciences",
+          "alt_name": "Karl-Friedrich-Bonhoeffer-Institut",
+          "int_name": "Max Planck Institute for Multidisciplinary Sciences",
+          "old_name": "Max-Planck-Institut für biophysikalische Chemie",
+          "short_name": "MPINAT"
+        },
+        "boundingbox": [
+          "51.5599763",
+          "51.5652474",
+          "9.9633450",
+          "9.9744025"
+        ]
+      },
+      {
+        "place_id": 139978002,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 326968710,
+        "lat": "51.5512726",
+        "lon": "9.9374266",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.3298727163953751,
+        "addresstype": "amenity",
+        "name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+        "display_name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften, Hermann-Rein-Straße, Weende, Weende / Deppoldshausen, Göttingen, Radolfshausen, Landkreis Göttingen, Niedersachsen, 37075, Deutschland",
+        "address": {
+          "amenity": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "road": "Hermann-Rein-Straße",
+          "neighbourhood": "Weende",
+          "suburb": "Weende / Deppoldshausen",
+          "city": "Göttingen",
+          "municipality": "Radolfshausen",
+          "county": "Landkreis Göttingen",
+          "state": "Niedersachsen",
+          "ISO3166-2-lvl4": "DE-NI",
+          "postcode": "37075",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "wikipedia": "de:Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "start_date": "1964",
+          "contact:website": "https://www.mpinat.mpg.de/"
+        },
+        "namedetails": {
+          "name": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "name:de": "Max-Planck-Institut für Multidisziplinäre Naturwissenschaften",
+          "name:en": "Max Planck Institute for Multidisciplinary Sciences",
+          "int_name": "Max Planck Institute for Multidisciplinary Sciences",
+          "old_name": "Max-Planck-Institut für experimentelle Medizin",
+          "short_name": "MPINAT"
+        },
+        "boundingbox": [
+          "51.5502118",
+          "51.5519546",
+          "9.9362416",
+          "9.9386330"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q11087599",
+    "name": "Institute of Molecular",
+    "city": "",
+    "country": "Switzerland",
+    "results": []
+  },
+  {
+    "qid": "Q111722916",
+    "name": "College of Agriculture",
+    "city": "",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 377796382,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 437250463,
+        "lat": "19.7001531",
+        "lon": "-155.0825823",
+        "category": "building",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.0000580216678110478,
+        "addresstype": "building",
+        "name": "College of Agriculture",
+        "display_name": "College of Agriculture, Nowelo Street, Waiākea, Hilo, Hawaiʻi County, Hawaii, 96720, United States",
+        "address": {
+          "building": "College of Agriculture",
+          "road": "Nowelo Street",
+          "suburb": "Waiākea",
+          "city": "Hilo",
+          "county": "Hawaiʻi County",
+          "state": "Hawaii",
+          "ISO3166-2-lvl4": "US-HI",
+          "postcode": "96720",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": null,
+        "namedetails": {
+          "ref": "319",
+          "name": "College of Agriculture",
+          "name:en": "College of Agriculture"
+        },
+        "boundingbox": [
+          "19.7000541",
+          "19.7002442",
+          "-155.0827432",
+          "-155.0824262"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q112328210",
+    "name": "Kyoto Imperial University",
+    "city": "Kyoto",
+    "country": "Japan",
+    "results": []
+  },
+  {
+    "qid": "Q1130172",
+    "name": "Mayo Clinic",
+    "city": "Rochester, MN",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 372772849,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 585536566,
+        "lat": "44.0225389",
+        "lon": "-92.4666075",
+        "category": "amenity",
+        "type": "clinic",
+        "place_rank": 30,
+        "importance": 0.00006353170061794487,
+        "addresstype": "amenity",
+        "name": "Mayo Clinic",
+        "display_name": "Mayo Clinic, 7 Level Skyway, Rochester, Olmsted County, Minnesota, 55903, United States",
+        "address": {
+          "amenity": "Mayo Clinic",
+          "road": "7 Level Skyway",
+          "city": "Rochester",
+          "county": "Olmsted County",
+          "state": "Minnesota",
+          "ISO3166-2-lvl4": "US-MN",
+          "postcode": "55903",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "healthcare": "clinic",
+          "wheelchair": "yes",
+          "opening_hours": "24/7"
+        },
+        "namedetails": {
+          "name": "Mayo Clinic"
+        },
+        "boundingbox": [
+          "44.0216898",
+          "44.0234029",
+          "-92.4672436",
+          "-92.4659064"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1144725",
+    "name": "Microsoft Research",
+    "city": "Redmond",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q1149028",
+    "name": "Lister Institute of Preventive Medicine",
+    "city": "London",
+    "country": "United Kingdom",
+    "results": []
+  },
+  {
+    "qid": "Q1153275",
+    "name": "RIKEN",
+    "city": "Kobe",
+    "country": "Japan",
+    "results": [
+      {
+        "place_id": 267421429,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 1330162401,
+        "lat": "34.6528736",
+        "lon": "135.2207474",
+        "category": "office",
+        "type": "research",
+        "place_rank": 30,
+        "importance": 0.00007270542458223877,
+        "addresstype": "office",
+        "name": "理化学研究所 計算科学研究センター",
+        "display_name": "理化学研究所 計算科学研究センター, 港島４５号線, 港島南町七丁目, 中央区, 神戸市, 兵庫県, 650-0047, 日本",
+        "address": {
+          "office": "理化学研究所 計算科学研究センター",
+          "road": "港島４５号線",
+          "neighbourhood": "港島南町七丁目",
+          "suburb": "中央区",
+          "city": "神戸市",
+          "province": "兵庫県",
+          "ISO3166-2-lvl4": "JP-28",
+          "postcode": "650-0047",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": {
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Fr 08:00-17:00; Sa-Su closed; PH closed"
+        },
+        "namedetails": {
+          "name": "理化学研究所 計算科学研究センター",
+          "name:en": "RIKEN Center for Computational Science",
+          "name:ja": "理化学研究所 計算科学研究センター",
+          "short_name": "R_CCS"
+        },
+        "boundingbox": [
+          "34.6519495",
+          "34.6543607",
+          "135.2193437",
+          "135.2218070"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1153275",
+    "name": "RIKEN",
+    "city": "Wako",
+    "country": "Japan",
+    "results": [
+      {
+        "place_id": 268097866,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 91530744,
+        "lat": "35.7788386",
+        "lon": "139.6160176",
+        "category": "office",
+        "type": "research",
+        "place_rank": 30,
+        "importance": 0.00008593499656667457,
+        "addresstype": "office",
+        "name": "理化学研究所",
+        "display_name": "理化学研究所, 1, 東京外環自動車道, 中央一丁目, 西大和団地, 和光市, 埼玉県, 351-0198, 日本",
+        "address": {
+          "office": "理化学研究所",
+          "house_number": "1",
+          "road": "東京外環自動車道",
+          "neighbourhood": "中央一丁目",
+          "quarter": "西大和団地",
+          "city": "和光市",
+          "province": "埼玉県",
+          "ISO3166-2-lvl4": "JP-11",
+          "postcode": "351-0198",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": {
+          "amenity": "research_institute",
+          "landuse": "commercial",
+          "website": "https://www.riken.jp/",
+          "wikidata": "Q1153275",
+          "wikipedia": "ja:理化学研究所",
+          "full_name:en": "Institute of Physical and Chemical Research",
+          "full_name:ja": "国立研究開発法人理化学研究所"
+        },
+        "namedetails": {
+          "name": "理化学研究所",
+          "name:en": "Riken",
+          "name:ja": "理化学研究所",
+          "name:ko": "이화학연구소",
+          "name:zh": "理化學研究所"
+        },
+        "boundingbox": [
+          "35.7752528",
+          "35.7823990",
+          "139.6076854",
+          "139.6184479"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q11589396",
+    "name": "Kanagawa Academy of Science and Technology",
+    "city": "Kawasaki",
+    "country": "Japan",
+    "results": []
+  },
+  {
+    "qid": "Q1204921",
+    "name": "International Rice Research Institute",
+    "city": "",
+    "country": "Philippines",
+    "results": [
+      {
+        "place_id": 256960430,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 1830438,
+        "lat": "14.1416863",
+        "lon": "121.2615716",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.00005061036087582235,
+        "addresstype": "amenity",
+        "name": "International Rice Research Institute",
+        "display_name": "International Rice Research Institute, Dapdap Street, Putho Tuntungin, Los Baños, Laguna, Calabarzon, 4031, Philippines",
+        "address": {
+          "amenity": "International Rice Research Institute",
+          "road": "Dapdap Street",
+          "quarter": "Putho Tuntungin",
+          "town": "Los Baños",
+          "state": "Laguna",
+          "ISO3166-2-lvl4": "PH-LAG",
+          "region": "Calabarzon",
+          "ISO3166-2-lvl3": "PH-40",
+          "postcode": "4031",
+          "country": "Philippines",
+          "country_code": "ph"
+        },
+        "extratags": {
+          "landuse": "farmland",
+          "website": "https://irri.org/",
+          "wikidata": "Q1204921",
+          "wikipedia": "en:International Rice Research Institute",
+          "previously": "node:428745344"
+        },
+        "namedetails": {
+          "name": "International Rice Research Institute",
+          "name:en": "International Rice Research Institute",
+          "name:tl": "Pandaigdigang Sanayan sa Pananaliksik sa Bigas",
+          "alt_name": "IRRI"
+        },
+        "boundingbox": [
+          "14.1308706",
+          "14.1755543",
+          "121.2524179",
+          "121.2733566"
+        ]
+      },
+      {
+        "place_id": 259002411,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 7572834137,
+        "lat": "14.1688340",
+        "lon": "121.2552207",
+        "category": "historic",
+        "type": "memorial",
+        "place_rank": 30,
+        "importance": 0.00005061036087582235,
+        "addresstype": "historic",
+        "name": "International Rice Research Institute",
+        "display_name": "International Rice Research Institute, Pili Drive, Maahas, Los Baños, Laguna, Calabarzon, 4033, Philippines",
+        "address": {
+          "historic": "International Rice Research Institute",
+          "road": "Pili Drive",
+          "quarter": "Maahas",
+          "town": "Los Baños",
+          "state": "Laguna",
+          "ISO3166-2-lvl4": "PH-LAG",
+          "region": "Calabarzon",
+          "ISO3166-2-lvl3": "PH-40",
+          "postcode": "4033",
+          "country": "Philippines",
+          "country_code": "ph"
+        },
+        "extratags": {
+          "memorial": "plaque",
+          "wikidata": "Q36164177",
+          "start_date": "2010-04-14",
+          "subject:wikidata": "Q1204921"
+        },
+        "namedetails": {
+          "name": "International Rice Research Institute"
+        },
+        "boundingbox": [
+          "14.1687840",
+          "14.1688840",
+          "121.2551707",
+          "121.2552707"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1204921",
+    "name": "International Rice Research Institute",
+    "city": "Los Baños",
+    "country": "Philippines",
+    "results": [
+      {
+        "place_id": 256960430,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 1830438,
+        "lat": "14.1416863",
+        "lon": "121.2615716",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.00005061036087582235,
+        "addresstype": "amenity",
+        "name": "International Rice Research Institute",
+        "display_name": "International Rice Research Institute, Dapdap Street, Putho Tuntungin, Los Baños, Laguna, Calabarzon, 4031, Philippines",
+        "address": {
+          "amenity": "International Rice Research Institute",
+          "road": "Dapdap Street",
+          "quarter": "Putho Tuntungin",
+          "town": "Los Baños",
+          "state": "Laguna",
+          "ISO3166-2-lvl4": "PH-LAG",
+          "region": "Calabarzon",
+          "ISO3166-2-lvl3": "PH-40",
+          "postcode": "4031",
+          "country": "Philippines",
+          "country_code": "ph"
+        },
+        "extratags": {
+          "landuse": "farmland",
+          "website": "https://irri.org/",
+          "wikidata": "Q1204921",
+          "wikipedia": "en:International Rice Research Institute",
+          "previously": "node:428745344"
+        },
+        "namedetails": {
+          "name": "International Rice Research Institute",
+          "name:en": "International Rice Research Institute",
+          "name:tl": "Pandaigdigang Sanayan sa Pananaliksik sa Bigas",
+          "alt_name": "IRRI"
+        },
+        "boundingbox": [
+          "14.1308706",
+          "14.1755543",
+          "121.2524179",
+          "121.2733566"
+        ]
+      },
+      {
+        "place_id": 259002411,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 7572834137,
+        "lat": "14.1688340",
+        "lon": "121.2552207",
+        "category": "historic",
+        "type": "memorial",
+        "place_rank": 30,
+        "importance": 0.00005061036087582235,
+        "addresstype": "historic",
+        "name": "International Rice Research Institute",
+        "display_name": "International Rice Research Institute, Pili Drive, Maahas, Los Baños, Laguna, Calabarzon, 4033, Philippines",
+        "address": {
+          "historic": "International Rice Research Institute",
+          "road": "Pili Drive",
+          "quarter": "Maahas",
+          "town": "Los Baños",
+          "state": "Laguna",
+          "ISO3166-2-lvl4": "PH-LAG",
+          "region": "Calabarzon",
+          "ISO3166-2-lvl3": "PH-40",
+          "postcode": "4033",
+          "country": "Philippines",
+          "country_code": "ph"
+        },
+        "extratags": {
+          "memorial": "plaque",
+          "wikidata": "Q36164177",
+          "start_date": "2010-04-14",
+          "subject:wikidata": "Q1204921"
+        },
+        "namedetails": {
+          "name": "International Rice Research Institute"
+        },
+        "boundingbox": [
+          "14.1687840",
+          "14.1688840",
+          "121.2551707",
+          "121.2552707"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q135840532",
+    "name": "Halle University",
+    "city": "Halle",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 135828061,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 305139566,
+        "lat": "51.5030163",
+        "lon": "11.9540043",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.4230625932431813,
+        "addresstype": "amenity",
+        "name": "Burg Giebichenstein Kunsthochschule Halle - Campus Kunst",
+        "display_name": "Burg Giebichenstein Kunsthochschule Halle - Campus Kunst, Fährstraße, Giebichenstein, Halle (Saale), Sachsen-Anhalt, 06114, Deutschland",
+        "address": {
+          "amenity": "Burg Giebichenstein Kunsthochschule Halle - Campus Kunst",
+          "road": "Fährstraße",
+          "suburb": "Giebichenstein",
+          "city": "Halle (Saale)",
+          "state": "Sachsen-Anhalt",
+          "ISO3166-2-lvl4": "DE-ST",
+          "postcode": "06114",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "historic": "castle",
+          "operator": "Burg Giebichenstein Kunsthochschule Halle",
+          "wikidata": "Q1011953",
+          "wheelchair": "no",
+          "castle_type": "defensive",
+          "castle_type:de": "burg",
+          "toilets:wheelchair": "no"
+        },
+        "namedetails": {
+          "name": "Burg Giebichenstein Kunsthochschule Halle - Campus Kunst"
+        },
+        "boundingbox": [
+          "51.5024744",
+          "51.5035572",
+          "11.9529243",
+          "11.9552563"
+        ]
+      },
+      {
+        "place_id": 135807089,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 189508394,
+        "lat": "51.5024675",
+        "lon": "11.9568677",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.000071281757839277,
+        "addresstype": "amenity",
+        "name": "Weißes Haus, Campus Kunst, Burg Giebichenstein Kunsthochschule Halle",
+        "display_name": "Weißes Haus, Campus Kunst, Burg Giebichenstein Kunsthochschule Halle, Seebener Straße, Giebichenstein, Halle (Saale), Sachsen-Anhalt, 06114, Deutschland",
+        "address": {
+          "amenity": "Weißes Haus, Campus Kunst, Burg Giebichenstein Kunsthochschule Halle",
+          "road": "Seebener Straße",
+          "suburb": "Giebichenstein",
+          "city": "Halle (Saale)",
+          "state": "Sachsen-Anhalt",
+          "ISO3166-2-lvl4": "DE-ST",
+          "postcode": "06114",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "Weißes Haus, Campus Kunst, Burg Giebichenstein Kunsthochschule Halle"
+        },
+        "boundingbox": [
+          "51.5021072",
+          "51.5028360",
+          "11.9563527",
+          "11.9574409"
+        ]
+      },
+      {
+        "place_id": 136360815,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 28908043,
+        "lat": "51.4891666",
+        "lon": "11.9570807",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.000071281757839277,
+        "addresstype": "amenity",
+        "name": "Kunsthochschule Halle, Medienzentrum",
+        "display_name": "Kunsthochschule Halle, Medienzentrum, 1, Neuwerk, Klaustorvorstadt, Nördliche Innenstadt, Halle (Saale), Sachsen-Anhalt, 06108, Deutschland",
+        "address": {
+          "amenity": "Kunsthochschule Halle, Medienzentrum",
+          "house_number": "1",
+          "road": "Neuwerk",
+          "neighbourhood": "Klaustorvorstadt",
+          "suburb": "Nördliche Innenstadt",
+          "city": "Halle (Saale)",
+          "state": "Sachsen-Anhalt",
+          "ISO3166-2-lvl4": "DE-ST",
+          "postcode": "06108",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "operator": "Burg Giebichenstein Kunsthochschule Halle",
+          "check_date": "2025-02-27",
+          "wheelchair": "limited"
+        },
+        "namedetails": {
+          "name": "Kunsthochschule Halle, Medienzentrum"
+        },
+        "boundingbox": [
+          "51.4887442",
+          "51.4895577",
+          "11.9565979",
+          "11.9575175"
+        ]
+      },
+      {
+        "place_id": 136272143,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 1024429170,
+        "lat": "51.4953318",
+        "lon": "11.9820782",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.000071281757839277,
+        "addresstype": "amenity",
+        "name": "Landesstudienkolleg Halle",
+        "display_name": "Landesstudienkolleg Halle, 22, Paracelsusstraße, Am Wasserturm/Thaerviertel, Halle (Saale), Sachsen-Anhalt, 06114, Deutschland",
+        "address": {
+          "amenity": "Landesstudienkolleg Halle",
+          "house_number": "22",
+          "road": "Paracelsusstraße",
+          "suburb": "Am Wasserturm/Thaerviertel",
+          "city": "Halle (Saale)",
+          "state": "Sachsen-Anhalt",
+          "ISO3166-2-lvl4": "DE-ST",
+          "postcode": "06114",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.studienkolleg.uni-halle.de/",
+          "operator": "Martin-Luther-Universität Halle-Wittenberg und Hochschule Anhalt (FH)",
+          "operator:type": "public"
+        },
+        "namedetails": {
+          "name": "Landesstudienkolleg Halle"
+        },
+        "boundingbox": [
+          "51.4949212",
+          "51.4957120",
+          "11.9818106",
+          "11.9823521"
+        ]
+      },
+      {
+        "place_id": 136341673,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 138917319,
+        "lat": "51.4866872",
+        "lon": "11.9653296",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.000071281757839277,
+        "addresstype": "amenity",
+        "name": "Naturkundliches Museum der Martin-Luther-Universität Halle-Wittenberg (geplant)",
+        "display_name": "Naturkundliches Museum der Martin-Luther-Universität Halle-Wittenberg (geplant), Friedemann-Bach-Platz, Altstadt, Halle (Saale), Sachsen-Anhalt, 06108, Deutschland",
+        "address": {
+          "amenity": "Naturkundliches Museum der Martin-Luther-Universität Halle-Wittenberg (geplant)",
+          "road": "Friedemann-Bach-Platz",
+          "suburb": "Altstadt",
+          "city": "Halle (Saale)",
+          "state": "Sachsen-Anhalt",
+          "ISO3166-2-lvl4": "DE-ST",
+          "postcode": "06108",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "image": "https://commons.wikimedia.org/wiki/File:Uni_-_panoramio_(2).jpg",
+          "tourism": "museum",
+          "building": "yes",
+          "heritage": "4",
+          "architect": "Otto Kilburger, Heinrich Herrmann, Paul Emanuel Spieker",
+          "wheelchair": "no",
+          "heritage:ref": "094 04651",
+          "heritage:operator": "lda",
+          "architect:wikidata": "Q114011217;Q11326203;Q2059422",
+          "year_of_construction": "1887...1890"
+        },
+        "namedetails": {
+          "name": "Naturkundliches Museum der Martin-Luther-Universität Halle-Wittenberg (geplant)"
+        },
+        "boundingbox": [
+          "51.4864442",
+          "51.4869606",
+          "11.9651156",
+          "11.9656191"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1371037",
+    "name": "Institute of Technology",
+    "city": "Milan",
+    "country": "Italy",
+    "results": []
+  },
+  {
+    "qid": "Q1452369",
+    "name": "Fred Hutchinson Cancer Research Center",
+    "city": "Seattle",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 325534275,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 384119484,
+        "lat": "47.6277525",
+        "lon": "-122.3306730",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "amenity",
+        "name": "Fred Hutchinson Cancer Research Center",
+        "display_name": "Fred Hutchinson Cancer Research Center, 1100, Fairview Avenue North, South Lake Union, Cascade, Capitol Hill, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "amenity": "Fred Hutchinson Cancer Research Center",
+          "house_number": "1100",
+          "road": "Fairview Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Capitol Hill",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1-206-667-5000",
+          "website": "https://www.fredhutch.org/",
+          "wikidata": "Q1452369",
+          "wikipedia": "en:Fred Hutchinson Cancer Center"
+        },
+        "namedetails": {
+          "name": "Fred Hutchinson Cancer Research Center"
+        },
+        "boundingbox": [
+          "47.6260289",
+          "47.6294110",
+          "-122.3327558",
+          "-122.3282524"
+        ]
+      },
+      {
+        "place_id": 325543993,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 2881960,
+        "lat": "47.6273286",
+        "lon": "-122.3316769",
+        "category": "building",
+        "type": "industrial",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "building",
+        "name": "Fred Hutchinson Cancer Research Center",
+        "display_name": "Fred Hutchinson Cancer Research Center, 1100, Fairview Avenue North, South Lake Union, Cascade, Capitol Hill, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "building": "Fred Hutchinson Cancer Research Center",
+          "house_number": "1100",
+          "road": "Fairview Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Capitol Hill",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "Fred Hutchinson Cancer Research Center"
+        },
+        "boundingbox": [
+          "47.6269536",
+          "47.6293540",
+          "-122.3323986",
+          "-122.3294194"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1452369",
+    "name": "Fred Hutchinson Cancer Research Center",
+    "city": "Seattle, WA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 324398845,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 384119484,
+        "lat": "47.6277525",
+        "lon": "-122.3306730",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "amenity",
+        "name": "Fred Hutchinson Cancer Research Center",
+        "display_name": "Fred Hutchinson Cancer Research Center, 1100, Fairview Avenue North, South Lake Union, Cascade, Capitol Hill, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "amenity": "Fred Hutchinson Cancer Research Center",
+          "house_number": "1100",
+          "road": "Fairview Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Capitol Hill",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1-206-667-5000",
+          "website": "https://www.fredhutch.org/",
+          "wikidata": "Q1452369",
+          "wikipedia": "en:Fred Hutchinson Cancer Center"
+        },
+        "namedetails": {
+          "name": "Fred Hutchinson Cancer Research Center"
+        },
+        "boundingbox": [
+          "47.6260289",
+          "47.6294110",
+          "-122.3327558",
+          "-122.3282524"
+        ]
+      },
+      {
+        "place_id": 324298529,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 2881960,
+        "lat": "47.6273286",
+        "lon": "-122.3316769",
+        "category": "building",
+        "type": "industrial",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "building",
+        "name": "Fred Hutchinson Cancer Research Center",
+        "display_name": "Fred Hutchinson Cancer Research Center, 1100, Fairview Avenue North, South Lake Union, Cascade, Capitol Hill, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "building": "Fred Hutchinson Cancer Research Center",
+          "house_number": "1100",
+          "road": "Fairview Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Capitol Hill",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "Fred Hutchinson Cancer Research Center"
+        },
+        "boundingbox": [
+          "47.6269536",
+          "47.6293540",
+          "-122.3323986",
+          "-122.3294194"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1512226",
+    "name": "Howard Hughes Medical Institute",
+    "city": "Bethesda",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q1512226",
+    "name": "Howard Hughes Medical Institute",
+    "city": "Durham, NC",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q154804",
+    "name": "Leipzig University",
+    "city": "Leipzig",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 135235333,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 165483202,
+        "lat": "51.3273963",
+        "lon": "12.3908893",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.678429677342361,
+        "addresstype": "amenity",
+        "name": "Universität Leipzig - Fakultäten für Chemie und Physik",
+        "display_name": "Universität Leipzig - Fakultäten für Chemie und Physik, Philipp-Rosenthal-Straße, Zentrum-Südost, Mitte, Leipzig, Sachsen, 04103, Deutschland",
+        "address": {
+          "amenity": "Universität Leipzig - Fakultäten für Chemie und Physik",
+          "road": "Philipp-Rosenthal-Straße",
+          "suburb": "Zentrum-Südost",
+          "city_district": "Mitte",
+          "city": "Leipzig",
+          "state": "Sachsen",
+          "ISO3166-2-lvl4": "DE-SN",
+          "postcode": "04103",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.chemie.uni-leipzig.de/",
+          "operator": "Universität Leipzig",
+          "wikidata": "Q154804",
+          "education": "university",
+          "wikipedia": "de:Universität Leipzig",
+          "wheelchair": "yes",
+          "nohousenumber": "separate",
+          "operator:type": "university",
+          "contact:twitter": "https://twitter.com/unileipzig",
+          "contact:youtube": "https://www.youtube.com/user/UniversityofLeipzig",
+          "contact:facebook": "https://www.facebook.com/unileipzig/",
+          "contact:linkedin": "https://www.linkedin.com/school/22593/",
+          "contact:mastodon": "https://wisskomm.social/@unileipzig",
+          "contact:instagram": "https://www.instagram.com/universitaetleipzig"
+        },
+        "namedetails": {
+          "name": "Universität Leipzig - Fakultäten für Chemie und Physik"
+        },
+        "boundingbox": [
+          "51.3263990",
+          "51.3283835",
+          "12.3886937",
+          "12.3928679"
+        ]
+      },
+      {
+        "place_id": 135685762,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 186275381,
+        "lat": "51.3384539",
+        "lon": "12.3786386",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.678429677342361,
+        "addresstype": "amenity",
+        "name": "Universität Leipzig",
+        "display_name": "Universität Leipzig, Grimmaische Straße, Zentrum, Mitte, Leipzig, Sachsen, 04109, Deutschland",
+        "address": {
+          "amenity": "Universität Leipzig",
+          "road": "Grimmaische Straße",
+          "suburb": "Zentrum",
+          "city_district": "Mitte",
+          "city": "Leipzig",
+          "state": "Sachsen",
+          "ISO3166-2-lvl4": "DE-SN",
+          "postcode": "04109",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.uni-leipzig.de/",
+          "wikidata": "Q154804",
+          "ref:vatin": "DE141510383",
+          "wikipedia": "de:Universität Leipzig",
+          "wheelchair": "yes",
+          "contact:xing": "https://www.xing.com/communities/groups/alumni-der-universitaet-leipzig-1068746",
+          "contact:twitter": "https://twitter.com/unileipzig",
+          "contact:youtube": "https://www.youtube.com/user/UniversityofLeipzig",
+          "contact:facebook": "https://www.facebook.com/unileipzig",
+          "contact:linkedin": "https://www.linkedin.com/edu/school?id=11974",
+          "contact:mastodon": "@unileipzig@wisskomm.social",
+          "contact:instagram": "https://www.instagram.com/universitaetleipzig/",
+          "toilets:wheelchair": "yes"
+        },
+        "namedetails": {
+          "name": "Universität Leipzig",
+          "name:da": "Leipzig Universitet",
+          "name:de": "Universität Leipzig",
+          "name:el": "Πανεπιστήμιο της Λειψίας",
+          "name:es": "Universidad de Leipzig",
+          "name:et": "Leipzigi Ülikool",
+          "name:fr": "Université de Leipzig",
+          "name:he": "אוניברסיטת לייפציג",
+          "name:ja": "ライプツィヒ大学",
+          "name:lt": "Leipcigo universitetas",
+          "name:pl": "Uniwersytet w Lipsku",
+          "name:ru": "Лейпцигский университет",
+          "name:uk": "Лейпцизький університет",
+          "loc_name": "Uni Leipzig",
+          "name:hsb": "Uniwersita Lipsk",
+          "name:1953-1990": "Karl-Marx-Universität"
+        },
+        "boundingbox": [
+          "51.3372841",
+          "51.3396240",
+          "12.3777092",
+          "12.3796080"
+        ]
+      },
+      {
+        "place_id": 135531601,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 752754904,
+        "lat": "51.3327247",
+        "lon": "12.3668529",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5368070737817536,
+        "addresstype": "amenity",
+        "name": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig",
+        "display_name": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig, 8, Grassistraße, Musikviertel, Zentrum-Süd, Mitte, Leipzig, Sachsen, 04107, Deutschland",
+        "address": {
+          "amenity": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig",
+          "house_number": "8",
+          "road": "Grassistraße",
+          "neighbourhood": "Musikviertel",
+          "suburb": "Zentrum-Süd",
+          "city_district": "Mitte",
+          "city": "Leipzig",
+          "state": "Sachsen",
+          "ISO3166-2-lvl4": "DE-SN",
+          "postcode": "04107",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "wikidata": "Q312578",
+          "wikipedia": "de:Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig",
+          "wheelchair": "yes",
+          "contact:website": "https://www.hmt-leipzig.de/",
+          "toilets:wheelchair": "no"
+        },
+        "namedetails": {
+          "name": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig",
+          "name:de": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“ Leipzig",
+          "addr:housename": "Hochschule für Musik und Theater „Felix Mendelssohn Bartholdy“"
+        },
+        "boundingbox": [
+          "51.3326747",
+          "51.3327747",
+          "12.3668029",
+          "12.3669029"
+        ]
+      },
+      {
+        "place_id": 134748227,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 186305761,
+        "lat": "51.3130967",
+        "lon": "12.3744741",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.36467385585497514,
+        "addresstype": "amenity",
+        "name": "Hochschule für Technik, Wirtschaft und Kultur Leipzig",
+        "display_name": "Hochschule für Technik, Wirtschaft und Kultur Leipzig, Eichendorffstraße, Connewitz, Süd, Leipzig, Sachsen, 04277, Deutschland",
+        "address": {
+          "amenity": "Hochschule für Technik, Wirtschaft und Kultur Leipzig",
+          "road": "Eichendorffstraße",
+          "suburb": "Connewitz",
+          "city_district": "Süd",
+          "city": "Leipzig",
+          "state": "Sachsen",
+          "ISO3166-2-lvl4": "DE-SN",
+          "postcode": "04277",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.htwk-leipzig.de/",
+          "wikidata": "Q1622216",
+          "wikipedia": "de:Hochschule für Technik, Wirtschaft und Kultur Leipzig",
+          "check_date": "2026-07-01",
+          "wheelchair": "yes",
+          "contact:twitter": "https://twitter.com/htwkleipzig",
+          "contact:youtube": "https://www.youtube.com/user/DieHTWKLeipzig",
+          "contact:facebook": "https://www.facebook.com/HTWKLeipzig"
+        },
+        "namedetails": {
+          "name": "Hochschule für Technik, Wirtschaft und Kultur Leipzig",
+          "name:de": "Hochschule für Technik, Wirtschaft und Kultur Leipzig",
+          "name:en": "Leipzig University of Applied Sciences",
+          "name:ru": "Лейпцигский университет прикладных наук",
+          "short_name": "HTWK"
+        },
+        "boundingbox": [
+          "51.3116923",
+          "51.3147162",
+          "12.3716217",
+          "12.3764280"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q17007257",
+    "name": "Centre for land",
+    "city": "",
+    "country": "Canada",
+    "results": []
+  },
+  {
+    "qid": "Q17513775",
+    "name": "Department of Scientific and Industrial Research",
+    "city": "London",
+    "country": "United Kingdom",
+    "results": []
+  },
+  {
+    "qid": "Q1829731",
+    "name": "Institute for Systems Biology",
+    "city": "Seattle",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 325504562,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 6780355241,
+        "lat": "47.6226477",
+        "lon": "-122.3374170",
+        "category": "office",
+        "type": "association",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "office",
+        "name": "Institute for Systems Biology",
+        "display_name": "Institute for Systems Biology, 401, Terry Avenue North, South Lake Union, Cascade, Belltown, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "office": "Institute for Systems Biology",
+          "house_number": "401",
+          "road": "Terry Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Belltown",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1-206-732-1369",
+          "website": "https://isbscience.org/",
+          "check_date": "2026-03-23",
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Fr 07:30-16:30"
+        },
+        "namedetails": {
+          "name": "Institute for Systems Biology"
+        },
+        "boundingbox": [
+          "47.6225977",
+          "47.6226977",
+          "-122.3374670",
+          "-122.3373670"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q1829731",
+    "name": "Institute for Systems Biology",
+    "city": "Seattle, WA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 321076977,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 6780355241,
+        "lat": "47.6226477",
+        "lon": "-122.3374170",
+        "category": "office",
+        "type": "association",
+        "place_rank": 30,
+        "importance": 0.0000772983901731444,
+        "addresstype": "office",
+        "name": "Institute for Systems Biology",
+        "display_name": "Institute for Systems Biology, 401, Terry Avenue North, South Lake Union, Cascade, Belltown, Seattle, King County, Washington, 98109, United States",
+        "address": {
+          "office": "Institute for Systems Biology",
+          "house_number": "401",
+          "road": "Terry Avenue North",
+          "neighbourhood": "South Lake Union",
+          "quarter": "Cascade",
+          "suburb": "Belltown",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98109",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1-206-732-1369",
+          "website": "https://isbscience.org/",
+          "check_date": "2026-03-23",
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Fr 07:30-16:30"
+        },
+        "namedetails": {
+          "name": "Institute for Systems Biology"
+        },
+        "boundingbox": [
+          "47.6225977",
+          "47.6226977",
+          "-122.3374670",
+          "-122.3373670"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 317399003,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 234707753,
+        "lat": "33.9727335",
+        "lon": "-117.3474449",
+        "category": "amenity",
+        "type": "post_office",
+        "place_rank": 30,
+        "importance": 0.0000663500419622647,
+        "addresstype": "amenity",
+        "name": "United States Post Office",
+        "display_name": "United States Post Office, Chicago Avenue, University, Riverside, Riverside County, California, 92521, United States",
+        "address": {
+          "amenity": "United States Post Office",
+          "road": "Chicago Avenue",
+          "neighbourhood": "University",
+          "city": "Riverside",
+          "county": "Riverside County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "92521",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "building": "yes",
+          "operator": "United States Postal Service",
+          "operator:type": "public",
+          "brand:wikidata": "Q668687",
+          "operator:short": "USPS",
+          "operator:website": "https://www.usps.com",
+          "operator:wikidata": "Q668687",
+          "operator:wikipedia": "en:United States Postal Service"
+        },
+        "namedetails": {
+          "name": "United States Post Office",
+          "brand": "United States Post Office",
+          "name:en": "United States Post Office"
+        },
+        "boundingbox": [
+          "33.9725383",
+          "33.9729286",
+          "-117.3478280",
+          "-117.3470706"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "Berkeley, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 322362884,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 2814221,
+        "lat": "37.8754996",
+        "lon": "-122.2390685",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.7168066234224784,
+        "addresstype": "amenity",
+        "name": "University of California, Berkeley",
+        "display_name": "University of California, Berkeley, Hearst Avenue, Downtown Berkeley, Berkeley, Alameda County, California, 94704, United States",
+        "address": {
+          "amenity": "University of California, Berkeley",
+          "road": "Hearst Avenue",
+          "neighbourhood": "Downtown Berkeley",
+          "city": "Berkeley",
+          "county": "Alameda County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "94704",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.berkeley.edu/",
+          "operator": "University of California, Berkeley",
+          "wikidata": "Q168756",
+          "education": "university",
+          "wikipedia": "en:University of California, Berkeley",
+          "operator:type": "public"
+        },
+        "namedetails": {
+          "name": "University of California, Berkeley",
+          "name:de": "Universität von Kalifornien, Berkeley",
+          "name:en": "University of California, Berkeley",
+          "name:ja": "カリフォルニア大学バークレー校",
+          "short_name": "UC Berkeley"
+        },
+        "boundingbox": [
+          "37.8624117",
+          "37.8833911",
+          "-122.2718761",
+          "-122.2162559"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "Irvine, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 318337597,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 3513479970,
+        "lat": "33.6491782",
+        "lon": "-117.8391158",
+        "category": "amenity",
+        "type": "post_office",
+        "place_rank": 30,
+        "importance": 0.00006623712520022915,
+        "addresstype": "amenity",
+        "name": "United States Post Office",
+        "display_name": "United States Post Office, 4255, Campus Drive, University Town Center, Irvine, Orange County, California, 92612, United States",
+        "address": {
+          "amenity": "United States Post Office",
+          "house_number": "4255",
+          "road": "Campus Drive",
+          "suburb": "University Town Center",
+          "city": "Irvine",
+          "county": "Orange County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "92612",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "operator": "United States Postal Service",
+          "opening_hours": "Mo-Fr 08:30-16:30",
+          "operator:type": "public",
+          "brand:wikidata": "Q668687",
+          "operator:short": "USPS",
+          "operator:website": "https://www.usps.com",
+          "operator:wikidata": "Q668687",
+          "operator:wikipedia": "en:United States Postal Service"
+        },
+        "namedetails": {
+          "name": "United States Post Office",
+          "brand": "United States Post Office",
+          "name:en": "United States Post Office",
+          "short_name": "USPS"
+        },
+        "boundingbox": [
+          "33.6491282",
+          "33.6492282",
+          "-117.8391658",
+          "-117.8390658"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "Los Angeles, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 320143079,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 7493269,
+        "lat": "34.0708777",
+        "lon": "-118.4468503",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6880972165559937,
+        "addresstype": "amenity",
+        "name": "University of California, Los Angeles",
+        "display_name": "University of California, Los Angeles, Bellagio Way, Bel Air, Westwood, Los Angeles, Los Angeles County, California, 90095, United States",
+        "address": {
+          "amenity": "University of California, Los Angeles",
+          "road": "Bellagio Way",
+          "quarter": "Bel Air",
+          "suburb": "Westwood",
+          "city": "Los Angeles",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "90095",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "wikidata": "Q174710",
+          "wikipedia": "en:University of California, Los Angeles"
+        },
+        "namedetails": {
+          "name": "University of California, Los Angeles",
+          "name:en": "University of California, Los Angeles",
+          "short_name": "UCLA"
+        },
+        "boundingbox": [
+          "34.0575332",
+          "34.0780784",
+          "-118.4553993",
+          "-118.4374163"
+        ]
+      },
+      {
+        "place_id": 320213744,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 18383936,
+        "lat": "34.0218690",
+        "lon": "-118.2858579",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6759135529827882,
+        "addresstype": "amenity",
+        "name": "University of Southern California",
+        "display_name": "University of Southern California, South Hoover Street, University Park, Exposition Park, Los Angeles, Los Angeles County, California, 90089, United States",
+        "address": {
+          "amenity": "University of Southern California",
+          "road": "South Hoover Street",
+          "quarter": "University Park",
+          "suburb": "Exposition Park",
+          "city": "Los Angeles",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "90089",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "access": "permissive",
+          "website": "https://www.usc.edu/",
+          "wikidata": "Q4614",
+          "wikipedia": "en:University of Southern California",
+          "internet_access": "wlan",
+          "access:conditional": "private @ (18:00-06:00)",
+          "internet_access:fee": "no"
+        },
+        "namedetails": {
+          "name": "University of Southern California",
+          "name:en": "University of Southern California",
+          "name:tr": "Güney California Üniversitesi",
+          "name:zh": "南加州大学",
+          "short_name": "USC"
+        },
+        "boundingbox": [
+          "34.0183956",
+          "34.0253619",
+          "-118.2913926",
+          "-118.2789706"
+        ]
+      },
+      {
+        "place_id": 320112823,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 29111188,
+        "lat": "34.1370138",
+        "lon": "-118.1252883",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6430491962901372,
+        "addresstype": "amenity",
+        "name": "California Institute of Technology",
+        "display_name": "California Institute of Technology, East California Boulevard, Pasadena Council District 7, Pasadena, Los Angeles County, California, 91125, United States",
+        "address": {
+          "amenity": "California Institute of Technology",
+          "road": "East California Boulevard",
+          "city_district": "Pasadena Council District 7",
+          "city": "Pasadena",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "91125",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "233",
+          "website": "https://www.caltech.edu/",
+          "wikidata": "Q161562",
+          "source_ref": "AM909_DSCV2791",
+          "school:gender": "mixed",
+          "isced:2011:level": "bachelor;doctorate;master"
+        },
+        "namedetails": {
+          "name": "California Institute of Technology",
+          "name:en": "California Institute of Technology",
+          "name:zh": "加州理工学院",
+          "loc_name": "Caltech"
+        },
+        "boundingbox": [
+          "34.1324218",
+          "34.1417441",
+          "-118.1292759",
+          "-118.1214075"
+        ]
+      },
+      {
+        "place_id": 320274167,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 442955747,
+        "lat": "34.3923170",
+        "lon": "-118.5666724",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5375606718049718,
+        "addresstype": "amenity",
+        "name": "California Institute of the Arts",
+        "display_name": "California Institute of the Arts, 24700, McBean Parkway, Santa Clarita, Los Angeles County, California, 91355, United States",
+        "address": {
+          "amenity": "California Institute of the Arts",
+          "house_number": "24700",
+          "road": "McBean Parkway",
+          "city": "Santa Clarita",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "91355",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://calarts.edu/",
+          "wikidata": "Q1026827",
+          "check_date": "2026-02-10"
+        },
+        "namedetails": {
+          "name": "California Institute of the Arts",
+          "name:en": "California Institute Of The Arts",
+          "name:es": "Instituto De Las Artes De California",
+          "short_name": "CalArts"
+        },
+        "boundingbox": [
+          "34.3902772",
+          "34.3946659",
+          "-118.5700360",
+          "-118.5622182"
+        ]
+      },
+      {
+        "place_id": 321012659,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 358858290,
+        "lat": "34.0431787",
+        "lon": "-118.2328067",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.40880653590732546,
+        "addresstype": "amenity",
+        "name": "Southern California Institute of Architecture",
+        "display_name": "Southern California Institute of Architecture, 960, East 3rd Street, Little Tokyo, Downtown, Los Angeles, Los Angeles County, California, 90013, United States",
+        "address": {
+          "amenity": "Southern California Institute of Architecture",
+          "house_number": "960",
+          "road": "East 3rd Street",
+          "quarter": "Little Tokyo",
+          "suburb": "Downtown",
+          "city": "Los Angeles",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "90013",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "79",
+          "wikidata": "Q1786506",
+          "education": "university"
+        },
+        "namedetails": {
+          "name": "Southern California Institute of Architecture"
+        },
+        "boundingbox": [
+          "34.0431287",
+          "34.0432287",
+          "-118.2328567",
+          "-118.2327567"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "San Diego, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 319008413,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 25822522,
+        "lat": "32.8792438",
+        "lon": "-117.2311247",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.607871577126012,
+        "addresstype": "amenity",
+        "name": "University of California, San Diego",
+        "display_name": "University of California, San Diego, 9500, Gilman Drive, Torrey Pines, San Diego, San Diego County, California, 92093, United States",
+        "address": {
+          "amenity": "University of California, San Diego",
+          "house_number": "9500",
+          "road": "Gilman Drive",
+          "suburb": "Torrey Pines",
+          "city": "San Diego",
+          "county": "San Diego County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "92093",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.ucsd.edu/",
+          "wikidata": "Q622664",
+          "education": "university",
+          "wikipedia": "en:University of California, San Diego",
+          "wheelchair": "yes",
+          "short_name_2": "UC San Diego"
+        },
+        "namedetails": {
+          "name": "University of California, San Diego",
+          "name:de": "Universität von Kalifornien, San Diego",
+          "name:en": "University of California, San Diego",
+          "name:es": "Universidad de California en San Diego",
+          "short_name": "UCSD"
+        },
+        "boundingbox": [
+          "32.8635576",
+          "32.8941294",
+          "-117.2547461",
+          "-117.2183739"
+        ]
+      },
+      {
+        "place_id": 316413097,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 31523860,
+        "lat": "32.7218151",
+        "lon": "-117.1624831",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.319279276758968,
+        "addresstype": "amenity",
+        "name": "California Western School of Law",
+        "display_name": "California Western School of Law, 3rd Avenue, Cortez Hill, Banker's Hill, San Diego, San Diego County, California, 92101, United States",
+        "address": {
+          "amenity": "California Western School of Law",
+          "road": "3rd Avenue",
+          "quarter": "Cortez Hill",
+          "suburb": "Banker's Hill",
+          "city": "San Diego",
+          "county": "San Diego County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "92101",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "wikidata": "Q5021183",
+          "check_date": "2024-08-30"
+        },
+        "namedetails": {
+          "name": "California Western School of Law"
+        },
+        "boundingbox": [
+          "32.7215803",
+          "32.7224902",
+          "-117.1628779",
+          "-117.1612042"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "San Francisco, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 323404672,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 34324395,
+        "lat": "37.7627257",
+        "lon": "-122.4582568",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5373462414879644,
+        "addresstype": "amenity",
+        "name": "University of California, San Francisco",
+        "display_name": "University of California, San Francisco, Irving Street, Haight-Ashbury, Richmond District, San Francisco, California, 94117, United States",
+        "address": {
+          "amenity": "University of California, San Francisco",
+          "road": "Irving Street",
+          "quarter": "Haight-Ashbury",
+          "suburb": "Richmond District",
+          "city": "San Francisco",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "94117",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "112",
+          "website": "https://www.ucsf.edu/",
+          "wikidata": "Q1061104",
+          "check_date": "2026-01-15",
+          "wheelchair": "yes"
+        },
+        "namedetails": {
+          "name": "University of California, San Francisco",
+          "name:de": "Universität von Kalifornien, San Francisco",
+          "name:en": "University of California, San Francisco",
+          "short_name": "UCSF"
+        },
+        "boundingbox": [
+          "37.7606042",
+          "37.7648521",
+          "-122.4617952",
+          "-122.4559334"
+        ]
+      },
+      {
+        "place_id": 323904278,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 184540572,
+        "lat": "37.7678590",
+        "lon": "-122.4006019",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.45803640632205495,
+        "addresstype": "amenity",
+        "name": "California College of the Arts",
+        "display_name": "California College of the Arts, 7th Street, Mission Bay, South of Market, San Francisco, California, 94107, United States",
+        "address": {
+          "amenity": "California College of the Arts",
+          "road": "7th Street",
+          "quarter": "Mission Bay",
+          "suburb": "South of Market",
+          "city": "San Francisco",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "94107",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.cca.edu/",
+          "wikidata": "Q1026804",
+          "wikipedia": "en:California College of the Arts"
+        },
+        "namedetails": {
+          "name": "California College of the Arts",
+          "name:en": "California College of the Arts",
+          "alt_name": "CCA",
+          "old_name": "California College of Arts and Crafts;CCAC"
+        },
+        "boundingbox": [
+          "37.7668529",
+          "37.7689084",
+          "-122.4017536",
+          "-122.3976303"
+        ]
+      },
+      {
+        "place_id": 319809978,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 301557499,
+        "lat": "37.7812436",
+        "lon": "-122.4162893",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.3947951802650482,
+        "addresstype": "amenity",
+        "name": "University of California College of the Law, San Francisco",
+        "display_name": "University of California College of the Law, San Francisco, Larkin Street, Civic Center, South of Market, San Francisco, California, 94102, United States",
+        "address": {
+          "amenity": "University of California College of the Law, San Francisco",
+          "road": "Larkin Street",
+          "neighbourhood": "Civic Center",
+          "quarter": "Civic Center",
+          "suburb": "South of Market",
+          "city": "San Francisco",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "94102",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.uchastings.edu/",
+          "wikidata": "Q3577853",
+          "check_date": "2025-04-10"
+        },
+        "namedetails": {
+          "name": "University of California College of the Law, San Francisco",
+          "name:en": "University of California College of the Law, San Francisco",
+          "alt_name": "UC Law San Francisco"
+        },
+        "boundingbox": [
+          "37.7807507",
+          "37.7815569",
+          "-122.4170407",
+          "-122.4154800"
+        ]
+      },
+      {
+        "place_id": 320125549,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 35115837,
+        "lat": "37.7745776",
+        "lon": "-122.4161974",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.3980280368594564,
+        "addresstype": "amenity",
+        "name": "California Institute of Integral Studies",
+        "display_name": "California Institute of Integral Studies, Mission Street, Tenderloin, Mission, San Francisco, California, 94102, United States",
+        "address": {
+          "amenity": "California Institute of Integral Studies",
+          "road": "Mission Street",
+          "quarter": "Tenderloin",
+          "suburb": "Mission",
+          "city": "San Francisco",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "94102",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "14",
+          "height": "43 m",
+          "building": "university",
+          "wikidata": "Q3444680"
+        },
+        "namedetails": {
+          "name": "California Institute of Integral Studies"
+        },
+        "boundingbox": [
+          "37.7743184",
+          "37.7748367",
+          "-122.4165262",
+          "-122.4158687"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q184478",
+    "name": "University of California",
+    "city": "Santa Barbara, CA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 321309449,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 12409275,
+        "lat": "34.4146025",
+        "lon": "-119.8458100",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6003253632295261,
+        "addresstype": "amenity",
+        "name": "University of California, Santa Barbara",
+        "display_name": "University of California, Santa Barbara, 552, Greenleaf Court, Storke Ranch, Goleta, Santa Barbara County, California, 93106, United States",
+        "address": {
+          "amenity": "University of California, Santa Barbara",
+          "house_number": "552",
+          "road": "Greenleaf Court",
+          "residential": "Storke Ranch",
+          "town": "Goleta",
+          "county": "Santa Barbara County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "93106",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "14",
+          "mascot": "Gauchos",
+          "website": "https://www.ucsb.edu/",
+          "wikidata": "Q263064",
+          "education": "university",
+          "wikipedia": "en:University of California, Santa Barbara",
+          "check_date": "2025-10-10",
+          "school:gender": "mixed",
+          "isced:2011:level": "bachelor;doctorate;master"
+        },
+        "namedetails": {
+          "name": "University of California, Santa Barbara",
+          "name:de": "Universität von Kalifornien, Santa Barbara",
+          "name:en": "University of California, Santa Barbara",
+          "short_name": "UCSB;UC Santa Barbara"
+        },
+        "boundingbox": [
+          "34.4047282",
+          "34.4243898",
+          "-119.8851062",
+          "-119.8360564"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q18627472",
+    "name": "DuPont",
+    "city": "Dangé-Saint-Romain",
+    "country": "France",
+    "results": []
+  },
+  {
+    "qid": "Q186394",
+    "name": "Fujitsu",
+    "city": "Kawasaki",
+    "country": "Japan",
+    "results": [
+      {
+        "place_id": 265234393,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 87703730,
+        "lat": "35.5782457",
+        "lon": "139.6422000",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.0000683306630044559,
+        "addresstype": "building",
+        "name": "富士通中原ビル (Fujitsu Naakahara Building)",
+        "display_name": "富士通中原ビル (Fujitsu Naakahara Building), 中原街道, 下小田中一丁目, 下小田中, 中原区, 川崎市, 神奈川県, 211-0041, 日本",
+        "address": {
+          "building": "富士通中原ビル (Fujitsu Naakahara Building)",
+          "road": "中原街道",
+          "neighbourhood": "下小田中一丁目",
+          "quarter": "下小田中",
+          "suburb": "中原区",
+          "city": "川崎市",
+          "province": "神奈川県",
+          "ISO3166-2-lvl4": "JP-14",
+          "postcode": "211-0041",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "富士通中原ビル (Fujitsu Naakahara Building)"
+        },
+        "boundingbox": [
+          "35.5780856",
+          "35.5784660",
+          "139.6417409",
+          "139.6426646"
+        ]
+      },
+      {
+        "place_id": 267548137,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 87699611,
+        "lat": "35.5825717",
+        "lon": "139.6422690",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.0000683306630044559,
+        "addresstype": "building",
+        "name": "富士通研究所 (Fujitsu Lab)",
+        "display_name": "富士通研究所 (Fujitsu Lab), 南武沿線道路, 上小田中四丁目, 上小田中, 中原区, 川崎市, 神奈川県, 211-0053, 日本",
+        "address": {
+          "building": "富士通研究所 (Fujitsu Lab)",
+          "road": "南武沿線道路",
+          "neighbourhood": "上小田中四丁目",
+          "quarter": "上小田中",
+          "suburb": "中原区",
+          "city": "川崎市",
+          "province": "神奈川県",
+          "ISO3166-2-lvl4": "JP-14",
+          "postcode": "211-0053",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "富士通研究所 (Fujitsu Lab)",
+          "name:en": "Fujitsu Lab",
+          "name:ja": "富士通研究所 (Fujitsu Lab)"
+        },
+        "boundingbox": [
+          "35.5824010",
+          "35.5827391",
+          "139.6417706",
+          "139.6427710"
+        ]
+      },
+      {
+        "place_id": 265122525,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 80913272,
+        "lat": "35.5783021",
+        "lon": "139.6445621",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.0000683306630044559,
+        "addresstype": "building",
+        "name": "富士通エフ・アイ・ピー (Fujitsu FIP)",
+        "display_name": "富士通エフ・アイ・ピー (Fujitsu FIP), 南武沿線道路, 上小田中六丁目, 上小田中, 中原区, 川崎市, 神奈川県, 211-0053, 日本",
+        "address": {
+          "building": "富士通エフ・アイ・ピー (Fujitsu FIP)",
+          "road": "南武沿線道路",
+          "neighbourhood": "上小田中六丁目",
+          "quarter": "上小田中",
+          "suburb": "中原区",
+          "city": "川崎市",
+          "province": "神奈川県",
+          "ISO3166-2-lvl4": "JP-14",
+          "postcode": "211-0053",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "富士通エフ・アイ・ピー (Fujitsu FIP)"
+        },
+        "boundingbox": [
+          "35.5781439",
+          "35.5784748",
+          "139.6443407",
+          "139.6447833"
+        ]
+      },
+      {
+        "place_id": 261903093,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 87698969,
+        "lat": "35.5831389",
+        "lon": "139.6423165",
+        "category": "amenity",
+        "type": "hospital",
+        "place_rank": 30,
+        "importance": 0.09078915819201436,
+        "addresstype": "amenity",
+        "name": "富士通クリニック",
+        "display_name": "富士通クリニック, 南武沿線道路, 上小田中四丁目, 上小田中, 中原区, 川崎市, 神奈川県, 211-0053, 日本",
+        "address": {
+          "amenity": "富士通クリニック",
+          "road": "南武沿線道路",
+          "neighbourhood": "上小田中四丁目",
+          "quarter": "上小田中",
+          "suburb": "中原区",
+          "city": "川崎市",
+          "province": "神奈川県",
+          "ISO3166-2-lvl4": "JP-14",
+          "postcode": "211-0053",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": {
+          "building": "yes",
+          "wikidata": "Q11456220",
+          "wikipedia": "ja:富士通クリニック",
+          "healthcare": "hospital"
+        },
+        "namedetails": {
+          "name": "富士通クリニック",
+          "name:en": "Fujitsu Clinic",
+          "name:ja": "富士通クリニック"
+        },
+        "boundingbox": [
+          "35.5829984",
+          "35.5835432",
+          "139.6419754",
+          "139.6425698"
+        ]
+      },
+      {
+        "place_id": 264697253,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 58777347,
+        "lat": "35.5838110",
+        "lon": "139.6397941",
+        "category": "man_made",
+        "type": "works",
+        "place_rank": 30,
+        "importance": 0.0000683306630044559,
+        "addresstype": "man_made",
+        "name": "富士通川崎工場",
+        "display_name": "富士通川崎工場, 南武沿線道路, 上小田中四丁目, 上小田中, 中原区, 川崎市, 神奈川県, 211-0053, 日本",
+        "address": {
+          "man_made": "富士通川崎工場",
+          "road": "南武沿線道路",
+          "neighbourhood": "上小田中四丁目",
+          "quarter": "上小田中",
+          "suburb": "中原区",
+          "city": "川崎市",
+          "province": "神奈川県",
+          "ISO3166-2-lvl4": "JP-14",
+          "postcode": "211-0053",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": {
+          "landuse": "industrial"
+        },
+        "namedetails": {
+          "name": "富士通川崎工場",
+          "name:en": "Fujitsu Kawasaki factory",
+          "name:ja": "富士通川崎工場"
+        },
+        "boundingbox": [
+          "35.5814713",
+          "35.5858874",
+          "139.6380568",
+          "139.6415688"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q19952130",
+    "name": "Brussels University",
+    "city": "Brussels",
+    "country": "Belgium",
+    "results": [
+      {
+        "place_id": 106074375,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 12379370034,
+        "lat": "50.8137605",
+        "lon": "4.3789118",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.43407397006149884,
+        "addresstype": "amenity",
+        "name": "Solvay Brussels School of Economics & Management",
+        "display_name": "Solvay Brussels School of Economics & Management, Chemin Henri Storck, Petite Suisse - Klein-Zwitserland, south extension of Brussels, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1050, België / Belgique / Belgien",
+        "address": {
+          "amenity": "Solvay Brussels School of Economics & Management",
+          "road": "Chemin Henri Storck",
+          "neighbourhood": "Petite Suisse - Klein-Zwitserland",
+          "city_district": "Bruxelles - Brussel",
+          "city": "Bruxelles - Brussel",
+          "county": "Brussel-Hoofdstad - Bruxelles-Capitale",
+          "region": "Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest",
+          "ISO3166-2-lvl4": "BE-BRU",
+          "postcode": "1050",
+          "country": "België / Belgique / Belgien",
+          "country_code": "be"
+        },
+        "extratags": {
+          "operator": "Université Libre de Bruxelles",
+          "wikidata": "Q3247899",
+          "contact:website": "https://www.solvay.edu/"
+        },
+        "namedetails": {
+          "name": "Solvay Brussels School of Economics & Management",
+          "old_name": "Solvay Business School",
+          "short_name": "SBS-EM"
+        },
+        "boundingbox": [
+          "50.8137105",
+          "50.8138105",
+          "4.3788618",
+          "4.3789618"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q20266894",
+    "name": "Berlin University",
+    "city": "Berlin",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 144115015,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 12741778,
+        "lat": "52.5185793",
+        "lon": "13.3935975",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6953355174617015,
+        "addresstype": "amenity",
+        "name": "Humboldt-Universität zu Berlin - Campus Mitte",
+        "display_name": "Humboldt-Universität zu Berlin - Campus Mitte, Dorotheenstraße, Dorotheenstadt, Mitte, Berlin, 10117, Deutschland",
+        "address": {
+          "amenity": "Humboldt-Universität zu Berlin - Campus Mitte",
+          "road": "Dorotheenstraße",
+          "quarter": "Dorotheenstadt",
+          "suburb": "Mitte",
+          "borough": "Mitte",
+          "city": "Berlin",
+          "ISO3166-2-lvl4": "DE-BE",
+          "postcode": "10117",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "phone": "+49 30 20930",
+          "website": "https://www.hu-berlin.de/de",
+          "wikidata": "Q152087",
+          "wikipedia": "de:Humboldt-Universität zu Berlin",
+          "wheelchair": "yes",
+          "wikimedia_commons": "Category:Humboldt-Universität zu Berlin"
+        },
+        "namedetails": {
+          "name": "Humboldt-Universität zu Berlin - Campus Mitte",
+          "name:cs": "Humboldtova univerzita v Berlíně",
+          "name:de": "Humboldt-Universität zu Berlin - Campus Mitte",
+          "name:en": "Humboldt University in Berlin Mitte Campus"
+        },
+        "boundingbox": [
+          "52.5159669",
+          "52.5200704",
+          "13.3906703",
+          "13.3948873"
+        ]
+      },
+      {
+        "place_id": 145481119,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 11148577,
+        "lat": "52.4528565",
+        "lon": "13.2907249",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6412025397246642,
+        "addresstype": "amenity",
+        "name": "Freie Universität Berlin",
+        "display_name": "Freie Universität Berlin, Lansstraße, Dahlem, Steglitz-Zehlendorf, Berlin, 14195, Deutschland",
+        "address": {
+          "amenity": "Freie Universität Berlin",
+          "road": "Lansstraße",
+          "suburb": "Dahlem",
+          "borough": "Steglitz-Zehlendorf",
+          "city": "Berlin",
+          "ISO3166-2-lvl4": "DE-BE",
+          "postcode": "14195",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "wikidata": "Q153006",
+          "education": "university",
+          "wheelchair": "limited",
+          "toilets:wheelchair": "yes"
+        },
+        "namedetails": {
+          "name": "Freie Universität Berlin",
+          "name:de": "Freie Universität Berlin",
+          "alt_name": "FU Berlin"
+        },
+        "boundingbox": [
+          "52.4500944",
+          "52.4578221",
+          "13.2869237",
+          "13.3000220"
+        ]
+      },
+      {
+        "place_id": 146308638,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 1273140,
+        "lat": "52.5110159",
+        "lon": "13.3269541",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6119376086955474,
+        "addresstype": "amenity",
+        "name": "Technische Universität Berlin",
+        "display_name": "Technische Universität Berlin, Müller-Breslau-Straße, Tiergarten, Mitte, Berlin, 10623, Deutschland",
+        "address": {
+          "amenity": "Technische Universität Berlin",
+          "road": "Müller-Breslau-Straße",
+          "suburb": "Tiergarten",
+          "borough": "Mitte",
+          "city": "Berlin",
+          "ISO3166-2-lvl4": "DE-BE",
+          "postcode": "10623",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "wikidata": "Q51985"
+        },
+        "namedetails": {
+          "name": "Technische Universität Berlin",
+          "name:de": "Technische Universität Berlin",
+          "name:pl": "Berliński Uniwersytet Techniczny",
+          "alt_name": "TU Berlin"
+        },
+        "boundingbox": [
+          "52.4565962",
+          "52.5208548",
+          "13.3150920",
+          "13.3365650"
+        ]
+      },
+      {
+        "place_id": 144902909,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 14720811,
+        "lat": "52.5096672",
+        "lon": "13.3277920",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5881574816255354,
+        "addresstype": "amenity",
+        "name": "Universität der Künste Berlin",
+        "display_name": "Universität der Künste Berlin, Joachimsthaler Straße, City West, Charlottenburg, Charlottenburg-Wilmersdorf, Berlin, 10789, Deutschland",
+        "address": {
+          "amenity": "Universität der Künste Berlin",
+          "road": "Joachimsthaler Straße",
+          "neighbourhood": "City West",
+          "suburb": "Charlottenburg",
+          "borough": "Charlottenburg-Wilmersdorf",
+          "city": "Berlin",
+          "ISO3166-2-lvl4": "DE-BE",
+          "postcode": "10789",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.udk-berlin.de/",
+          "wikidata": "Q55038",
+          "wikipedia": "de:Universität der Künste Berlin",
+          "start_date": "1696",
+          "wheelchair": "limited"
+        },
+        "namedetails": {
+          "name": "Universität der Künste Berlin",
+          "name:de": "Universität der Künste Berlin",
+          "name:en": "Berlin University of the Arts",
+          "name:es": "Universidad de las Artes de Berlín",
+          "name:fr": "Université des arts de Berlin",
+          "name:nl": "Universiteit voor de Kunsten Berlijn",
+          "name:pl": "Berliński Uniwersytet Sztuki",
+          "name:tr": "Berlin Sanat Üniversitesi",
+          "alt_name": "Universität der Künste",
+          "old_name": "Hochschule der Künste Berlin",
+          "short_name": "UdK Berlin"
+        },
+        "boundingbox": [
+          "52.4979054",
+          "52.5107400",
+          "13.3262065",
+          "13.3332654"
+        ]
+      },
+      {
+        "place_id": 145267454,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 97283527,
+        "lat": "52.5171026",
+        "lon": "13.3218723",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5881574816255354,
+        "addresstype": "amenity",
+        "name": "Universitätsarchiv – Universität der Künste Berlin",
+        "display_name": "Universitätsarchiv – Universität der Künste Berlin, 43, Einsteinufer, Spreestadt Charlottenburg, Charlottenburg, Charlottenburg-Wilmersdorf, Berlin, 10587, Deutschland",
+        "address": {
+          "amenity": "Universitätsarchiv – Universität der Künste Berlin",
+          "house_number": "43",
+          "road": "Einsteinufer",
+          "quarter": "Spreestadt Charlottenburg",
+          "suburb": "Charlottenburg",
+          "borough": "Charlottenburg-Wilmersdorf",
+          "city": "Berlin",
+          "ISO3166-2-lvl4": "DE-BE",
+          "postcode": "10587",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "building": "university",
+          "operator": "Universität der Künste",
+          "wikipedia": "de:Universität der Künste Berlin",
+          "roof:shape": "flat",
+          "wheelchair": "yes",
+          "building:levels": "1"
+        },
+        "namedetails": {
+          "name": "Universitätsarchiv – Universität der Künste Berlin",
+          "name:de": "Universitätsarchiv – Universität der Künste Berlin",
+          "name:en": "University of the Arts",
+          "old_name": "Hochschule der Künste Berlin",
+          "short_name": "UdK Berlin"
+        },
+        "boundingbox": [
+          "52.5166270",
+          "52.5175287",
+          "13.3213656",
+          "13.3229430"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q212322",
+    "name": "GSK",
+    "city": "Siena",
+    "country": "Italy",
+    "results": [
+      {
+        "place_id": 81543016,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 16405923,
+        "lat": "43.3325662",
+        "lon": "11.3053851",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.00007175173571369525,
+        "addresstype": "amenity",
+        "name": "GSK Vaccines",
+        "display_name": "GSK Vaccines, 1, Via Fiorentina, Le Terrazze, Petriccio, Siena, Toscana, 53100, Italia",
+        "address": {
+          "amenity": "GSK Vaccines",
+          "house_number": "1",
+          "road": "Via Fiorentina",
+          "residential": "Le Terrazze",
+          "suburb": "Petriccio",
+          "city": "Siena",
+          "county": "Siena",
+          "ISO3166-2-lvl6": "IT-SI",
+          "state": "Toscana",
+          "ISO3166-2-lvl4": "IT-52",
+          "postcode": "53100",
+          "country": "Italia",
+          "country_code": "it"
+        },
+        "extratags": {
+          "phone": "+39 0577 243111",
+          "office": "research",
+          "landuse": "industrial",
+          "website": "https://www.gsk.com/",
+          "old_name_1": "Sclavo",
+          "opening_hours": "Mo-Fr 09:00-18:00"
+        },
+        "namedetails": {
+          "name": "GSK Vaccines",
+          "old_name": "Istituto Vaccinogeno Sieroterapico Toscano",
+          "short_name": "GSK"
+        },
+        "boundingbox": [
+          "43.3302963",
+          "43.3347562",
+          "11.3029334",
+          "11.3101915"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q219563",
+    "name": "University of Washington",
+    "city": "Seattle, WA",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 325565492,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 5268488,
+        "lat": "47.6554303",
+        "lon": "-122.3001692",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.6610522795484114,
+        "addresstype": "amenity",
+        "name": "University of Washington",
+        "display_name": "University of Washington, 1410, Northeast Campus Parkway, West Campus, University District, Seattle, King County, Washington, 98195, United States",
+        "address": {
+          "amenity": "University of Washington",
+          "house_number": "1410",
+          "road": "Northeast Campus Parkway",
+          "neighbourhood": "West Campus",
+          "suburb": "University District",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98195",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "branch": "UW-Seattle",
+          "website": "http://www.washington.edu",
+          "operator": "University of Washington",
+          "wikidata": "Q219563",
+          "education": "university",
+          "wikipedia": "en:University of Washington",
+          "internet_access": "wlan"
+        },
+        "namedetails": {
+          "name": "University of Washington",
+          "name:en": "University of Washington",
+          "name:zh": "華盛頓大學",
+          "alt_name": "UW",
+          "short_name": "UW",
+          "alt_name:zh": "華大",
+          "name:zh-Hans": "华盛顿大学",
+          "name:zh-Hant": "華盛頓大學",
+          "alt_name:zh-Hans": "华大",
+          "alt_name:zh-Hant": "華大"
+        },
+        "boundingbox": [
+          "47.6477824",
+          "47.6660717",
+          "-122.3218076",
+          "-122.2875884"
+        ]
+      },
+      {
+        "place_id": 325591415,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 325150399,
+        "lat": "47.6498198",
+        "lon": "-122.3038271",
+        "category": "building",
+        "type": "train_station",
+        "place_rank": 30,
+        "importance": 0.3090170114439377,
+        "addresstype": "building",
+        "name": "University of Washington",
+        "display_name": "University of Washington, 3720, Montlake Boulevard Northeast, South Campus, University District, Seattle, King County, Washington, 98105, United States",
+        "address": {
+          "building": "University of Washington",
+          "house_number": "3720",
+          "road": "Montlake Boulevard Northeast",
+          "neighbourhood": "South Campus",
+          "suburb": "University District",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98105",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "wikidata": "Q7896563",
+          "wikipedia": "en:University of Washington station",
+          "building:levels": "2",
+          "contact:website": "https://www.soundtransit.org/ride-with-us/stops-stations/university-washington-station",
+          "wikimedia_commons": "Category:University of Washington (Link station)"
+        },
+        "namedetails": {
+          "name": "University of Washington"
+        },
+        "boundingbox": [
+          "47.6495516",
+          "47.6500589",
+          "-122.3039659",
+          "-122.3037481"
+        ]
+      },
+      {
+        "place_id": 325737982,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 8511481731,
+        "lat": "47.6498518",
+        "lon": "-122.3037660",
+        "category": "railway",
+        "type": "station",
+        "place_rank": 30,
+        "importance": 0.3090170114439377,
+        "addresstype": "railway",
+        "name": "University of Washington",
+        "display_name": "University of Washington, 3720, Montlake Boulevard Northeast, South Campus, University District, Seattle, King County, Washington, 98105, United States",
+        "address": {
+          "railway": "University of Washington",
+          "house_number": "3720",
+          "road": "Montlake Boulevard Northeast",
+          "neighbourhood": "South Campus",
+          "suburb": "University District",
+          "city": "Seattle",
+          "county": "King County",
+          "state": "Washington",
+          "ISO3166-2-lvl4": "US-WA",
+          "postcode": "98105",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "network": "Link Light Rail",
+          "station": "light_rail",
+          "operator": "Sound Transit",
+          "wikidata": "Q7896563",
+          "wikipedia": "en:University of Washington station",
+          "light_rail": "yes",
+          "wheelchair": "yes",
+          "description": "Light rail station in Seattle, Washington, USA",
+          "public_transport": "station",
+          "not:network:wikidata": "Q7564853"
+        },
+        "namedetails": {
+          "ref": "48",
+          "name": "University of Washington",
+          "name:en": "University of Washington"
+        },
+        "boundingbox": [
+          "47.6448518",
+          "47.6548518",
+          "-122.3087660",
+          "-122.2987660"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q24638021",
+    "name": "Middlesex Hospital Medical School",
+    "city": "London",
+    "country": "United Kingdom",
+    "results": []
+  },
+  {
+    "qid": "Q248",
+    "name": "Intel",
+    "city": "Santa Clara",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 321639270,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 31311353,
+        "lat": "37.3893179",
+        "lon": "-121.9790117",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.5040290766446917,
+        "addresstype": "building",
+        "name": "McAfee",
+        "display_name": "McAfee, Mission College Boulevard, Santa Clara, Santa Clara County, California, 95054, United States",
+        "address": {
+          "building": "McAfee",
+          "road": "Mission College Boulevard",
+          "city": "Santa Clara",
+          "county": "Santa Clara County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "95054",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "height": "34.8",
+          "website": "https://www.mcafee.com/us/about/ebc/santa-clara/map-directions.aspx",
+          "wikidata": "Q267313",
+          "wikipedia": "en:McAfee",
+          "building:levels": "8"
+        },
+        "namedetails": {
+          "name": "McAfee",
+          "name:en": "McAfee",
+          "old_name": "Intel Security"
+        },
+        "boundingbox": [
+          "37.3890053",
+          "37.3896305",
+          "-121.9793535",
+          "-121.9786700"
+        ]
+      },
+      {
+        "place_id": 318765053,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 1710205852,
+        "lat": "37.3878290",
+        "lon": "-121.9633667",
+        "category": "tourism",
+        "type": "museum",
+        "place_rank": 30,
+        "importance": 0.35782926338984733,
+        "addresstype": "tourism",
+        "name": "Intel Museum",
+        "display_name": "Intel Museum, 2200, Mission College Boulevard, Agnew, Santa Clara, Santa Clara County, California, 95054, United States",
+        "address": {
+          "tourism": "Intel Museum",
+          "house_number": "2200",
+          "road": "Mission College Boulevard",
+          "hamlet": "Agnew",
+          "city": "Santa Clara",
+          "county": "Santa Clara County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "95054",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "fee": "no",
+          "phone": "+1-408-765-5050",
+          "website": "https://www.intel.com/content/www/us/en/company-overview/intel-museum.html",
+          "wikidata": "Q6043501"
+        },
+        "namedetails": {
+          "name": "Intel Museum"
+        },
+        "boundingbox": [
+          "37.3877790",
+          "37.3878790",
+          "-121.9634167",
+          "-121.9633167"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q270272",
+    "name": "Rockefeller University",
+    "city": "",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 355567084,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 108158013,
+        "lat": "40.7624395",
+        "lon": "-73.9557565",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5586543507546606,
+        "addresstype": "amenity",
+        "name": "Rockefeller University",
+        "display_name": "Rockefeller University, 1230, York Avenue, Roosevelt Island, Manhattan Community Board 8, Manhattan, New York County, New York, 10065, United States",
+        "address": {
+          "amenity": "Rockefeller University",
+          "house_number": "1230",
+          "road": "York Avenue",
+          "neighbourhood": "Roosevelt Island",
+          "suburb": "Manhattan",
+          "county": "New York County",
+          "city": "New York",
+          "state": "New York",
+          "ISO3166-2-lvl4": "US-NY",
+          "postcode": "10065",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1 212 327 8000",
+          "website": "https://www.rockefeller.edu/",
+          "wikidata": "Q270272",
+          "wikipedia": "en:Rockefeller University",
+          "check_date": "2024-05-21"
+        },
+        "namedetails": {
+          "name": "Rockefeller University"
+        },
+        "boundingbox": [
+          "40.7603422",
+          "40.7642057",
+          "-73.9581436",
+          "-73.9537599"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q270272",
+    "name": "Rockefeller University",
+    "city": "New York City",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 358994931,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 108158013,
+        "lat": "40.7624395",
+        "lon": "-73.9557565",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5586543507546606,
+        "addresstype": "amenity",
+        "name": "Rockefeller University",
+        "display_name": "Rockefeller University, 1230, York Avenue, Lenox Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10065, United States",
+        "address": {
+          "amenity": "Rockefeller University",
+          "house_number": "1230",
+          "road": "York Avenue",
+          "neighbourhood": "Lenox Hill",
+          "suburb": "Manhattan",
+          "county": "New York County",
+          "city": "New York",
+          "state": "New York",
+          "ISO3166-2-lvl4": "US-NY",
+          "postcode": "10065",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1 212 327 8000",
+          "website": "https://www.rockefeller.edu/",
+          "wikidata": "Q270272",
+          "wikipedia": "en:Rockefeller University",
+          "check_date": "2024-05-21"
+        },
+        "namedetails": {
+          "name": "Rockefeller University"
+        },
+        "boundingbox": [
+          "40.7603422",
+          "40.7642057",
+          "-73.9581436",
+          "-73.9537599"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q28154621",
+    "name": "Imperial Cancer Research Fund",
+    "city": "London",
+    "country": "United Kingdom",
+    "results": []
+  },
+  {
+    "qid": "Q30256699",
+    "name": "BioNTech",
+    "city": "Mainz",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 125048076,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 8998983352,
+        "lat": "49.9877842",
+        "lon": "8.2713763",
+        "category": "office",
+        "type": "research",
+        "place_rank": 30,
+        "importance": 0.46947412653329906,
+        "addresstype": "office",
+        "name": "BioNTech SE",
+        "display_name": "BioNTech SE, 12, An der Goldgrube, Siedlung am Fichteplatz, Oberstadt, Mainz, Rheinland-Pfalz, 55131, Deutschland",
+        "address": {
+          "office": "BioNTech SE",
+          "house_number": "12",
+          "road": "An der Goldgrube",
+          "neighbourhood": "Siedlung am Fichteplatz",
+          "suburb": "Oberstadt",
+          "city": "Mainz",
+          "state": "Rheinland-Pfalz",
+          "ISO3166-2-lvl4": "DE-RP",
+          "postcode": "55131",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "email": "info@biontech.de",
+          "phone": "+49 6131 9084 0",
+          "website": "https://biontech.de",
+          "research": "medicine",
+          "wikidata": "Q30256699",
+          "contact:fax": "+49 6131 9084 2121",
+          "wikipedia:en": "BioNTech"
+        },
+        "namedetails": {
+          "name": "BioNTech SE"
+        },
+        "boundingbox": [
+          "49.9877342",
+          "49.9878342",
+          "8.2713263",
+          "8.2714263"
+        ]
+      },
+      {
+        "place_id": 423186428,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 14022219262,
+        "lat": "49.9553756",
+        "lon": "8.2527710",
+        "category": "office",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.00007383611810478397,
+        "addresstype": "office",
+        "name": "BioNTech SE Innovation Hub",
+        "display_name": "BioNTech SE Innovation Hub, 10, Adam-Opel-Straße, Wirtschaftspark Mainz-Süd, Hechtsheim, Mainz, Rheinland-Pfalz, 55129, Deutschland",
+        "address": {
+          "office": "BioNTech SE Innovation Hub",
+          "house_number": "10",
+          "road": "Adam-Opel-Straße",
+          "quarter": "Wirtschaftspark Mainz-Süd",
+          "suburb": "Hechtsheim",
+          "city": "Mainz",
+          "state": "Rheinland-Pfalz",
+          "ISO3166-2-lvl4": "DE-RP",
+          "postcode": "55129",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "website": "https://www.biontech.com"
+        },
+        "namedetails": {
+          "name": "BioNTech SE Innovation Hub"
+        },
+        "boundingbox": [
+          "49.9553256",
+          "49.9554256",
+          "8.2527210",
+          "8.2528210"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q3146518",
+    "name": "IBM Research",
+    "city": "Yorktown Heights",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q3152167",
+    "name": "Institut Imagine",
+    "city": "Paris",
+    "country": "France",
+    "results": [
+      {
+        "place_id": 97886081,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 114528788,
+        "lat": "48.8452470",
+        "lon": "2.3181018",
+        "category": "building",
+        "type": "office",
+        "place_rank": 30,
+        "importance": 0.00009317235065227768,
+        "addresstype": "building",
+        "name": "Institut des Maladies Génétiques - Imagine",
+        "display_name": "Institut des Maladies Génétiques - Imagine, Square du Croisic, Quartier Necker, Paris 15e Arrondissement, Paris, Île-de-France, France métropolitaine, 75015, France",
+        "address": {
+          "building": "Institut des Maladies Génétiques - Imagine",
+          "road": "Square du Croisic",
+          "city_block": "Quartier Necker",
+          "suburb": "Paris 15e Arrondissement",
+          "city_district": "Paris",
+          "city": "Paris",
+          "ISO3166-2-lvl6": "FR-75C",
+          "state": "Île-de-France",
+          "ISO3166-2-lvl4": "FR-IDF",
+          "region": "France métropolitaine",
+          "postcode": "75015",
+          "country": "France",
+          "country_code": "fr"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "Institut des Maladies Génétiques - Imagine",
+          "name:fr": "Institut des Maladies Génétiques - Imagine",
+          "alt_name": "Imagine"
+        },
+        "boundingbox": [
+          "48.8449129",
+          "48.8457308",
+          "2.3175371",
+          "2.3188139"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q3350649",
+    "name": "Corporation for National Research Initiatives",
+    "city": "Reston",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q37156",
+    "name": "IBM",
+    "city": "Yorktown Heights",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q390551",
+    "name": "National Institutes of Health",
+    "city": "Bethesda, MD",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 348405324,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 42921793,
+        "lat": "39.0000143",
+        "lon": "-77.1040039",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.6127066535096652,
+        "addresstype": "amenity",
+        "name": "National Institutes of Health",
+        "display_name": "National Institutes of Health, 9000, Rockville Pike, Pooks Hill, Bethesda, Montgomery County, Maryland, 20892, United States",
+        "address": {
+          "amenity": "National Institutes of Health",
+          "house_number": "9000",
+          "road": "Rockville Pike",
+          "suburb": "Pooks Hill",
+          "city": "Bethesda",
+          "county": "Montgomery County",
+          "state": "Maryland",
+          "ISO3166-2-lvl4": "US-MD",
+          "postcode": "20892",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "ele": "95",
+          "wikidata": "Q390551",
+          "operator:type": "government"
+        },
+        "namedetails": {
+          "name": "National Institutes of Health",
+          "name:de": "Nationale Gesundheitsinstitute",
+          "name:en": "National Institutes of Health",
+          "short_name": "NIH"
+        },
+        "boundingbox": [
+          "38.9938715",
+          "39.0061951",
+          "-77.1100086",
+          "-77.0969438"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q390551",
+    "name": "National Institutes of Health",
+    "city": "Framingham",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q414147",
+    "name": "Academy of Sciences",
+    "city": "Moscow",
+    "country": "Russia",
+    "results": [
+      {
+        "place_id": 195975738,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 6630668245,
+        "lat": "55.6802582",
+        "lon": "37.5713164",
+        "category": "office",
+        "type": "research",
+        "place_rank": 30,
+        "importance": 0.44965087387585717,
+        "addresstype": "office",
+        "name": "Институт научной информации по общественным наукам РАН",
+        "display_name": "Институт научной информации по общественным наукам РАН, 15 к2, улица Кржижановского, Академический район, Москва, Центральный федеральный округ, 117218, Россия",
+        "address": {
+          "office": "Институт научной информации по общественным наукам РАН",
+          "house_number": "15 к2",
+          "road": "улица Кржижановского",
+          "suburb": "Академический район",
+          "city": "Москва",
+          "state": "Москва",
+          "ISO3166-2-lvl4": "RU-MOW",
+          "region": "Центральный федеральный округ",
+          "postcode": "117218",
+          "country": "Россия",
+          "country_code": "ru"
+        },
+        "extratags": {
+          "amenity": "research_institute",
+          "wikidata": "Q4201615",
+          "wikipedia": "ru:Институт научной информации по общественным наукам РАН",
+          "contact:fax": "+7 499 1288881",
+          "contact:email": "info@inion.ru",
+          "contact:phone": "+7 499 1288881",
+          "contact:website": "http://www.inion.ru/"
+        },
+        "namedetails": {
+          "name": "Институт научной информации по общественным наукам РАН",
+          "name:de": "Institut für gesellschafts­wissenschaftliche Information der russischen Akademie der Wissenschaften",
+          "name:en": "Institute of Scientific Information in Social Sciences of the Russian Academy of Sciences",
+          "name:ru": "Институт научной информации по общественным наукам РАН",
+          "short_name": "ИНИОН",
+          "official_name": "Федеральное государственное бюджетное учреждение науки Институт научной информации по общественным наукам Российской академии наук"
+        },
+        "boundingbox": [
+          "55.6802082",
+          "55.6803082",
+          "37.5712664",
+          "37.5713664"
+        ]
+      },
+      {
+        "place_id": 195980389,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 5619882593,
+        "lat": "55.6932801",
+        "lon": "37.5609066",
+        "category": "amenity",
+        "type": "library",
+        "place_rank": 30,
+        "importance": 0.44965087387585717,
+        "addresstype": "amenity",
+        "name": "Институт научной информации по общественным наукам РАН",
+        "display_name": "Институт научной информации по общественным наукам РАН, улица Дмитрия Ульянова, Гагаринский район, Москва, Центральный федеральный округ, 119333, Россия",
+        "address": {
+          "amenity": "Институт научной информации по общественным наукам РАН",
+          "road": "улица Дмитрия Ульянова",
+          "suburb": "Гагаринский район",
+          "city": "Москва",
+          "state": "Москва",
+          "ISO3166-2-lvl4": "RU-MOW",
+          "region": "Центральный федеральный округ",
+          "postcode": "119333",
+          "country": "Россия",
+          "country_code": "ru"
+        },
+        "extratags": {
+          "wikidata": "Q4201615",
+          "wikipedia": "ru:Институт научной информации по общественным наукам РАН",
+          "check_date": "2024-08-07",
+          "contact:email": "info@inion.ru",
+          "contact:website": "http://www.inion.ru/"
+        },
+        "namedetails": {
+          "name": "Институт научной информации по общественным наукам РАН",
+          "name:de": "Institut für gesellschafts­wissenschaftliche Information der russischen Akademie der Wissenschaften",
+          "name:en": "Institute of Scientific Information for Social Sciences of the Russian Academy of Sciences",
+          "name:ru": "Институт научной информации по общественным наукам РАН",
+          "short_name": "ИНИОН",
+          "official_name": "Федеральное государственное бюджетное учреждение науки Институт научной информации по общественным наукам Российской академии наук"
+        },
+        "boundingbox": [
+          "55.6932301",
+          "55.6933301",
+          "37.5608566",
+          "37.5609566"
+        ]
+      },
+      {
+        "place_id": 195677704,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 1250623,
+        "lat": "55.8382165",
+        "lon": "37.6009817",
+        "category": "leisure",
+        "type": "park",
+        "place_rank": 24,
+        "importance": 0.41215939017041997,
+        "addresstype": "park",
+        "name": "Главный ботанический сад",
+        "display_name": "Главный ботанический сад, Останкинский район, Москва, Центральный федеральный округ, Россия",
+        "address": {
+          "park": "Главный ботанический сад",
+          "suburb": "Останкинский район",
+          "city": "Москва",
+          "state": "Москва",
+          "ISO3166-2-lvl4": "RU-MOW",
+          "region": "Центральный федеральный округ",
+          "country": "Россия",
+          "country_code": "ru"
+        },
+        "extratags": {
+          "fax": "+7 499 9779172",
+          "email": "info@gbsad.ru",
+          "phone": "+7 499 9779145",
+          "website": "http://gbsad.ru/",
+          "wikidata": "Q894653",
+          "wikipedia": "ru:Главный ботанический сад имени Н. В. Цицина РАН"
+        },
+        "namedetails": {
+          "name": "Главный ботанический сад",
+          "name:de": "Botanischer Garten Moskau",
+          "name:en": "Moscow Botanical Garden of Academy of Sciences",
+          "name:eo": "Botanika ĝardeno en Moskvo",
+          "name:es": "Jardín Botánico N.V.Tsitsin",
+          "name:fr": "Jardin botanique de Moscou",
+          "name:it": "Orto botanico di Mosca",
+          "name:ru": "Главный ботанический сад",
+          "name:tr": "Bilimler Akademisi Ana Botanik Bahçesi",
+          "official_name": "Главный ботанический сад имени Н. В. Цицина РАН"
+        },
+        "boundingbox": [
+          "55.8301497",
+          "55.8464892",
+          "37.5864803",
+          "37.6362045"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q42847577",
+    "name": "Rotman Research Institute",
+    "city": "Toronto",
+    "country": "Canada",
+    "results": []
+  },
+  {
+    "qid": "Q4853066",
+    "name": "Institute of Statistical Mathematics",
+    "city": "Tokyo",
+    "country": "Japan",
+    "results": [
+      {
+        "place_id": 265116181,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 2129290750,
+        "lat": "35.7121810",
+        "lon": "139.4088490",
+        "category": "amenity",
+        "type": "college",
+        "place_rank": 30,
+        "importance": 0.00008593499656667457,
+        "addresstype": "amenity",
+        "name": "統計数理研究所",
+        "display_name": "統計数理研究所, 43, 緑町, 立川市, 東京都, 190-8666, 日本",
+        "address": {
+          "amenity": "統計数理研究所",
+          "road": "43",
+          "quarter": "緑町",
+          "city": "立川市",
+          "ISO3166-2-lvl4": "JP-13",
+          "postcode": "190-8666",
+          "country": "日本",
+          "country_code": "jp"
+        },
+        "extratags": {
+          "website": "https://www.ism.ac.jp/",
+          "education": "college"
+        },
+        "namedetails": {
+          "name": "統計数理研究所",
+          "name:en": "The Institute of Statistical Mathematics",
+          "name:ja": "統計数理研究所"
+        },
+        "boundingbox": [
+          "35.7121310",
+          "35.7122310",
+          "139.4087990",
+          "139.4088990"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q4894094",
+    "name": "Berne University",
+    "city": "Berne",
+    "country": "Switzerland",
+    "results": [
+      {
+        "place_id": 91983379,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 3960418,
+        "lat": "46.9509726",
+        "lon": "7.4386841",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.59035299116976,
+        "addresstype": "amenity",
+        "name": "Universität Bern",
+        "display_name": "Universität Bern, Kleine Westtangente, Länggasse, Stadtteil II, Bern, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern/Berne, 3012, Schweiz/Suisse/Svizzera/Svizra",
+        "address": {
+          "amenity": "Universität Bern",
+          "road": "Kleine Westtangente",
+          "quarter": "Länggasse",
+          "city_district": "Stadtteil II",
+          "city": "Bern",
+          "county": "Verwaltungskreis Bern-Mittelland",
+          "state_district": "Verwaltungsregion Bern-Mittelland",
+          "state": "Bern/Berne",
+          "ISO3166-2-lvl4": "CH-BE",
+          "postcode": "3012",
+          "country": "Schweiz/Suisse/Svizzera/Svizra",
+          "country_code": "ch"
+        },
+        "extratags": {
+          "phone": "+41 31 684 81 11",
+          "website": "https://www.unibe.ch/",
+          "wikidata": "Q659080",
+          "wikipedia": "de:Universität Bern",
+          "wheelchair": "yes"
+        },
+        "namedetails": {
+          "name": "Universität Bern",
+          "name:de": "Universität Bern",
+          "name:en": "University of Bern",
+          "name:fr": "Université de Berne",
+          "name:he": "אוניברסיטת ברן",
+          "name:it": "Università di Berna",
+          "name:ko": "베른 대학교",
+          "name:la": "Universitas Bernensis",
+          "name:rm": "Universitad da Berna",
+          "name:ru": "Бернский университет",
+          "name:zh": "伯尔尼大学"
+        },
+        "boundingbox": [
+          "46.9497692",
+          "46.9522996",
+          "7.4363134",
+          "7.4397470"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q49088",
+    "name": "Columbia University",
+    "city": "",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 359248282,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 732228095,
+        "lat": "40.8077507",
+        "lon": "-73.9624901",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.7386072323684951,
+        "addresstype": "amenity",
+        "name": "Columbia University",
+        "display_name": "Columbia University, West 109th Street, Manhattan Valley, Manhattan Community Board 7, Manhattan, New York County, New York, 10027, United States",
+        "address": {
+          "amenity": "Columbia University",
+          "road": "West 109th Street",
+          "neighbourhood": "Manhattan Valley",
+          "suburb": "Manhattan",
+          "county": "New York County",
+          "city": "New York",
+          "state": "New York",
+          "ISO3166-2-lvl4": "US-NY",
+          "postcode": "10027",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.columbia.edu",
+          "wikidata": "Q49088",
+          "education": "university",
+          "wikipedia": "en:Columbia University"
+        },
+        "namedetails": {
+          "name": "Columbia University",
+          "name:en": "Columbia University",
+          "name:es": "Universidad de Columbia",
+          "name:ja": "コロンビア大学",
+          "name:zh": "哥伦比亚大学",
+          "alt_name": "Columbia University in the City of New York",
+          "name:zh-Hans": "哥伦比亚大学",
+          "name:zh-Hant": "哥倫比亞大學"
+        },
+        "boundingbox": [
+          "40.8031566",
+          "40.8124865",
+          "-73.9676058",
+          "-73.9572548"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q49088",
+    "name": "Columbia University",
+    "city": "New York, NY",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 358354943,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 732228095,
+        "lat": "40.8077507",
+        "lon": "-73.9624901",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.7386072323684951,
+        "addresstype": "amenity",
+        "name": "Columbia University",
+        "display_name": "Columbia University, West 121st Street, Morningside Heights, Manhattan Community Board 9, Manhattan, New York County, New York, 10027, United States",
+        "address": {
+          "amenity": "Columbia University",
+          "road": "West 121st Street",
+          "neighbourhood": "Morningside Heights",
+          "suburb": "Manhattan",
+          "county": "New York County",
+          "city": "New York",
+          "state": "New York",
+          "ISO3166-2-lvl4": "US-NY",
+          "postcode": "10027",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.columbia.edu",
+          "wikidata": "Q49088",
+          "education": "university",
+          "wikipedia": "en:Columbia University"
+        },
+        "namedetails": {
+          "name": "Columbia University",
+          "name:en": "Columbia University",
+          "name:es": "Universidad de Columbia",
+          "name:ja": "コロンビア大学",
+          "name:zh": "哥伦比亚大学",
+          "alt_name": "Columbia University in the City of New York",
+          "name:zh-Hans": "哥伦比亚大学",
+          "name:zh-Hant": "哥倫比亞大學"
+        },
+        "boundingbox": [
+          "40.8031566",
+          "40.8124865",
+          "-73.9676058",
+          "-73.9572548"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q5013781",
+    "name": "Gurdon Institute",
+    "city": "Cambridge",
+    "country": "United Kingdom",
+    "results": [
+      {
+        "place_id": 160086243,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "node",
+        "osm_id": 4892334874,
+        "lat": "52.1992643",
+        "lon": "0.1225506",
+        "category": "amenity",
+        "type": "recycling",
+        "place_rank": 30,
+        "importance": 0.0000742771038375985,
+        "addresstype": "amenity",
+        "name": "Gurdon Institute",
+        "display_name": "Gurdon Institute, Tennis Court Road, Petersfield, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 1QJ, United Kingdom",
+        "address": {
+          "amenity": "Gurdon Institute",
+          "road": "Tennis Court Road",
+          "suburb": "Petersfield",
+          "city": "Cambridge",
+          "county": "Cambridgeshire",
+          "ISO3166-2-lvl6": "GB-CAM",
+          "state_district": "Cambridgeshire and Peterborough",
+          "state": "England",
+          "ISO3166-2-lvl4": "GB-ENG",
+          "postcode": "CB2 1QJ",
+          "country": "United Kingdom",
+          "country_code": "gb"
+        },
+        "extratags": {
+          "access": "private",
+          "operator": "University of Cambridge",
+          "recycling_type": "container",
+          "collection_times": "Weekly",
+          "operator:wikidata": "Q35794",
+          "recycling:pallets": "yes",
+          "recycling:fluorescent_tubes": "yes"
+        },
+        "namedetails": {
+          "name": "Gurdon Institute"
+        },
+        "boundingbox": [
+          "52.1992143",
+          "52.1993143",
+          "0.1225006",
+          "0.1226006"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q5065711",
+    "name": "Cetus Corporation",
+    "city": "La Jolla",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q5123723",
+    "name": "City of Hope National Medical Center",
+    "city": "Duarte",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 318736762,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 571802586,
+        "lat": "34.1279634",
+        "lon": "-117.9730617",
+        "category": "amenity",
+        "type": "hospital",
+        "place_rank": 30,
+        "importance": 0.36160342477182406,
+        "addresstype": "amenity",
+        "name": "City of Hope",
+        "display_name": "City of Hope, 1500, East Duarte Road, Butler, Duarte, Los Angeles County, California, 91010, United States",
+        "address": {
+          "amenity": "City of Hope",
+          "house_number": "1500",
+          "road": "East Duarte Road",
+          "hamlet": "Butler",
+          "town": "Duarte",
+          "county": "Los Angeles County",
+          "state": "California",
+          "ISO3166-2-lvl4": "US-CA",
+          "postcode": "91010",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "phone": "+1 626 256 4673",
+          "website": "https://www.cityofhope.org/",
+          "wikidata": "Q5123723",
+          "emergency": "no",
+          "wikipedia": "en:City of Hope National Medical Center",
+          "healthcare": "hospital",
+          "healthcare:speciality": "oncology"
+        },
+        "namedetails": {
+          "name": "City of Hope",
+          "name:en": "City of Hope",
+          "alt_name": "City of Hope National Medical Center"
+        },
+        "boundingbox": [
+          "34.1235912",
+          "34.1321725",
+          "-117.9757504",
+          "-117.9678648"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q52607919",
+    "name": "Innsbruck University",
+    "city": "Innsbruck",
+    "country": "Austria",
+    "results": [
+      {
+        "place_id": 70701009,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 24903217,
+        "lat": "47.2632870",
+        "lon": "11.3844497",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.5895352507764572,
+        "addresstype": "amenity",
+        "name": "Universität Innsbruck - Campus Innrain",
+        "display_name": "Universität Innsbruck - Campus Innrain, Blasius-Hueber-Straße, Innenstadt, Innsbruck, Tirol, 6020, Österreich",
+        "address": {
+          "amenity": "Universität Innsbruck - Campus Innrain",
+          "road": "Blasius-Hueber-Straße",
+          "suburb": "Innenstadt",
+          "city_district": "Innsbruck",
+          "city": "Innsbruck",
+          "state": "Tirol",
+          "ISO3166-2-lvl4": "AT-7",
+          "postcode": "6020",
+          "country": "Österreich",
+          "country_code": "at"
+        },
+        "extratags": {
+          "website": "https://www.uibk.ac.at/",
+          "wikidata": "Q875788",
+          "wikipedia": "de:Universität Innsbruck",
+          "wheelchair": "limited",
+          "internet_access": "wlan",
+          "contact:mastodon": "@uniinnsbruck@social.uibk.ac.at"
+        },
+        "namedetails": {
+          "name": "Universität Innsbruck - Campus Innrain",
+          "name:de": "Universität Innsbruck - Campus Innrain",
+          "name:en": "University of Innsbruck - Campus Innrain"
+        },
+        "boundingbox": [
+          "47.2618052",
+          "47.2648377",
+          "11.3825471",
+          "11.3862931"
+        ]
+      },
+      {
+        "place_id": 70569099,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 625320587,
+        "lat": "47.2596957",
+        "lon": "11.3872319",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.38307540422660474,
+        "addresstype": "amenity",
+        "name": "Universitätsgelände Medizinische Universität Innsbruck",
+        "display_name": "Universitätsgelände Medizinische Universität Innsbruck, Schöpfstraße, Wilten, Innsbruck, Tirol, 6020, Österreich",
+        "address": {
+          "amenity": "Universitätsgelände Medizinische Universität Innsbruck",
+          "road": "Schöpfstraße",
+          "suburb": "Wilten",
+          "city_district": "Wilten",
+          "city": "Innsbruck",
+          "state": "Tirol",
+          "ISO3166-2-lvl4": "AT-7",
+          "postcode": "6020",
+          "country": "Österreich",
+          "country_code": "at"
+        },
+        "extratags": {
+          "operator": "Medizinische Universität Innsbruck",
+          "wikidata": "Q686772",
+          "education": "university",
+          "wikipedia": "de:Medizinische Universität Innsbruck"
+        },
+        "namedetails": {
+          "name": "Universitätsgelände Medizinische Universität Innsbruck",
+          "name:de": "Universitätsgelände Medizinische Universität Innsbruck",
+          "short_name": "Med-Uni Innsbruck"
+        },
+        "boundingbox": [
+          "47.2593044",
+          "47.2602843",
+          "11.3868885",
+          "11.3879918"
+        ]
+      },
+      {
+        "place_id": 70391382,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "relation",
+        "osm_id": 18556134,
+        "lat": "47.2692703",
+        "lon": "11.3984544",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.3151525238377993,
+        "addresstype": "amenity",
+        "name": "Management Center Innsbruck",
+        "display_name": "Management Center Innsbruck, Meinhardstraße, Innenstadt, Innsbruck, Tirol, 6020, Österreich",
+        "address": {
+          "amenity": "Management Center Innsbruck",
+          "road": "Meinhardstraße",
+          "suburb": "Innenstadt",
+          "city_district": "Innsbruck",
+          "city": "Innsbruck",
+          "state": "Tirol",
+          "ISO3166-2-lvl4": "AT-7",
+          "postcode": "6020",
+          "country": "Österreich",
+          "country_code": "at"
+        },
+        "extratags": {
+          "email": "office@mci.edu",
+          "phone": "+43 512 2070-0",
+          "website": "https://www.mci.edu/",
+          "wikidata": "Q684775",
+          "education": "university",
+          "wikipedia": "de:Management Center Innsbruck",
+          "internet_access": "yes"
+        },
+        "namedetails": {
+          "name": "Management Center Innsbruck",
+          "name:de": "Management Center Innsbruck",
+          "short_name": "MCI"
+        },
+        "boundingbox": [
+          "47.2617525",
+          "47.2798004",
+          "11.3907159",
+          "11.4028749"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q54173",
+    "name": "General Electric Company",
+    "city": "Schenectady, NY",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q621610",
+    "name": "Applied Materials",
+    "city": "",
+    "country": "Israel",
+    "results": [
+      {
+        "place_id": 48008403,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 173435005,
+        "lat": "31.9121544",
+        "lon": "34.8095481",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.00006200122072170622,
+        "addresstype": "building",
+        "name": "PDC 2, Applied Materials",
+        "display_name": "PDC 2, Applied Materials, פרופ׳ א.ד. ברגמן, פארק ת.מ.ר, רחובות, נפת רחובות, מחוז המרכז, 7670609, ישראל",
+        "address": {
+          "building": "PDC 2, Applied Materials",
+          "road": "פרופ׳ א.ד. ברגמן",
+          "commercial": "פארק ת.מ.ר",
+          "town": "רחובות",
+          "state_district": "נפת רחובות",
+          "state": "מחוז המרכז",
+          "ISO3166-2-lvl4": "IL-M",
+          "postcode": "7670609",
+          "country": "ישראל",
+          "country_code": "il"
+        },
+        "extratags": null,
+        "namedetails": {
+          "name": "PDC 2, Applied Materials",
+          "name:en": "PDC 2, Applied Materials",
+          "name:he": "PDC 2, Applied Materials"
+        },
+        "boundingbox": [
+          "31.9119241",
+          "31.9125019",
+          "34.8089743",
+          "34.8101071"
+        ]
+      },
+      {
+        "place_id": 47940983,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 173449261,
+        "lat": "31.9113261",
+        "lon": "34.8080779",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.00006200122072170622,
+        "addresstype": "building",
+        "name": "PDC 1, Applied Materials",
+        "display_name": "PDC 1, Applied Materials, פרופ׳ הלל וחנן אופנהיימר, פארק ת.מ.ר, רחובות, נפת רחובות, מחוז המרכז, 7670609, ישראל",
+        "address": {
+          "building": "PDC 1, Applied Materials",
+          "road": "פרופ׳ הלל וחנן אופנהיימר",
+          "commercial": "פארק ת.מ.ר",
+          "town": "רחובות",
+          "state_district": "נפת רחובות",
+          "state": "מחוז המרכז",
+          "ISO3166-2-lvl4": "IL-M",
+          "postcode": "7670609",
+          "country": "ישראל",
+          "country_code": "il"
+        },
+        "extratags": {
+          "building:levels": "5"
+        },
+        "namedetails": {
+          "name": "PDC 1, Applied Materials",
+          "name:en": "PDC 1, Applied Materials",
+          "name:he": "PDC 1, Applied Materials"
+        },
+        "boundingbox": [
+          "31.9110994",
+          "31.9115532",
+          "34.8075492",
+          "34.8086067"
+        ]
+      },
+      {
+        "place_id": 47953629,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 173447043,
+        "lat": "31.9126694",
+        "lon": "34.8091823",
+        "category": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 0.00006200122072170622,
+        "addresstype": "building",
+        "name": "PDC 3, Applied Materials",
+        "display_name": "PDC 3, Applied Materials, פרופ׳ א.ד. ברגמן, פארק ת.מ.ר, רחובות, נפת רחובות, מחוז המרכז, 7670609, ישראל",
+        "address": {
+          "building": "PDC 3, Applied Materials",
+          "road": "פרופ׳ א.ד. ברגמן",
+          "commercial": "פארק ת.מ.ר",
+          "town": "רחובות",
+          "state_district": "נפת רחובות",
+          "state": "מחוז המרכז",
+          "ISO3166-2-lvl4": "IL-M",
+          "postcode": "7670609",
+          "country": "ישראל",
+          "country_code": "il"
+        },
+        "extratags": {
+          "building:levels": "6"
+        },
+        "namedetails": {
+          "name": "PDC 3, Applied Materials",
+          "name:en": "PDC 3, Applied Materials",
+          "name:he": "PDC 3, Applied Materials"
+        },
+        "boundingbox": [
+          "31.9124723",
+          "31.9128599",
+          "34.8088741",
+          "34.8094824"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q635642",
+    "name": "Institute for Advanced Study",
+    "city": "",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 358771607,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 27340268,
+        "lat": "40.3322547",
+        "lon": "-74.6657877",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.00006656519417100813,
+        "addresstype": "amenity",
+        "name": "Institute for Advanced Study",
+        "display_name": "Institute for Advanced Study, Trolley Track Trail, Battlefield Area, Princeton, Mercer County, New Jersey, 08544, United States",
+        "address": {
+          "amenity": "Institute for Advanced Study",
+          "road": "Trolley Track Trail",
+          "neighbourhood": "Battlefield Area",
+          "city": "Princeton",
+          "county": "Mercer County",
+          "state": "New Jersey",
+          "ISO3166-2-lvl4": "US-NJ",
+          "postcode": "08544",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.ias.edu/",
+          "wikidata": "Q635642",
+          "check_date": "2026-07-08"
+        },
+        "namedetails": {
+          "name": "Institute for Advanced Study"
+        },
+        "boundingbox": [
+          "40.3289632",
+          "40.3357331",
+          "-74.6718901",
+          "-74.6596877"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q635642",
+    "name": "Institute for Advanced Study",
+    "city": "Princeton, NJ",
+    "country": "United States",
+    "results": [
+      {
+        "place_id": 358182897,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 27340268,
+        "lat": "40.3322547",
+        "lon": "-74.6657877",
+        "category": "amenity",
+        "type": "university",
+        "place_rank": 30,
+        "importance": 0.00006656519417100813,
+        "addresstype": "amenity",
+        "name": "Institute for Advanced Study",
+        "display_name": "Institute for Advanced Study, Einstein Drive, Institute Area, Princeton, Mercer County, New Jersey, 08544, United States",
+        "address": {
+          "amenity": "Institute for Advanced Study",
+          "road": "Einstein Drive",
+          "neighbourhood": "Institute Area",
+          "city": "Princeton",
+          "county": "Mercer County",
+          "state": "New Jersey",
+          "ISO3166-2-lvl4": "US-NJ",
+          "postcode": "08544",
+          "country": "United States",
+          "country_code": "us"
+        },
+        "extratags": {
+          "website": "https://www.ias.edu/",
+          "wikidata": "Q635642",
+          "check_date": "2026-07-08"
+        },
+        "namedetails": {
+          "name": "Institute for Advanced Study"
+        },
+        "boundingbox": [
+          "40.3289632",
+          "40.3357331",
+          "-74.6718901",
+          "-74.6596877"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q6467293",
+    "name": "Laboratory for Interactive Learning",
+    "city": "Durham",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q65045874",
+    "name": "Connaught Laboratories",
+    "city": "Toronto",
+    "country": "Canada",
+    "results": []
+  },
+  {
+    "qid": "Q690079",
+    "name": "Digital Equipment Corporation",
+    "city": "Maynard",
+    "country": "United States",
+    "results": []
+  },
+  {
+    "qid": "Q720489",
+    "name": "Asahi Kasei Corporation",
+    "city": "Tokyo",
+    "country": "Japan",
+    "results": []
+  },
+  {
+    "qid": "Q84026",
+    "name": "Institut Français du Pétrole",
+    "city": "Rueil-Malmaison",
+    "country": "France",
+    "results": [
+      {
+        "place_id": 98557447,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 72464284,
+        "lat": "48.8764479",
+        "lon": "2.1754136",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.00006155260547794335,
+        "addresstype": "amenity",
+        "name": "IFP Énergies nouvelles",
+        "display_name": "IFP Énergies nouvelles, Rue Messire Aubin, Village Centre-ville, Rueil-Malmaison, Nanterre, Hauts-de-Seine, Île-de-France, France métropolitaine, 92500, France",
+        "address": {
+          "amenity": "IFP Énergies nouvelles",
+          "road": "Rue Messire Aubin",
+          "suburb": "Village Centre-ville",
+          "town": "Rueil-Malmaison",
+          "municipality": "Nanterre",
+          "county": "Hauts-de-Seine",
+          "ISO3166-2-lvl6": "FR-92",
+          "state": "Île-de-France",
+          "ISO3166-2-lvl4": "FR-IDF",
+          "region": "France métropolitaine",
+          "postcode": "92500",
+          "country": "France",
+          "country_code": "fr"
+        },
+        "extratags": {
+          "website": "https://www.ifpenergiesnouvelles.com",
+          "wikipedia": "fr:IFP Énergies nouvelles"
+        },
+        "namedetails": {
+          "name": "IFP Énergies nouvelles",
+          "name:fr": "IFP Énergies nouvelles",
+          "old_name": "Institut Français du Pétrole"
+        },
+        "boundingbox": [
+          "48.8749463",
+          "48.8778805",
+          "2.1734290",
+          "2.1777096"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q85413125",
+    "name": "DESY",
+    "city": "Hamburg",
+    "country": "Germany",
+    "results": [
+      {
+        "place_id": 142093099,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 276641657,
+        "lat": "53.5767780",
+        "lon": "9.8819531",
+        "category": "amenity",
+        "type": "research_institute",
+        "place_rank": 30,
+        "importance": 0.00008255359731436664,
+        "addresstype": "amenity",
+        "name": "Deutsches Elektronen-Synchrotron DESY",
+        "display_name": "Deutsches Elektronen-Synchrotron DESY, 85, Notkestraße, Bahrenfeld, Altona, Hamburg, 22607, Deutschland",
+        "address": {
+          "amenity": "Deutsches Elektronen-Synchrotron DESY",
+          "house_number": "85",
+          "road": "Notkestraße",
+          "suburb": "Bahrenfeld",
+          "city_district": "Altona",
+          "city": "Hamburg",
+          "ISO3166-2-lvl4": "DE-HH",
+          "postcode": "22607",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "phone": "+49 40 89980",
+          "access": "private",
+          "landuse": "industrial",
+          "website": "https://www.desy.de/",
+          "research": "particle_physics",
+          "wikidata": "Q311801",
+          "wikipedia": "de:Deutsches Elektronen-Synchrotron"
+        },
+        "namedetails": {
+          "name": "Deutsches Elektronen-Synchrotron DESY",
+          "name:de": "Deutsches Elektronen-Synchrotron DESY",
+          "short_name": "DESY"
+        },
+        "boundingbox": [
+          "53.5724421",
+          "53.5811421",
+          "9.8726759",
+          "9.8882453"
+        ]
+      },
+      {
+        "place_id": 142123376,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 23010536,
+        "lat": "53.5902530",
+        "lon": "9.8844009",
+        "category": "landuse",
+        "type": "research",
+        "place_rank": 24,
+        "importance": 0.08008255359731438,
+        "addresstype": "research",
+        "name": "DESY/H1",
+        "display_name": "DESY/H1, Bahrenfeld, Altona, Hamburg, Deutschland",
+        "address": {
+          "research": "DESY/H1",
+          "suburb": "Bahrenfeld",
+          "city_district": "Altona",
+          "city": "Hamburg",
+          "ISO3166-2-lvl4": "DE-HH",
+          "country": "Deutschland",
+          "country_code": "de"
+        },
+        "extratags": {
+          "check_date": "2024-03-10"
+        },
+        "namedetails": {
+          "name": "DESY/H1"
+        },
+        "boundingbox": [
+          "53.5898876",
+          "53.5904453",
+          "9.8837380",
+          "9.8848212"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q874154",
+    "name": "Hamburg Ballet",
+    "city": "Hamburg",
+    "country": "Germany",
+    "results": []
+  },
+  {
+    "qid": "Q903523",
+    "name": "Janssen Pharmaceutica",
+    "city": "Beerse",
+    "country": "Belgium",
+    "results": [
+      {
+        "place_id": 107066219,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 184338583,
+        "lat": "51.3058352",
+        "lon": "4.8615659",
+        "category": "highway",
+        "type": "service",
+        "place_rank": 27,
+        "importance": 0.04005505683985656,
+        "addresstype": "road",
+        "name": "privéweg Janssen Pharmaceutica",
+        "display_name": "privéweg Janssen Pharmaceutica, Beerse, Turnhout, Antwerpen, Vlaanderen, 2340, België / Belgique / Belgien",
+        "address": {
+          "road": "privéweg Janssen Pharmaceutica",
+          "city_district": "Beerse",
+          "town": "Beerse",
+          "county": "Turnhout",
+          "state": "Antwerpen",
+          "ISO3166-2-lvl6": "BE-VAN",
+          "ISO3166-2-lvl4": "BE-VLG",
+          "postcode": "2340",
+          "country": "België / Belgique / Belgien",
+          "country_code": "be"
+        },
+        "extratags": {
+          "foot": "yes",
+          "access": "no",
+          "bicycle": "yes",
+          "surface": "paved",
+          "maxspeed": "30"
+        },
+        "namedetails": {
+          "name": "privéweg Janssen Pharmaceutica"
+        },
+        "boundingbox": [
+          "51.3057897",
+          "51.3058806",
+          "4.8615618",
+          "4.8615700"
+        ]
+      }
+    ]
+  },
+  {
+    "qid": "Q95",
+    "name": "Google Inc.",
+    "city": "Mountain View",
+    "country": "United States",
+    "results": []
+  }
+]

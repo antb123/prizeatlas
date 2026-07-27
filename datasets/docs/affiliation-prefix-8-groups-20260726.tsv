@@ -1,0 +1,366 @@
+primary_country	prefix_8	variants_in_group	primary_affiliation_name	additional_affiliations	additional_countries	multi_value	affiliation_value_count	country_value_count	award_record_count	award_record_ids
+Argentina	institut	2	Institute for Biochemical Research			no	1	1	1	nobel-000402
+Argentina	institut	2	Instituto de Biologia y Medicina Experimental (Institute for Biology and Experimental Medicine)			no	1	1	1	nobel-000237
+Australia	australi	2	Australian National University			no	1	1	6	gairdner_international_award-000175,japan_prize-000011,kyoto_prize-000104,nobel-000346,nobel-000852,shaw_prize-000012
+Australia	australi	2	Australian Research Council Centre of Excellence for Gravitational Wave Discovery			no	1	1	1	shaw_prize-000101
+Australia	universi	2	University of Melbourne			no	1	1	2	lasker_awards-000361,nobel-001014
+Australia	universi	2	University of New South Wales (UNSW Sydney)			no	1	1	1	japan_prize-000099
+Australia	walter a	2	Walter and Eliza Hall Institute for Medical Research			no	1	1	1	nobel-000325
+Australia	walter a	2	Walter and Eliza Hall Institute of Medical Research			no	1	1	2	gairdner_international_award-000043,gairdner_international_award-000225
+Austria	universi	4	University of Graz			no	1	1	1	max_planck_medal-000007
+Austria	universi	4	University of Innsbruck			no	1	1	2	max_planck_medal-000069,wolf_prize-000289
+Austria	universi	4	University of Salzburg			no	1	1	1	nobel-000442
+Austria	universi	4	University of Vienna			no	1	1	4	max_planck_medal-000042,nobel-000989,wolf_prize-000016,wolf_prize-000261
+Belgium	universi	2	University of Liège			no	1	1	2	gairdner_international_award-000194,wolf_prize-000233
+Belgium	universi	2	Université libre de Bruxelles			no	1	1	4	nobel-000473,nobel-000875,wolf_prize-000222,wolf_prize-000224
+Canada	universi	10	University of Alberta			no	1	1	4	gairdner_international_award-000168,nobel-000957,turing_award-000079,wolf_prize-000182
+Canada	universi	10	University of British Columbia			no	1	1	9	breakthrough-000062,crafoord-000075,gairdner_international_award-000049,gairdner_international_award-000097,gairdner_international_award-000162,gairdner_international_award-000174,gairdner_international_award-000366,japan_prize-000045,nobel-000629
+Canada	universi	10	University of Calgary			no	1	1	1	gairdner_international_award-000297
+Canada	universi	10	University of Manitoba			no	1	1	4	gairdner_international_award-000057,gairdner_international_award-000112,gairdner_international_award-000141,wolf_prize-000173
+Canada	universi	10	University of Ottawa			no	1	1	2	gairdner_international_award-000170,wolf_prize-000365
+Canada	universi	10	University of Toronto			no	1	1	34	fields-000003,gairdner_international_award-000005,gairdner_international_award-000030,gairdner_international_award-000064,gairdner_international_award-000067,gairdner_international_award-000069,gairdner_international_award-000075,gairdner_international_award-000083,gairdner_international_award-000087,gairdner_international_award-000103,gairdner_international_award-000104,gairdner_international_award-000133,gairdner_international_award-000171,gairdner_international_award-000197,gairdner_international_award-000198,gairdner_international_award-000202,gairdner_international_award-000203,gairdner_international_award-000205,gairdner_international_award-000206,gairdner_international_award-000217,gairdner_international_award-000342,gairdner_international_award-000359,lasker_awards-000064,lasker_awards-000277,nobel-000116,nobel-000117,nobel-000563,nobel-001012,shaw_prize-000112,turing_award-000019,turing_award-000069,wolf_prize-000048,wolf_prize-000301,wolf_prize-000373
+Canada	universi	10	University of Toronto Ontario Cancer Institute			no	1	1	2	lasker_awards-000318,lasker_awards-000319
+Canada	universi	10	University of Waterloo			no	1	1	1	nobel-000936
+Canada	universi	10	University of Western Ontario			no	1	1	2	gairdner_international_award-000013,gairdner_international_award-000027
+Canada	universi	10	Université de Montréal			no	1	1	4	breakthrough-000103,turing_award-000068,turing_award-000081,wolf_prize-000330
+China	china ac	2	China Academy of Chinese Medical Sciences			no	1	1	1	lasker_awards-000349
+China	china ac	2	China Academy of Traditional Chinese Medicine			no	1	1	1	nobel-000897
+France	centre n	2	Centre National de la Recherche Scientifique			no	1	1	1	abel_prize-000027
+France	centre n	2	Centre National de la Recherche Scientifique	Institut Fourier, Université Grenoble-Alpes		yes	2	1	1	breakthrough-000076
+France	institut	11	Institut Français du Pétrole			no	1	1	1	nobel-000771
+France	institut	11	Institut Imagine			no	1	1	1	japan_prize-000086
+France	institut	11	Institut Laue–Langevin			no	1	1	1	wolf_prize-000074
+France	institut	11	Institut Pasteur			no	1	1	11	gairdner_international_award-000028,gairdner_international_award-000060,gairdner_international_award-000120,gairdner_international_award-000181,nobel-000040,nobel-000046,nobel-000364,nobel-000365,nobel-000366,shaw_prize-000117,wolf_prize-000052
+France	institut	11	Institut d'Astrophysique Spatiale			no	1	1	1	shaw_prize-000077
+France	institut	11	Institut d'Optique			no	1	1	1	wolf_prize-000260
+France	institut	11	Institut des Hautes Études Scientifiques			no	1	1	15	abel_prize-000009,breakthrough-000007,breakthrough-000037,crafoord-000012,crafoord-000034,crafoord-000045,fields-000025,fields-000029,fields-000031,fields-000042,fields-000045,kyoto_prize-000058,max_planck_medal-000078,shaw_prize-000048,wolf_prize-000145
+France	institut	11	Institut du Radium			no	1	1	2	nobel-000179,nobel-000180
+France	institut	11	Institut d’Optique Graduate School – Université Paris-Saclay			no	1	1	1	nobel-000987
+France	institut	11	Institute of Genetics and Molecular and Cellular Biology			no	1	1	2	gairdner_international_award-000306,lasker_awards-000314
+France	institut	11	Institute of Molecular and Cellular Biology, CNRS			no	1	1	1	gairdner_international_award-000312
+France	joseph f	2	Joseph Fourier University			no	1	1	1	breakthrough-000032
+France	joseph f	2	Joseph Fourier University, Grenoble			no	1	1	1	lasker_awards-000367
+France	toulouse	2	Toulouse School of Economics (TSE)			no	1	1	1	nobel-000880
+France	toulouse	2	Toulouse University			no	1	1	1	nobel-000070
+France	universi	13	Universite de Paris			no	1	1	1	wolf_prize-000023
+France	universi	13	University of Grenoble			no	1	1	1	nobel-000410
+France	universi	13	University of Lorraine			no	1	1	2	fields-000065,nobel-000069
+France	universi	13	University of Paris			no	1	1	6	crafoord-000007,fields-000057,kyoto_prize-000051,lasker_awards-000244,max_planck_medal-000008,max_planck_medal-000067
+France	universi	13	University of Paris VI			no	1	1	1	wolf_prize-000097
+France	universi	13	University of Strasbourg			no	1	1	4	fields-000062,nobel-000846,nobel-000901,shaw_prize-000040
+France	universi	13	Université Louis Pasteur			no	1	1	1	nobel-000573
+France	universi	13	Université Paris-Saclay			no	1	1	2	shaw_prize-000092,wolf_prize-000336
+France	universi	13	Université Paris-Sud			no	1	1	6	fields-000017,fields-000024,japan_prize-000061,nobel-000803,wolf_prize-000198,wolf_prize-000240
+France	universi	13	Université de Paris, Laboratoire Immuno-Hématologie			no	1	1	1	nobel-000512
+France	universi	13	Université de Paris-Dauphine, CEREMADE, France			no	1	1	1	fields-000032
+France	universi	13	Université de Paris-Sud (Orsay), France			no	1	1	1	fields-000033
+France	universi	13	Université de Strasbourg			no	1	1	1	nobel-000864
+France	École no	3	École Normale Supérieure			no	1	1	2	japan_prize-000019,nobel-000376
+France	École no	3	École Normale Supérieure Paris-Saclay			no	1	1	1	abel_prize-000018
+France	École no	3	École Normale Supérieure de Lyon and Institut Henri Poincaré, France			no	1	1	1	fields-000020
+Germany	humboldt	2	Humboldt University of Berlin			no	1	1	3	lasker_awards-000397,max_planck_medal-000009,shaw_prize-000086
+Germany	humboldt	2	Humboldt-Universität zu Berlin			no	1	1	1	gairdner_international_award-000348
+Germany	technica	3	Technical University			no	1	1	2	nobel-000334,nobel-000428
+Germany	technica	3	Technical University of Darmstadt			no	1	1	1	wolf_prize-000271
+Germany	technica	3	Technical University of Munich			no	1	1	3	max_planck_medal-000070,max_planck_medal-000081,max_planck_medal-000084
+Germany	technisc	2	Technische Hochschule (Institute of Technology)			no	1	1	1	nobel-000152
+Germany	technisc	2	Technische Universität Berlin			no	1	1	1	wolf_prize-000387
+Germany	universi	17	University of Augsburg			no	1	1	1	max_planck_medal-000074
+Germany	universi	17	University of Berlin			no	1	1	4	max_planck_medal-000001,max_planck_medal-000002,max_planck_medal-000005,max_planck_medal-000013
+Germany	universi	17	University of Bonn			no	1	1	2	nobel-000602,wolf_prize-000103
+Germany	universi	17	University of Cologne			no	1	1	1	max_planck_medal-000076
+Germany	universi	17	University of Duisburg-Essen			no	1	1	1	max_planck_medal-000073
+Germany	universi	17	University of Freiburg			no	1	1	2	nobel-000181,nobel-000273
+Germany	universi	17	University of Göttingen			no	1	1	5	max_planck_medal-000032,max_planck_medal-000058,max_planck_medal-000072,max_planck_medal-000086,wolf_prize-000004
+Germany	universi	17	University of Hamburg			no	1	1	3	max_planck_medal-000023,max_planck_medal-000033,max_planck_medal-000036
+Germany	universi	17	University of Heidelberg			no	1	1	7	max_planck_medal-000019,nobel-000060,nobel-000157,nobel-000158,nobel-000286,nobel-000353,nobel-000496
+Germany	universi	17	University of Karlsruhe			no	1	1	1	max_planck_medal-000051
+Germany	universi	17	University of Leipzig			no	1	1	2	max_planck_medal-000006,max_planck_medal-000010
+Germany	universi	17	University of Mainz			no	1	1	1	max_planck_medal-000057
+Germany	universi	17	University of Marburg			no	1	1	1	max_planck_medal-000059
+Germany	universi	17	University of Munich			no	1	1	1	max_planck_medal-000004
+Germany	universi	17	University of Stuttgart			no	1	1	1	max_planck_medal-000054
+Germany	universi	17	University of Tübingen			no	1	1	3	crafoord-000017,kyoto_prize-000012,max_planck_medal-000011
+Germany	universi	17	University of Würzburg			no	1	1	1	shaw_prize-000084
+Italy	institut	3	Institute of Cell Biology Italian National Council of Research			no	1	1	1	lasker_awards-000226
+Italy	institut	3	Institute of Cell Biology of the C.N.R.			no	1	1	1	nobel-000567
+Italy	institut	3	Institute of Technology			no	1	1	1	nobel-000344
+Italy	universi	2	University of Milan			no	1	1	1	wolf_prize-000019
+Italy	universi	2	University of Pisa, Italy			no	1	1	1	fields-000049
+Japan	institut	2	Institute for Molecular Science			no	1	1	1	kyoto_prize-000072
+Japan	institut	2	Institute of Statistical Mathematics			no	1	1	1	kyoto_prize-000070
+Japan	kyoto un	3	Kyoto University			no	1	1	18	breakthrough-000100,gairdner_international_award-000299,gairdner_international_award-000303,kyoto_prize-000032,kyoto_prize-000044,kyoto_prize-000082,kyoto_prize-000101,kyoto_prize-000107,lasker_awards-000338,lasker_awards-000365,nobel-000517,nobel-000860,nobel-000931,nobel-001013,shaw_prize-000024,shaw_prize-000058,wolf_prize-000090,wolf_prize-000209
+Japan	kyoto un	3	Kyoto University Institute for Advanced Study			no	1	1	1	abel_prize-000028
+Japan	kyoto un	3	Kyoto University	J. David Gladstone Institutes; University of California, San Francisco		yes	3	1	1	breakthrough-000020
+Japan	national	3	National Cancer Center	Toho University		yes	2	1	1	japan_prize-000032
+Japan	national	3	National Institute of Genetics			no	1	1	1	crafoord-000061
+Japan	national	3	National Institute of Information and Communications Technology			no	1	1	2	japan_prize-000056,japan_prize-000106
+Japan	ogawa la	2	Ogawa Laboratories for Brain Function Research			no	1	1	1	gairdner_international_award-000271
+Japan	ogawa la	2	Ogawa Laboratories for Brain Function Research, Hamano Life Science Research Foundation			no	1	1	1	japan_prize-000051
+Japan	the univ	2	The University of Osaka			no	1	1	1	nobel-001022
+Japan	the univ	2	The University of Tokyo			no	1	1	10	japan_prize-000035,japan_prize-000052,japan_prize-000084,nobel-000746,nobel-000899,wolf_prize-000068,wolf_prize-000099,wolf_prize-000193,wolf_prize-000325,wolf_prize-000370
+Japan	universi	2	University of Tokyo and RIKEN			no	1	1	1	breakthrough-000095
+Japan	universi	2	University of Tsukuba			no	1	1	2	japan_prize-000036,nobel-000709
+Netherlands	universi	3	University of Groningen			no	1	1	1	nobel-000903
+Netherlands	universi	3	University of Leiden			no	1	1	1	wolf_prize-000008
+Netherlands	universi	3	University of Twente			no	1	1	1	max_planck_medal-000083
+New Zealand	universi	2	University of Canterbury			no	1	1	1	crafoord-000062
+New Zealand	universi	2	University of Otago			no	1	1	1	gairdner_international_award-000038
+Poland	institut	2	Institute of Nuclear Physics, Polish Academy of Sciences			no	1	1	1	max_planck_medal-000043
+Poland	institut	2	Institute of Zoology, Warsaw University			no	1	1	1	japan_prize-000048
+Russia	institut	2	Institute for Chemical Physics of the Academy of Sciences of the USSR			no	1	1	1	nobel-000293
+Russia	institut	2	Institute for Physical Problems			no	1	1	1	max_planck_medal-000026
+Russia	steklov 	2	Steklov Institute of Mathematics			no	1	1	4	crafoord-000001,max_planck_medal-000060,shaw_prize-000025,shaw_prize-000026
+Russia	steklov 	2	Steklov Mathematical Institute			no	1	1	2	fields-000035,wolf_prize-000202
+Sweden	karolins	2	Karolinska Institutet			no	1	1	12	crafoord-000057,gairdner_international_award-000017,gairdner_international_award-000019,gairdner_international_award-000082,gairdner_international_award-000107,gairdner_international_award-000137,lasker_awards-000176,lasker_awards-000178,nobel-000381,nobel-000406,nobel-000531,nobel-000532
+Sweden	karolins	2	Karolinska Institutet, Nobel Medical Institute			no	1	1	1	nobel-000289
+Sweden	stockhol	2	Stockholm School of Economics			no	1	1	1	nobel-000474
+Sweden	stockhol	2	Stockholm University			no	1	1	5	fields-000059,max_planck_medal-000025,nobel-000014,nobel-000146,nobel-000208
+Sweden	universi	2	University Hospital of Lund			no	1	1	1	lasker_awards-000180
+Sweden	universi	2	University of Gothenburg			no	1	1	5	gairdner_international_award-000146,japan_prize-000027,nobel-000713,wolf_prize-000015,wolf_prize-000033
+Switzerland	biozentr	2	Biozentrum University of Basel			no	1	1	3	breakthrough-000028,gairdner_international_award-000331,lasker_awards-000381
+Switzerland	biozentr	2	Biozentrum der Universität			no	1	1	1	nobel-000487
+Switzerland	cern	2	CERN			no	1	1	13	breakthrough-000022,breakthrough-000131,breakthrough-000132,breakthrough-000133,breakthrough-000134,breakthrough-000135,breakthrough-000136,max_planck_medal-000039,max_planck_medal-000062,max_planck_medal-000064,nobel-000551,nobel-000552,nobel-000592
+Switzerland	cern	2	CERN	Brookhaven National Laboratory; Fermilab	United States	yes	3	2	1	breakthrough-000121
+Switzerland	swiss fe	3	Swiss Federal Institute of Technology (ETH)			no	1	1	4	wolf_prize-000078,wolf_prize-000113,wolf_prize-000129,wolf_prize-000132
+Switzerland	swiss fe	3	Swiss Federal Institute of Technology in Lausanne, Switzerland			no	1	1	1	fields-000005
+Switzerland	swiss fe	3	Swiss Federal Institute of Technology in Zurich, Switzerland			no	1	1	1	fields-000010
+Switzerland	universi	4	University of Basel			no	1	1	3	gairdner_international_award-000185,gairdner_international_award-000243,kyoto_prize-000050
+Switzerland	universi	4	University of Geneva			no	1	1	9	fields-000008,fields-000019,kyoto_prize-000098,max_planck_medal-000041,nobel-000949,nobel-000950,shaw_prize-000008,wolf_prize-000320,wolf_prize-000321
+Switzerland	universi	4	University of Lausanne			no	1	1	1	nobel-000912
+Switzerland	universi	4	University of Zurich			no	1	1	7	gairdner_international_award-000177,lasker_awards-000262,max_planck_medal-000034,nobel-000075,nobel-000192,nobel-000247,nobel-000670
+United Kingdom	central 	2	Central Research Laboratories EMI, Ltd.			no	1	1	1	lasker_awards-000169
+United Kingdom	central 	2	Central Research Laboratories, EMI			no	1	1	1	nobel-000501
+United Kingdom	imperial	4	Imperial College London			no	1	1	8	breakthrough-000093,crafoord-000033,kyoto_prize-000121,nobel-000392,nobel-000416,nobel-000429,shaw_prize-000031,wolf_prize-000340
+United Kingdom	imperial	4	Imperial College London, Kennedy Institute of Rheumatology			no	1	1	2	lasker_awards-000310,lasker_awards-000311
+United Kingdom	imperial	4	Imperial College of Science			no	1	1	1	wolf_prize-000089
+United Kingdom	imperial	4	Imperial College of Science and Technology			no	1	1	1	lasker_awards-000182
+United Kingdom	medical 	3	Medical Research Council			no	1	1	4	gairdner_international_award-000086,lasker_awards-000142,wolf_prize-000024,wolf_prize-000025
+United Kingdom	medical 	3	Medical Research Council, Cambridge, England			no	1	1	1	lasker_awards-000216
+United Kingdom	medical 	3	Medical Research Council, Mammalian Genetics Unit			no	1	1	1	wolf_prize-000172
+United Kingdom	national	2	National Institute for Medical Research			no	1	1	2	nobel-000186,nobel-000266
+United Kingdom	national	2	National Physical Laboratory			no	1	1	1	turing_award-000005
+United Kingdom	the well	2	The Wellcome Research Laboratories			no	1	1	1	nobel-000533
+United Kingdom	the well	2	The Wellcome Trust Sanger Institute			no	1	1	1	nobel-000743
+United Kingdom	universi	19	University College			no	1	1	7	nobel-000009,nobel-000021,nobel-000085,nobel-000326,nobel-000348,nobel-000405,nobel-000882
+United Kingdom	universi	19	University College London			no	1	1	4	breakthrough-000048,gairdner_international_award-000035,lasker_awards-000102,lasker_awards-000173
+United Kingdom	universi	19	University of Aberdeen			no	1	1	1	lasker_awards-000181
+United Kingdom	universi	19	University of Birmingham			no	1	1	1	max_planck_medal-000029
+United Kingdom	universi	19	University of Bristol			no	1	1	1	wolf_prize-000180
+United Kingdom	universi	19	University of Cambridge			no	1	1	53	breakthrough-000023,breakthrough-000099,crafoord-000023,crafoord-000025,crafoord-000035,crafoord-000041,crafoord-000076,fields-000009,fields-000027,fields-000028,fields-000051,gairdner_international_award-000040,gairdner_international_award-000246,gairdner_international_award-000344,gairdner_international_award-000373,gairdner_international_award-000376,japan_prize-000018,kyoto_prize-000022,kyoto_prize-000125,lasker_awards-000098,lasker_awards-000139,lasker_awards-000298,lasker_awards-000302,lasker_awards-000332,lasker_awards-000337,lasker_awards-000354,max_planck_medal-000018,nobel-000037,nobel-000108,nobel-000140,nobel-000149,nobel-000166,nobel-000172,nobel-000301,nobel-000307,nobel-000347,nobel-000439,nobel-000450,nobel-000451,nobel-000475,nobel-000482,nobel-000545,nobel-000666,nobel-000837,shaw_prize-000111,turing_award-000002,wolf_prize-000108,wolf_prize-000112,wolf_prize-000117,wolf_prize-000137,wolf_prize-000153,wolf_prize-000254,wolf_prize-000382
+United Kingdom	universi	19	University of Edinburgh			no	1	1	10	abel_prize-000002,gairdner_international_award-000309,max_planck_medal-000012,max_planck_medal-000047,nobel-000876,shaw_prize-000022,shaw_prize-000056,shaw_prize-000069,turing_award-000030,wolf_prize-000223
+United Kingdom	universi	19	University of Hull			no	1	1	1	kyoto_prize-000031
+United Kingdom	universi	19	University of Leicester			no	1	1	1	lasker_awards-000320
+United Kingdom	universi	19	University of Liverpool			no	1	1	2	gairdner_international_award-000111,max_planck_medal-000037
+United Kingdom	universi	19	University of London			no	1	1	8	fields-000061,nobel-000110,nobel-000144,nobel-000145,nobel-000197,nobel-000220,nobel-000340,nobel-000586
+United Kingdom	universi	19	University of Manchester			no	1	1	4	gairdner_international_award-000015,gairdner_international_award-000088,nobel-000839,nobel-000840
+United Kingdom	universi	19	University of Nottingham			no	1	1	2	nobel-000754,shaw_prize-000023
+United Kingdom	universi	19	University of Oxford			no	1	1	47	abel_prize-000017,breakthrough-000066,breakthrough-000110,crafoord-000018,crafoord-000020,crafoord-000024,crafoord-000032,fields-000006,fields-000039,fields-000055,gairdner_international_award-000010,gairdner_international_award-000042,gairdner_international_award-000061,gairdner_international_award-000074,gairdner_international_award-000187,gairdner_international_award-000200,gairdner_international_award-000214,gairdner_international_award-000215,gairdner_international_award-000249,gairdner_international_award-000292,gairdner_international_award-000305,gairdner_international_award-000326,gairdner_international_award-000327,kyoto_prize-000026,kyoto_prize-000049,lasker_awards-000321,nobel-000103,nobel-000165,nobel-000221,nobel-000222,nobel-000233,nobel-000292,nobel-000354,nobel-000420,nobel-000424,nobel-000434,nobel-000945,nobel-000960,shaw_prize-000003,shaw_prize-000050,shaw_prize-000071,shaw_prize-000085,shaw_prize-000098,turing_award-000013,turing_award-000017,wolf_prize-000071,wolf_prize-000107
+United Kingdom	universi	19	University of Oxford and University of Dundee			no	1	1	1	breakthrough-000070
+United Kingdom	universi	19	University of Oxford, Francis Crick Institute			no	1	1	1	lasker_awards-000375
+United Kingdom	universi	19	University of Reading			no	1	1	1	japan_prize-000109
+United Kingdom	universi	19	University of Sussex			no	1	1	5	crafoord-000030,kyoto_prize-000055,nobel-000452,nobel-000664,wolf_prize-000035
+United Kingdom	universi	19	University of Warwick			no	1	1	2	fields-000015,gairdner_international_award-000276
+United Kingdom	wellcome	3	Wellcome Research Laboratories			no	1	1	3	gairdner_international_award-000129,lasker_awards-000177,wolf_prize-000051
+United Kingdom	wellcome	3	Wellcome Sanger Institute			no	1	1	1	gairdner_international_award-000263
+United Kingdom	wellcome	3	Wellcome Trust / Cancer Research Campaign (CRC) Institute			no	1	1	1	japan_prize-000047
+United States	american	4	American Cancer Society			no	1	1	1	lasker_awards-000225
+United States	american	4	American Cancer Society University of Wisconsin			no	1	1	1	lasker_awards-000161
+United States	american	4	American Heart Association Harvard Medical School			no	1	1	1	lasker_awards-000091
+United States	american	4	American Public Health Association			no	1	1	1	lasker_awards-000081
+United States	boston c	2	Boston Children's Hospital			no	1	1	1	gairdner_international_award-000353
+United States	boston c	2	Boston Children’s Hospital/Harvard Medical School			no	1	1	1	lasker_awards-000403
+United States	brigham 	2	Brigham and Women's Hospital	Harvard Medical School; Howard Hughes Medical Institute		yes	3	1	1	breakthrough-000058
+United States	brigham 	2	Brigham and Women’s Hospital			no	1	1	2	lasker_awards-000371,nobel-000608
+United States	bristol-	2	Bristol-Meyers Squibb- Squibb Institute for Medical Research			no	1	1	2	lasker_awards-000056,lasker_awards-000058
+United States	bristol-	2	Bristol-Myers Squibb Pharmaceutical Research Institute			no	1	1	2	lasker_awards-000285,lasker_awards-000286
+United States	carnegie	5	Carnegie Institution			no	1	1	1	lasker_awards-000327
+United States	carnegie	5	Carnegie Institution for Science in Baltimore			no	1	1	1	lasker_awards-000356
+United States	carnegie	5	Carnegie Mellon University			no	1	1	10	kyoto_prize-000100,nobel-000211,nobel-000485,nobel-000762,turing_award-000001,turing_award-000010,turing_award-000011,turing_award-000035,turing_award-000052,wolf_prize-000267
+United States	carnegie	5	Carnegie Observatories			no	1	1	1	crafoord-000016
+United States	carnegie	5	Carnegie-Mellon University			no	1	1	1	wolf_prize-000136
+United States	columbia	2	Columbia University			no	1	1	47	breakthrough-000114,crafoord-000042,crafoord-000058,fields-000036,gairdner_international_award-000002,gairdner_international_award-000004,gairdner_international_award-000011,gairdner_international_award-000180,gairdner_international_award-000270,gairdner_international_award-000272,gairdner_international_award-000318,gairdner_international_award-000378,gairdner_international_award-000379,kyoto_prize-000090,lasker_awards-000017,lasker_awards-000041,lasker_awards-000163,lasker_awards-000185,lasker_awards-000198,lasker_awards-000200,lasker_awards-000211,lasker_awards-000352,lasker_awards-000357,nobel-000162,nobel-000173,nobel-000217,nobel-000291,nobel-000295,nobel-000297,nobel-000306,nobel-000463,nobel-000667,nobel-000698,nobel-000701,nobel-000715,nobel-000725,nobel-000765,nobel-000785,nobel-000806,nobel-000913,nobel-000991,shaw_prize-000043,turing_award-000073,wolf_prize-000009,wolf_prize-000081,wolf_prize-000161,wolf_prize-000185
+United States	columbia	2	Columbia University College of Physicians and Surgeons			no	1	1	3	lasker_awards-000027,lasker_awards-000066,lasker_awards-000253
+United States	dana-far	2	Dana-Farber Cancer Institute			no	1	1	1	gairdner_international_award-000308
+United States	dana-far	2	Dana-Farber Cancer Institute, Harvard Medical School			no	1	1	1	lasker_awards-000376
+United States	digital 	2	Digital Equipment Corporation			no	1	1	1	turing_award-000031
+United States	digital 	2	Digital Pathways, Inc.			no	1	1	1	nobel-000591
+United States	harvard 	7	Harvard Medical School, Children’s Cancer Research Foundation			no	1	1	1	lasker_awards-000123
+United States	harvard 	7	Harvard Medical School, Massachusetts General Hospital			no	1	1	1	lasker_awards-000333
+United States	harvard 	7	Harvard Medical School	Beth Israel Hospital		yes	2	1	1	lasker_awards-000157
+United States	harvard 	7	Harvard Medical School	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000127
+United States	harvard 	7	Harvard Medical School	Weill Cornell Medical College		yes	2	1	1	breakthrough-000017
+United States	harvard 	7	Harvard University			no	1	1	110	breakthrough-000036,breakthrough-000053,breakthrough-000143,crafoord-000015,crafoord-000021,crafoord-000028,crafoord-000029,crafoord-000038,crafoord-000060,crafoord-000074,fields-000030,fields-000037,fields-000050,fields-000052,fields-000067,gairdner_international_award-000018,gairdner_international_award-000033,gairdner_international_award-000068,gairdner_international_award-000105,gairdner_international_award-000114,gairdner_international_award-000128,gairdner_international_award-000130,gairdner_international_award-000165,gairdner_international_award-000195,gairdner_international_award-000209,gairdner_international_award-000224,gairdner_international_award-000256,gairdner_international_award-000294,gairdner_international_award-000302,gairdner_international_award-000322,gairdner_international_award-000361,gairdner_international_award-000367,gairdner_international_award-000382,japan_prize-000003,japan_prize-000015,japan_prize-000040,japan_prize-000041,japan_prize-000063,japan_prize-000114,kyoto_prize-000036,kyoto_prize-000060,kyoto_prize-000122,lasker_awards-000011,lasker_awards-000030,lasker_awards-000039,lasker_awards-000047,lasker_awards-000050,lasker_awards-000099,lasker_awards-000191,lasker_awards-000207,lasker_awards-000229,lasker_awards-000233,lasker_awards-000258,lasker_awards-000260,lasker_awards-000287,lasker_awards-000317,lasker_awards-000325,nobel-000080,nobel-000176,nobel-000177,nobel-000232,nobel-000257,nobel-000272,nobel-000276,nobel-000281,nobel-000331,nobel-000339,nobel-000356,nobel-000362,nobel-000369,nobel-000383,nobel-000412,nobel-000421,nobel-000430,nobel-000464,nobel-000483,nobel-000503,nobel-000505,nobel-000508,nobel-000511,nobel-000522,nobel-000523,nobel-000525,nobel-000561,nobel-000600,nobel-000603,nobel-000679,nobel-000781,nobel-000825,nobel-000856,nobel-000904,nobel-000942,nobel-000944,nobel-000993,shaw_prize-000019,shaw_prize-000030,shaw_prize-000055,shaw_prize-000108,turing_award-000057,wolf_prize-000036,wolf_prize-000037,wolf_prize-000079,wolf_prize-000139,wolf_prize-000192,wolf_prize-000214,wolf_prize-000258,wolf_prize-000277,wolf_prize-000306,wolf_prize-000310,wolf_prize-000311
+United States	harvard 	7	Harvard University	Howard Hughes Medical Institute		yes	2	1	2	breakthrough-000074,breakthrough-000089
+United States	howard h	3	Howard Hughes Medical Institute			no	1	1	2	nobel-000854,nobel-000891
+United States	howard h	3	Howard Hughes Medical Institute	Johns Hopkins University		yes	2	1	1	breakthrough-000011
+United States	howard h	3	Howard Hughes Medical Institute	Memorial Sloan-Kettering Cancer Center		yes	2	1	1	breakthrough-000012
+United States	institut	4	Institute for Advanced Study			no	1	1	36	abel_prize-000013,abel_prize-000019,abel_prize-000024,breakthrough-000005,breakthrough-000006,breakthrough-000008,breakthrough-000009,breakthrough-000038,breakthrough-000060,crafoord-000011,crafoord-000046,crafoord-000054,crafoord-000072,fields-000012,fields-000026,fields-000044,fields-000066,kyoto_prize-000029,kyoto_prize-000095,max_planck_medal-000035,nobel-000305,nobel-000795,shaw_prize-000017,shaw_prize-000020,shaw_prize-000036,shaw_prize-000110,shaw_prize-000120,turing_award-000077,wolf_prize-000013,wolf_prize-000040,wolf_prize-000049,wolf_prize-000080,wolf_prize-000115,wolf_prize-000164,wolf_prize-000250,wolf_prize-000251
+United States	institut	4	Institute for Genomic Biology, University of Illinois			no	1	1	1	wolf_prize-000263
+United States	institut	4	Institute for Physical Sciences and Technology, University of Maryland			no	1	1	1	japan_prize-000050
+United States	institut	4	Institute for Systems Biology			no	1	1	2	kyoto_prize-000057,nobel-001020
+United States	laborato	2	Laboratories of the Division of Medicine and Public Health, Rockefeller Foundation			no	1	1	1	nobel-000262
+United States	laborato	2	Laboratory for Interactive Learning			no	1	1	1	japan_prize-000067
+United States	massachu	5	Massachusetts General Hospital			no	1	1	4	lasker_awards-000271,lasker_awards-000413,nobel-001009,wolf_prize-000295
+United States	massachu	5	Massachusetts Institute of Technology			no	1	1	83	abel_prize-000003,breakthrough-000001,breakthrough-000030,breakthrough-000046,breakthrough-000072,breakthrough-000104,breakthrough-000142,crafoord-000003,crafoord-000069,crafoord-000070,fields-000048,fields-000068,gairdner_international_award-000093,gairdner_international_award-000132,gairdner_international_award-000156,gairdner_international_award-000176,gairdner_international_award-000235,gairdner_international_award-000239,gairdner_international_award-000248,gairdner_international_award-000258,gairdner_international_award-000346,japan_prize-000016,japan_prize-000046,japan_prize-000097,kyoto_prize-000002,kyoto_prize-000007,kyoto_prize-000011,kyoto_prize-000020,kyoto_prize-000094,lasker_awards-000043,lasker_awards-000065,lasker_awards-000234,lasker_awards-000236,lasker_awards-000402,lasker_awards-000409,lasker_awards-000410,max_planck_medal-000022,nobel-000359,nobel-000399,nobel-000403,nobel-000457,nobel-000472,nobel-000555,nobel-000575,nobel-000577,nobel-000611,nobel-000612,nobel-000634,nobel-000650,nobel-000652,nobel-000733,nobel-000742,nobel-000770,nobel-000773,nobel-000833,nobel-000905,nobel-000940,nobel-000941,nobel-000966,nobel-000990,nobel-001004,nobel-001005,shaw_prize-000045,shaw_prize-000060,shaw_prize-000067,turing_award-000004,turing_award-000029,turing_award-000045,turing_award-000055,turing_award-000059,turing_award-000060,turing_award-000062,turing_award-000065,turing_award-000076,wolf_prize-000042,wolf_prize-000061,wolf_prize-000094,wolf_prize-000232,wolf_prize-000285,wolf_prize-000287,wolf_prize-000334,wolf_prize-000345,wolf_prize-000362
+United States	massachu	5	Massachusetts Institute of Technology and Stanford University			no	1	1	1	breakthrough-000077
+United States	massachu	5	Massachusetts Institute of Technology	Broad Institute		yes	2	1	1	breakthrough-000015
+United States	massachu	5	Massachusetts Institute of Technology	Whitehead Institute		yes	2	1	1	breakthrough-000019
+United States	memorial	3	Memorial Hospital for Cancer and Allied Diseases			no	1	1	1	lasker_awards-000151
+United States	memorial	3	Memorial Sloan Kettering Cancer Center	Weill Cornell Graduate School of Medical Sciences, Cornell University		yes	2	1	1	shaw_prize-000081
+United States	memorial	3	Memorial Sloan-Kettering Cancer Center			no	1	1	7	crafoord-000067,gairdner_international_award-000232,gairdner_international_award-000284,gairdner_international_award-000374,lasker_awards-000272,lasker_awards-000340,wolf_prize-000162
+United States	mount si	2	Mount Sinai Hospital			no	1	1	1	gairdner_international_award-000014
+United States	mount si	2	Mount Sinai School of Medicine			no	1	1	1	gairdner_international_award-000080
+United States	national	17	National Cancer Institute			no	1	1	2	lasker_awards-000382,lasker_awards-000383
+United States	national	17	National Cancer Institute, National Institutes of Health			no	1	1	7	japan_prize-000013,lasker_awards-000141,lasker_awards-000153,lasker_awards-000156,lasker_awards-000208,lasker_awards-000218,lasker_awards-000230
+United States	national	17	National Heart Institute			no	1	1	1	lasker_awards-000042
+United States	national	17	National Heart Institute, NIH			no	1	1	1	lasker_awards-000129
+United States	national	17	National Heart Institute, National Institutes of Health			no	1	1	1	lasker_awards-000125
+United States	national	17	National Heart, Lung, and Blood Institute, National Institutes of Health			no	1	1	2	breakthrough-000128,shaw_prize-000109
+United States	national	17	National Human Genome Research Institute			no	1	1	2	crafoord-000073,gairdner_international_award-000259
+United States	national	17	National Institute of Allergy and Infectious Diseases			no	1	1	1	lasker_awards-000331
+United States	national	17	National Institute of Arthritis, Diabetes, Digestive and Kidney Diseases, NIH			no	1	1	1	lasker_awards-000209
+United States	national	17	National Institute of Environmental Health Sciences			no	1	1	1	nobel-000645
+United States	national	17	National Institute of Mental Health			no	1	1	1	lasker_awards-000203
+United States	national	17	National Institute of Neurological Disorders and Stroke, NIH			no	1	1	1	lasker_awards-000210
+United States	national	17	National Institute of Standards and Technology			no	1	1	3	kyoto_prize-000085,nobel-000687,nobel-000863
+United States	national	17	National Institute of Standards and Technology and University of Colorado			no	1	1	1	breakthrough-000096
+United States	national	17	National Institute on Aging, National Institutes of Health			no	1	1	1	breakthrough-000123
+United States	national	17	National Institutes of Health			no	1	1	30	breakthrough-000091,gairdner_international_award-000022,gairdner_international_award-000053,gairdner_international_award-000054,gairdner_international_award-000056,gairdner_international_award-000059,gairdner_international_award-000090,gairdner_international_award-000110,gairdner_international_award-000116,gairdner_international_award-000134,gairdner_international_award-000139,gairdner_international_award-000147,gairdner_international_award-000153,gairdner_international_award-000161,gairdner_international_award-000184,gairdner_international_award-000201,gairdner_international_award-000320,lasker_awards-000016,lasker_awards-000079,lasker_awards-000092,lasker_awards-000110,lasker_awards-000268,lasker_awards-000270,lasker_awards-000291,lasker_awards-000350,nobel-000389,nobel-000407,nobel-000417,nobel-000468,nobel-000956
+United States	national	17	National Jewish Health, Denver, Colorado			no	1	1	2	wolf_prize-000303,wolf_prize-000304
+United States	new york	10	New York City-Commissioner of Health			no	1	1	1	lasker_awards-000051
+United States	new york	10	New York Medical College			no	1	1	2	lasker_awards-000154,lasker_awards-000316
+United States	new york	10	New York Medical Examiner’s Office			no	1	1	1	lasker_awards-000002
+United States	new york	10	New York State Agricultural Experiment Station, College of Agriculture			no	1	1	1	wolf_prize-000043
+United States	new york	10	New York Times			no	1	1	1	lasker_awards-000297
+United States	new york	10	New York University			no	1	1	13	crafoord-000002,kyoto_prize-000126,lasker_awards-000008,lasker_awards-000018,lasker_awards-000019,lasker_awards-000215,nobel-000318,nobel-000441,nobel-000750,nobel-000842,nobel-000928,shaw_prize-000093,turing_award-000070
+United States	new york	10	New York University Medical Center			no	1	1	1	lasker_awards-000130
+United States	new york	10	New York University School of Medicine, Office of Defense Mobilization, New York Times			no	1	1	1	lasker_awards-000038
+United States	new york	10	New York University, USA	Institut des Hautes Études Scientifiques, France	France	yes	2	2	1	fields-000004
+United States	new york	10	New York-Presbyterian Hospital/Weill Cornell Medical Center			no	1	1	1	lasker_awards-000105
+United States	north ca	2	North Carolina State University			no	1	1	1	gairdner_international_award-000338
+United States	north ca	2	North Carolina State University, NC			no	1	1	1	wolf_prize-000307
+United States	princeto	2	Princeton University			no	1	1	67	abel_prize-000014,abel_prize-000015,breakthrough-000010,breakthrough-000014,breakthrough-000063,breakthrough-000144,breakthrough-000145,crafoord-000006,crafoord-000039,crafoord-000040,crafoord-000068,fields-000007,fields-000014,fields-000021,fields-000038,fields-000040,fields-000043,fields-000046,fields-000060,fields-000063,gairdner_international_award-000368,japan_prize-000017,kyoto_prize-000067,kyoto_prize-000079,kyoto_prize-000080,kyoto_prize-000110,kyoto_prize-000116,kyoto_prize-000119,max_planck_medal-000027,max_planck_medal-000052,max_planck_medal-000056,max_planck_medal-000085,nobel-000224,nobel-000351,nobel-000498,nobel-000516,nobel-000637,nobel-000638,nobel-000641,nobel-000658,nobel-000699,nobel-000738,nobel-000808,nobel-000843,nobel-000893,nobel-000910,nobel-000948,nobel-000964,nobel-000973,nobel-001011,shaw_prize-000001,shaw_prize-000010,shaw_prize-000033,shaw_prize-000034,shaw_prize-000062,shaw_prize-000076,shaw_prize-000099,turing_award-000025,turing_award-000041,wolf_prize-000140,wolf_prize-000163,wolf_prize-000170,wolf_prize-000171,wolf_prize-000183,wolf_prize-000294,wolf_prize-000317,wolf_prize-000360
+United States	princeto	2	Princeton University	Howard Hughes Medical Institute; Marine Biological Laboratory		yes	3	1	1	breakthrough-000105
+United States	research	2	Research Division of Infectious Diseases, Children's Medical Center			no	1	1	1	nobel-000282
+United States	research	2	Research to Prevent Blindness			no	1	1	1	lasker_awards-000171
+United States	rice uni	2	Rice University			no	1	1	2	nobel-000663,nobel-000665
+United States	rice uni	2	Rice University, Houston, TX			no	1	1	1	wolf_prize-000309
+United States	rockefel	4	Rockefeller Institute for Medical Research			no	1	1	6	nobel-000072,nobel-000154,nobel-000215,nobel-000226,nobel-000227,nobel-000310
+United States	rockefel	4	Rockefeller University			no	1	1	54	breakthrough-000013,breakthrough-000021,breakthrough-000033,gairdner_international_award-000021,gairdner_international_award-000050,gairdner_international_award-000072,gairdner_international_award-000073,gairdner_international_award-000148,gairdner_international_award-000172,gairdner_international_award-000252,gairdner_international_award-000257,gairdner_international_award-000269,gairdner_international_award-000283,gairdner_international_award-000289,gairdner_international_award-000315,gairdner_international_award-000317,gairdner_international_award-000328,gairdner_international_award-000354,japan_prize-000083,kyoto_prize-000113,lasker_awards-000122,lasker_awards-000133,lasker_awards-000184,lasker_awards-000205,lasker_awards-000238,lasker_awards-000251,lasker_awards-000257,lasker_awards-000284,lasker_awards-000308,lasker_awards-000309,lasker_awards-000328,lasker_awards-000344,lasker_awards-000377,lasker_awards-000385,lasker_awards-000415,max_planck_medal-000030,nobel-000374,nobel-000382,nobel-000418,nobel-000419,nobel-000423,nobel-000446,nobel-000544,nobel-000703,nobel-000714,nobel-000749,nobel-000847,nobel-000919,nobel-000958,shaw_prize-000029,shaw_prize-000053,wolf_prize-000018,wolf_prize-000122,wolf_prize-000337
+United States	rockefel	4	Rockefeller University, New York			no	1	1	1	wolf_prize-000302
+United States	rockefel	4	Rockefeller University	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000084
+United States	salk ins	2	Salk Institute for Biological Studies			no	1	1	11	gairdner_international_award-000098,gairdner_international_award-000227,gairdner_international_award-000287,japan_prize-000111,lasker_awards-000117,lasker_awards-000168,lasker_awards-000315,nobel-000477,wolf_prize-000231,wolf_prize-000280,wolf_prize-000375
+United States	salk ins	2	Salk Institute for Biological Studies	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000065
+United States	sanford 	2	Sanford Burnham Prebys			no	1	1	1	lasker_awards-000401
+United States	sanford 	2	Sanford Burnham Prebys Medical Discovery Institute			no	1	1	1	gairdner_international_award-000238
+United States	scripps 	4	Scripps Clinic and Research Foundation			no	1	1	1	lasker_awards-000166
+United States	scripps 	4	Scripps Institution of Oceanography			no	1	1	3	crafoord-000050,kyoto_prize-000047,kyoto_prize-000128
+United States	scripps 	4	Scripps Research			no	1	1	7	crafoord-000081,gairdner_international_award-000066,gairdner_international_award-000094,gairdner_international_award-000383,gairdner_international_award-000384,nobel-000970,nobel-000976
+United States	scripps 	4	Scripps Research Institute			no	1	1	5	breakthrough-000097,wolf_prize-000151,wolf_prize-000199,wolf_prize-000359,wolf_prize-000371
+United States	st. jude	2	St. Jude Children's Research Hospital			no	1	1	2	gairdner_international_award-000145,nobel-000669
+United States	st. jude	2	St. Jude Children’s Research Hospital			no	1	1	2	lasker_awards-000143,lasker_awards-000261
+United States	stanford	3	Stanford Linear Accelerator Center			no	1	1	1	nobel-000471
+United States	stanford	3	Stanford University			no	1	1	83	breakthrough-000003,breakthrough-000087,breakthrough-000107,crafoord-000014,crafoord-000037,crafoord-000063,crafoord-000064,fields-000016,fields-000056,gairdner_international_award-000136,gairdner_international_award-000164,gairdner_international_award-000196,gairdner_international_award-000228,gairdner_international_award-000253,gairdner_international_award-000278,gairdner_international_award-000300,gairdner_international_award-000347,gairdner_international_award-000357,japan_prize-000001,japan_prize-000070,japan_prize-000104,kyoto_prize-000010,kyoto_prize-000034,kyoto_prize-000069,kyoto_prize-000106,lasker_awards-000137,lasker_awards-000193,lasker_awards-000195,lasker_awards-000196,lasker_awards-000336,lasker_awards-000351,lasker_awards-000359,lasker_awards-000396,lasker_awards-000423,nobel-000271,nobel-000290,nobel-000319,nobel-000333,nobel-000440,nobel-000507,nobel-000526,nobel-000537,nobel-000606,nobel-000613,nobel-000661,nobel-000674,nobel-000685,nobel-000697,nobel-000724,nobel-000784,nobel-000787,nobel-000855,nobel-000865,nobel-000873,nobel-000879,nobel-000953,nobel-000954,nobel-000967,nobel-000977,shaw_prize-000004,shaw_prize-000054,shaw_prize-000083,shaw_prize-000121,turing_award-000006,turing_award-000009,turing_award-000015,turing_award-000034,turing_award-000063,turing_award-000064,turing_award-000066,turing_award-000072,turing_award-000074,wolf_prize-000003,wolf_prize-000039,wolf_prize-000055,wolf_prize-000059,wolf_prize-000073,wolf_prize-000169,wolf_prize-000226,wolf_prize-000248,wolf_prize-000305,wolf_prize-000341,wolf_prize-000361
+United States	stanford	3	Stanford University	Howard Hughes Medical Institute		yes	2	1	2	breakthrough-000057,japan_prize-000108
+United States	state un	2	State University of New York at Stony Brook			no	1	1	2	crafoord-000031,lasker_awards-000219
+United States	state un	2	State University of New York, Health Science Center at Brooklyn			no	1	1	1	lasker_awards-000266
+United States	stony br	2	Stony Brook University			no	1	1	6	abel_prize-000011,abel_prize-000025,breakthrough-000078,breakthrough-000109,max_planck_medal-000061,wolf_prize-000257
+United States	stony br	2	Stony Brook University	Imperial College London		yes	2	1	1	breakthrough-000039
+United States	the inst	2	The Institute for Cancer Research			no	1	1	1	nobel-000467
+United States	the inst	2	The Institute for Genomic Research			no	1	1	1	gairdner_international_award-000260
+United States	the ohio	2	The Ohio State University			no	1	1	2	nobel-000998,wolf_prize-000298
+United States	the ohio	2	The Ohio State University, Carbon Management and Sequestration Center			no	1	1	1	japan_prize-000096
+United States	the rock	3	The Rockefeller Foundation			no	1	1	2	lasker_awards-000007,lasker_awards-000021
+United States	the rock	3	The Rockefeller Institute			no	1	1	7	lasker_awards-000004,lasker_awards-000005,lasker_awards-000009,lasker_awards-000012,lasker_awards-000087,lasker_awards-000111,lasker_awards-000167
+United States	the rock	3	The Rockefeller University (Rockefeller Institute)			no	1	1	1	lasker_awards-000077
+United States	the univ	3	The University of Chicago			no	1	1	2	japan_prize-000075,wolf_prize-000369
+United States	the univ	3	The University of Massachusetts Medical School			no	1	1	1	wolf_prize-000297
+United States	the univ	3	The University of Texas at Austin			no	1	1	1	japan_prize-000079
+United States	united s	5	United States Children’s Bureau			no	1	1	1	lasker_awards-000015
+United States	united s	5	United States House of Representatives			no	1	1	2	lasker_awards-000250,lasker_awards-000296
+United States	united s	5	United States President			no	1	1	1	lasker_awards-000121
+United States	united s	5	United States Public Health Service			no	1	1	1	lasker_awards-000063
+United States	united s	5	United States Senate			no	1	1	3	lasker_awards-000132,lasker_awards-000159,lasker_awards-000264
+United States	universi	69	University at Albany (SUNY)			no	1	1	1	turing_award-000033
+United States	universi	69	University of Arizona			no	1	1	1	kyoto_prize-000046
+United States	universi	69	University of California			no	1	1	52	lasker_awards-000088,nobel-000207,nobel-000245,nobel-000259,nobel-000260,nobel-000321,nobel-000322,nobel-000323,nobel-000328,nobel-000329,nobel-000352,nobel-000391,nobel-000538,nobel-000562,nobel-000572,nobel-000597,nobel-000598,nobel-000640,nobel-000653,nobel-000662,nobel-000676,nobel-000682,nobel-000688,nobel-000693,nobel-000707,nobel-000711,nobel-000718,nobel-000723,nobel-000751,nobel-000761,nobel-000792,nobel-000807,nobel-000821,nobel-000823,nobel-000857,nobel-000872,nobel-000889,nobel-000952,nobel-000962,nobel-000965,nobel-000969,nobel-001015,nobel-001024,nobel-001026,wolf_prize-000047,wolf_prize-000125,wolf_prize-000128,wolf_prize-000141,wolf_prize-000147,wolf_prize-000150,wolf_prize-000165,wolf_prize-000176
+United States	universi	69	University of California Davis			no	1	1	1	wolf_prize-000290
+United States	universi	69	University of California San Diego			no	1	1	1	wolf_prize-000221
+United States	universi	69	University of California, Berkeley			no	1	1	31	fields-000058,gairdner_international_award-000151,gairdner_international_award-000234,gairdner_international_award-000237,gairdner_international_award-000336,japan_prize-000033,japan_prize-000090,kyoto_prize-000075,kyoto_prize-000105,lasker_awards-000085,lasker_awards-000116,lasker_awards-000281,lasker_awards-000305,max_planck_medal-000053,shaw_prize-000007,shaw_prize-000073,shaw_prize-000103,turing_award-000023,turing_award-000028,turing_award-000036,turing_award-000067,wolf_prize-000063,wolf_prize-000067,wolf_prize-000070,wolf_prize-000239,wolf_prize-000316,wolf_prize-000326,wolf_prize-000331,wolf_prize-000333,wolf_prize-000343,wolf_prize-000383
+United States	universi	69	University of California, Berkeley and Lawrence Berkeley National Laboratory	Australian National University;Johns Hopkins University and Space Telescope Science Institute		yes	3	1	3	breakthrough-000031,breakthrough-000138,breakthrough-000139
+United States	universi	69	University of California, Berkeley	Howard Hughes Medical Institute; Lawrence Berkeley National Laboratory		yes	3	1	1	breakthrough-000034
+United States	universi	69	University of California, Berkeley	Institute for Advanced Study		yes	2	1	1	breakthrough-000050
+United States	universi	69	University of California, Davis			no	1	1	2	wolf_prize-000355,wolf_prize-000376
+United States	universi	69	University of California, Irvine			no	1	1	2	japan_prize-000014,wolf_prize-000318
+United States	universi	69	University of California, Kavli Institute for Theoretical Physics			no	1	1	1	nobel-000768
+United States	universi	69	University of California, Los Angeles			no	1	1	10	breakthrough-000040,crafoord-000053,crafoord-000055,fields-000023,gairdner_international_award-000275,gairdner_international_award-000290,lasker_awards-000386,lasker_awards-000392,shaw_prize-000044,turing_award-000058
+United States	universi	69	University of California, San Diego			no	1	1	10	breakthrough-000018,breakthrough-000064,breakthrough-000069,crafoord-000082,fields-000041,gairdner_international_award-000230,gairdner_international_award-000325,japan_prize-000085,shaw_prize-000027,wolf_prize-000237
+United States	universi	69	University of California, San Francisco			no	1	1	29	breakthrough-000082,breakthrough-000118,crafoord-000066,gairdner_international_award-000154,gairdner_international_award-000158,gairdner_international_award-000159,gairdner_international_award-000163,gairdner_international_award-000222,gairdner_international_award-000229,gairdner_international_award-000241,gairdner_international_award-000301,gairdner_international_award-000340,gairdner_international_award-000351,lasker_awards-000026,lasker_awards-000194,lasker_awards-000204,lasker_awards-000206,lasker_awards-000248,lasker_awards-000255,lasker_awards-000256,lasker_awards-000324,lasker_awards-000353,lasker_awards-000366,lasker_awards-000380,shaw_prize-000002,shaw_prize-000005,shaw_prize-000035,shaw_prize-000059,shaw_prize-000074
+United States	universi	69	University of California, San Francisco	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000067
+United States	universi	69	University of California, Santa Barbara			no	1	1	1	breakthrough-000054
+United States	universi	69	University of California, Santa Barbara	Kavli Institute for Theoretical Physics		yes	2	1	1	breakthrough-000130
+United States	universi	69	University of California, Santa Cruz			no	1	1	3	breakthrough-000055,gairdner_international_award-000291,shaw_prize-000116
+United States	universi	69	University of Chicago			no	1	1	45	breakthrough-000086,crafoord-000071,fields-000001,fields-000054,gairdner_international_award-000041,gairdner_international_award-000076,gairdner_international_award-000126,gairdner_international_award-000233,kyoto_prize-000061,kyoto_prize-000102,lasker_awards-000112,max_planck_medal-000017,max_planck_medal-000020,max_planck_medal-000040,max_planck_medal-000049,nobel-000043,nobel-000139,nobel-000371,nobel-000465,nobel-000497,nobel-000515,nobel-000529,nobel-000542,nobel-000605,nobel-000615,nobel-000622,nobel-000630,nobel-000654,nobel-000710,nobel-000796,nobel-000867,nobel-000868,nobel-000915,nobel-000980,nobel-001006,shaw_prize-000087,shaw_prize-000106,wolf_prize-000028,wolf_prize-000083,wolf_prize-000114,wolf_prize-000156,wolf_prize-000268,wolf_prize-000327,wolf_prize-000328,wolf_prize-000335
+United States	universi	69	University of Chicago Medical Center			no	1	1	2	lasker_awards-000279,wolf_prize-000069
+United States	universi	69	University of Chicago, Ben May Laboratory for Cancer Research			no	1	1	1	nobel-000375
+United States	universi	69	University of Chicago, University of Cincinnati College of Medicine			no	1	1	1	lasker_awards-000313
+United States	universi	69	University of Cincinnati			no	1	1	1	lasker_awards-000120
+United States	universi	69	University of Colorado			no	1	1	1	nobel-000594
+United States	universi	69	University of Colorado Denver			no	1	1	1	crafoord-000047
+United States	universi	69	University of Colorado, Boulder			no	1	1	3	crafoord-000059,gairdner_international_award-000190,lasker_awards-000237
+United States	universi	69	University of Colorado, JILA			no	1	1	3	nobel-000732,nobel-000734,nobel-000782
+United States	universi	69	University of Delaware			no	1	1	1	nobel-000830
+United States	universi	69	University of Florida			no	1	1	2	abel_prize-000007,crafoord-000010
+United States	universi	69	University of Georgia			no	1	1	1	crafoord-000009
+United States	universi	69	University of Hawaii			no	1	1	1	kyoto_prize-000118
+United States	universi	69	University of Hawaii at Manoa			no	1	1	1	japan_prize-000039
+United States	universi	69	University of Illinois College of Medicine			no	1	1	1	lasker_awards-000029
+United States	universi	69	University of Illinois Urbana-Champaign			no	1	1	14	crafoord-000036,gairdner_international_award-000167,japan_prize-000028,kyoto_prize-000028,nobel-000299,nobel-000425,nobel-000753,nobel-000758,wolf_prize-000001,wolf_prize-000030,wolf_prize-000060,wolf_prize-000157,wolf_prize-000213,wolf_prize-000322
+United States	universi	69	University of Iowa			no	1	1	4	crafoord-000013,gairdner_international_award-000380,lasker_awards-000421,shaw_prize-000096
+United States	universi	69	University of Maine			no	1	1	1	nobel-000917
+United States	universi	69	University of Maryland			no	1	1	3	nobel-000775,wolf_prize-000029,wolf_prize-000228
+United States	universi	69	University of Massachusetts			no	1	1	6	breakthrough-000035,gairdner_international_award-000280,gairdner_international_award-000298,lasker_awards-000334,nobel-000788,nobel-001008
+United States	universi	69	University of Massachusetts Amherst			no	1	1	1	turing_award-000078
+United States	universi	69	University of Michigan			no	1	1	4	gairdner_international_award-000039,japan_prize-000068,lasker_awards-000010,lasker_awards-000101
+United States	universi	69	University of Minnesota			no	1	1	10	gairdner_international_award-000023,gairdner_international_award-000071,lasker_awards-000054,lasker_awards-000057,lasker_awards-000059,lasker_awards-000060,lasker_awards-000136,nobel-000794,wolf_prize-000088,wolf_prize-000234
+United States	universi	69	University of Missouri			no	1	1	3	nobel-000925,wolf_prize-000075,wolf_prize-000206
+United States	universi	69	University of North Carolina			no	1	1	3	nobel-000800,nobel-000892,wolf_prize-000211
+United States	universi	69	University of North Carolina at Chapel Hill			no	1	1	5	gairdner_international_award-000204,gairdner_international_award-000221,lasker_awards-000301,turing_award-000040,wolf_prize-000384
+United States	universi	69	University of Pennsylvania			no	1	1	27	breakthrough-000071,breakthrough-000085,breakthrough-000111,breakthrough-000122,breakthrough-000124,breakthrough-000146,crafoord-000005,gairdner_international_award-000081,gairdner_international_award-000255,gairdner_international_award-000286,gairdner_international_award-000363,japan_prize-000042,japan_prize-000103,kyoto_prize-000041,lasker_awards-000006,lasker_awards-000072,lasker_awards-000186,lasker_awards-000280,lasker_awards-000283,lasker_awards-000326,lasker_awards-000398,nobel-000427,nobel-000509,nobel-000708,nobel-000745,wolf_prize-000194,wolf_prize-000212
+United States	universi	69	University of Pennsylvania, Children’s Hospital of Philadelphia	Rockefeller University		yes	2	1	1	breakthrough-000125
+United States	universi	69	University of Pittsburgh			no	1	1	4	lasker_awards-000068,lasker_awards-000223,lasker_awards-000355,wolf_prize-000381
+United States	universi	69	University of Puerto Rico			no	1	1	1	lasker_awards-000108
+United States	universi	69	University of Rochester			no	1	1	6	gairdner_international_award-000330,kyoto_prize-000109,lasker_awards-000269,nobel-000175,wolf_prize-000266,wolf_prize-000353
+United States	universi	69	University of Southern California			no	1	1	5	gairdner_international_award-000265,kyoto_prize-000019,nobel-000639,nobel-000866,turing_award-000044
+United States	universi	69	University of Tennessee			no	1	1	1	turing_award-000075
+United States	universi	69	University of Texas			no	1	1	3	japan_prize-000044,nobel-000937,wolf_prize-000247
+United States	universi	69	University of Texas MD Anderson Cancer Center			no	1	1	3	lasker_awards-000146,lasker_awards-000372,wolf_prize-000319
+United States	universi	69	University of Texas Medical School at Houston			no	1	1	1	nobel-000694
+United States	universi	69	University of Texas Southwestern Medical Center			no	1	1	6	gairdner_international_award-000142,gairdner_international_award-000143,gairdner_international_award-000157,japan_prize-000116,shaw_prize-000014,shaw_prize-000039
+United States	universi	69	University of Texas Southwestern Medical Center at Dallas			no	1	1	5	nobel-000557,nobel-000558,nobel-000581,nobel-000644,nobel-000845
+United States	universi	69	University of Texas Southwestern Medical Center	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000047
+United States	universi	69	University of Texas at Austin			no	1	1	9	abel_prize-000010,abel_prize-000020,abel_prize-000026,breakthrough-000094,shaw_prize-000079,turing_award-000053,wolf_prize-000208,wolf_prize-000278,wolf_prize-000344
+United States	universi	69	University of Utah			no	1	1	8	breakthrough-000068,gairdner_international_award-000219,japan_prize-000004,kyoto_prize-000035,lasker_awards-000307,nobel-000798,wolf_prize-000021,wolf_prize-000210
+United States	universi	69	University of Utah, Howard Hughes Medical Institute			no	1	1	1	lasker_awards-000299
+United States	universi	69	University of Virginia			no	1	1	2	gairdner_international_award-000231,shaw_prize-000049
+United States	universi	69	University of Virginia Medical Center			no	1	1	1	lasker_awards-000263
+United States	universi	69	University of Washington			no	1	1	26	breakthrough-000088,breakthrough-000147,breakthrough-000148,gairdner_international_award-000062,gairdner_international_award-000117,gairdner_international_award-000213,gairdner_international_award-000254,gairdner_international_award-000264,gairdner_international_award-000266,gairdner_international_award-000307,gairdner_international_award-000362,gairdner_international_award-000370,japan_prize-000110,lasker_awards-000040,lasker_awards-000241,lasker_awards-000282,lasker_awards-000306,lasker_awards-000369,nobel-000601,nobel-000624,nobel-000625,nobel-000909,nobel-001001,shaw_prize-000063,shaw_prize-000078,wolf_prize-000123
+United States	universi	69	University of Washington	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000090
+United States	universi	69	University of Wisconsin			no	1	1	8	lasker_awards-000034,lasker_awards-000128,nobel-000311,nobel-000388,nobel-000459,wolf_prize-000002,wolf_prize-000031,wolf_prize-000166
+United States	universi	69	University of Wisconsin (now at the University of Chicago), USA			no	1	1	1	fields-000034
+United States	universi	69	University of Wisconsin, Madison			no	1	1	2	lasker_awards-000053,lasker_awards-000106
+United States	universi	69	University of Wisconsin–Madison			no	1	1	4	gairdner_international_award-000095,gairdner_international_award-000096,gairdner_international_award-000118,gairdner_international_award-000119
+United States	ut south	3	UT Southwestern Medical Center			no	1	1	4	lasker_awards-000221,lasker_awards-000222,lasker_awards-000412,lasker_awards-000419
+United States	ut south	3	UT Southwestern Medical Center	Howard Hughes Medical Institute		yes	2	1	1	breakthrough-000075
+United States	ut south	3	UT Southwestern School of Medicine			no	1	1	1	lasker_awards-000240
+United States	veterans	2	Veterans Administration			no	1	1	1	lasker_awards-000165
+United States	veterans	2	Veterans Administration Hospital			no	1	1	5	lasker_awards-000095,lasker_awards-000140,lasker_awards-000162,nobel-000478,nobel-000479
+United States	washingt	4	Washington State University			no	1	1	1	wolf_prize-000264
+United States	washingt	4	Washington University			no	1	1	7	lasker_awards-000001,lasker_awards-000259,nobel-000214,nobel-000235,nobel-000236,nobel-000631,nobel-000981
+United States	washingt	4	Washington University Genome Sequencing Center			no	1	1	1	gairdner_international_award-000267
+United States	washingt	4	Washington University in St. Louis			no	1	1	2	gairdner_international_award-000220,gairdner_international_award-000250
+United States	whitehea	4	Whitehead Institute			no	1	1	1	wolf_prize-000269
+United States	whitehea	4	Whitehead Institute for Biomedical Research			no	1	1	1	gairdner_international_award-000216
+United States	whitehea	4	Whitehead Institute for Biomedical Research, Massachusetts Institute of Technology (MIT)			no	1	1	1	wolf_prize-000220
+United States	whitehea	4	Whitehead Institute for Biomedical Research	Massachusetts Institute of Technology (MIT)		yes	2	1	1	japan_prize-000101

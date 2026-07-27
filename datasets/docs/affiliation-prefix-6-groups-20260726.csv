@@ -1,0 +1,438 @@
+prefix,affiliation_name,award_record_count
+
+boston,"Boston Children's Hospital",1
+boston,"Boston Children’s Hospital/Harvard Medical School",1
+bristo,"Bristol University",1
+bristo,"Bristol-Meyers Squibb- Squibb Institute for Medical Research",2
+bristo,"Bristol-Myers Squibb Pharmaceutical Research Institute",2
+califo,"California Institute of Technology",52
+califo,"California Institute of Technology and Cambridge University, Cambridge, UK",2
+califo,"California Institute of Technology Pasadena, California",1
+califo,"California Institute of Technology, Pasadena, CA Currently at KITP and UCSB, Santa Barbara",1
+centra,"Central Research Laboratories EMI, Ltd.",1
+centra,"Central Research Laboratories, EMI",1
+chines,"Chinese Academy of Sciences",1
+chines,"Chinese Academy of Sciences, University of California, Berkeley",2
+columb,"Columbia University",46
+columb,"Columbia University College of Physicians and Surgeons",3
+columb,"Columbia University Division, Cardio-Pulmonary Laboratory, Bellevue Hospital",1
+"fermi ","Fermi National Accelerator Laboratory",1
+"fermi ","Fermi National Accelerator Laboratory Chicago",1
+harvar,"Harvard Medical School, Children’s Cancer Research Foundation",1
+harvar,"Harvard Medical School, Massachusetts General Hospital",1
+harvar,"Harvard Medical School; Beth Israel Hospital",1
+harvar,"Harvard Medical School; Howard Hughes Medical Institute",1
+harvar,"Harvard Medical School; Weill Cornell Medical College",1
+harvar,"Harvard University; Howard Hughes Medical Institute",2
+"high e","High Energy Accelerator Research Organization (KEK)",1
+"high e","High Energy Accelerator Research Organization, Japan",1
+howard,"Howard Hughes Medical Institute",2
+howard,"Howard Hughes Medical Institute; Johns Hopkins University",1
+howard,"Howard Hughes Medical Institute; Memorial Sloan-Kettering Cancer Center",1
+humbol,"Humboldt University of Berlin",3
+humbol,"Humboldt-Universität zu Berlin",1
+imperi,"Imperial Cancer Research Fund",3
+imperi,"Imperial Cancer Research Fund Laboratory",1
+imperi,"Imperial College",3
+imperi,"Imperial College London",5
+imperi,"Imperial College London, Kennedy Institute of Rheumatology",2
+imperi,"Imperial College of Science",1
+imperi,"Imperial College of Science and Technology",1
+instit,"Institut d'Astrophysique Spatiale",1
+instit,"Institut d'Optique",1
+instit,"Institut des Hautes Études Scientifiques",15
+instit,"Institut du Radium",2
+instit,"Institut d’Optique Graduate School – Université Paris-Saclay",1
+instit,"Institut Français du Pétrole",1
+instit,"Institut Imagine",1
+instit,"Institut Laue–Langevin",1
+instit,"Institut Pasteur",12
+instit,"Institute for Advanced Study",35
+instit,"Institute for Advanced Study; Princeton University",1
+instit,"Institute for Biochemical Research",1
+instit,"Institute for Chemical Physics of the Academy of Sciences of the USSR",1
+instit,"Institute for Genomic Biology, University of Illinois",1
+instit,"Institute for Infectious Diseases",1
+instit,"Institute for Molecular Science",1
+instit,"Institute for Physical Problems",1
+instit,"Institute for Physical Sciences and Technology, University of Maryland",1
+instit,"Institute for Systems Biology",2
+instit,"Institute of Cell Biology Italian National Council of Research",1
+instit,"Institute of Cell Biology of the C.N.R.",1
+instit,"Institute of Genetics and Molecular and Cellular Biology",2
+instit,"Institute of Molecular",1
+instit,"Institute of Molecular and Cellular Biology, CNRS",1
+instit,"Institute of Nuclear Physics, Polish Academy of Sciences",1
+instit,"Institute of Physical Chemistry",1
+instit,"Institute of Physical Chemistry of Ukrainian S.S.R. Academy of Sciences",2
+instit,"Institute of Statistical Mathematics",1
+instit,"Institute of Technology",1
+instit,"Institute of Zoology, Warsaw University",1
+instit,"Instituto de Biologia y Medicina Experimental (Institute for Biology and Experimental Medicine)",1
+intern,"International Centre for Theoretical Physics",1
+intern,"International Rice Research Institute",2
+joseph,"Joseph Fourier University",1
+joseph,"Joseph Fourier University, Grenoble",1
+joseph,"Joseph P. Kennedy Foundation",1
+karoli,"Karolinska Institutet",12
+karoli,"Karolinska Institutet, Nobel Medical Institute",1
+"kyoto ","Kyoto Imperial University",1
+"kyoto ","Kyoto Sangyo University",1
+"kyoto ","Kyoto University",18
+"kyoto ","Kyoto University Institute for Advanced Study",1
+"kyoto ","Kyoto University; J. David Gladstone Institutes; University of California, San Francisco",1
+labora,"Laboratories of the Division of Medicine and Public Health, Rockefeller Foundation",1
+labora,"Laboratorium der Farben-Fabriken J.R. Geigy A.G. (Laboratory of the J.R. Geigy Dye-Factory Co.)",1
+labora,"Laboratory for Interactive Learning",1
+labora,"Laboratory of Molecular Biology, Cambridge, England",1
+lawren,"Lawrence Berkeley National Laboratory",3
+lawren,"Lawrence Berkley National Lab, Berkley",1
+london,"London School of Economics and Political Science",2
+maiman,"Maiman Associates",1
+maiman,"Maiman Associates Inc.",1
+massac,"Massachusetts General Hospital",4
+massac,"Massachusetts Institute of Technology",81
+massac,"Massachusetts Institute of Technology (MIT), Center for Cancer Research",1
+massac,"Massachusetts Institute of Technology and Stanford University",1
+massac,"Massachusetts Institute of Technology Center for Cancer Research",1
+massac,"Massachusetts Institute of Technology; Broad Institute",1
+massac,"Massachusetts Institute of Technology; Whitehead Institute",1
+medica,"Medical College of Georgia",2
+medica,"Medical Research Council",4
+medica,"Medical Research Council, Cambridge, England",1
+medica,"Medical Research Council, Mammalian Genetics Unit",1
+memori,"Memorial Hospital for Cancer and Allied Diseases",1
+memori,"Memorial Sloan Kettering Cancer Center; Weill Cornell Graduate School of Medical Sciences, Cornell University",1
+memori,"Memorial Sloan-Kettering Cancer Center",7
+"mount ","Mount Sinai Hospital",2
+"mount ","Mount Sinai School of Medicine",1
+nation,"National Cancer Center; Toho University",1
+nation,"National Cancer Institute",2
+nation,"National Cancer Institute, National Institutes of Health",7
+nation,"National Heart Institute",1
+nation,"National Heart Institute, National Institutes of Health",1
+nation,"National Heart Institute, NIH",1
+nation,"National Heart, Lung, and Blood Institute, National Institutes of Health",2
+nation,"National Human Genome Research Institute",2
+nation,"National Institute for Astrophysics",1
+nation,"National Institute for Medical Research",2
+nation,"National Institute of Allergy and Infectious Diseases",1
+nation,"National Institute of Arthritis, Diabetes, Digestive and Kidney Diseases, NIH",1
+nation,"National Institute of Environmental Health Sciences",1
+nation,"National Institute of Genetics",1
+nation,"National Institute of Information and Communications Technology",2
+nation,"National Institute of Mental Health",1
+nation,"National Institute of Neurological Disorders and Stroke, NIH",1
+nation,"National Institute of Standards and Technology",3
+nation,"National Institute of Standards and Technology and University of Colorado",1
+nation,"National Institute on Aging, National Institutes of Health",1
+nation,"National Institutes of Health",30
+nation,"National Jewish Health, Denver, Colorado",2
+nation,"National Physical Laboratory",1
+nation,"National Research Council of Canada",1
+"new yo","New York City-Commissioner of Health",1
+"new yo","New York Medical College",2
+"new yo","New York Medical Examiner’s Office",1
+"new yo","New York State Agricultural Experiment Station, College of Agriculture",1
+"new yo","New York Times",1
+"new yo","New York University",13
+"new yo","New York University Medical Center",1
+"new yo","New York University School of Medicine, Office of Defense Mobilization, New York Times",1
+"new yo","New York University, USA; Institut des Hautes Études Scientifiques, France",1
+"new yo","New York-Presbyterian Hospital/Weill Cornell Medical Center",1
+"north ","North Carolina State University",1
+"north ","North Carolina State University, NC",1
+"north ","North General Hospital",1
+"ogawa ","Ogawa Laboratories for Brain Function Research",1
+"ogawa ","Ogawa Laboratories for Brain Function Research, Hamano Life Science Research Foundation",1
+"osaka ","Osaka Medical College",1
+"osaka ","Osaka University",5
+prince,"Princess Margaret Cancer Centre",1
+prince,"Princeton University",67
+prince,"Princeton University; Howard Hughes Medical Institute; Marine Biological Laboratory",1
+resear,"Research Division of Infectious Diseases, Children's Medical Center",1
+resear,"Research to Prevent Blindness",1
+"rice u","Rice University",2
+"rice u","Rice University, Houston, TX",1
+rockef,"Rockefeller Institute for Medical Research",6
+rockef,"Rockefeller University",54
+rockef,"Rockefeller University, New York",1
+rockef,"Rockefeller University; Howard Hughes Medical Institute",1
+"royal ","Royal College of Surgeons of England",1
+"royal ","Royal Free Hospital School of Medicine",1
+"royal ","Royal Institute of Technology",3
+"royal ","Royal Institution of Great Britain",2
+"royal ","Royal Liverpool Hospital",1
+"royal ","Royal Melbourne Hospital",1
+"royal ","Royal Postgraduate Medical School",2
+"royal ","Royal Shakespeare Company",1
+rutger,"Rutgers University",9
+rutger,"Rutgers, The State University of New Jersey",1
+"saint ","Saint Louis Hospital Paris",1
+"saint ","Saint Louis University",1
+"salk i","Salk Institute for Biological Studies",4
+"salk i","Salk Institute for Biological Studies; Howard Hughes Medical Institute",1
+scripp,"Scripps Clinic and Research Foundation",1
+scripp,"Scripps Institution of Oceanography",3
+scripp,"Scripps Research",7
+scripp,"Scripps Research Institute",5
+sorbon,"Sorbonne University",7
+sorbon,"Sorbonne University, Institut Henri Poincaré",1
+"st. ju","St. Jude Children's Research Hospital",2
+"st. ju","St. Jude Children’s Research Hospital",2
+stanfo,"Stanford Linear Accelerator Center",1
+stanfo,"Stanford University",81
+stanfo,"Stanford University California",1
+stanfo,"Stanford University, Woods Institute for the Environment",1
+stanfo,"Stanford University; Howard Hughes Medical Institute",2
+"state ","State University of New York at Stony Brook",2
+"state ","State University of New York, Health Science Center at Brooklyn",1
+steklo,"Steklov Institute of Mathematics",4
+steklo,"Steklov Mathematical Institute",2
+stockh,"Stockholm School of Economics",1
+stockh,"Stockholm University",4
+stockh,"Stockholm University, Sweden",1
+"stony ","Stony Brook University",6
+"stony ","Stony Brook University; Imperial College London",1
+"swiss ","Swiss Federal Institute of Technology (ETH)",4
+"swiss ","Swiss Federal Institute of Technology in Lausanne, Switzerland",1
+"swiss ","Swiss Federal Institute of Technology in Zurich, Switzerland",1
+techni,"Technical University",2
+techni,"Technical University of Darmstadt",1
+techni,"Technical University of Munich",3
+techni,"Technion – Israel Institute of Technology",9
+techni,"Technische Hochschule (Institute of Technology)",1
+techni,"Technische Universität Berlin",1
+"texas ","Texas A&M University",5
+"texas ","Texas Instruments",2
+"the ch","The Chinese University of Hong Kong",3
+"the ch","The Christopher Reeve Paralysis Foundation",1
+"the in","The Institute for Cancer Research",1
+"the in","The Institute for Genomic Research",1
+"the in","The Institute of Physical and Chemical Research (RIKEN), Frontier Research Program",1
+"the oh","The Ohio State University",2
+"the oh","The Ohio State University, Carbon Management and Sequestration Center",1
+"the ro","The Rockefeller Foundation",2
+"the ro","The Rockefeller Institute",7
+"the ro","The Rockefeller University (Rockefeller Institute)",1
+"the sa","The Sainsbury Laboratory",1
+"the sa","The Salk Institute",4
+"the sa","The Salk Institute for Biological Studies",3
+"the sa","The Samuel Lunenfeld Research Institute of Mount Sinai Hospital",1
+"the un","The University of Chicago",2
+"the un","The University of Liverpool",1
+"the un","The University of Massachusetts Medical School",1
+"the un","The University of Osaka",1
+"the un","The University of Texas at Austin",1
+"the un","The University of Tokyo",3
+"the we","The Wellcome Research Laboratories",1
+"the we","The Wellcome Trust Sanger Institute",1
+tohoku,"Tohoku Institute of Technology",1
+tohoku,"Tohoku University",1
+"tokyo ","Tokyo Institute of Technology",6
+"tokyo ","Tokyo University of Education",1
+toulou,"Toulouse School of Economics (TSE)",1
+toulou,"Toulouse University",1
+united,"United Nations Children’s Fund",1
+united,"United States Children’s Bureau",1
+united,"United States House of Representatives",2
+united,"United States President",1
+united,"United States Public Health Service",1
+united,"United States Senate",3
+univer,"Universite de Paris",1
+univer,"University at Albany (SUNY)",1
+univer,"University Centre of Health Sciences",1
+univer,"University College",7
+univer,"University College Dublin",1
+univer,"University College London",4
+univer,"University Hospital of Lund",1
+univer,"University of Aberdeen",1
+univer,"University of Alberta",4
+univer,"University of Arizona",1
+univer,"University of Augsburg",1
+univer,"University of Basel",3
+univer,"University of Berlin",4
+univer,"University of Birmingham",1
+univer,"University of Bonn",2
+univer,"University of Bristol",1
+univer,"University of British Columbia",9
+univer,"University of Calgary",1
+univer,"University of California",52
+univer,"University of California Davis",1
+univer,"University of California San Diego",1
+univer,"University of California, Berkeley",31
+univer,"University of California, Berkeley and Lawrence Berkeley National Laboratory; Australian National University;Johns Hopkins University and Space Telescope Science Institute",3
+univer,"University of California, Berkeley; Howard Hughes Medical Institute; Lawrence Berkeley National Laboratory",1
+univer,"University of California, Berkeley; Institute for Advanced Study",1
+univer,"University of California, Davis",2
+univer,"University of California, Irvine",2
+univer,"University of California, Kavli Institute for Theoretical Physics",1
+univer,"University of California, Los Angeles",10
+univer,"University of California, San Diego",10
+univer,"University of California, San Francisco",29
+univer,"University of California, San Francisco; Howard Hughes Medical Institute",1
+univer,"University of California, Santa Barbara",1
+univer,"University of California, Santa Barbara; Kavli Institute for Theoretical Physics",1
+univer,"University of California, Santa Cruz",3
+univer,"University of Cambridge",53
+univer,"University of Canterbury",1
+univer,"University of Chicago",45
+univer,"University of Chicago Medical Center",2
+univer,"University of Chicago, Ben May Laboratory for Cancer Research",1
+univer,"University of Chicago, University of Cincinnati College of Medicine",1
+univer,"University of Cincinnati",1
+univer,"University of Cologne",1
+univer,"University of Colorado",1
+univer,"University of Colorado Denver",1
+univer,"University of Colorado, Boulder",3
+univer,"University of Colorado, JILA",3
+univer,"University of Copenhagen",5
+univer,"University of Delaware",1
+univer,"University of Duisburg-Essen",1
+univer,"University of Edinburgh",10
+univer,"University of Florida",2
+univer,"University of Freiburg",1
+univer,"University of Freiburg im Breisgau",1
+univer,"University of Geneva",7
+univer,"University of Geneva, Switzerland",2
+univer,"University of Georgia",1
+univer,"University of Gothenburg",5
+univer,"University of Graz",1
+univer,"University of Grenoble",1
+univer,"University of Groningen",1
+univer,"University of Göttingen",5
+univer,"University of Hamburg",3
+univer,"University of Hawaii",1
+univer,"University of Hawaii at Manoa",1
+univer,"University of Heidelberg",7
+univer,"University of Helsinki",2
+univer,"University of Hull",1
+univer,"University of Illinois",9
+univer,"University of Illinois at Urbana",1
+univer,"University of Illinois at Urbana–Champaign",4
+univer,"University of Illinois School of Medicine",1
+univer,"University of Innsbruck",2
+univer,"University of Iowa",4
+univer,"University of Karlsruhe",1
+univer,"University of Lausanne",1
+univer,"University of Leicester",1
+univer,"University of Leiden",1
+univer,"University of Leipzig",2
+univer,"University of Lisbon",1
+univer,"University of Liverpool",2
+univer,"University of Liège",2
+univer,"University of Lorraine",2
+univer,"University of Maine",1
+univer,"University of Mainz",1
+univer,"University of Manchester",4
+univer,"University of Manitoba",4
+univer,"University of Marburg",1
+univer,"University of Maryland",3
+univer,"University of Massachusetts",6
+univer,"University of Massachusetts Amherst",1
+univer,"University of Melbourne",2
+univer,"University of Michigan",4
+univer,"University of Milan",1
+univer,"University of Minnesota",10
+univer,"University of Missouri",3
+univer,"University of Munich",1
+univer,"University of New South Wales (UNSW Sydney)",1
+univer,"University of North Carolina",3
+univer,"University of North Carolina at Chapel Hill",5
+univer,"University of Nottingham",2
+univer,"University of Oslo",5
+univer,"University of Otago",1
+univer,"University of Ottawa",2
+univer,"University of Oxford",44
+univer,"University of Oxford and University of Dundee",1
+univer,"University of Oxford, Francis Crick Institute",1
+univer,"University of Oxford, Royal Society",1
+univer,"University of Paris",6
+univer,"University of Paris VI",1
+univer,"University of Paris-South",1
+univer,"University of Pennsylvania",27
+univer,"University of Pennsylvania, Children’s Hospital of Philadelphia; Rockefeller University",1
+univer,"University of Pisa, Italy",1
+univer,"University of Pittsburgh",4
+univer,"University of Puerto Rico",1
+univer,"University of Reading",1
+univer,"University of Rochester",6
+univer,"University of Salzburg",1
+univer,"University of Southern California",5
+univer,"University of Strasbourg",3
+univer,"University of Strasbourg, France",1
+univer,"University of Stuttgart",1
+univer,"University of Sussex",5
+univer,"University of Szeged",1
+univer,"University of Tennessee",1
+univer,"University of Texas",3
+univer,"University of Texas at Austin",9
+univer,"University of Texas MD Anderson Cancer Center",3
+univer,"University of Texas Medical School at Houston",1
+
+univer,"University of Texas Southwestern Medical Center; Howard Hughes Medical Institute",1
+univer,"University of Tokyo",7
+univer,"University of Tokyo and RIKEN",1
+univer,"University of Toronto",34
+univer,"University of Toronto Ontario Cancer Institute",2
+univer,"University of Tsukuba",2
+univer,"University of Twente",1
+univer,"University of Tübingen",3
+univer,"University of Utah",8
+univer,"University of Utah, Howard Hughes Medical Institute",1
+univer,"University of Vienna",4
+univer,"University of Virginia",2
+univer,"University of Virginia Medical Center",1
+univer,"University of Warwick",1
+univer,"University of Warwick, UK",1
+univer,"University of Washington",26
+univer,"University of Washington; Howard Hughes Medical Institute",1
+univer,"University of Waterloo",1
+univer,"University of Western Ontario",2
+univer,"University of Wisconsin",8
+univer,"University of Wisconsin (now at the University of Chicago), USA",1
+univer,"University of Wisconsin, Madison",2
+univer,"University of Wisconsin–Madison",4
+univer,"University of Würzburg",1
+univer,"University of Zurich",6
+univer,"University of Zurich, Institute of Experimental Immunology",1
+univer,"Université Catholique de Louvain",1
+univer,"Université catholique de Louvain",2
+univer,"Université de Montréal",4
+univer,"Université de Paris, Laboratoire Immuno-Hématologie",1
+univer,"Université de Paris-Dauphine, CEREMADE, France",1
+univer,"Université de Paris-Sud (Orsay), France",1
+univer,"Université de Strasbourg",1
+univer,"Université libre de Bruxelles",4
+univer,"Université Louis Pasteur",1
+univer,"Université Paris-Saclay",2
+univer,"Université Paris-Sud",3
+univer,"Université Paris-Sud 11, France, and Institute for Advanced Study, USA",1
+univer,"Université Paris-Sud; Unité Mixte de Physique CNRS/THALES",1
+"ut sou","UT Southwestern Medical Center",4
+"ut sou","UT Southwestern Medical Center; Howard Hughes Medical Institute",1
+"ut sou","UT Southwestern School of Medicine",1
+vetera,"Veterans Administration",1
+vetera,"Veterans Administration Hospital",5
+walter,"Walter and Eliza Hall Institute for Medical Research",1
+walter,"Walter and Eliza Hall Institute of Medical Research",2
+washin,"Washington State University",1
+washin,"Washington University",7
+washin,"Washington University Genome Sequencing Center",1
+washin,"Washington University in St. Louis",2
+wellco,"Wellcome Research Laboratories",5
+wellco,"Wellcome Sanger Institute",1
+wellco,"Wellcome Trust / Cancer Research Campaign (CRC) Institute",1
+whiteh,"Whitehead Institute",1
+whiteh,"Whitehead Institute for Biomedical Research",1
+whiteh,"Whitehead Institute for Biomedical Research, Massachusetts Institute of Technology (MIT)",1
+whiteh,"Whitehead Institute for Biomedical Research; Massachusetts Institute of Technology (MIT)",1
+"world ","World Foundation for AIDS Research and Prevention",1
+"world ","World Health Organization",2
+"École ","École municipale de physique et de chimie industrielles (Municipal School of Industrial Physics and Chemistry)",1
+"École ","École Nationale Supérieur des Mines de Paris",1
+"École ","École Normale Supérieure",2
+"École ","École Normale Supérieure de Lyon and Institut Henri Poincaré, France",1
+"École ","École Normale Supérieure Paris-Saclay",1
+"École ","École Polytechnique",2
+"École ","École Supérieure de Physique et Chimie",1
