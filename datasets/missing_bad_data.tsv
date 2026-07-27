@@ -1,0 +1,51 @@
+award_record_id	prize_name	full_name	birth_date	birth_city	birth_country	birth_coordinates	laureate_wikidata_qid	issue
+breakthrough-000044	Breakthrough Prize	Kōichirō Nishikawa	1951-03-13	Showa	Japan		Q11628065	missing_coordinates
+breakthrough-000073	Breakthrough Prize	C. Frank Bennett	1953	Farmington	United States		Q57446459	missing_coordinates
+breakthrough-000092	Breakthrough Prize	Yuk Ming Dennis Lo	1963-11-10	Hong Kong	Hong Kong	114.1950,22.2550	Q14915755	city_equals_country
+breakthrough-000136	Breakthrough Prize	Lyn Evans	1947-02-27	Sri Lanka	Sri Lanka	81,7	Q514831	city_equals_country
+crafoord-000080	Crafoord Prize	Christopher Goodnow	1959-09-19	Hong Kong	People's Republic of China	114.1586,22.2783	Q5106685	suspected_swapped_columns
+gairdner_international_award-000103	Canada Gairdner International Award	John D. Keith	1908-01-01	Canada	Canada	-109,56	Q15436270	city_equals_country
+gairdner_international_award-000364	Canada Gairdner International Award	John E. Dick	1957-01-01	Carman	Canada		Q6229356	missing_coordinates
+gairdner_international_award-000386	Canada Gairdner International Award	Ruedi Aebersold	1954-09-12	Switzerland	Switzerland	8.232,46.7986	Q7377799	city_equals_country
+japan_prize-000023	Japan Prize	Ernest John Christopher Polge	1926-08-16	Jordans	United Kingdom		Q5113077	missing_coordinates
+japan_prize-000063	Japan Prize	Peter Shaw Ashton	1934-06-27	Boscombe, Bournemouth	United Kingdom		Q2078318	missing_coordinates
+japan_prize-000082	Japan Prize	Yasuharu Suematsu	1932-09-22	Nakatsugawa	Japan		Q3572260	missing_coordinates
+japan_prize-000088	Japan Prize	Steven D. Tanksley	1954-04-07	Fort Collins	United States		Q7614611	missing_coordinates
+japan_prize-000096	Japan Prize	Rattan Lal	1944-09-05	Karyal	India		Q62712764	missing_coordinates
+japan_prize-000112	Japan Prize	Russell Dean Dupuis	1947-07-09	Urbana	United States		Q7381274	missing_coordinates
+kyoto_prize-000007	Kyoto Prize	Morris Cohen	1911-09-27	Chelsea	United States		Q1127185	missing_coordinates
+kyoto_prize-000109	Kyoto Prize	Ching W. Tang	1947-07-23	Hong Kong	Hong Kong	114.1586,22.2783	Q510956	city_equals_country
+lasker_awards-000008	Lasker Award	Homer Smith	1892-01-02	Schmitz	United States		Q64032752	missing_coordinates
+lasker_awards-000023	Lasker Award	Marion W. Sheahan	1897-11-24	Pittston	United States		Q35212355	missing_coordinates
+lasker_awards-000026	Lasker Award	Eugene Lindsay Bishop	1903-12-09	Newark	United States		Q5407444	missing_coordinates
+lasker_awards-000029	Lasker Award	Frederic A. Gibbs	1906-03-15	Marblehead	United States		Q5496967	missing_coordinates
+lasker_awards-000050	Lasker Award	Robert E. Gross	1905-10-04	Bolton	United States		Q7344980	missing_coordinates
+lasker_awards-000056	Lasker Award	Edward H. Robitzek	1906	United States	United States		Q5343403	missing_coordinates;city_equals_country
+lasker_awards-000059	Lasker Award	Morley Cohen	1906	Hungary	Hungary	-97.1386,49.8956	Q3324161	city_equals_country
+lasker_awards-000070	Lasker Award	V. Everett Kinsey	1888-04-26	Prairie Center	United States		Q7906072	missing_coordinates
+lasker_awards-000071	Lasker Award	William P. Shepard	1901	Columbus	United States		Q8016594	missing_coordinates
+lasker_awards-000079	Lasker Award	C.J. Van Slyke	1879-10-31	Weehawken	United States		Q5006100	missing_coordinates
+lasker_awards-000147	Lasker Award	Eugene J. Van Scott	1928-05-06	Brooksville	United States		Q5407462	missing_coordinates
+lasker_awards-000155	Lasker Award	V. Anomah Ngu	1934	Cameroon	Cameroon	9.2333,4.1667	Q7925690	city_equals_country
+lasker_awards-000198	Lasker Award	John G. Gorman	1926-04-29	Plainfield	United States		Q27921451	missing_coordinates
+lasker_awards-000224	Lasker Award	Ann Landers (Eppie Lederer)	1918-07-04	Sioux City	United States		Q4765313	missing_coordinates
+lasker_awards-000225	Lasker Award	Lane W. Adams	1915	United States	Male		Q6485395	missing_coordinates;suspected_swapped_columns
+lasker_awards-000248	Lasker Award	Yuet Wai Kan	1936-09-17	Hong Kong	Hong Kong	114.1950,22.2550	Q2547334	city_equals_country
+lasker_awards-000302	Lasker Award	Robert Edwards	1930-10-27	Batley	United Kingdom		Q418022	missing_coordinates
+lasker_awards-000393	Lasker Award	H. Michael Shepard	1962	Bloomington	United States		Q5628425	missing_coordinates
+max_planck_medal-000086	Max Planck Medal	Annette Zippelius	1949-06-25	Gernsbach	Germany		Q566727	missing_coordinates
+nobel-000385	Nobel Prize	Lars Onsager	1903-11-27	Kristiania (Oslo)	Norway		Q107405	missing_coordinates
+nobel-000393	Nobel Prize	Odd Hassel	1897-05-17	Kristiania (Oslo)	Norway		Q157212	missing_coordinates
+shaw_prize-000094	Shaw Prize	Lennart Lindegren	1950-01-01	Sweden	Sweden	15,61	Q5954921	city_equals_country
+shaw_prize-000096	Shaw Prize	Michael J. Welsh	1948	Marshalltown	United States		Q87963543	missing_coordinates
+turing_award-000035	Turing Award	Raj Reddy	1937-06-13	Katur	India		Q92820	missing_coordinates
+wolf_prize-000125	Wolf Prize	Shang Fa Yang	1932-11-10	Taiwan	Taiwan	121,24	Q3959116	city_equals_country
+wolf_prize-000173	Wolf Prize	Baldur R. Stefansson	1917-04-26	Vestfold	Canada		Q4850493	missing_coordinates
+wolf_prize-000234	Wolf Prize	Ronald L. Phillips	1940-01-01	United States	United States	-98.5795,39.8282	Q7365043	city_equals_country
+wolf_prize-000338	Wolf Prize	Caroline Dean	1957-04-02	Sale	United Kingdom		Q5045038	missing_coordinates
+wolf_prize-000346	Wolf Prize	Rafi Bistritzer	1974-01-01	Israel	Israel	35.0000,31.0000	Q81911850	city_equals_country
+wolf_prize-000357	Wolf Prize	Momoyo Kaijima	1969-01-01	Yotsuya	Japan		Q111694346	missing_coordinates
+wolf_prize-000380	Wolf Prize	Botond Roska	1969-12-17	Hungary	Hungary	19.0000,47.0000	Q62021364	city_equals_country
+wolf_prize-000383	Wolf Prize	Brian J. Staskawicz	1952	Lewiston	United States		Q63213180	missing_coordinates
+wolf_prize-000384	Wolf Prize	Jeffery L. Dangl	1957-10-13	Grand Rapids	United States		Q6175753	missing_coordinates
+wolf_prize-000391	Wolf Prize	Mordehai Heiblum	1947	Israel	Israel	35.0000,31.0000	Q12408922	city_equals_country

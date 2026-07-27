@@ -1,0 +1,732 @@
+[
+  {
+    "qid": "Q185800",
+    "name": "MRC Laboratory of Molecular Biology",
+    "desc": "Research institute in Cambridge, England, United Kingdom, founded 1947"
+  },
+  {
+    "qid": "Q202660",
+    "name": "Coll\u00e8ge de France",
+    "desc": "French higher education and research establishment in Paris, France, founded 1530"
+  },
+  {
+    "qid": "Q217365",
+    "name": "Bell Labs",
+    "desc": "Research and scientific development company, United States, founded 1925"
+  },
+  {
+    "qid": "Q42944",
+    "name": "CERN",
+    "desc": "International organization which operates the world's largest particle physics laboratory, Switzerland, founded 1954"
+  },
+  {
+    "qid": "Q391083",
+    "name": "Institut Pasteur",
+    "desc": "French research institute (1887-), France"
+  },
+  {
+    "qid": "Q878218",
+    "name": "Max Planck Institute of Biochemistry",
+    "desc": "Research institute in Martinsried, Germany, founded 1973"
+  },
+  {
+    "qid": "Q15733006",
+    "name": "DeepMind",
+    "desc": "Artificial intelligence company owned by Google, United Kingdom, founded 2010"
+  },
+  {
+    "qid": "Q1808012",
+    "name": "Memorial Sloan-Kettering Cancer Center",
+    "desc": "Cancer treatment and research institution in New York City, United States, founded 1884"
+  },
+  {
+    "qid": "Q1452369",
+    "name": "Fred Hutchinson Cancer Research Center",
+    "desc": "Cancer research institute in Seattle, Washington, United States, founded 1975"
+  },
+  {
+    "qid": "Q3146518",
+    "name": "IBM Research",
+    "desc": "IBM's research and development division, United States, founded 1945"
+  },
+  {
+    "qid": "Q609768",
+    "name": "Cold Spring Harbor Laboratory",
+    "desc": "Private, non-profit research institution in New York, United States, founded 1890"
+  },
+  {
+    "qid": "Q1677355",
+    "name": "Jackson Laboratory",
+    "desc": "American biomedical research institution, United States, founded 1929"
+  },
+  {
+    "qid": "Q829535",
+    "name": "Max Planck Institute of Quantum Optics",
+    "desc": "Research institute in Garching bei M\u00fcnchen, Germany, founded 1981"
+  },
+  {
+    "qid": "Q1192597",
+    "name": "Kobe University",
+    "desc": "Higher education institution in Hy\u014dgo Prefecture, Japan, founded 1949"
+  },
+  {
+    "qid": "Q126412",
+    "name": "Massachusetts General Hospital",
+    "desc": "Teaching hospital in Boston, Massachusetts, United States, founded 1811"
+  },
+  {
+    "qid": "Q1351061",
+    "name": "Salk Institute for Biological Studies",
+    "desc": "Life sciences research institute, United States, founded 1960"
+  },
+  {
+    "qid": "Q1474431",
+    "name": "IBM Zurich Research Laboratory",
+    "desc": "Research institute in R\u00fcschlikon, Switzerland, founded 1956"
+  },
+  {
+    "qid": "Q476208",
+    "name": "IBM Thomas J. Watson Research Center",
+    "desc": "Research institute in Yorktown Heights, New York, USA"
+  },
+  {
+    "qid": "Q48861",
+    "name": "Max Planck Institute for Astrophysics",
+    "desc": "Research institute located in Garching, Germany, founded 1991"
+  },
+  {
+    "qid": "Q5476635",
+    "name": "Fox Chase Cancer Center",
+    "desc": "Research facility and hospital, United States, founded 1904"
+  },
+  {
+    "qid": "Q697111",
+    "name": "Forschungszentrum J\u00fclich",
+    "desc": "Interdisciplinary research centre in Germany, founded 1956"
+  },
+  {
+    "qid": "Q746879",
+    "name": "Medical Research Council",
+    "desc": "Institution responsible for co-ordinating and funding medical research in the United Kingdom, founded 1913"
+  },
+  {
+    "qid": "Q2154182",
+    "name": "Columbia University College of Physicians and Surgeons",
+    "desc": "Medical school in New York, United States, founded 1767"
+  },
+  {
+    "qid": "Q248",
+    "name": "Intel",
+    "desc": "American multinational technology company, United States, founded 1968"
+  },
+  {
+    "qid": "Q280413",
+    "name": "Centre National de la Recherche Scientifique",
+    "desc": "French research organisation, France, founded 1939"
+  },
+  {
+    "qid": "Q28154621",
+    "name": "Imperial Cancer Research Fund",
+    "desc": "Cancer research organization in the UK, founded 1902, merged 2002 with The Cancer Research Campaign to form Cancer Research UK"
+  },
+  {
+    "qid": "Q4117596",
+    "name": "Cleveland Clinic",
+    "desc": "Nonprofit multispecialty academic medical center based in Cleveland, Ohio, United States, founded 1921"
+  },
+  {
+    "qid": "Q514590",
+    "name": "Fritz-Haber-Institut der Max-Planck-Gesellschaft",
+    "desc": "German catalysis research institute, Germany, founded 1911"
+  },
+  {
+    "qid": "Q585777",
+    "name": "Brookhaven National Laboratory",
+    "desc": "United States Department of Energy national laboratory, founded 1947"
+  },
+  {
+    "qid": "Q632667",
+    "name": "Max Planck Institute for Mathematics",
+    "desc": "Mathematical institute, Germany, founded 1980"
+  },
+  {
+    "qid": "Q682926",
+    "name": "Max Planck Institute for Evolutionary Anthropology",
+    "desc": "Research institute, Germany, founded 1997"
+  },
+  {
+    "qid": "Q822371",
+    "name": "Max Planck Institute for Extraterrestrial Physics",
+    "desc": "German research institute, Germany, founded 1963"
+  },
+  {
+    "qid": "Q836125",
+    "name": "Max Planck Institute for Biophysical Chemistry",
+    "desc": "Research institute, Germany, founded 1948"
+  },
+  {
+    "qid": "Q899140",
+    "name": "Genentech",
+    "desc": "Biotech company, United States, founded 1976"
+  },
+  {
+    "qid": "Q1204921",
+    "name": "International Rice Research Institute",
+    "desc": "Organization, founded 1960"
+  },
+  {
+    "qid": "Q1512226",
+    "name": "Howard Hughes Medical Institute",
+    "desc": "Foundation, United States, founded 1953"
+  },
+  {
+    "qid": "Q1667439",
+    "name": "Max Planck Institute for Infection Biology",
+    "desc": "Institute for infection biology, Germany, founded 1993"
+  },
+  {
+    "qid": "Q1829731",
+    "name": "Institute for Systems Biology",
+    "desc": "Non-profit research institute, United States, founded 2000"
+  },
+  {
+    "qid": "Q1912076",
+    "name": "Max Planck Institute of Immunobiology and Epigenetics",
+    "desc": "Interdisciplinary research institute in Freiburg, Germany"
+  },
+  {
+    "qid": "Q2171086",
+    "name": "Royal Institution of Great Britain",
+    "desc": "Scientific education and research organisation based in London, United Kingdom, founded 1799"
+  },
+  {
+    "qid": "Q2451973",
+    "name": "Institut du Radium",
+    "desc": "Scientific research center, France, founded 1920"
+  },
+  {
+    "qid": "Q2892284",
+    "name": "Baylor College of Medicine",
+    "desc": "Private medical school in Houston, Texas, United States, founded 1900"
+  },
+  {
+    "qid": "Q2900977",
+    "name": "Brigham and Women\u2019s Hospital",
+    "desc": "Hospital in Boston, Massachusetts, United States, founded 1980"
+  },
+  {
+    "qid": "Q30256699",
+    "name": "BioNTech",
+    "desc": "Biotechnology company from Germany, founded 2008"
+  },
+  {
+    "qid": "Q3041197",
+    "name": "Rowett Research Institute",
+    "desc": "Research institute in Aberdeen City, Scotland, UK, founded 1913"
+  },
+  {
+    "qid": "Q3152004",
+    "name": "Institute of Genetics and Molecular and Cellular Biology",
+    "desc": "Facility in Illkirch-Graffenstaden, France, founded 1994"
+  },
+  {
+    "qid": "Q324178",
+    "name": "Max Planck Institute for Medical Research",
+    "desc": "Medical institute, Germany, founded 1930"
+  },
+  {
+    "qid": "Q3246712",
+    "name": "SUNY Downstate Medical Center",
+    "desc": "Hospital in New York City, United States, founded 1860"
+  },
+  {
+    "qid": "Q326044",
+    "name": "Francis Crick Institute",
+    "desc": "Biomedical research centre in London, United Kingdom, founded 2007"
+  },
+  {
+    "qid": "Q3350649",
+    "name": "Corporation for National Research Initiatives",
+    "desc": "Not-for-profit organization in the USA"
+  },
+  {
+    "qid": "Q449325",
+    "name": "German Cancer Research Center",
+    "desc": "National cancer research center in Heidelberg, Germany, founded 1964"
+  },
+  {
+    "qid": "Q4748849",
+    "name": "Amsterdam University",
+    "desc": "Educational institution in Amsterdam, the Netherlands, founded 2008"
+  },
+  {
+    "qid": "Q4838012",
+    "name": "Babraham Institute",
+    "desc": "Organization, United Kingdom, founded 1949"
+  },
+  {
+    "qid": "Q5123723",
+    "name": "City of Hope National Medical Center",
+    "desc": "Hospital, United States, founded 1913"
+  },
+  {
+    "qid": "Q54173",
+    "name": "General Electric Company",
+    "desc": "American multinational conglomerate (1892\u20132024), United States"
+  },
+  {
+    "qid": "Q655286",
+    "name": "Bill & Melinda Gates Foundation",
+    "desc": "Private foundation founded by Bill and Melinda Gates, United States"
+  },
+  {
+    "qid": "Q689775",
+    "name": "Graz University",
+    "desc": "Institute of technology in Austria, founded 1811"
+  },
+  {
+    "qid": "Q7370121",
+    "name": "Roswell Park Memorial Institute",
+    "desc": "Hospital in New York, United States, founded 1898"
+  },
+  {
+    "qid": "Q847117",
+    "name": "Meijo University",
+    "desc": "Higher education institution in Gifu Prefecture, Japan, founded 1926"
+  },
+  {
+    "qid": "Q895960",
+    "name": "Max-Planck-Institut f\u00fcr Kohlenforschung (Max-Planck-Institute for Carbon Research)",
+    "desc": "Research institute in M\u00fclheim an der Ruhr, Germany, founded 1912"
+  },
+  {
+    "qid": "Q100337263",
+    "name": "Royal Liverpool Hospital",
+    "desc": ""
+  },
+  {
+    "qid": "Q1073814",
+    "name": "China Academy of Chinese Medical Sciences",
+    "desc": "Education organization in Beijing, China, founded 1955"
+  },
+  {
+    "qid": "Q1074758",
+    "name": "Chiron Corporation",
+    "desc": "American multinational biotechnology firm (1981-2006), United States"
+  },
+  {
+    "qid": "Q1326711",
+    "name": "Rothamsted Research",
+    "desc": "Agricultural research institution, United Kingdom, founded 1843"
+  },
+  {
+    "qid": "Q138314106",
+    "name": "Kyoto University Institute for Advanced Study",
+    "desc": ""
+  },
+  {
+    "qid": "Q1525831",
+    "name": "MD Anderson Cancer Center",
+    "desc": "Hospital in Texas, United States, founded 1941"
+  },
+  {
+    "qid": "Q1536754",
+    "name": "Institut Laue\u2013Langevin",
+    "desc": "Internationally financed scientific facility, France, founded 1967"
+  },
+  {
+    "qid": "Q1567819",
+    "name": "MED-EL",
+    "desc": "Business, Austria, founded 1990"
+  },
+  {
+    "qid": "Q158085",
+    "name": "Max Planck Society",
+    "desc": "Association of German research institutes, Germany, founded 1948"
+  },
+  {
+    "qid": "Q1584160",
+    "name": "Royal College of Surgeons of England",
+    "desc": "Professional body in England, United Kingdom"
+  },
+  {
+    "qid": "Q16998687",
+    "name": "Kresge Eye Institute",
+    "desc": "Hospital in Michigan, United States"
+  },
+  {
+    "qid": "Q17669886",
+    "name": "Former First Lady",
+    "desc": "Wikinews article"
+  },
+  {
+    "qid": "Q17747021",
+    "name": "Arbutus Biopharma",
+    "desc": "Canadian Bio Tech Company, Canada, founded 2007"
+  },
+  {
+    "qid": "Q1810862",
+    "name": "Lebedev Physical Institute",
+    "desc": "Russian science institute, founded 1934"
+  },
+  {
+    "qid": "Q186394",
+    "name": "Fujitsu",
+    "desc": "Japanese multinational information technology equipment and services company, founded 1935"
+  },
+  {
+    "qid": "Q1912080",
+    "name": "Max Planck Institute for Meteorology",
+    "desc": "Meteorological research institute, Germany, founded 1975"
+  },
+  {
+    "qid": "Q2030894",
+    "name": "Albert Einstein College of Medicine",
+    "desc": "Private medical school in New York City, NY, United States, founded 1955"
+  },
+  {
+    "qid": "Q207361",
+    "name": "DARPA",
+    "desc": "Agency of the U.S. Department of Defense responsible for the development of new technologies, founded 1958"
+  },
+  {
+    "qid": "Q212322",
+    "name": "GSK",
+    "desc": "British multinational pharmaceutical and biotechnology company, United Kingdom, founded 2000"
+  },
+  {
+    "qid": "Q2165768",
+    "name": "High Energy Accelerator Research Organization (KEK)",
+    "desc": "Organization in Japan, founded 1997"
+  },
+  {
+    "qid": "Q22079531",
+    "name": "Ionis Pharmaceuticals",
+    "desc": "American pharmaceutical company, United States, founded 1989"
+  },
+  {
+    "qid": "Q2221774",
+    "name": "Kyoto Sangyo University",
+    "desc": "Higher education institution in Kyoto Prefecture, Japan, founded 1965"
+  },
+  {
+    "qid": "Q2512544",
+    "name": "Hubrecht Institute",
+    "desc": "Research institute for developmental biology and stem cells in the Netherlands, founded 1916"
+  },
+  {
+    "qid": "Q255876",
+    "name": "Max-Planck-Institut f\u00fcr Biophysik",
+    "desc": "Research institute, Germany, founded 1937"
+  },
+  {
+    "qid": "Q259517",
+    "name": "Joint Institute for Nuclear Research",
+    "desc": "Physics research institute in Russia, founded 1956"
+  },
+  {
+    "qid": "Q2599020",
+    "name": "Circulation Research",
+    "desc": "Peer-reviewed scientific journal, founded 1953"
+  },
+  {
+    "qid": "Q265058",
+    "name": "Hungarian Academy of Sciences",
+    "desc": "Learned society of Hungary, founded 1825"
+  },
+  {
+    "qid": "Q2778415",
+    "name": "Max Planck Institute for Gravitational Physics",
+    "desc": "Physics Institute, Germany, founded 1995"
+  },
+  {
+    "qid": "Q2929775",
+    "name": "B\u00e9jart Ballet Lausanne",
+    "desc": "Dance troupe from Lausanne, Switzerland, founded 1987"
+  },
+  {
+    "qid": "Q30255594",
+    "name": "Carnegie Observatories",
+    "desc": "Facility in Pasadena, United States, founded 1904"
+  },
+  {
+    "qid": "Q30264894",
+    "name": "China Academy of Traditional Chinese Medicine",
+    "desc": "Hospital in Shijingshan, Beijing, China, founded 1994"
+  },
+  {
+    "qid": "Q30267664",
+    "name": "RIKEN Center for Developmental Biology",
+    "desc": "Facility in Kobe, Japan, founded 2014"
+  },
+  {
+    "qid": "Q30272675",
+    "name": "Milbank Memorial Fund",
+    "desc": "Nonprofit organization in New York, United States, founded 1905"
+  },
+  {
+    "qid": "Q30280440",
+    "name": "Mercy Catholic Medical Center",
+    "desc": "Healthcare organization in Philadelphia, United States"
+  },
+  {
+    "qid": "Q3100800",
+    "name": "Genoscope",
+    "desc": "Biological research institute, France, founded 1996"
+  },
+  {
+    "qid": "Q3145336",
+    "name": "H\u00f4pital Europeen Georges Pompidou",
+    "desc": "Hospital in Paris, France, founded 2001"
+  },
+  {
+    "qid": "Q3151953",
+    "name": "Dublin Institute for Advanced Studies",
+    "desc": "Irish educational institution, academic publisher, founded 1940"
+  },
+  {
+    "qid": "Q3152167",
+    "name": "Institut Imagine",
+    "desc": "Facility in Paris, France, founded 2007"
+  },
+  {
+    "qid": "Q316653",
+    "name": "Max Planck Institute for Nuclear Physics",
+    "desc": "Research institute in Heidelberg, Germany, founded 1958"
+  },
+  {
+    "qid": "Q32637",
+    "name": "Ioffe Institute",
+    "desc": "Research center within the Russian Academy of Sciences, founded 1918"
+  },
+  {
+    "qid": "Q337641",
+    "name": "Fermi National Accelerator Laboratory",
+    "desc": "High-energy particle physics laboratory in Illinois, USA, founded 1967"
+  },
+  {
+    "qid": "Q365105",
+    "name": "John Innes Centre",
+    "desc": "Independent centre for plant research, United Kingdom"
+  },
+  {
+    "qid": "Q37156",
+    "name": "IBM",
+    "desc": "American multinational technology company, United States, founded 1911"
+  },
+  {
+    "qid": "Q372863",
+    "name": "Concentus Musicus Wien",
+    "desc": "Austrian musical group; baroque orchestra, founded 1953"
+  },
+  {
+    "qid": "Q3803682",
+    "name": "Istituto Superiore di Sanit\u00e0 (Chief Institute of Public Health)",
+    "desc": "Italian public institution, Italy, founded 1934"
+  },
+  {
+    "qid": "Q42847577",
+    "name": "Rotman Research Institute",
+    "desc": ""
+  },
+  {
+    "qid": "Q4389652",
+    "name": "Kitasato University",
+    "desc": "Higher education institution in Kanagawa Prefecture, Japan, founded 1962"
+  },
+  {
+    "qid": "Q4483580",
+    "name": "Institute of Physical Chemistry",
+    "desc": "Research institute in Odesa, Ukraine, founded 1910"
+  },
+  {
+    "qid": "Q463326",
+    "name": "Max Planck Institute for Physics",
+    "desc": "Physics research institute near Munich, Germany, founded 1917"
+  },
+  {
+    "qid": "Q463665",
+    "name": "American Cancer Society",
+    "desc": "Health organization seeking to cure and treat cancer, United States, founded 1913"
+  },
+  {
+    "qid": "Q47321182",
+    "name": "James J. Peters VA Medical Center",
+    "desc": "Hospital in The Bronx, New York City, United States, founded 1922"
+  },
+  {
+    "qid": "Q4744758",
+    "name": "American Public Health Association",
+    "desc": "Washington, D.C.-based professional organization, United States, founded 1872"
+  },
+  {
+    "qid": "Q4853066",
+    "name": "Institute of Statistical Mathematics",
+    "desc": "Research institute, Japan, founded 1944"
+  },
+  {
+    "qid": "Q4897536",
+    "name": "Beth Israel Deaconess Medical Center",
+    "desc": "Teaching hospital of Harvard Medical School, United States, founded 1896"
+  },
+  {
+    "qid": "Q4971893",
+    "name": "Broad Institute",
+    "desc": "Biomedical and genomic research center, United States"
+  },
+  {
+    "qid": "Q500632",
+    "name": "Marine Biological Laboratory (MBL)",
+    "desc": "Biological research center in Woods Hole, Massachusetts, United States, founded 1888"
+  },
+  {
+    "qid": "Q5013781",
+    "name": "Gurdon Institute",
+    "desc": "Wellcome CRC Institute; Cambridge, UK"
+  },
+  {
+    "qid": "Q52607919",
+    "name": "Innsbruck University",
+    "desc": "Academic publisher based in Austria, founded 2005"
+  },
+  {
+    "qid": "Q530471",
+    "name": "Chinese Academy of Sciences",
+    "desc": "National academy for natural sciences of China, founded 1949"
+  },
+  {
+    "qid": "Q5524507",
+    "name": "Garvan Institute of Medical Research",
+    "desc": "Organization, Australia, founded 1963"
+  },
+  {
+    "qid": "Q56582970",
+    "name": "Blueprint Medicines",
+    "desc": "Company in Cambridge, United States, founded 2008"
+  },
+  {
+    "qid": "Q579314",
+    "name": "IRCAM",
+    "desc": "French research institute, France, founded 1977"
+  },
+  {
+    "qid": "Q583725",
+    "name": "Centers for Disease Control and Prevention",
+    "desc": "United States government public health agency"
+  },
+  {
+    "qid": "Q5918039",
+    "name": "Instituto de Biologia y Medicina Experimental (Institute for Biology and Experimental Medicine)",
+    "desc": "Argentine research and development centre, founded 1944"
+  },
+  {
+    "qid": "Q621610",
+    "name": "Applied Materials",
+    "desc": "American company, United States, founded 1967"
+  },
+  {
+    "qid": "Q6463245",
+    "name": "La Jolla Institute for Allergy and Immunology",
+    "desc": "Research institute, United States"
+  },
+  {
+    "qid": "Q649120",
+    "name": "Argonne National Laboratory",
+    "desc": "Science and engineering research national laboratory in Lemont, IL, United States, founded 1946"
+  },
+  {
+    "qid": "Q688592",
+    "name": "Gavi, the Vaccine Alliance",
+    "desc": "Global Alliance for Vaccines and Immunization, Switzerland, founded 2000"
+  },
+  {
+    "qid": "Q690079",
+    "name": "Digital Equipment Corporation",
+    "desc": "American manufacturer of minicomputers, United States, founded 1957"
+  },
+  {
+    "qid": "Q720489",
+    "name": "Asahi Kasei Corporation",
+    "desc": "Japanese company, founded 1931"
+  },
+  {
+    "qid": "Q7315181",
+    "name": "Research to Prevent Blindness",
+    "desc": "Non-profit organization, United States, founded 1960"
+  },
+  {
+    "qid": "Q731938",
+    "name": "AstraZeneca (Retired)",
+    "desc": "British-Swedish pharmaceutical company, United Kingdom, founded 1913"
+  },
+  {
+    "qid": "Q7374471",
+    "name": "Royal Melbourne Hospital",
+    "desc": "Public hospital in Melbourne, Australia, founded 1848"
+  },
+  {
+    "qid": "Q7412058",
+    "name": "Samuel Lunenfeld Research Institute",
+    "desc": "Research institute in Toronto, Canada, founded 1985"
+  },
+  {
+    "qid": "Q7417591",
+    "name": "Sanford Burnham Prebys",
+    "desc": "American research institute, United States, founded 1976"
+  },
+  {
+    "qid": "Q751572",
+    "name": "March of Dimes",
+    "desc": "United States nonprofit organization, founded 1938"
+  },
+  {
+    "qid": "Q77084747",
+    "name": "Max Planck Unit for the Science of Pathogens",
+    "desc": "Facility in Berlin, Germany, founded 2018"
+  },
+  {
+    "qid": "Q7733638",
+    "name": "Feinstein Institute for Medical Research",
+    "desc": "Medical research lab in New York, United States, founded 1995"
+  },
+  {
+    "qid": "Q832808",
+    "name": "Max-Planck-Institut f\u00fcr Chemie",
+    "desc": "Research institute in Mainz, Germany, founded 1912"
+  },
+  {
+    "qid": "Q835529",
+    "name": "Max-Planck-Institut f\u00fcr Festk\u00f6rperforschung",
+    "desc": "Research institute in Stuttgart, Germany, founded 1969"
+  },
+  {
+    "qid": "Q84026",
+    "name": "Institut Fran\u00e7ais du P\u00e9trole",
+    "desc": "Public research organization in France, founded 1944"
+  },
+  {
+    "qid": "Q868550",
+    "name": "Commissariat \u00e0 l'Energie Atomique",
+    "desc": "French research organisation, France, founded 1945"
+  },
+  {
+    "qid": "Q874154",
+    "name": "Hamburg Ballet",
+    "desc": "Ballet company, Germany"
+  },
+  {
+    "qid": "Q876629",
+    "name": "Max Planck Institute for Polymer Research",
+    "desc": ""
+  },
+  {
+    "qid": "Q903523",
+    "name": "Janssen Pharmaceutica",
+    "desc": "Company, Belgium, founded 1953"
+  },
+  {
+    "qid": "Q958460",
+    "name": "Jane Goodall Institute",
+    "desc": "Organization, United States, founded 1977"
+  }
+]
