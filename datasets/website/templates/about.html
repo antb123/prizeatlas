@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block body_class %}about{% endblock %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">About</p>
+  <h1>About this site</h1>
+  <p>
+    A free, static reference to the international prizes that mark work with lasting impact, and to everyone who has
+    received one. Every prize, every award year, and every recipient has its own page, and the pages are linked to each
+    other by subject, country, and institution so that one name leads to the next.
+  </p>
+</header>
+<dl class="totals">
+  {% for value, label in totals %}
+  <div>
+    <dt>{{ value }}</dt>
+    <dd>{{ label }}</dd>
+  </div>
+  {% endfor %}
+</dl>
+<section>
+  <h2>Why it is useful to students</h2>
+  <p>
+    Award citations are the shortest honest summary of a discovery ever written. Each one states what was found, by
+    whom, and why it mattered, in a sentence that had to survive a committee. This site collects them and makes them
+    browsable in the terms a student already has.
+  </p>
+  <ul>
+    <li>
+      <strong>Sorted by school subject.</strong> Every award is tagged with the class its work belongs to — Biology,
+      Physics, Chemistry, Math, CS, History, Lit, Arts, Economics, Earth Science — so
+      <a href="{{ href(subjects_route) }}">the subject pages</a> turn "we are studying genetics this term" into the
+      people who did the defining work in it.
+    </li>
+    <li>
+      <strong>Usable as a source.</strong> Every page carries a canonical address and links out to the awarding body's
+      own record, so a citation in an essay or a bibliography is a copy and a paste rather than a search.
+    </li>
+    <li>
+      <strong>Fast and free everywhere.</strong> These are plain HTML pages. No account, no paywall, no cookie banner,
+      no autoplaying anything. They open on a school Chromebook and on a phone with one bar of signal.
+    </li>
+    <li>
+      <strong>Practice at reading data.</strong> <a href="{{ href(explorer_route) }}">The explorer</a> ranks laureates
+      and countries and then lets a reader test the ranking — dividing by population changes the leaderboard
+      completely, and noticing why is the lesson.
+    </li>
+    <li>
+      <strong>Geography and history in one view.</strong> <a href="{{ href(map_route) }}">The atlas</a> plots where
+      laureates were born against the institutions where they later worked. The distance between the two dots is a
+      century of migration, visible at a glance.
+    </li>
+  </ul>
+</section>
+<section>
+  <h2>What you can do here</h2>
+  <ul>
+    <li>
+      <a href="{{ home_href }}">Prizes</a> — the award families, each with a short description and an editorial
+      prestige score, opening onto that prize's categories, its award years, and a page for every recipient with the
+      full citation.
+    </li>
+    <li>
+      <a href="{{ href(people_route) }}">People</a> — every laureate on record, listed by surname. A person's page
+      gathers all of their awards in one place, which is where the repeat winners become obvious.
+    </li>
+    <li>
+      <a href="{{ href(subjects_route) }}">Subjects</a> — the same awards regrouped by high school class, with the
+      institutions that recur in each field.
+    </li>
+    <li>
+      <a href="{{ href(countries_route) }}">Countries</a> — laureates by country of birth, and
+      <a href="{{ href(affiliations_route) }}">Institutions</a> — the universities, laboratories, and organizations
+      where the recognized work was done.
+    </li>
+    <li>
+      <a href="{{ href(map_route) }}">Map</a> — birthplaces and institutions on one atlas, filterable by subject.
+    </li>
+    <li>
+      <a href="{{ href(explorer_route) }}">Explorer</a> — ranked leaderboards, laureates per million people, and a
+      chart of those who won before turning forty.
+    </li>
+  </ul>
+</section>
+<section>
+  <h2>Where the data comes from</h2>
+  <p>
+    One row per recipient, compiled from each award's official record and cross-checked against Wikipedia and Wikidata.
+    Fields are verified individually rather than imported wholesale, and the standing rule is to leave a cell blank
+    rather than guess: a missing birthplace here means nobody could confirm it, not that it was rounded to something
+    plausible. Places use their present-day names, so a laureate born in Königsberg in 1904 is listed under Kaliningrad,
+    Russia.
+  </p>
+  <p>
+    The pages themselves are generated from that database by a build script and served as fixed files. Nothing is
+    assembled while you read it, and nothing about your visit is recorded. The one exception is the explorer, which may
+    ask a public service which country you are browsing from in order to show your country's laureates first; if that
+    request fails the rest of the page is unaffected.
+  </p>
+</section>
+<section>
+  <h2>What this site is not</h2>
+  <p>
+    The prestige score attached to each prize is an editorial judgement, not a measurement, and the points used to rank
+    individuals follow from it — one Nobel counts as a full point, other awards a fraction of one. Reasonable people
+    would score them differently.
+  </p>
+  <p>
+    The awards themselves carry a heavier bias than any ranking of them could. This set skews strongly toward the
+    sciences, toward Europe and North America, and toward men, because the prizes did. The pages report that record as
+    it stands; they do not correct it, and a name absent from this site is a statement about who has been recognized
+    rather than about who did the work.
+  </p>
+</section>
+{% endblock %}

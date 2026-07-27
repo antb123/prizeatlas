@@ -59,6 +59,7 @@ TEMPLATES = (
     "subject_affiliations.html",
     "explorer.html",
     "map.html",
+    "about.html",
     "404.html",
 )
 PEOPLE_ROUTE = "/people/"
@@ -72,6 +73,7 @@ AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
 MAP_ROUTE = "/map/"
+ABOUT_ROUTE = "/about/"
 SUBJECTS = (
     "Biology", "Physics", "Chemistry", "Math", "CS",
     "History", "Lit", "Arts", "Economics", "Earth Science",
@@ -1627,6 +1629,28 @@ def create_site_plan(
         )
     )
 
+    jobs.append(
+        _page(
+            "about.html",
+            ABOUT_ROUTE,
+            "About This Site",
+            _clamp(
+                f"A free, static reference to {len(rankings)} international prizes and their {len(people):,} recipients, "
+                "sorted by school subject, country, and institution."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("About", None)),
+            totals=(
+                (f"{len(people):,}", "laureates"),
+                (f"{len(records):,}", "awards"),
+                (f"{len(rankings)}", "prizes"),
+                (f"{min(year_prefixes)}-{latest_year}", "years"),
+                (f"{len(subjects)}", "subjects"),
+                (f"{len(countries)}", "countries"),
+                (f"{len(affiliations):,}", "institutions"),
+            ),
+        )
+    )
+
     routes = [job.route for job in jobs]
     if len(routes) != len(set(routes)):
         raise BuildFailure("duplicate public route")
@@ -1732,6 +1756,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
         map_route=MAP_ROUTE,
+        about_route=ABOUT_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
         **job.context,
@@ -1762,6 +1787,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
         map_route=MAP_ROUTE,
+        about_route=ABOUT_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
     )

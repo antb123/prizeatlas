@@ -711,6 +711,16 @@ dd {
   overflow-wrap: anywhere;
 }
 
+/* The about page is prose, so it needs a reading measure the data pages never do. */
+.about main p,
+.about main li {
+  max-width: 46rem;
+}
+
+.about main li + li {
+  margin-top: 0.75rem;
+}
+
 @media (min-width: 64rem) {
   .site-header,
   .breadcrumbs,
