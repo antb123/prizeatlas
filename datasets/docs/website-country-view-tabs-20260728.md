@@ -9,7 +9,7 @@ list and its own per-country pages.
 ## Background
 
 `/countries/` today is a single ranked list of birth countries (`templates/countries.html`), built by `plan_places`
-(`build.py:827-865`), which groups laureates on the first non-blank `birth_country` across their award records. Each
+(`build.py:829-867`), which groups laureates on the first non-blank `birth_country` across their award records. Each
 row links to `/countries/{slug}/` (`templates/country.html`), listing that country's laureates.
 
 A second tab already exists — Institutions, at `/countries/affiliations/` — but it ranks countries by *distinct
@@ -33,7 +33,7 @@ recorded at institutions in two countries belongs to both.
 1. **(load-bearing)** "Awarded in" means the country recorded on an award's affiliation row — the institution the
    laureate was at when the award was made. There is no separate ceremony-location field.
 2. **(load-bearing)** A laureate is counted once per country per view, never once per award. This is the existing rule
-   for Born (`build.py:833-836`) and MUST hold for all three views. Awarded therefore counts a laureate in every
+   for Born (`build.py:835-838`) and MUST hold for all three views. Awarded therefore counts a laureate in every
    distinct country they were recorded at; its column does not sum to the laureate total.
 3. **(load-bearing)** `/countries/` keeps serving Born. It is already indexed and linked from `index.html:11-12`,
    `base.html:28`, `about.html:72`, and `person.html:8`; those URLs MUST NOT change.
@@ -45,7 +45,7 @@ recorded at institutions in two countries belongs to both.
 6. The Institutions tab keeps its current meaning and route. It joins the same tab row as a fourth peer.
 7. The `view_tabs` macro stays as-is because Subjects depends on it. Countries gets its own macro.
 8. Prose copy per view lives in `build.py`, alongside the page titles and descriptions that already live there
-   (`build.py:1486-1490`), not in `{% if %}` branches in the templates. It travels as ordinary `_page(...)` kwargs —
+   (`build.py:1489-1493`), not in `{% if %}` branches in the templates. It travels as ordinary `_page(...)` kwargs —
    the road `title` and `description` already travel — so no carrier dataclass is needed.
 9. Tab order is the life arc: **Born, Awarded, Died**, then Institutions. Born leads because `/countries/` is the
    landing route linked from `base.html:28`. This orders the four differently from the tab set as first sketched
@@ -65,10 +65,10 @@ recorded at institutions in two countries belongs to both.
 | `datasets/website/templates/affiliation_country.html` | swap to `country_tabs` | 1 |
 | `datasets/website/templates/about.html:72` | copy: three country views, not one | ~2 |
 | `datasets/website/static/style.css` | `flex-wrap` guard, right-align the Institutions tab, plain Died counts | ~8 |
-| `datasets/tests/test_build_website.py:878` | the People tab is now Born — assertion must follow | 1 |
+| `datasets/tests/test_build_website.py:882` | the People tab is now Born — assertion must follow | 1 |
 
-`tests/test_build_website.py:878` asserts `'href="../">People</a>'` against `/countries/affiliations/` and MUST be
-updated. Line 999 is the same assertion against the **Subjects** tab bar and MUST NOT be touched — `view_tabs` is
+`tests/test_build_website.py:882` asserts `'href="../">People</a>'` against `/countries/affiliations/` and MUST be
+updated. Line 1071 is the same assertion against the **Subjects** tab bar and MUST NOT be touched — `view_tabs` is
 unchanged there.
 
 ## Routes
@@ -85,7 +85,7 @@ unchanged there.
 ```
 
 Born detail pages sit directly under `/countries/`, so a Born country slug MUST NOT collide with a sibling segment.
-`build.py:861-862` guards only against `affiliations` today; the guard becomes a reserved-segment set covering
+`build.py:863-864` guards only against `affiliations` today; the guard becomes a reserved-segment set covering
 `affiliations`, `awarded`, and `died`. Awarded and Died detail pages live under their own prefix and cannot collide.
 
 ## Design
@@ -104,7 +104,7 @@ flowchart LR
   PL --> DET["country.html  (per country)"]
 ```
 
-One planner, three membership functions. `Place` (`build.py:253-258`) is reused unchanged for all three views.
+One planner, three membership functions. `Place` (`build.py:256-261`) is reused unchanged for all three views.
 
 ### The view table — build.py, beside the other route constants (~line 70)
 
@@ -120,11 +120,11 @@ COUNTRY_VIEWS = (
 RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "died"})
 ```
 
-`RESERVED_COUNTRY_SEGMENTS` replaces the single-segment guard at `build.py:861-862`, reusing the existing
-`COUNTRY_AFFILIATIONS_SEGMENT` constant (`build.py:70`, still live at `build.py:1077`) rather than respelling
+`RESERVED_COUNTRY_SEGMENTS` replaces the single-segment guard at `build.py:863-864`, reusing the existing
+`COUNTRY_AFFILIATIONS_SEGMENT` constant (`build.py:70`, still live at `build.py:1080`) rather than respelling
 `"affiliations"`.
 
-### `plan_country_places` — build.py, replacing the country half of `plan_places` (`build.py:842-865`)
+### `plan_country_places` — build.py, replacing the country half of `plan_places` (`build.py:844-867`)
 
 ```python
 def plan_country_places(people: list[Laureate], route: str,
@@ -151,8 +151,8 @@ The three membership functions are module-level, one expression each, collected 
 
 `plan_places` keeps only its affiliation half. A function called `plan_places` that plans no places is worse than the
 churn of renaming it, so it becomes `plan_affiliations(records, record_routes, profiles_by_qid) -> list[Affiliation]`,
-losing the `people` argument and the first two paragraphs of its docstring (`build.py:833-841`), which are entirely
-about ranking birth countries. It has one call site (`build.py:1431`) and no test imports it —
+losing the `people` argument and the first two paragraphs of its docstring (`build.py:835-843`), which are entirely
+about ranking birth countries. It has one call site (`build.py:1434`) and no test imports it —
 `tests/test_build_website.py` drives everything through `build.build_site` — so the rename is free.
 
 ```python
@@ -161,11 +161,11 @@ country_places = {label: plan_country_places(people, route, MEMBERS[label]) for 
 countries = country_places["Born"]
 ```
 
-The `countries` binding is kept deliberately: `build.py:1714` (About-page total) and `build.py:1731`
+The `countries` binding is kept deliberately: `build.py:1717` (About-page total) and `build.py:1734`
 (`SitePlan.country_count`) already read it and MUST keep meaning the Born places, so the reported country count does
 not silently change meaning.
 
-### Page jobs — build.py, replacing `build.py:1482-1509`
+### Page jobs — build.py, replacing `build.py:1485-1512`
 
 One loop over `COUNTRY_VIEWS` emitting the index page and, nested, its detail pages. Both get `tab=label` and
 `eyebrow=f"{label} in"`; the index also gets `blurb` and `caveat`, and each detail page gets its own `blurb` as an
@@ -176,7 +176,7 @@ Breadcrumbs: Born keeps `Home > Countries > {name}`; Awarded and Died use `Home 
 the Countries crumb pointing at `COUNTRIES_ROUTE`.
 
 Index blurbs MUST carry the view's country count and laureate coverage — 92, 42, 52 countries, and 2,332 / 2,041 /
-1,291 laureates. Switching tabs otherwise halves the list with no explanation. `build.py:1487-1489` already computes
+1,291 laureates. Switching tabs otherwise halves the list with no explanation. `build.py:1490-1492` already computes
 these numbers for the meta description; the change surfaces them in the visible blurb too.
 
 Two caveats are not optional:
@@ -192,7 +192,7 @@ Two caveats are not optional:
 
 A new `country_tabs(current)` macro loops over `country_views` for the three people tabs and appends the Institutions
 anchor, with `aria-label="Country views"` rather than the generic "Views" of `_view_tabs.html:2`. It reads routes from
-the global render context, so `build.py:1818-1825` and `build.py:1849-1856` each gain `country_views=COUNTRY_VIEWS`
+the global render context, so `build.py:1821-1828` and `build.py:1852-1859` each gain `country_views=COUNTRY_VIEWS`
 alongside the existing `country_affiliations_route`. `view_tabs` is left exactly as it is for `subject.html` and
 `subject_affiliations.html`.
 
@@ -206,13 +206,13 @@ Three small rules. The existing `.view-tabs` block was written for two tabs and 
 1. `.view-tabs` (`style.css:286-291`) has no `flex-wrap`. Flex items default to `min-width: auto` and single words
    have no break opportunity, so an overflowing row spills out of `<main>` and scrolls the page horizontally instead
    of wrapping. The four labels measure ~210px plus 3 × 1.25rem gaps = ~270px against a 288px `main` at a 320px
-   viewport (`style.css:60`) — it fits, barely. Add `flex-wrap: wrap` as a guard against large user font sizes.
+   viewport (`style.css:59`) — it fits, barely. Add `flex-wrap: wrap` as a guard against large user font sizes.
    Wrapping does misplace the active tab's accent bar, which relies on the container's `border-bottom` and
    `margin-bottom: -1px` (`style.css:290, 303-305`) — acceptable for a rule that should never fire.
 2. The fourth tab changes axis: three rank people, one ranks institutions. Push it right with
    `.view-tabs .tab-alt { margin-left: auto; }`, the same device `.site-nav` already uses at `style.css:92`. It marks
    the change without a pipe, a rule, or a word, and collapses to zero when space runs out.
-3. The Died index MUST NOT draw the share-of-leader bar. `.rank-count::after` (`style.css:371-380`) renders a
+3. The Died index MUST NOT draw the share-of-leader bar. `.rank-count::after` (`style.css:387-396`) renders a
    progress bar against the leader; on Died that is a league table of deaths with `#1 United States 627` winning.
    The index passes `rank-list rank-list-plain` and the stylesheet gains
    `.rank-list-plain .rank-count::after { content: none; }`. The numbers still rank; the competitive framing goes.
