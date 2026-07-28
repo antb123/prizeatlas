@@ -935,6 +935,74 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("Boston", united_states)
         self.assertNotIn("Paris", united_states)
 
+    def test_affiliation_ranking_discloses_units_after_the_first_three(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": f"one-{index}",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": f"One Person {index}",
+                "laureate_wikidata_qid": f"Q10{index}",
+                "affiliation_name": "University One",
+                "affiliation_sub_name": f"Unit {letter}",
+            }
+            for index, letter in enumerate("ABCDE", start=1)
+        ]
+        records.extend(
+            {
+                "award_record_id": f"three-{index}",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": f"Three Person {index}",
+                "laureate_wikidata_qid": f"Q20{index}",
+                "affiliation_name": "University Three",
+                "affiliation_sub_name": f"Unit {letter}",
+            }
+            for index, letter in enumerate("ABC", start=1)
+        )
+        records.append(
+            {
+                "award_record_id": "unitless",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Unitless Person",
+                "laureate_wikidata_qid": "Q301",
+                "affiliation_name": "Unitless Institute",
+            }
+        )
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        page = (self.website / "dist/affiliations/index.html").read_text()
+        one_start = page.index('href="university-one/"')
+        three_start = page.index('href="university-three/"')
+        unitless_start = page.index('href="unitless-institute/"')
+        one = page[one_start:three_start]
+        three = page[three_start:unitless_start]
+        unitless = page[unitless_start:page.index("</ol>", unitless_start)]
+
+        visible, disclosure = one.split('<details class="rank-units-more">', 1)
+        hidden = disclosure.split("</details>", 1)[0]
+        self.assertLess(visible.index("Unit A"), visible.index("Unit B"))
+        self.assertLess(visible.index("Unit B"), visible.index("Unit C"))
+        self.assertNotIn("Unit D", visible)
+        self.assertNotIn("Unit E", visible)
+        self.assertIn("<summary>+ 2 more</summary>", hidden)
+        self.assertLess(hidden.index("Unit D"), hidden.index("Unit E"))
+        self.assertRegex(one, r'rank-count[^>]*>5<')
+
+        self.assertNotIn("<details", three)
+        self.assertLess(three.index("Unit A"), three.index("Unit B"))
+        self.assertLess(three.index("Unit B"), three.index("Unit C"))
+        self.assertNotIn("rank-units", unitless)
+        self.assertNotIn("<details", unitless)
+        self.assertRegex(unitless, r'rank-count[^>]*>1<')
+
     def test_subject_institutions_tab_ranks_by_in_subject_laureates(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
         records = [

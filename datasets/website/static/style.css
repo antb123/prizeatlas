@@ -342,6 +342,21 @@ h3 {
   padding-block: 0.15rem;
 }
 
+.rank-units-more {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.rank-units-more summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+.rank-units-more .rank-units {
+  margin-top: 0.2rem;
+}
+
 .rank-unit-count {
   font-variant-numeric: tabular-nums;
 }
