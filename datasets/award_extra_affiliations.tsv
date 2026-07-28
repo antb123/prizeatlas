@@ -1,6 +1,6 @@
 award_record_id	affiliation_name	affiliation_sub_name	affiliation_city	affiliation_country	affiliation_coordinates	affiliation_wikidata_qid
 breakthrough-000002	Kavli Institute for Theoretical Physics		Santa Barbara	United States		
-breakthrough-000002	University of California, Santa Barbara		Santa Barbara	United States		
+breakthrough-000002	University of California	University of California, Santa Barbara	Santa Barbara	United States		Q184478
 breakthrough-000011	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
 breakthrough-000012	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
 breakthrough-000015	Massachusetts Institute of Technology		Cambridge	United States		
@@ -8,7 +8,7 @@ breakthrough-000015	Harvard Medical School		Boston	United States
 breakthrough-000017	NewYork-Presbyterian Hospital		New York	United States		
 breakthrough-000019	Massachusetts Institute of Technology		Cambridge	United States		
 breakthrough-000020	Gladstone Institutes		San Francisco	United States		
-breakthrough-000020	University of California, San Francisco		San Francisco	United States		
+breakthrough-000020	University of California	University of California, San Francisco	San Francisco	United States		Q184478
 breakthrough-000031	Lawrence Berkeley National Laboratory		Berkeley	United States		
 breakthrough-000034	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
 breakthrough-000034	Lawrence Berkeley National Laboratory		Berkeley	United States		
@@ -27,7 +27,7 @@ breakthrough-000074	Howard Hughes Medical Institute		Chevy Chase	United States		
 breakthrough-000075	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
 breakthrough-000076	Centre National de la Recherche Scientifique					Q280413
 breakthrough-000077	Stanford University		Stanford	United States		
-breakthrough-000079	University of California, Los Angeles		Los Angeles	United States		
+breakthrough-000079	University of California	University of California, Los Angeles	Los Angeles	United States		Q184478
 breakthrough-000080	Academia Sinica Institute of Astronomy and Astrophysics		Taipei	Taiwan		
 breakthrough-000080	University of Arizona		Tucson	United States		
 breakthrough-000080	University of Chicago		Chicago	United States		
