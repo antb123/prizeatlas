@@ -19,6 +19,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from website import build
 
+# Both affiliation stores spell the six columns the same way: the flat columns are position 1, the table is 2+.
+AFFILIATION_COLUMNS = (
+    "affiliation_name",
+    "affiliation_sub_name",
+    "affiliation_city",
+    "affiliation_country",
+    "affiliation_coordinates",
+    "affiliation_wikidata_qid",
+)
+
+
+def award(extras: tuple[dict[str, str], ...] = (), **values: str) -> build.AwardRecord:
+    """One record composed the way `read_database` composes it: the flat values are position 1, `extras` follow."""
+    rows = (values, *extras)
+    return build.AwardRecord(
+        *(values.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS),
+        affiliations=tuple(
+            build.AwardAffiliation(position, *(row.get(column, "") for column in AFFILIATION_COLUMNS))
+            for position, row in enumerate(rows, start=1)
+            if any(row.get(column, "") for column in AFFILIATION_COLUMNS)
+        ),
+    )
+
 
 class WebsiteBuildTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -35,6 +58,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self,
         rankings: list[tuple[str, str, str, str, int]],
         records: list[dict[str, str]],
+        extras: dict[str, list[dict[str, str]]] | None = None,
     ) -> Path:
         database = self.directory / "awards.sqlite3"
         columns = ", ".join(f'"{column}" TEXT' for column in build.AWARD_COLUMNS)
@@ -64,6 +88,21 @@ class WebsiteBuildTests(unittest.TestCase):
                 ) STRICT
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE award_extra_affiliations (
+                    award_record_id          TEXT    NOT NULL REFERENCES awards(award_record_id),
+                    position                 INTEGER NOT NULL CHECK (position >= 2),
+                    affiliation_name         TEXT    NOT NULL DEFAULT '',
+                    affiliation_sub_name     TEXT    NOT NULL DEFAULT '',
+                    affiliation_city         TEXT    NOT NULL DEFAULT '',
+                    affiliation_country      TEXT    NOT NULL DEFAULT '',
+                    affiliation_coordinates  TEXT    NOT NULL DEFAULT '',
+                    affiliation_wikidata_qid TEXT    NOT NULL DEFAULT '',
+                    PRIMARY KEY (award_record_id, position)
+                ) STRICT
+                """
+            )
             connection.executemany(
                 "INSERT INTO award_ranking VALUES (?, ?, ?, ?, ?, 'Blurb.', 'Reasoning.')",
                 rankings,
@@ -73,6 +112,14 @@ class WebsiteBuildTests(unittest.TestCase):
                 [
                     tuple(record.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
                     for record in records
+                ],
+            )
+            connection.executemany(
+                "INSERT INTO award_extra_affiliations VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                    (record_id, position, *(extra.get(column, "") for column in AFFILIATION_COLUMNS))
+                    for record_id, rows in (extras or {}).items()
+                    for position, extra in enumerate(rows, start=2)
                 ],
             )
         return database
@@ -105,11 +152,6 @@ class WebsiteBuildTests(unittest.TestCase):
             build.Ranking("Q2", "Second Prize", "second-prize", "https://example.org/second", 60, "Blurb.", "Reasoning."),
         ]
 
-        def award(**values: str) -> build.AwardRecord:
-            return build.AwardRecord(
-                *(values.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
-            )
-
         records = [
             award(
                 award_record_id="first-1",
@@ -123,8 +165,9 @@ class WebsiteBuildTests(unittest.TestCase):
                 birth_date="1970-04-03",
                 birth_country="Belgium",
                 death_country="France",
-                affiliation_country="United States; Belgium",
+                affiliation_country="United States",
                 citizenship_countries="Belgium; Canada",
+                extras=({"affiliation_country": "Belgium"},),
             ),
             award(
                 award_record_id="second-1",
@@ -136,8 +179,9 @@ class WebsiteBuildTests(unittest.TestCase):
                 full_name="Alice Example",
                 birth_country="Germany",
                 death_country="Germany",
-                affiliation_country="Canada; Switzerland",
+                affiliation_country="Canada",
                 citizenship_countries="France",
+                extras=({"affiliation_country": "Switzerland"},),
             ),
             award(
                 award_record_id="second-2",
@@ -215,11 +259,6 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("explorer.html", explorer.template)
 
     def test_map_coordinates_aggregation_serialization_and_routes(self) -> None:
-        def award(**values: str) -> build.AwardRecord:
-            return build.AwardRecord(
-                *(values.get(column, "Physics" if column == "high_school_subject" else "") for column in build.AWARD_COLUMNS)
-            )
-
         self.assertEqual(((-180.0, -90.0), (180.0, 90.0)), build.parse_map_points("-180,-90;180,90", "r1", "affiliation_coordinates", True))
         self.assertEqual(((-73.9, 40.7),), build.parse_map_points("-73.9,40.7", "r1", "birth_coordinates", False))
         for value in ("181,0", "0,91", "nan,0", "1", "1,2,3", "1,2;3,4"):
@@ -237,10 +276,18 @@ class WebsiteBuildTests(unittest.TestCase):
                 birth_city="Paris",
                 birth_country="France",
                 birth_coordinates="2.35,48.86",
-                affiliation_name="Two institutes",
-                affiliation_city="Paris; Boston",
-                affiliation_country="France; United States",
-                affiliation_coordinates="2.35,48.86;-71.06,42.36",
+                affiliation_name="Paris Academy",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2.35,48.86",
+                extras=(
+                    {
+                        "affiliation_name": "Boston Institute",
+                        "affiliation_city": "Boston",
+                        "affiliation_country": "United States",
+                        "affiliation_coordinates": "-71.06,42.36",
+                    },
+                ),
             ),
             award(
                 award_record_id="r2",
@@ -273,12 +320,13 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("", belgium_birth["city"])
         self.assertEqual("Belgium", belgium_birth["title"])
 
+        # Two institutions share the Paris point; r1's second affiliation stands alone in Boston with its own label.
         self.assertEqual(2, len(payload["affiliation"]))
         paris_institution = next(marker for marker in payload["affiliation"] if marker["count"] == 2)
-        self.assertEqual("Multiple recorded institutions", paris_institution["title"])
+        self.assertEqual("Paris Academy", paris_institution["title"])
         self.assertEqual(1, paris_institution["extra_labels"])
         boston_institution = next(marker for marker in payload["affiliation"] if marker["count"] == 1)
-        self.assertEqual("Multiple recorded institutions", boston_institution["title"])
+        self.assertEqual("Boston Institute", boston_institution["title"])
 
         serialized = build.map_json({"birth": [{"title": "</script>"}], "affiliation": []})
         self.assertNotIn("<", serialized)
@@ -542,12 +590,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertNotIn("alert(1)", block)
 
         # A field that does reach the schema is escaped, so "</script>" cannot close the block early.
-        hostile = build.AwardRecord(
-            *(
-                {"full_name": "Test", "affiliation_name": "</script><script>alert(1)</script>"}.get(column, "")
-                for column in build.AWARD_COLUMNS
-            )
-        )
+        hostile = award(full_name="Test", affiliation_name="</script><script>alert(1)</script>")
         rendered = build._structured_data(
             "https://example.org/",
             build.PageJob("winner.html", "/x/", "t", "d", (), {"schema": build._laureate_schema(hostile, "https://example.org/x/")}),
@@ -766,7 +809,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "laureate_wikidata_qid": "Q100",
                 "birth_country": "Belgium",
                 "affiliation_name": "University One",
-                "affiliation_country": "United States; Belgium",
+                "affiliation_country": "United States",
             },
             {
                 "award_record_id": "alice-two",
@@ -777,7 +820,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "laureate_wikidata_qid": "Q100",
                 "birth_country": "Belgium",
                 "affiliation_name": "University One",
-                "affiliation_country": "United States; Belgium",
+                "affiliation_country": "United States",
             },
             {
                 "award_record_id": "bob",
@@ -799,7 +842,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "laureate_wikidata_qid": "Q300",
                 "birth_country": "Canada",
                 "affiliation_name": "Joint Institute; Partner Lab",
-                "affiliation_country": "Canada; Switzerland",
+                "affiliation_country": "Canada",
             },
             {
                 "award_record_id": "dave",
@@ -814,7 +857,13 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_country": "United States",
             },
         ]
-        database = self.create_database(rankings, records)
+        # The second country of a multi-country award is a second affiliation row, not a ";" inside one.
+        extras = {
+            "alice-one": [{"affiliation_name": "University One", "affiliation_country": "Belgium"}],
+            "alice-two": [{"affiliation_name": "University One", "affiliation_country": "Belgium"}],
+            "carol": [{"affiliation_name": "Joint Institute; Partner Lab", "affiliation_country": "Switzerland"}],
+        }
+        database = self.create_database(rankings, records, extras)
 
         build.build_site(database, "https://example.org/", self.website)
 
@@ -843,6 +892,48 @@ class WebsiteBuildTests(unittest.TestCase):
         # The city recorded for the institution in this country rides on the row.
         self.assertIn("Boston", united_states)
         self.assertRegex(united_states, r"(?s)1 institution ·\s*2 laureates ·\s*1 city")
+
+    def test_second_affiliation_places_one_award_under_both_institutions(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "shared-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "affiliation_name": "Paris Institute",
+                "affiliation_city": "Paris",
+                "affiliation_country": "France",
+            }
+        ]
+        extras = {"shared-one": [{"affiliation_name": "Boston Institute", "affiliation_city": "Boston", "affiliation_country": "United States"}]}
+        database = self.create_database(rankings, records, extras)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        winner = (self.website / "dist/test-prize/2000/alice-alpha/index.html").read_text()
+        # Position orders the affiliations, so the flat row is named before the one from the extras table.
+        self.assertIn(">Paris Institute</a>", winner)
+        self.assertIn(">Boston Institute</a>", winner)
+        self.assertLess(winner.index("Paris Institute"), winner.index("Boston Institute"))
+
+        # One award, two recorded institutions: neither ranking under-counts it.
+        paris = (self.website / "dist/affiliations/paris-institute/index.html").read_text()
+        boston = (self.website / "dist/affiliations/boston-institute/index.html").read_text()
+        self.assertIn('href="../../test-prize/2000/alice-alpha/">Alice Alpha</a>', paris)
+        self.assertIn('href="../../test-prize/2000/alice-alpha/">Alice Alpha</a>', boston)
+
+        # Each institution is placed by its own affiliation row, so neither country page borrows the other's city.
+        france = (self.website / "dist/countries/affiliations/france/index.html").read_text()
+        united_states = (self.website / "dist/countries/affiliations/united-states/index.html").read_text()
+        self.assertIn(">Paris Institute</a>", france)
+        self.assertIn("Paris", france)
+        self.assertNotIn("Boston", france)
+        self.assertIn(">Boston Institute</a>", united_states)
+        self.assertIn("Boston", united_states)
+        self.assertNotIn("Paris", united_states)
 
     def test_subject_institutions_tab_ranks_by_in_subject_laureates(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

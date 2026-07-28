@@ -14,14 +14,14 @@
         <a class="external-source" href="{{ wikipedia_url }}">Find {{ record.full_name }} on Wikipedia <span aria-hidden="true">↗</span></a>
       </p>
     </header>
-    {% if record.affiliation_name or record.affiliation_city or record.affiliation_country %}
+    {% if record.affiliations %}
     <section>
-      <h2>Affiliation</h2>
-      {% if record.affiliation_sub_name %}<p>{{ record.affiliation_sub_name }}</p>{% endif %}
-      {% if record.affiliation_name %}<p>{% if affiliation_route %}<a href="{{ href(affiliation_route) }}">{{ record.affiliation_name }}</a>{% else %}{{ record.affiliation_name }}{% endif %}</p>{% endif %}
-      {% if record.affiliation_city or record.affiliation_country %}
-      <p>{{ record.affiliation_city }}{% if record.affiliation_city and record.affiliation_country %}, {% endif %}{{ record.affiliation_country }}</p>
-      {% endif %}
+      <h2>Affiliation</h2>{% for affiliation in record.affiliations %}{% set route = affiliation_routes[loop.index0] %}
+      {% if affiliation.sub_name %}<p>{{ affiliation.sub_name }}</p>{% endif %}
+      {% if affiliation.name %}<p>{% if route %}<a href="{{ href(route) }}">{{ affiliation.name }}</a>{% else %}{{ affiliation.name }}{% endif %}</p>{% endif %}
+      {% if affiliation.city or affiliation.country %}
+      <p>{{ affiliation.city }}{% if affiliation.city and affiliation.country %}, {% endif %}{{ affiliation.country }}</p>
+      {% endif %}{% endfor %}
     </section>
     {% endif %}
     {% if co_laureates %}

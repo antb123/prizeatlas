@@ -23,7 +23,7 @@ import unicodedata
 from collections import Counter
 from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus, urlsplit, urlunsplit
@@ -176,6 +176,27 @@ class AwardRecord:
     death_country: str
     biographical_note: str
     high_school_subject: str
+    affiliations: tuple[AwardAffiliation, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class AwardAffiliation:
+    """One recorded affiliation of one award. `position` orders rows; it does not rank them."""
+    position: int
+    name: str
+    sub_name: str
+    city: str
+    country: str
+    coordinates: str
+    wikidata_qid: str
+
+
+@dataclass(frozen=True, slots=True)
+class AwardLink:
+    """An award as it appears under one institution, carrying the affiliation row that placed it there."""
+    record: AwardRecord
+    affiliation: AwardAffiliation
+    route: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -199,7 +220,7 @@ class Affiliation:
     route: str
     count: int
     units: tuple[tuple[str, int], ...]
-    awards: tuple[tuple[AwardRecord, str], ...]
+    awards: tuple[AwardLink, ...]
     subjects: tuple[tuple[str, str], ...]
     profile: AffiliationProfile | None
 
@@ -405,9 +426,9 @@ def explorer_payload(
             person["bc"] = country_index(record.birth_country)
         if record.death_country and person["dc"] is None:
             person["dc"] = country_index(record.death_country)
-        for name in record.affiliation_country.split(";"):
-            if name.strip():
-                person["ac"].add(country_index(name.strip()))
+        for affiliation in record.affiliations:
+            if _nonblank(affiliation.country):
+                person["ac"].add(country_index(affiliation.country.strip()))
         for name in record.citizenship_countries.split(";"):
             if name.strip():
                 person["cc"].add(country_index(name.strip()))
@@ -509,24 +530,17 @@ def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]
             )[0]
             add("birth", point, (record.birth_city.strip(), record.birth_country.strip()), subject, decade)
 
-        if _nonblank(record.affiliation_coordinates):
-            points = parse_map_points(
-                record.affiliation_coordinates,
+        for affiliation in record.affiliations:
+            if not _nonblank(affiliation.coordinates):
+                continue
+            point = parse_map_points(
+                affiliation.coordinates,
                 record.award_record_id,
                 "affiliation_coordinates",
-                multiple=True,
-            )
-            label = (
-                ("Multiple recorded institutions", "", "")
-                if len(points) > 1
-                else (
-                    record.affiliation_name.strip(),
-                    record.affiliation_city.strip(),
-                    record.affiliation_country.strip(),
-                )
-            )
-            for point in points:
-                add("affiliation", point, label, subject, decade)
+                multiple=False,
+            )[0]
+            label = (affiliation.name.strip(), affiliation.city.strip(), affiliation.country.strip())
+            add("affiliation", point, label, subject, decade)
 
     result: dict[str, list[dict[str, object]]] = {"birth": [], "affiliation": []}
     for kind, points in labels.items():
@@ -580,6 +594,19 @@ def _category_slugs(categories: set[str]) -> dict[str, str]:
     return result
 
 
+def _read_affiliation(row: sqlite3.Row, position: int) -> AwardAffiliation:
+    """Read one affiliation from either store — both spell the six columns the same way."""
+    return AwardAffiliation(
+        position=position,
+        name=_text(row["affiliation_name"]),
+        sub_name=_text(row["affiliation_sub_name"]),
+        city=_text(row["affiliation_city"]),
+        country=_text(row["affiliation_country"]),
+        coordinates=_text(row["affiliation_coordinates"]),
+        wikidata_qid=_text(row["affiliation_wikidata_qid"]),
+    )
+
+
 def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfile], list[AwardRecord]]:
     if not database.is_file():
         raise BuildFailure("database is missing")
@@ -598,6 +625,17 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             "FROM affiliations ORDER BY affiliation_wikidata_qid"
         ).fetchall()
         award_rows = connection.execute(f"SELECT {', '.join(AWARD_COLUMNS)} FROM awards").fetchall()
+        # Positions 2+ live in their own table, which a database predating this feature simply does not have.
+        extra_rows: list[sqlite3.Row] = []
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'award_extra_affiliations'").fetchone():
+            extra_rows = connection.execute(
+                """
+                SELECT award_record_id, position, affiliation_name, affiliation_sub_name, affiliation_wikidata_qid,
+                       affiliation_city, affiliation_country, affiliation_coordinates
+                FROM award_extra_affiliations
+                ORDER BY award_record_id, position
+                """
+            ).fetchall()
         connection.commit()
 
     rankings = [
@@ -637,7 +675,22 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
         )
         for row in profile_rows
     ]
-    records = [AwardRecord(*(_text(row[field.name]) for field in fields(AwardRecord))) for row in award_rows]
+    extras: dict[str, list[AwardAffiliation]] = {}
+    for row in extra_rows:
+        extras.setdefault(_text(row["award_record_id"]), []).append(_read_affiliation(row, row["position"]))
+
+    records: list[AwardRecord] = []
+    for row in award_rows:
+        # The flat columns are position 1 and the table is positions 2+; a wholly blank flat set records no affiliation.
+        first = _read_affiliation(row, 1)
+        rest = extras.get(_text(row["award_record_id"]), ())
+        recorded = any(_nonblank(value) for value in (first.name, first.sub_name, first.city, first.country, first.coordinates, first.wikidata_qid))
+        records.append(
+            AwardRecord(
+                *(_text(row[column]) for column in AWARD_COLUMNS),
+                affiliations=(first, *rest) if recorded else tuple(rest),
+            )
+        )
     return rankings, profiles, records
 
 
@@ -669,12 +722,13 @@ def _winner_description(record: AwardRecord, award_label: str) -> str:
     """
     lead = f"{record.full_name} won the {award_label} in {record.year}."
     motivation = record.motivation if _nonblank(record.motivation) else ""
-    if not _nonblank(record.affiliation_name):
+    affiliation = next((item for item in record.affiliations if _nonblank(item.name)), None)
+    if affiliation is None:
         return _clamp(f"{lead} {motivation}")
 
-    places = [record.affiliation_name]
-    if _nonblank(record.affiliation_sub_name):
-        places.insert(0, f"{record.affiliation_sub_name}, {record.affiliation_name}")
+    places = [affiliation.name]
+    if _nonblank(affiliation.sub_name):
+        places.insert(0, f"{affiliation.sub_name}, {affiliation.name}")
     for place in places:
         candidate = " ".join(f"{lead} {motivation} At the time: {place}.".split())
         if len(candidate) <= DESCRIPTION_LIMIT:
@@ -697,6 +751,14 @@ def _year_span(years: list[str]) -> str:
     return prefixes[0] if prefixes[0] == prefixes[-1] else f"{prefixes[0]}-{prefixes[-1]}"
 
 
+def _affiliation_schema(affiliation: AwardAffiliation) -> dict[str, Any]:
+    payload: dict[str, Any] = {"@type": "Organization", "name": affiliation.name}
+    # schema.org's department is an Organization, not a string. The parent stays the resolvable entity.
+    if _nonblank(affiliation.sub_name):
+        payload["department"] = {"@type": "Organization", "name": affiliation.sub_name}
+    return payload
+
+
 def _laureate_schema(record: AwardRecord, url: str) -> dict[str, Any]:
     """schema.org markup for one recipient, carrying only the fields the record actually holds."""
     payload: dict[str, Any] = {
@@ -712,11 +774,11 @@ def _laureate_schema(record: AwardRecord, url: str) -> dict[str, Any]:
         payload["birthPlace"] = {"@type": "Place", "name": birth_place}
     if _nonblank(record.death_date):
         payload["deathDate"] = record.death_date
-    if _nonblank(record.affiliation_name):
-        payload["affiliation"] = {"@type": "Organization", "name": record.affiliation_name}
-        # schema.org's department is an Organization, not a string. The parent stays the resolvable entity.
-        if _nonblank(record.affiliation_sub_name):
-            payload["affiliation"]["department"] = {"@type": "Organization", "name": record.affiliation_sub_name}
+    named = [affiliation for affiliation in record.affiliations if _nonblank(affiliation.name)]
+    if len(named) == 1:
+        payload["affiliation"] = _affiliation_schema(named[0])
+    elif named:
+        payload["affiliation"] = [_affiliation_schema(affiliation) for affiliation in named]
     return payload
 
 
@@ -757,6 +819,11 @@ def _by_motivation(pairs: Iterable[tuple[AwardRecord, str]]) -> tuple[tuple[str,
     return tuple((motivation, tuple(members)) for motivation, members in groups.items())
 
 
+def _named_affiliations(record: AwardRecord) -> tuple[AwardAffiliation, ...]:
+    """The affiliation rows that name an institution the rankings should count."""
+    return tuple(item for item in record.affiliations if _nonblank(item.name) and item.name not in AFFILIATION_BLOCKLIST)
+
+
 def plan_places(
     people: list[Laureate],
     records: list[AwardRecord],
@@ -780,10 +847,10 @@ def plan_places(
         if country := birth.strip():
             by_country.setdefault(country, []).append(person)
         for record, _ in person.awards:
-            if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST:
-                laureates_by_name.setdefault(record.affiliation_name, set()).add(person.qid)
-                if record.affiliation_sub_name:
-                    units_by_name.setdefault(record.affiliation_name, {}).setdefault(record.affiliation_sub_name, set()).add(person.qid)
+            for affiliation in _named_affiliations(record):
+                laureates_by_name.setdefault(affiliation.name, set()).add(person.qid)
+                if affiliation.sub_name:
+                    units_by_name.setdefault(affiliation.name, {}).setdefault(affiliation.sub_name, set()).add(person.qid)
 
     countries: list[Place] = []
     slugs: dict[str, str] = {}
@@ -797,11 +864,10 @@ def plan_places(
         countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
     countries.sort(key=lambda place: (-len(place.people), place.name))
 
-    awards_by_name: dict[str, list[tuple[AwardRecord, str]]] = {}
+    awards_by_name: dict[str, list[AwardLink]] = {}
     for record in records:
-        if not _nonblank(record.affiliation_name) or record.affiliation_name in AFFILIATION_BLOCKLIST:
-            continue
-        awards_by_name.setdefault(record.affiliation_name, []).append((record, record_routes[record.award_record_id]))
+        for affiliation in _named_affiliations(record):
+            awards_by_name.setdefault(affiliation.name, []).append(AwardLink(record, affiliation, record_routes[record.award_record_id]))
 
     names_by_slug: dict[str, list[str]] = {}
     for name in set(awards_by_name) | set(laureates_by_name):
@@ -812,24 +878,24 @@ def plan_places(
         display = max(names, key=lambda name: (len(awards_by_name.get(name, ())), name))
         laureates: set[str] = set()
         units: dict[str, set[str]] = {}
-        awards: list[tuple[AwardRecord, str]] = []
+        awards: list[AwardLink] = []
         for name in names:
             laureates.update(laureates_by_name.get(name, ()))
             for unit, members in units_by_name.get(name, {}).items():
                 units.setdefault(unit, set()).update(members)
             awards.extend(awards_by_name.get(name, ()))
         awards.sort(
-            key=lambda pair: (_year_prefix(pair[0].year, pair[0].award_record_id), pair[0].award_record_id),
+            key=lambda link: (_year_prefix(link.record.year, link.record.award_record_id), link.record.award_record_id),
             reverse=True,
         )
         subject_counts: dict[str, int] = {}
-        for record, _ in awards:
-            subject_counts[record.high_school_subject] = subject_counts.get(record.high_school_subject, 0) + 1
+        for link in awards:
+            subject_counts[link.record.high_school_subject] = subject_counts.get(link.record.high_school_subject, 0) + 1
         subjects = tuple(
             (subject, f"{SUBJECTS_ROUTE}{slugify(subject)}/")
             for subject in sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject))
         )
-        qids = {record.affiliation_wikidata_qid for record, _ in awards if _nonblank(record.affiliation_wikidata_qid)}
+        qids = {link.affiliation.wikidata_qid for link in awards if _nonblank(link.affiliation.wikidata_qid)}
         matched_profiles = [profiles_by_qid[qid] for qid in qids if qid in profiles_by_qid]
         if matched_profiles and len(qids) != 1:
             raise BuildFailure(f"conflicting affiliation metadata route={AFFILIATIONS_ROUTE}{slug}/ qids={','.join(sorted(qids))}")
@@ -863,14 +929,13 @@ def plan_affiliation_countries(affiliations: list[Affiliation]) -> list[Affiliat
     for affiliation in affiliations:
         laureates: dict[str, set[str]] = {}
         cities: dict[str, list[str]] = {}
-        for record, _ in affiliation.awards:
-            for country in record.affiliation_country.split(";"):
-                if not _nonblank(country):
-                    continue
-                name = country.strip()
-                laureates.setdefault(name, set()).add(record.laureate_wikidata_qid)
-                if _nonblank(record.affiliation_city):
-                    cities.setdefault(name, []).append(record.affiliation_city.strip())
+        for link in affiliation.awards:
+            if not _nonblank(link.affiliation.country):
+                continue
+            name = link.affiliation.country.strip()
+            laureates.setdefault(name, set()).add(link.record.laureate_wikidata_qid)
+            if _nonblank(link.affiliation.city):
+                cities.setdefault(name, []).append(link.affiliation.city.strip())
         for name, qids in laureates.items():
             slug = slugify(name)
             if slugs.setdefault(slug, name) != name:
@@ -902,10 +967,10 @@ def plan_subject_affiliations(affiliations: list[Affiliation]) -> dict[str, tupl
     for affiliation in affiliations:
         laureates: dict[str, set[str]] = {}
         cities: dict[str, list[str]] = {}
-        for record, _ in affiliation.awards:
-            laureates.setdefault(record.high_school_subject, set()).add(record.laureate_wikidata_qid)
-            if _nonblank(record.affiliation_city) or _nonblank(record.affiliation_country):
-                cities.setdefault(record.high_school_subject, []).append(_place_label(record))
+        for link in affiliation.awards:
+            laureates.setdefault(link.record.high_school_subject, set()).add(link.record.laureate_wikidata_qid)
+            if _nonblank(link.affiliation.city) or _nonblank(link.affiliation.country):
+                cities.setdefault(link.record.high_school_subject, []).append(_place_label(link.affiliation))
         for subject, qids in laureates.items():
             members.setdefault(subject, []).append(RankedAffiliation(affiliation, len(qids), _commonest(cities.get(subject, ()))))
     return {
@@ -914,9 +979,9 @@ def plan_subject_affiliations(affiliations: list[Affiliation]) -> dict[str, tupl
     }
 
 
-def _place_label(record: AwardRecord) -> str:
+def _place_label(affiliation: AwardAffiliation) -> str:
     """City and country as a reader sees them, dropping whichever half is missing."""
-    city, country = record.affiliation_city.strip(), record.affiliation_country.strip()
+    city, country = affiliation.city.strip(), affiliation.country.strip()
     return ", ".join(part for part in (city, country) if part)
 
 
@@ -1310,10 +1375,11 @@ def create_site_plan(
                             if other.award_record_id != record.award_record_id
                         ),
                         person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
-                        affiliation_route=(
-                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(record.affiliation_name)}/"
-                            if _nonblank(record.affiliation_name) and record.affiliation_name not in AFFILIATION_BLOCKLIST
+                        affiliation_routes=tuple(
+                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
+                            if _nonblank(affiliation.name) and affiliation.name not in AFFILIATION_BLOCKLIST
                             else ""
+                            for affiliation in record.affiliations
                         ),
                         schema={
                             **_laureate_schema(record, public_url(base_url, all_record_routes[record.award_record_id])),
@@ -1412,7 +1478,7 @@ def create_site_plan(
                 leader=subject.affiliations[0].count if subject.affiliations else 0,
             )
         )
-    recorded_affiliations = sum(1 for record in records if _nonblank(record.affiliation_name))
+    recorded_affiliations = sum(1 for record in records if any(_nonblank(affiliation.name) for affiliation in record.affiliations))
     jobs.append(
         _page(
             "countries.html",
@@ -1441,7 +1507,7 @@ def create_site_plan(
                 place=place,
             )
         )
-    recorded_affiliation_countries = sum(1 for record in records if _nonblank(record.affiliation_country))
+    recorded_affiliation_countries = sum(1 for record in records if any(_nonblank(affiliation.country) for affiliation in record.affiliations))
     jobs.append(
         _page(
             "affiliation_countries.html",
@@ -1496,7 +1562,7 @@ def create_site_plan(
         )
     )
     for affiliation in affiliations:
-        span = _year_span([record.year for record, _ in affiliation.awards])
+        span = _year_span([link.record.year for link in affiliation.awards])
         award_count = len(affiliation.awards)
         jobs.append(
             _page(

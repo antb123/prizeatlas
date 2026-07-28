@@ -23,12 +23,12 @@
 <section>
   <h2>Awards</h2>
   <ol class="person-awards">
-    {% for record, route in affiliation.awards %}
+    {% for link in affiliation.awards %}
     <li>
-      <p class="person-award-year">{{ record.year }}</p>
+      <p class="person-award-year">{{ link.record.year }}</p>
       <div>
-        <h3><a href="{{ href(route) }}">{{ record.full_name }}</a></h3>
-        <p>{{ record.prize_name }}{% if record.category %} — {{ record.category }}{% endif %}{% if record.affiliation_sub_name %} · {{ record.affiliation_sub_name }}{% endif %}</p>
+        <h3><a href="{{ href(link.route) }}">{{ link.record.full_name }}</a></h3>
+        <p>{{ link.record.prize_name }}{% if link.record.category %} — {{ link.record.category }}{% endif %}{% if link.affiliation.sub_name %} · {{ link.affiliation.sub_name }}{% endif %}</p>
       </div>
     </li>
     {% endfor %}
