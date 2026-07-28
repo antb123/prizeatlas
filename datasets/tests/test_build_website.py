@@ -879,7 +879,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertIn('href="affiliations/">Institutions</a>', people)
         self.assertLess(born_belgium.index("Alice Alpha"), born_belgium.index("Bob Beta"))
-        self.assertIn('href="../">People</a>', institutions)
+        self.assertIn('href="../">Born</a>', institutions)
         self.assertIn('aria-current="page">Institutions</a>', institutions)
         self.assertLess(institutions.index(">Belgium</a>"), institutions.index(">Canada</a>"))
         self.assertIn(">2</span>", institutions)

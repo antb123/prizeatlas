@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% from "_view_tabs.html" import view_tabs with context %}
+{% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ view_tabs(countries_route, country_affiliations_route, "institutions") }}
+{{ country_tabs("Institutions") }}
 <header class="page-intro">
   <p class="eyebrow">Institutions in</p>
   <h1>{{ place.name }}</h1>

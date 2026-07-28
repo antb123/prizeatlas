@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% from "_view_tabs.html" import view_tabs with context %}
+{% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ view_tabs(countries_route, country_affiliations_route, "people") }}
+{{ country_tabs(tab) }}
 <header class="page-intro">
-  <p class="eyebrow">Born in</p>
+  <p class="eyebrow">{{ eyebrow }}</p>
   <h1>{{ place.name }}</h1>
-  <p>{{ place.people | length }} {{ "laureate" if place.people | length == 1 else "laureates" }} on record were born here.</p>
+  <p>{{ blurb }}</p>
 </header>
 <ul class="people-index">
   {% for person in place.people %}
@@ -18,5 +18,5 @@
   </li>
   {% endfor %}
 </ul>
-<p><a href="{{ href(countries_route) }}">All countries</a></p>
+<p><a href="{{ href(view_route) }}">All countries</a></p>
 {% endblock %}

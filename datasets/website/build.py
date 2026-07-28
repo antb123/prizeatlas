@@ -21,7 +21,7 @@ import sys
 import tempfile
 import unicodedata
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -68,6 +68,12 @@ HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
 COUNTRY_AFFILIATIONS_SEGMENT = "affiliations"
+COUNTRY_VIEWS = (
+    ("Born", COUNTRIES_ROUTE),
+    ("Awarded", "/countries/awarded/"),
+    ("Died", "/countries/died/"),
+)
+RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "died"})
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
@@ -826,33 +832,35 @@ def _named_affiliations(record: AwardRecord) -> tuple[AwardAffiliation, ...]:
     return tuple(item for item in record.affiliations if _nonblank(item.name) and item.name not in AFFILIATION_BLOCKLIST)
 
 
-def plan_places(
+def _born_countries(person: Laureate) -> Iterable[str]:
+    return next(((record.birth_country.strip(),) for record, _ in person.awards if _nonblank(record.birth_country)), ())
+
+
+def _awarded_countries(person: Laureate) -> Iterable[str]:
+    return {affiliation.country.strip() for record, _ in person.awards for affiliation in record.affiliations if _nonblank(affiliation.country)}
+
+
+def _died_countries(person: Laureate) -> Iterable[str]:
+    return next(((record.death_country.strip(),) for record, _ in person.awards if _nonblank(record.death_country)), ())
+
+
+MEMBERS = {
+    "Born": _born_countries,
+    "Awarded": _awarded_countries,
+    "Died": _died_countries,
+}
+
+
+def plan_country_places(
     people: list[Laureate],
-    records: list[AwardRecord],
-    record_routes: dict[str, str],
-    profiles_by_qid: dict[str, AffiliationProfile],
-) -> tuple[list[Place], list[Affiliation]]:
-    """Rank birth countries and affiliations by laureate, never by award record.
-
-    A laureate with seven awards is one person born in one country. Counting records would rank a country by how
-    decorated its emigrants were rather than how many laureates it produced.
-
-    Affiliations are keyed on (institution, unit) so that a school ranks under its parent while still being shown.
-    Someone recorded under both Harvard Medical School and Harvard University appears in two units and once in
-    Harvard's own count, which is why a parent's count is a union and not a sum.
-    """
+    route: str,
+    countries_for: Callable[[Laureate], Iterable[str]],
+) -> list[Place]:
+    """Rank countries by distinct laureates under one country-membership rule."""
     by_country: dict[str, list[Laureate]] = {}
-    laureates_by_name: dict[str, set[str]] = {}
-    units_by_name: dict[str, dict[str, set[str]]] = {}
     for person in people:
-        birth = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
-        if country := birth.strip():
+        for country in countries_for(person):
             by_country.setdefault(country, []).append(person)
-        for record, _ in person.awards:
-            for affiliation in _named_affiliations(record):
-                laureates_by_name.setdefault(affiliation.name, set()).add(person.qid)
-                if affiliation.sub_name:
-                    units_by_name.setdefault(affiliation.name, {}).setdefault(affiliation.sub_name, set()).add(person.qid)
 
     countries: list[Place] = []
     slugs: dict[str, str] = {}
@@ -860,16 +868,42 @@ def plan_places(
         slug = slugify(name)
         if slug in slugs:
             raise BuildFailure(f"duplicate country slug slug={slug} name={name!r} other={slugs[slug]!r}")
-        if slug == COUNTRY_AFFILIATIONS_SEGMENT:
-            raise BuildFailure(f"country slug collides with the institutions tab slug={slug} name={name!r}")
+        if slug in RESERVED_COUNTRY_SEGMENTS:
+            raise BuildFailure(f"country slug collides with a reserved route slug={slug} name={name!r}")
         slugs[slug] = name
-        countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: (-len(person.awards), _surname_key(person.name))))))
+        countries.append(
+            Place(
+                name,
+                slug,
+                f"{route}{slug}/",
+                tuple(sorted(members, key=lambda person: _surname_key(person.name))),
+            )
+        )
     countries.sort(key=lambda place: (-len(place.people), place.name))
+    return countries
 
+
+def plan_affiliations(
+    records: list[AwardRecord],
+    record_routes: dict[str, str],
+    profiles_by_qid: dict[str, AffiliationProfile],
+) -> list[Affiliation]:
+    """Rank affiliations by laureate, never by award record.
+
+    Affiliations are keyed on (institution, unit) so that a school ranks under its parent while still being shown.
+    Someone recorded under both Harvard Medical School and Harvard University appears in two units and once in
+    Harvard's own count, which is why a parent's count is a union and not a sum.
+    """
+    laureates_by_name: dict[str, set[str]] = {}
+    units_by_name: dict[str, dict[str, set[str]]] = {}
     awards_by_name: dict[str, list[AwardLink]] = {}
     for record in records:
         for affiliation in _named_affiliations(record):
             awards_by_name.setdefault(affiliation.name, []).append(AwardLink(record, affiliation, record_routes[record.award_record_id]))
+            if _nonblank(record.laureate_wikidata_qid):
+                laureates_by_name.setdefault(affiliation.name, set()).add(record.laureate_wikidata_qid)
+                if affiliation.sub_name:
+                    units_by_name.setdefault(affiliation.name, {}).setdefault(affiliation.sub_name, set()).add(record.laureate_wikidata_qid)
 
     names_by_slug: dict[str, list[str]] = {}
     for name in set(awards_by_name) | set(laureates_by_name):
@@ -914,7 +948,7 @@ def plan_places(
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
-    return countries, affiliations
+    return affiliations
 
 
 def plan_affiliation_countries(affiliations: list[Affiliation]) -> list[AffiliationCountry]:
@@ -1431,7 +1465,9 @@ def create_site_plan(
             )
         )
 
-    countries, affiliations = plan_places(people, records, all_record_routes, profiles_by_qid)
+    affiliations = plan_affiliations(records, all_record_routes, profiles_by_qid)
+    country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
+    countries = country_places["Born"]
     affiliation_countries = plan_affiliation_countries(affiliations)
     subjects = plan_subjects(people, subject_counts, affiliations)
     jobs.append(
@@ -1482,34 +1518,106 @@ def create_site_plan(
             )
         )
     recorded_affiliations = sum(1 for record in records if any(_nonblank(affiliation.name) for affiliation in record.affiliations))
-    jobs.append(
-        _page(
-            "countries.html",
-            COUNTRIES_ROUTE,
-            "Where laureates were born",
-            _clamp(
-                f"The birthplaces of {sum(len(place.people) for place in countries):,} laureates across "
-                f"{len(countries)} countries, ranked. Birthplace only, not where the work was done."
-            ),
-            (Breadcrumb("Home", "/"), Breadcrumb("Countries", None)),
-            countries=tuple(countries),
-            leader=countries[0].people.__len__() if countries else 0,
+    for label, route in COUNTRY_VIEWS:
+        places = country_places[label]
+        covered = len({person.qid for place in places for person in place.people})
+        if label == "Born":
+            title = "Where laureates were born"
+            description = (
+                f"The birthplaces of {covered:,} laureates across {len(places)} countries, ranked. "
+                "Birthplace only, not where the work was done."
+            )
+            blurb = "Every laureate counted once, by the country that holds their birthplace today."
+            caveat = (
+                "This is where laureates were <strong>born</strong>, not where they did the work. Many moved "
+                "countries to study or research, so a country's place here reflects both who it produced and who it lost."
+            )
+            detail_title = "Laureates born in {name}"
+            detail_description = (
+                "{count} award-winning {laureates} born in {name}, with every prize each of them won."
+            )
+            detail_blurb = "{count} {laureates} on record were born here."
+        elif label == "Awarded":
+            title = "Where laureates were awarded"
+            description = (
+                f"The award-time institution countries of {covered:,} laureates across {len(places)} countries, ranked. "
+                "Laureates may appear under more than one country."
+            )
+            blurb = f"{covered:,} laureates recorded at award-time institutions across {len(places)} countries."
+            caveat = (
+                "A laureate is counted once in every country where an institution was recorded for them. "
+                "Because some laureates were affiliated with institutions in more than one country, the country column does not sum to the laureate total."
+            )
+            detail_title = "Laureates awarded in {name}"
+            detail_description = (
+                "{count} award-winning {laureates} recorded at institutions in {name}, with every prize each of them won."
+            )
+            detail_blurb = "{count} {laureates} on record were affiliated with institutions here when their awards were made."
+        else:
+            title = "Where laureates died"
+            description = (
+                f"The recorded death countries of {covered:,} laureates across {len(places)} countries, ranked. "
+                "Living laureates and records without a death country are excluded."
+            )
+            blurb = f"{covered:,} laureates with a recorded country of death across {len(places)} countries."
+            caveat = (
+                "Living laureates appear nowhere in this view. A country of death may reflect retirement, travel, or exile, "
+                "so it is often incidental and is the weakest of these country signals."
+            )
+            detail_title = "Laureates who died in {name}"
+            detail_description = (
+                "{count} award-winning {laureates} with a recorded country of death of {name}, with every prize each of them won."
+            )
+            detail_blurb = "{count} {laureates} on record died here."
+
+        index_breadcrumbs = (
+            (Breadcrumb("Home", "/"), Breadcrumb("Countries", None))
+            if label == "Born"
+            else (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(label, None))
         )
-    )
-    for place in countries:
         jobs.append(
             _page(
-                "country.html",
-                place.route,
-                f"Laureates born in {place.name}",
-                _clamp(
-                    f"{len(place.people)} award-winning {'laureate' if len(place.people) == 1 else 'laureates'} "
-                    f"born in {place.name}, with every prize each of them won."
-                ),
-                (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(place.name, None)),
-                place=place,
+                "countries.html",
+                route,
+                title,
+                _clamp(description),
+                index_breadcrumbs,
+                countries=tuple(places),
+                leader=len(places[0].people) if places else 0,
+                tab=label,
+                eyebrow=f"{label} in",
+                blurb=blurb,
+                caveat=caveat,
+                plain_counts=label == "Died",
             )
         )
+        for place in places:
+            count = len(place.people)
+            laureates = "laureate" if count == 1 else "laureates"
+            detail_breadcrumbs = (
+                (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(place.name, None))
+                if label == "Born"
+                else (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb("Countries", COUNTRIES_ROUTE),
+                    Breadcrumb(label, route),
+                    Breadcrumb(place.name, None),
+                )
+            )
+            jobs.append(
+                _page(
+                    "country.html",
+                    place.route,
+                    detail_title.format(name=place.name),
+                    _clamp(detail_description.format(count=count, laureates=laureates, name=place.name)),
+                    detail_breadcrumbs,
+                    place=place,
+                    tab=label,
+                    eyebrow=f"{label} in",
+                    blurb=detail_blurb.format(count=count, laureates=laureates),
+                    view_route=route,
+                )
+            )
     recorded_affiliation_countries = sum(1 for record in records if any(_nonblank(affiliation.country) for affiliation in record.affiliations))
     jobs.append(
         _page(
@@ -1821,6 +1929,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
+        country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
@@ -1852,6 +1961,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
+        country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,

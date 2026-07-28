@@ -285,9 +285,14 @@ h3 {
 
 .view-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.25rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--rule);
+}
+
+.view-tabs .tab-alt {
+  margin-left: auto;
 }
 
 .view-tabs span {
@@ -348,9 +353,26 @@ h3 {
   font-size: 0.875rem;
 }
 
+/* The native triangle is the one piece of browser chrome on the page. Drop it and let the "+" carry the affordance. */
 .rank-units-more summary {
   width: fit-content;
   cursor: pointer;
+  list-style: none;
+  border-bottom: 1px solid transparent;
+}
+
+.rank-units-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.rank-units-more summary:hover {
+  color: var(--ink);
+  border-bottom-color: var(--rule);
+}
+
+.rank-units-more summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .rank-units-more .rank-units {
@@ -392,6 +414,10 @@ h3 {
   margin-top: 0.3rem;
   margin-left: auto;
   background: var(--accent);
+}
+
+.rank-list-plain .rank-count::after {
+  content: none;
 }
 
 .score-bar {

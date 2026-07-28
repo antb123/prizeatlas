@@ -163,14 +163,15 @@
     <p class="section-note">
       Distinct laureates per modern country, top 25 shown. Every view counts a person once, however many awards they hold.
       Affiliation and citizenship count a laureate once under each listed country.
-      Laureates per million measures birth country against World Bank population; it needs at least 5 laureates and skips countries with no published figure.
+      The two rate views measure laureates against World Bank population, by birth country and by affiliation country; each needs at least 5 laureates and skips countries with no published figure.
     </p>
     <select class="chart-select" id="country-select" aria-label="Country field">
       <option value="bc">Birth country</option>
       <option value="dc">Death country</option>
       <option value="ac">Affiliation country</option>
       <option value="cc">Citizenship</option>
-      <option value="pc">Laureates per million</option>
+      <option value="pb">Births / 1m</option>
+      <option value="pa">Affiliations / 1m</option>
     </select>
     <figure id="country-chart"></figure>
   </section>
@@ -432,12 +433,14 @@ countryLookup
   const holder = document.getElementById("country-chart");
   const TOP = 25;
   const MIN_PER_CAPITA = 5;                           // one laureate over a small population is noise, not a rate
+  const PER_CAPITA = { pb: "bc", pa: "ac" };          // rate views: which country field to count before dividing
 
   function draw(field) {
-    const perCapita = field === "pc";
+    const base = PER_CAPITA[field];
+    const perCapita = Boolean(base);
     const counts = new Map();
     for (const p of PEOPLE) {
-      const value = perCapita ? p.bc : p[field];
+      const value = p[base || field];
       const indices = Array.isArray(value) ? value : value === null ? [] : [value];
       for (const i of indices) counts.set(i, (counts.get(i) || 0) + 1);
     }
@@ -461,7 +464,7 @@ countryLookup
       const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
       const tip = el("title", {}, rect);
       tip.textContent = perCapita
-        ? `${name} — ${value.toFixed(1)} laureates per million (${count} laureate${count === 1 ? "" : "s"})`
+        ? `${name} — ${value.toFixed(1)} per million by ${base === "ac" ? "affiliation" : "birth"} (${count} laureate${count === 1 ? "" : "s"})`
         : `${name} — ${count} laureate${count === 1 ? "" : "s"}`;
       text(svg, labelW + barW + 6, y + 14, perCapita ? value.toFixed(1) : String(count), "bar-value");
     });

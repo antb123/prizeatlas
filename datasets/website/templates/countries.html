@@ -1,15 +1,14 @@
 {% extends "base.html" %}
-{% from "_view_tabs.html" import view_tabs with context %}
+{% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ view_tabs(countries_route, country_affiliations_route, "people") }}
+{{ country_tabs(tab) }}
 <header class="page-intro">
-  <p class="eyebrow">Born in</p>
+  <p class="eyebrow">{{ eyebrow }}</p>
   <h1>{{ title }}</h1>
-  <p>Every laureate counted once, by the country that holds their birthplace today.</p>
-  <p class="caveat">This is where laureates were <strong>born</strong>, not where they did the work. Many moved
-  countries to study or research, so a country's place here reflects both who it produced and who it lost.</p>
+  <p>{{ blurb }}</p>
+  {% if caveat %}<p class="caveat">{{ caveat | safe }}</p>{% endif %}
 </header>
-<ol class="rank-list">
+<ol class="rank-list{% if plain_counts %} rank-list-plain{% endif %}">
   {% for place in countries %}
   <li>
     <span class="rank-position">{{ loop.index }}</span>
