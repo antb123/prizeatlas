@@ -65,15 +65,19 @@ Site builds green: 8143 pages, 2374 people.
 
 4. **Recover the second affiliations.** They exist already, in three hiding places, because the flat table has one affiliation slot:
 
+   Counts re-measured against `awards.sqlite3` on 20260728; the originals are kept in parentheses where they were wrong.
+
    | Where | Count |
    |---|---|
-   | `remarks` prose — "held roles at X **and Howard Hughes Medical Institute**" | 62 extracted |
-   | `affiliation_sub_name` holding the real institution (UC campuses, MPI institutes) | 143 rows |
-   | Jammed into `affiliation_name` (`Boston Children's Hospital/Harvard Medical School`) | ~15 rows |
+   | `remarks` prose — "held roles at X **and Howard Hughes Medical Institute**" | 60 rows, ~74 extractable mentions (was "62 extracted") |
+   | `affiliation_sub_name` holding the real institution (UC campuses, MPI institutes) | 277 rows (was 143, unreproducible under any definition) |
+   | Jammed into `affiliation_name` (`Boston Children's Hospital/Harvard Medical School`) | 8 rows, 5 genuinely splittable (was ~15) |
 
-   Extractor written and run: `<scratchpad>/extract_second_affiliations.py` → `second_affiliations.tsv`. **Not committed** — copy it into `scripts/` if it's worth keeping. 62 matched cleanly, 10 matched nothing, 35 left prose behind.
+   `LIGO/VIRGO Collaboration` accounts for 3 of the 8 slashes and is a proper name, not a join. `Boston Children's Hospital/Harvard Medical School` uses a curly apostrophe (U+2019), not ASCII.
 
-   Cost of leaving this: **Howard Hughes Medical Institute ranks 4 when it should rank 23.** Berkeley ranks 34 when it should rank 62 (28 rows are filed under `sub_name` with the UC *system* QID `Q184478`). Only one remark in the whole table is a genuine remark — Perelman declining the prize.
+   Extractor written and run: `<scratchpad>/extract_second_affiliations.py` → `second_affiliations.tsv`. **Never committed, and unrecoverable as of 20260728** — no dangling git object, no stash, no remote (this repo has none), and `feat/map-mvp` survives only in reflog. It must be rewritten. The database is the better source now anyway: it held 52–54 remarks when the extractor ran and holds 60 today.
+
+   Cost of leaving this: **Howard Hughes Medical Institute ranks 4 when it should rank 23.** Berkeley ranks 34 when it should rank 62 (28 rows are filed under `sub_name` with the UC *system* QID `Q184478`). Three remarks are genuine non-affiliation remarks, not one — Perelman declining the prize, plus API-year corrections on Leloir and Milstein.
 
 5. **~20 institutions in the remarks are not in the database at all** and need creating plus QID resolution by hand — Royal Society, Marine Biological Laboratory, Gladstone Institutes, Kavli Institute for Theoretical Physics, NewYork-Presbyterian, Brigham and Women's, Sinai Health, plus the Event Horizon Telescope's 13 member institutes. No parser invents these safely.
 
