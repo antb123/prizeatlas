@@ -29,29 +29,50 @@ class Check:
     sql: str
 
 
+EXTRAS_TABLE = "award_extra_affiliations"
+
+# Every affiliation check reads both stores as one relation: the flat awards columns at position 1, the extras table at 2+.
+AFFILIATIONS = f"""
+WITH affiliations AS (
+    SELECT award_record_id, 1 AS position, affiliation_name, affiliation_sub_name, affiliation_city,
+           affiliation_country, affiliation_coordinates, COALESCE(affiliation_wikidata_qid, '') AS affiliation_wikidata_qid
+    FROM awards
+    UNION ALL
+    SELECT award_record_id, position, affiliation_name, affiliation_sub_name, affiliation_city,
+           affiliation_country, affiliation_coordinates, affiliation_wikidata_qid
+    FROM {EXTRAS_TABLE}
+)
+"""
+
+# The loader creates the extras table. Until it has, substitute a relation of the same shape holding no rows — this
+# script is read-only and must not create the table itself.
+NO_EXTRAS = """(SELECT award_record_id, 2 AS position, affiliation_name, affiliation_sub_name, affiliation_city,
+                       affiliation_country, affiliation_coordinates, affiliation_wikidata_qid FROM awards WHERE 0)"""
+
+
 CHECKS = (
     Check(
         "coords-without-qid", True,
         "coordinates with no QID to source them — nothing says where the point came from",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_name, affiliation_city, affiliation_coordinates, COUNT(*)
-        FROM awards WHERE affiliation_coordinates <> '' AND COALESCE(affiliation_wikidata_qid, '') = ''
+        FROM affiliations WHERE affiliation_coordinates <> '' AND affiliation_wikidata_qid = ''
         GROUP BY 1, 2, 3 ORDER BY 1
         """,
     ),
     Check(
         "institution-facts-disagree", True,
         "one institution recorded with two different cities, coordinates or QIDs",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_name,
                GROUP_CONCAT(DISTINCT affiliation_city),
                GROUP_CONCAT(DISTINCT affiliation_coordinates),
                GROUP_CONCAT(DISTINCT affiliation_wikidata_qid)
-        FROM awards WHERE affiliation_name <> ''
+        FROM affiliations WHERE affiliation_name <> ''
         GROUP BY affiliation_name
         HAVING COUNT(DISTINCT affiliation_city) > 1
             OR COUNT(DISTINCT affiliation_coordinates) > 1
-            OR COUNT(DISTINCT COALESCE(affiliation_wikidata_qid, '')) > 1
+            OR COUNT(DISTINCT affiliation_wikidata_qid) > 1
         ORDER BY 1
         """,
     ),
@@ -67,11 +88,11 @@ CHECKS = (
     Check(
         "coords-shared-across-cities", True,
         "one coordinate claimed by rows in different cities — one of them is in the wrong place",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_coordinates,
                GROUP_CONCAT(DISTINCT affiliation_city),
                GROUP_CONCAT(DISTINCT affiliation_name)
-        FROM awards WHERE affiliation_coordinates <> '' AND affiliation_city <> ''
+        FROM affiliations WHERE affiliation_coordinates <> '' AND affiliation_city <> ''
         GROUP BY affiliation_coordinates HAVING COUNT(DISTINCT affiliation_city) > 1
         ORDER BY COUNT(DISTINCT affiliation_city) DESC
         """,
@@ -79,10 +100,10 @@ CHECKS = (
     Check(
         "umbrella-qid", False,
         "one QID spread over several institutions — the QID names a parent body, not the place on the row",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_wikidata_qid, COUNT(DISTINCT affiliation_name),
                GROUP_CONCAT(DISTINCT affiliation_name)
-        FROM awards WHERE COALESCE(affiliation_wikidata_qid, '') <> ''
+        FROM affiliations WHERE affiliation_wikidata_qid <> ''
         GROUP BY affiliation_wikidata_qid HAVING COUNT(DISTINCT affiliation_name) > 1
         ORDER BY COUNT(DISTINCT affiliation_name) DESC
         """,
@@ -90,9 +111,9 @@ CHECKS = (
     Check(
         "sub-name-is-the-institution", False,
         "sub-name holds the real institution while the name holds a parent — nothing ranks the sub-name",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_name, affiliation_sub_name, COUNT(*)
-        FROM awards
+        FROM affiliations
         WHERE affiliation_sub_name <> ''
           AND (affiliation_sub_name LIKE affiliation_name || '%' OR affiliation_sub_name LIKE '%' || affiliation_name || '%')
         GROUP BY 1, 2 ORDER BY 3 DESC
@@ -101,35 +122,41 @@ CHECKS = (
     Check(
         "city-with-state-suffix", False,
         "city written 'City, ST' against the bare-city house style",
-        """
-        SELECT affiliation_city, COUNT(*) FROM awards
+        AFFILIATIONS + """
+        SELECT affiliation_city, COUNT(*) FROM affiliations
         WHERE affiliation_city GLOB '*, [A-Z][A-Z]' GROUP BY 1 ORDER BY 2 DESC
         """,
     ),
     Check(
         "affiliation-without-qid", False,
         "affiliation with no QID — cannot be linked, logoed, or placed on the map",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_name, affiliation_city, affiliation_country, COUNT(*)
-        FROM awards WHERE affiliation_name <> '' AND COALESCE(affiliation_wikidata_qid, '') = ''
+        FROM affiliations WHERE affiliation_name <> '' AND affiliation_wikidata_qid = ''
         GROUP BY 1, 2, 3 ORDER BY 4 DESC, 1
         """,
     ),
     Check(
         "missing-place", False,
         "affiliation with no city or no country",
-        """
+        AFFILIATIONS + """
         SELECT affiliation_name, affiliation_city, affiliation_country, COUNT(*)
-        FROM awards WHERE affiliation_name <> '' AND (affiliation_city = '' OR affiliation_country = '')
+        FROM affiliations WHERE affiliation_name <> '' AND (affiliation_city = '' OR affiliation_country = '')
         GROUP BY 1, 2, 3 ORDER BY 4 DESC, 1
         """,
     ),
 )
 
 
+def has_extras(connection: sqlite3.Connection) -> bool:
+    return connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (EXTRAS_TABLE,)).fetchone() is not None
+
+
 def run(database: Path, check: Check) -> list[tuple]:
     with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as connection:
-        return connection.execute(check.sql).fetchall()
+        if has_extras(connection):
+            return connection.execute(check.sql).fetchall()
+        return connection.execute(check.sql.replace(EXTRAS_TABLE, NO_EXTRAS)).fetchall()
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
