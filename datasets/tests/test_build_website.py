@@ -687,6 +687,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "2011",
                 "full_name": "Shinya Yamanaka",
                 "laureate_wikidata_qid": "Q188345",
+                "sex": "Male",
             },
             {
                 "award_record_id": "nobel-1",
@@ -714,6 +715,7 @@ class WebsiteBuildTests(unittest.TestCase):
         person = self.website / "dist/people/shinya-yamanaka/index.html"
         person_html = person.read_text()
         # Awards ascend by year, so a career reads in the order it happened.
+        self.assertIn("M</p>", person_html)
         self.assertLess(person_html.index("Wolf Prize"), person_html.index("Nobel Prize"))
         # Wolf Prize has a single category here, so it is not category-routed; Nobel has two and is.
         self.assertIn('href="../../wolf-prize/2011/shinya-yamanaka/"', person_html)
@@ -829,7 +831,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "2002",
                 "full_name": "Bob Beta",
                 "laureate_wikidata_qid": "Q200",
-                "birth_country": "Canada",
+                "birth_country": "Belgium",
                 "affiliation_name": "Belgian Academy",
                 "affiliation_country": "Belgium",
             },
@@ -867,6 +869,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         build.build_site(database, "https://example.org/", self.website)
 
+        born_belgium = (self.website / "dist/countries/belgium/index.html").read_text()
         people = (self.website / "dist/countries/index.html").read_text()
         institutions = (self.website / "dist/countries/affiliations/index.html").read_text()
         belgium = (self.website / "dist/countries/affiliations/belgium/index.html").read_text()
@@ -875,6 +878,7 @@ class WebsiteBuildTests(unittest.TestCase):
         united_states = (self.website / "dist/countries/affiliations/united-states/index.html").read_text()
 
         self.assertIn('href="affiliations/">Institutions</a>', people)
+        self.assertLess(born_belgium.index("Alice Alpha"), born_belgium.index("Bob Beta"))
         self.assertIn('href="../">People</a>', institutions)
         self.assertIn('aria-current="page">Institutions</a>', institutions)
         self.assertLess(institutions.index(">Belgium</a>"), institutions.index(">Canada</a>"))

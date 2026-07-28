@@ -96,6 +96,17 @@ Run the website build from this `datasets/` directory:
 
 Run these commands from this `datasets/` directory.
 
+### location lookup and validation
+
+Use both Wikidata and Nominatim; never trust either alone:
+
+1. Wikidata: `uv run scripts/lookup_coordinates.py "<place>" --country "<country>"`
+2. Nominatim: `uv run scripts/lookup_nominatim.py --city "<city>" --country "<country>" [--state "<state>"]`
+3. Validate: `uv run scripts/reverse_nominatim.py --coordinates "<longitude>,<latitude>"`
+
+The reverse country must match the record. If the sources disagree, leave the coordinate unchanged.
+Coordinates use `longitude,latitude` at four decimal places. Lookup tools print JSON and never update the database.
+
 ### `scripts/lookup_coordinates.py`
 
 Read-only lookup for one city or institution. It resolves an exact English Wikipedia title

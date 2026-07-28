@@ -116,6 +116,7 @@ AWARD_COLUMNS = (
     "birth_country",
     "birth_coordinates",
     "citizenship_countries",
+    "sex",
     "affiliation_name",
     "affiliation_sub_name",
     "affiliation_wikidata_qid",
@@ -165,6 +166,7 @@ class AwardRecord:
     birth_country: str
     birth_coordinates: str
     citizenship_countries: str
+    sex: str
     affiliation_name: str
     affiliation_sub_name: str
     affiliation_wikidata_qid: str
@@ -861,7 +863,7 @@ def plan_places(
         if slug == COUNTRY_AFFILIATIONS_SEGMENT:
             raise BuildFailure(f"country slug collides with the institutions tab slug={slug} name={name!r}")
         slugs[slug] = name
-        countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: _surname_key(person.name)))))
+        countries.append(Place(name, slug, f"{COUNTRIES_ROUTE}{slug}/", tuple(sorted(members, key=lambda person: (-len(person.awards), _surname_key(person.name))))))
     countries.sort(key=lambda place: (-len(place.people), place.name))
 
     awards_by_name: dict[str, list[AwardLink]] = {}
@@ -1420,6 +1422,7 @@ def create_site_plan(
                 person=person,
                 birth_year=birth_year,
                 birth_country=birth_country,
+                sex=next((record.sex[:1] for record, _ in person.awards if _nonblank(record.sex)), ""),
                 lifespan=lifespan,
                 schema={
                     **_laureate_schema(latest, public_url(base_url, person.route)),

@@ -3,9 +3,10 @@
 <header class="page-intro">
   <p class="eyebrow">Laureate</p>
   <h1>{{ person.name }}</h1>
-  {% if lifespan or birth_year or birth_country %}
+  {% if lifespan or birth_year or birth_country or sex %}
   <p class="lifespan">{% if lifespan %}{{ lifespan }}{% elif birth_year %}Born {{ birth_year }}{% endif %}{% if birth_country %}{% if lifespan or birth_year %} · {% endif %}
-    <a class="birth-country" href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}</p>
+    <a class="birth-country" href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}{% if sex %}{% if lifespan or birth_year or birth_country %} · {% endif %}
+    {{ sex }}{% endif %}</p>
   {% endif %}
 </header>
 <section>
