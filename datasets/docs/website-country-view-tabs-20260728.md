@@ -1,4 +1,4 @@
-# Country ranking tabs — Awarded, Born, Died
+# Country ranking tabs — Born, Awarded, Died
 
 ## Goals
 
@@ -21,8 +21,8 @@ distinct laureates:
 
 | View | Source field | Laureates covered | Countries |
 |---|---|---|---|
-| Awarded | `affiliation_country` (both affiliation stores) | 2,041 | 42 |
 | Born | `birth_country` | 2,332 | 92 |
+| Awarded | `affiliation_country` (both affiliation stores) | 2,041 | 42 |
 | Died | `death_country` | 1,291 | 52 |
 
 Awarded is the only multi-valued view: 2,090 total row-memberships for 2,041 laureates, because a laureate with awards
@@ -74,7 +74,7 @@ unchanged there.
 ## Routes
 
 ```
-/countries/                          Born      index      (unchanged)
+/countries/                          Born      index      (unchanged, tab 1)
 /countries/{slug}/                   Born      detail     (unchanged, 92 pages)
 /countries/awarded/                  Awarded   index      (new)
 /countries/awarded/{slug}/           Awarded   detail     (new, 42 pages)
@@ -93,11 +93,11 @@ Born detail pages sit directly under `/countries/`, so a Born country slug MUST 
 ```mermaid
 flowchart LR
   P[people: list Laureate] --> V{COUNTRY_VIEWS}
-  V -->|awarded| A["countries_for = affiliation countries (set)"]
-  V -->|born| B["countries_for = birth_country (0 or 1)"]
-  V -->|died| D["countries_for = death_country (0 or 1)"]
-  A --> R[plan_country_places]
-  B --> R
+  V -->|Born| B["countries_for = birth_country (0 or 1)"]
+  V -->|Awarded| A["countries_for = affiliation countries (set)"]
+  V -->|Died| D["countries_for = death_country (0 or 1)"]
+  B --> R[plan_country_places]
+  A --> R
   D --> R
   R --> PL["list Place  — name, slug, route, people"]
   PL --> IDX["countries.html  (index)"]
@@ -141,8 +141,13 @@ The reserved check is unconditional. It only *has* to hold for Born, whose detai
 making it a parameter buys one defaulted argument with one non-default caller. If a country ever did slug to
 `awarded`, failing all three views is the outcome you want anyway.
 
-The three membership functions are module-level and named `_born_countries`, `_awarded_countries`,
-`_died_countries` — one expression each, per the table above.
+The three membership functions are module-level, one expression each, collected in a `MEMBERS` dict keyed by label:
+
+| label | rule |
+|---|---|
+| `Born` | first non-blank `record.birth_country` across `p.awards`, as a 0- or 1-element tuple |
+| `Awarded` | `{a.country.strip() for r, _ in p.awards for a in r.affiliations if _nonblank(a.country)}` |
+| `Died` | first non-blank `record.death_country` across `p.awards`, as a 0- or 1-element tuple |
 
 `plan_places` keeps only its affiliation half. A function called `plan_places` that plans no places is worse than the
 churn of renaming it, so it becomes `plan_affiliations(records, record_routes, profiles_by_qid) -> list[Affiliation]`,
@@ -159,17 +164,6 @@ countries = country_places["Born"]
 The `countries` binding is kept deliberately: `build.py:1714` (About-page total) and `build.py:1731`
 (`SitePlan.country_count`) already read it and MUST keep meaning the Born places, so the reported country count does
 not silently change meaning.
-
-Membership functions, each one expression:
-
-| key | rule |
-|---|---|
-| `awarded` | `{a.country.strip() for r, _ in p.awards for a in r.affiliations if _nonblank(a.country)}` |
-| `born` | first non-blank `record.birth_country` across `p.awards`, as a 0- or 1-element tuple |
-| `died` | first non-blank `record.death_country` across `p.awards`, as a 0- or 1-element tuple |
-
-`countries` at `build.py:1714` and `build.py:1731` (the About-page total and `SitePlan.country_count`) continues to
-mean the Born places, so the reported country count does not silently change meaning.
 
 ### Page jobs — build.py, replacing `build.py:1482-1509`
 
@@ -207,7 +201,7 @@ at a 320px viewport (see CSS below); the gap and the accent underline already se
 
 ### CSS — static/style.css
 
-Three small rules; the spec's earlier claim that no CSS change was needed does not survive measurement.
+Three small rules. The existing `.view-tabs` block was written for two tabs and does not carry four unaided.
 
 1. `.view-tabs` (`style.css:286-291`) has no `flex-wrap`. Flex items default to `min-width: auto` and single words
    have no break opportunity, so an overflowing row spills out of `<main>` and scrolls the page horizontally instead
@@ -232,13 +226,18 @@ call becomes `country_tabs(tab)`. `affiliation_countries.html:4` and `affiliatio
 
 ## Behavior / Acceptance
 
-### Requirement: Four tabs — every country page MUST show Awarded, Born, Died, Institutions, with the current one marked
+### Requirement: Four tabs — every country page MUST show Born, Awarded, Died, Institutions, with the current one marked
 
 #### Scenario: landing on the born view
 - WHEN a reader opens `/countries/`
-- THEN the tab row shows Awarded, Born, Died, Institutions in that order
+- THEN the tab row shows Born, Awarded, Died, Institutions in that order
 - AND Born carries `aria-current="page"`
+- AND Institutions is right-aligned, marking that it ranks institutions rather than people
 - AND the ranked list is unchanged from before this change
+
+#### Scenario: narrow viewport
+- WHEN the tab row is rendered at a 320px viewport
+- THEN it does not overflow `<main>` horizontally
 
 #### Scenario: subjects are unaffected
 - WHEN a reader opens a subject page
@@ -261,6 +260,8 @@ call becomes `country_tabs(tab)`. `affiliation_countries.html:4` and `affiliatio
 - WHEN the Died index is built
 - THEN it lists 52 countries covering 1,291 laureates, led by United States with 627
 - AND laureates with no recorded death country appear in no row
+- AND the caveat states that living laureates are absent
+- AND no share-of-leader bar is drawn behind the counts
 
 ### Requirement: existing URLs MUST NOT change
 
@@ -279,6 +280,7 @@ call becomes `country_tabs(tab)`. `affiliation_countries.html:4` and `affiliatio
 ## Verification
 
 ```
+cd datasets && uv run -m pytest tests/test_build_website.py
 cd datasets && uv run website/build.py --base-url https://example.org/awards/    # generated_pages up by 96
 ```
 
@@ -292,3 +294,9 @@ build apart from the tab row, and that the sitemap carries the 96 new routes.
   a stale copy of the two-tab bar this change supersedes. Flagged for deletion in a separate commit, not touched here.
 - `person.html:8` links a laureate's birth country to `/countries/{slug}/`. Linking their death country to the Died
   view is a natural follow-up but was not requested.
+- `base.html:29` already carries a top-level nav item labelled **Institutions** pointing at `affiliations_route`,
+  while the fourth tab labelled **Institutions** points at `country_affiliations_route`. Same word, same viewport,
+  different destinations. Pre-existing; no better label exists, and right-aligning the tab at least stops the row
+  reading as a continuation of the site nav.
+- `countries.html:17` divides by `leader`, which `build.py` passes as `0` for an empty list — Jinja would raise on
+  `100 // 0`. Pre-existing and unreachable, but this change adds two more index pages using the same expression.
