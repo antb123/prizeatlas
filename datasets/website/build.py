@@ -36,6 +36,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DATASET_DIR = SCRIPT_DIR.parent
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 YEAR_PREFIX = re.compile(r"([0-9]{4})")
+# A biographical note that is only a birth or lifespan restates the Facts panel: "(b. 1946)", "(born 1961)",
+# "(1951–2023)", and the empty "(b. -)".
+DATE_NOTE = re.compile(r"\(\s*(?:b\.|born)?\s*(?:-|[0-9]{4})(?:\s*[–—-]\s*[0-9]{4})?\s*\)", re.IGNORECASE)
 WIKIDATA_QID = re.compile(r"Q[1-9][0-9]*")
 SITEMAP_URL_LIMIT = 50_000
 SITEMAP_BYTE_LIMIT = 52_428_800
@@ -815,7 +818,7 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             reasoning=_text(row["reasoning"]),
             logo={
                 "nobel-prize": "static/logos/nobel-prize.png",
-                "fields-medal": "static/logos/fields-medal.jpg",
+                "fields-medal": "static/logos/fields-medal.png",
                 "turing-award": "static/logos/turing-award.jpg",
                 "max-planck-medal": "static/logos/max-planck-medal.png",
                 "abel-prize": "static/logos/abel-prize.ico",
@@ -901,6 +904,34 @@ def _winner_description(record: AwardRecord, award_label: str) -> str:
         if len(candidate) <= DESCRIPTION_LIMIT:
             return candidate
     return _clamp(candidate)
+
+
+def _facts(record: AwardRecord) -> tuple[tuple[str, str], ...]:
+    """Facts panel rows, minus anything the page already states.
+
+    Type earns a row only for an organisation: 3047 of 3096 records are individuals, so on nearly every page the
+    row reads "Individual" and tells the reader what the name above it already said. Birth year is dropped
+    whenever a full birth date is present, for the same reason.
+    """
+    skip = set()
+    if record.laureate_type != "Organization":
+        skip.add("laureate_type")
+    if _nonblank(record.birth_date):
+        skip.add("birth_year")
+    return tuple(
+        (label, getattr(record, attribute))
+        for label, attribute in FACT_FIELDS
+        if attribute not in skip and _nonblank(getattr(record, attribute))
+    )
+
+
+def _note(text: str) -> str:
+    """Biographical note with the date-only parentheticals removed, since Facts lists Born and Died already.
+
+    Every one of the 118 "(b. 1946)" notes and all 221 "(1951–2023)" notes restate a field that is already in the
+    panel. Notes carrying anything else — "(posthumously awarded)" — keep that remainder.
+    """
+    return DATE_NOTE.sub("", text).strip(" ;").strip()
 
 
 def _names(values: list[str], limit: int = 3) -> str:
@@ -1035,7 +1066,7 @@ def plan_country_places(
                 name,
                 slug,
                 f"{route}{slug}/",
-                tuple(sorted(members, key=lambda person: _surname_key(person.name))),
+                tuple(sorted(members, key=lambda person: (-len(person.awards), _surname_key(person.name)))),
             )
         )
     countries.sort(key=lambda place: (-len(place.people), place.name))
@@ -1626,12 +1657,11 @@ def plan_year_pages(
                 winner_crumbs.append(
                     Breadcrumb(routed_category, layout.route + f"{layout.category_slugs[routed_category]}/")
                 )
+            elif _nonblank(record.category):
+                # A year-routed prize has no category page to link to, but the category is still where this award
+                # sits, and the trail is the only place the page names it.
+                winner_crumbs.append(Breadcrumb(record.category, None))
             winner_crumbs.extend((Breadcrumb(record.year, route), Breadcrumb(record.full_name, None)))
-            facts = tuple(
-                (label, getattr(record, attribute))
-                for label, attribute in FACT_FIELDS
-                if _nonblank(getattr(record, attribute))
-            )
             jobs.append(
                 _page(
                     "winner.html",
@@ -1639,9 +1669,9 @@ def plan_year_pages(
                     winner_title,
                     winner_description,
                     winner_crumbs,
-                    prize=layout.ranking,
                     record=record,
-                    facts=facts,
+                    facts=_facts(record),
+                    biographical_note=_note(record.biographical_note),
                     co_laureates=tuple(
                         (other, layout.record_routes[other.award_record_id])
                         for other in ordered_group

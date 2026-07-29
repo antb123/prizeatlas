@@ -6,14 +6,13 @@
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
-      <p class="eyebrow">{{ prize.prize_name }}{% if record.category %} · {{ record.category }}{% endif %} · {{ record.year }}
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
-      </p>
+      {% if record.high_school_subject %}
+      <p class="eyebrow"><a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a></p>
+      {% endif %}
       <h1>{{ record.full_name }}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
-      {% if record.biographical_note %}<p class="lead">{{ record.biographical_note }}</p>{% endif %}
+      {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
       <div class="ask-ai" aria-label="Ask an AI about this award">
-        <p class="ask-ai-label">Ask AI</p>
         <form action="https://chatgpt.com/" method="get" target="_blank" rel="noopener noreferrer">
           <input type="hidden" name="q" value="{{ ask_ai_prompt }}">
           <div class="ask-ai-actions">
