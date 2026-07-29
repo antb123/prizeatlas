@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+<nav class="view-tabs" aria-label="Institution views">
+  <a href="{{ href(affiliations_route) }}" aria-current="page">All institutions</a>
+  <a class="tab-alt" href="{{ href(country_affiliations_route) }}">By country</a>
+</nav>
 <header class="page-intro">
   <p class="eyebrow">Institutions</p>
   <h1>{{ title }}</h1>
