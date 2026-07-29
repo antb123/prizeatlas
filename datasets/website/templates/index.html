@@ -30,6 +30,22 @@
   </ol>
 </section>
 {% endif %}
+{% if top_institutions %}
+<section>
+  <p class="eyebrow">Top Institutions</p>
+  <h2>Institutions with the most award-winning laureates</h2>
+  <p>Ranked by laureates whose affiliation was recorded when an award was made, not by institutional quality.</p>
+  <ol class="highlights">
+    {% for affiliation in top_institutions %}
+    <li>
+      <a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
+      <span>{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+  <p><a href="{{ href(affiliations_route) }}">All institutions</a></p>
+</section>
+{% endif %}
 {% if recent %}
 <section>
   <h2>Recently awarded</h2>

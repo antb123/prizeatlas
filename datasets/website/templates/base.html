@@ -11,7 +11,11 @@
   <meta property="og:title" content="{{ title }}">
   <meta property="og:description" content="{{ description }}">
   {% if canonical %}<meta property="og:url" content="{{ canonical }}">{% endif %}
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="{{ share_image }}">
+  <meta property="og:image:width" content="{{ share_image_width }}">
+  <meta property="og:image:height" content="{{ share_image_height }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ share_image }}">
   <link rel="icon" href="{{ favicon_href }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ style_href }}">
   {% if structured_data %}<script type="application/ld+json">{{ structured_data|safe }}</script>{% endif %}

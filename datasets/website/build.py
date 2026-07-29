@@ -2,6 +2,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "jinja2==3.1.6",
+#     "pillow==11.3.0",
 # ]
 # ///
 """Build the static awards website from awards.sqlite3."""
@@ -31,6 +32,7 @@ from urllib.parse import quote, quote_plus, urlsplit, urlunsplit
 from xml.sax.saxutils import escape as xml_escape
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
+from PIL import Image, ImageDraw, ImageFont
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DATASET_DIR = SCRIPT_DIR.parent
@@ -113,6 +115,11 @@ SUBJECT_RECENT_YEARS = 3
 # The prize page shows recent years only. Its complete index of recipients lives one segment below.
 WINNERS_SEGMENT = "winners"
 DESCRIPTION_LIMIT = 160
+SHARE_IMAGE_WIDTH = 1200
+SHARE_IMAGE_HEIGHT = 630
+SHARE_IMAGE_DIRECTORY = "static/share"
+SHARE_IMAGE_FALLBACK = f"{SHARE_IMAGE_DIRECTORY}/default.png"
+SHARE_FONT = "static/fonts/noto-sans-cjk.ttc"
 # Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
 # category yields a page per award; they browse by year instead.
 YEAR_ROUTED_PRIZES = frozenset({"japan-prize"})
@@ -271,6 +278,16 @@ class PageJob:
     description: str
     breadcrumbs: tuple[Breadcrumb, ...]
     context: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class ShareCard:
+    kind: str
+    name: str
+    rank: int
+    award_count: int
+    subjects: tuple[str, ...]
+    slug: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -873,6 +890,18 @@ def _page(
     **context: Any,
 ) -> PageJob:
     return PageJob(template, route, title, description, tuple(breadcrumbs), context)
+
+
+def share_image_target(job: PageJob) -> str:
+    card = job.context.get("share_card")
+    if card is None:
+        return SHARE_IMAGE_FALLBACK
+    if not isinstance(card, ShareCard):
+        raise BuildFailure(f"invalid share card route={job.route}")
+    prefix = {"Laureate": "winner", "Prize": "prize", "Institution": "institution"}.get(card.kind)
+    if prefix is None or not SLUG.fullmatch(card.slug):
+        raise BuildFailure(f"invalid share card route={job.route}")
+    return f"{SHARE_IMAGE_DIRECTORY}/{prefix}-{card.slug}.png"
 
 
 def _clamp(text: str, limit: int = DESCRIPTION_LIMIT) -> str:
@@ -1508,7 +1537,7 @@ def plan_category_pages(layout: PrizeLayout) -> list[PageJob]:
     return jobs
 
 
-def plan_prize_page(layout: PrizeLayout) -> PageJob:
+def plan_prize_page(layout: PrizeLayout, rank: int, subject_order: dict[str, int]) -> PageJob:
     category_links = (
         tuple(
             (category, layout.route + f"{layout.category_slugs[category]}/")
@@ -1550,6 +1579,14 @@ def plan_prize_page(layout: PrizeLayout) -> PageJob:
         recent_groups=_year_groups(recent, layout.record_routes),
         recent_years=PRIZE_PAGE_YEARS,
         winners_route=layout.route + f"{WINNERS_SEGMENT}/",
+        share_card=ShareCard(
+            "Prize",
+            layout.ranking.prize_name,
+            rank,
+            len(layout.records),
+            tuple(sorted({record.high_school_subject for record in layout.records}, key=subject_order.__getitem__)),
+            layout.ranking.slug,
+        ),
     )
 
 
@@ -1702,9 +1739,17 @@ def plan_year_pages(
     return jobs
 
 
-def plan_person_pages(people: list[Laureate], base_url: str) -> list[PageJob]:
+def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: list[dict[str, Any]]) -> list[PageJob]:
+    ranking_by_route = {
+        row["r"]: (rank, row["c"])
+        for rank, row in enumerate(explorer_people, start=1)
+        if row["r"]
+    }
     jobs: list[PageJob] = []
     for person in people:
+        ranking = ranking_by_route.get(relative_route(EXPLORER_ROUTE, person.route))
+        if ranking is None or ranking[1] != len(person.awards):
+            raise BuildFailure(f"invalid laureate share ranking qid={person.qid}")
         prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
         span = _year_span([record.year for record, _ in person.awards])
         latest = person.awards[-1][0]
@@ -1733,6 +1778,14 @@ def plan_person_pages(people: list[Laureate], base_url: str) -> list[PageJob]:
                     **_laureate_schema(latest, public_url(base_url, person.route)),
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
                 },
+                share_card=ShareCard(
+                    "Laureate",
+                    person.name,
+                    ranking[0],
+                    ranking[1],
+                    tuple(name for name, _ in person.subjects),
+                    person.route.rstrip("/").rsplit("/", 1)[-1],
+                ),
             )
         )
     return jobs
@@ -1996,9 +2049,9 @@ def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardR
             total=len(records),
         )
     ]
-    for affiliation in affiliations:
+    for rank, affiliation in enumerate(affiliations, start=1):
         span = _year_span([link.record.year for link in affiliation.awards])
-        award_count = len(affiliation.awards)
+        award_count = len({link.record.award_record_id for link in affiliation.awards})
         jobs.append(
             _page(
                 "affiliation.html",
@@ -2015,7 +2068,16 @@ def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardR
                     Breadcrumb(affiliation.name, None),
                 ),
                 affiliation=affiliation,
+                award_count=award_count,
                 wikipedia_url=wikipedia_search_url(affiliation.name),
+                share_card=ShareCard(
+                    "Institution",
+                    affiliation.name,
+                    rank,
+                    award_count,
+                    tuple(name for name, _ in affiliation.subjects),
+                    affiliation.slug,
+                ),
             )
         )
     return jobs
@@ -2078,6 +2140,7 @@ def plan_home_page(
     rankings: list[Ranking],
     records: list[AwardRecord],
     people: list[Laureate],
+    affiliations: list[Affiliation],
     prize_routes: dict[str, str],
     ranking_by_qid: dict[str, Ranking],
     record_routes: dict[str, str],
@@ -2126,6 +2189,7 @@ def plan_home_page(
             for record in recent[:HOMEPAGE_ROWS]
         ),
         decorated=tuple(decorated[:HOMEPAGE_ROWS]),
+        top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
     )
 
 
@@ -2199,9 +2263,7 @@ def plan_map_pages(records: list[AwardRecord]) -> list[PageJob]:
 
 
 def plan_explorer_page(
-    rankings: list[Ranking],
-    records: list[AwardRecord],
-    routes_by_laureate: dict[str, str],
+    payload: dict[str, Any],
     generated: str,
 ) -> PageJob:
     return _page(
@@ -2210,7 +2272,7 @@ def plan_explorer_page(
         "Awards Data Explorer",
         "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
         (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
-        payload=explorer_json(explorer_payload(rankings, records, routes_by_laureate)),
+        payload=explorer_json(payload),
         generated=generated,
     )
 
@@ -2286,38 +2348,39 @@ def create_site_plan(
     rankings = sorted(rankings, key=lambda ranking: ranking.score, reverse=True)
     routes_by_laureate = person_routes(records)
     prize_routes = {ranking.qid: f"/{ranking.slug}/" for ranking in rankings}
-    record_routes: dict[str, str] = {}
-    jobs: list[PageJob] = []
-    for ranking in rankings:
-        layout = layout_prize(ranking, records_by_qid[ranking.qid])
-        record_routes.update(layout.record_routes)
-        jobs.extend(plan_category_pages(layout))
-        jobs.append(plan_prize_page(layout))
-        jobs.append(plan_winners_page(layout))
-        jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate))
-
     subject_counts = Counter(record.high_school_subject for record in records)
     subject_order = {
         name: index for index, name in enumerate(sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)))
     }
+    record_routes: dict[str, str] = {}
+    jobs: list[PageJob] = []
+    for rank, ranking in enumerate(rankings, start=1):
+        layout = layout_prize(ranking, records_by_qid[ranking.qid])
+        record_routes.update(layout.record_routes)
+        jobs.extend(plan_category_pages(layout))
+        jobs.append(plan_prize_page(layout, rank, subject_order))
+        jobs.append(plan_winners_page(layout))
+        jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate))
+
     people = plan_people(records, routes_by_laureate, record_routes, subject_order)
     affiliations = plan_affiliations(records, record_routes, profiles_by_qid)
     country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
     countries = country_places["Born"]
     affiliation_countries = plan_affiliation_countries(affiliations)
     subjects = plan_subjects(people, subject_counts, affiliations)
+    explorer = explorer_payload(rankings, records, routes_by_laureate)
 
-    jobs.extend(plan_person_pages(people, base_url))
+    jobs.extend(plan_person_pages(people, base_url, explorer["people"]))
     jobs.extend(plan_subject_pages(subjects, records, record_routes))
     jobs.extend(plan_country_pages(country_places))
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
     jobs.extend(plan_affiliation_pages(affiliations, records))
     jobs.extend(plan_university_pages(affiliations))
-    jobs.append(plan_home_page(rankings, records, people, prize_routes, ranking_by_qid, record_routes))
+    jobs.append(plan_home_page(rankings, records, people, affiliations, prize_routes, ranking_by_qid, record_routes))
     jobs.append(plan_awards_page(rankings, prize_routes))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records))
-    jobs.append(plan_explorer_page(rankings, records, routes_by_laureate, generated))
+    jobs.append(plan_explorer_page(explorer, generated))
     jobs.append(plan_nearby_page(records, routes_by_laureate, affiliations))
     jobs.append(plan_about_page(rankings, records, people, countries, subjects, affiliations))
 
@@ -2511,6 +2574,162 @@ These three pages carry their data as embedded JSON rather than prose, so read t
     (output / "llms.txt").write_text(body, encoding="utf-8")
 
 
+def _share_font(font_path: Path, size: int, fonts: dict[int, ImageFont.FreeTypeFont]) -> ImageFont.FreeTypeFont:
+    if size not in fonts:
+        fonts[size] = ImageFont.truetype(str(font_path), size)
+    return fonts[size]
+
+
+def _share_text_width(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> float:
+    return draw.textlength(text, font=font)
+
+
+def _share_wrap(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list[str]:
+    lines: list[str] = []
+    line = ""
+    for word in text.split():
+        candidate = f"{line} {word}" if line else word
+        if _share_text_width(draw, candidate, font) <= max_width:
+            line = candidate
+            continue
+        if line:
+            lines.append(line)
+            line = ""
+        while _share_text_width(draw, word, font) > max_width:
+            split = 1
+            while split < len(word) and _share_text_width(draw, word[: split + 1], font) <= max_width:
+                split += 1
+            lines.append(word[:split])
+            word = word[split:]
+        line = word
+    if line:
+        lines.append(line)
+    return lines or [""]
+
+
+def _share_ellipsize(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
+    candidate = text.rstrip()
+    while candidate and _share_text_width(draw, candidate + "…", font) > max_width:
+        candidate = candidate[:-1].rstrip()
+    return candidate + "…"
+
+
+def _share_fit(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    font_path: Path,
+    fonts: dict[int, ImageFont.FreeTypeFont],
+    max_width: int,
+    max_lines: int,
+    start_size: int,
+    minimum_size: int,
+) -> tuple[ImageFont.FreeTypeFont, list[str]]:
+    for size in range(start_size, minimum_size - 1, -2):
+        font = _share_font(font_path, size, fonts)
+        lines = _share_wrap(draw, text, font, max_width)
+        if len(lines) <= max_lines:
+            return font, lines
+    font = _share_font(font_path, minimum_size, fonts)
+    lines = _share_wrap(draw, text, font, max_width)
+    if len(lines) > max_lines:
+        remaining = " ".join(lines[max_lines - 1 :])
+        lines = [*lines[: max_lines - 1], _share_ellipsize(draw, remaining, font, max_width)]
+    return font, lines
+
+
+def _draw_share_lines(
+    draw: ImageDraw.ImageDraw,
+    x: int,
+    y: int,
+    lines: Iterable[str],
+    font: ImageFont.FreeTypeFont,
+    fill: tuple[int, int, int],
+    spacing: int,
+) -> None:
+    line_height = font.getbbox("Ag")[3] - font.getbbox("Ag")[1] + spacing
+    for index, line in enumerate(lines):
+        draw.text((x, y + index * line_height), line, font=font, fill=fill)
+
+
+def _write_share_image(
+    target: Path,
+    font_path: Path,
+    fonts: dict[int, ImageFont.FreeTypeFont],
+    page_url: str,
+    card: ShareCard | None,
+) -> None:
+    paper = (244, 240, 231)
+    surface = (251, 248, 241)
+    ink = (38, 40, 35)
+    muted = (101, 103, 95)
+    accent = (82, 106, 85)
+    rule = (203, 197, 184)
+    image = Image.new("RGB", (SHARE_IMAGE_WIDTH, SHARE_IMAGE_HEIGHT), paper)
+    draw = ImageDraw.Draw(image)
+    draw.rounded_rectangle((48, 42, 1152, 588), radius=30, fill=surface, outline=rule, width=2)
+    draw.rounded_rectangle((48, 42, 66, 588), radius=9, fill=accent)
+    draw.text((96, 78), "PRIZE ATLAS", font=_share_font(font_path, 28, fonts), fill=accent)
+
+    if card is None:
+        name_font, name_lines = _share_fit(draw, "Recognition for work with lasting impact", font_path, fonts, 1008, 2, 66, 46)
+        _draw_share_lines(draw, 96, 174, name_lines, name_font, ink, 12)
+        draw.text(
+            (96, 350),
+            "Ranked awards, laureates and institutions",
+            font=_share_font(font_path, 30, fonts),
+            fill=muted,
+        )
+    else:
+        if card.rank < 1 or card.award_count < 1 or not card.subjects:
+            raise BuildFailure(f"invalid share card slug={card.slug}")
+        kind_font = _share_font(font_path, 24, fonts)
+        kind = card.kind.upper()
+        draw.text((1104 - _share_text_width(draw, kind, kind_font), 82), kind, font=kind_font, fill=muted)
+        name_font, name_lines = _share_fit(draw, card.name, font_path, fonts, 1008, 2, 66, 42)
+        _draw_share_lines(draw, 96, 145, name_lines, name_font, ink, 10)
+        draw.line((96, 326, 1104, 326), fill=rule, width=2)
+        label_font = _share_font(font_path, 20, fonts)
+        value_font = _share_font(font_path, 50, fonts)
+        draw.text((96, 360), f"{card.kind.upper()} RANK", font=label_font, fill=muted)
+        draw.text((96, 388), f"#{card.rank:,}", font=value_font, fill=ink)
+        draw.text((340, 360), "RECORDED AWARDS", font=label_font, fill=muted)
+        draw.text((340, 388), f"{card.award_count:,}", font=value_font, fill=ink)
+        draw.text((610, 360), "SUBJECTS", font=label_font, fill=muted)
+        subjects_font, subject_lines = _share_fit(
+            draw,
+            " · ".join(card.subjects),
+            font_path,
+            fonts,
+            494,
+            3,
+            27,
+            20,
+        )
+        _draw_share_lines(draw, 610, 392, subject_lines, subjects_font, ink, 7)
+
+    url_font, url_lines = _share_fit(draw, page_url, font_path, fonts, 1008, 2, 22, 16)
+    _draw_share_lines(draw, 96, 526, url_lines, url_font, accent, 4)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    image.save(target, format="PNG", compress_level=9)
+
+
+def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob], font_path: Path) -> None:
+    if not font_path.is_file():
+        raise BuildFailure("share card font is missing")
+    fonts: dict[int, ImageFont.FreeTypeFont] = {}
+    _write_share_image(output / SHARE_IMAGE_FALLBACK, font_path, fonts, base_url, None)
+    owners: dict[str, str] = {}
+    for job in jobs:
+        card = job.context.get("share_card")
+        if card is None:
+            continue
+        target = share_image_target(job)
+        if target in owners:
+            raise BuildFailure(f"duplicate share image target={target} routes={owners[target]},{job.route}")
+        owners[target] = job.route
+        _write_share_image(output / target, font_path, fonts, public_url(base_url, job.route), card)
+
+
 def _environment(website_dir: Path) -> Environment:
     environment = Environment(
         loader=FileSystemLoader(website_dir / "templates"),
@@ -2532,6 +2751,9 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         title=job.title,
         description=job.description,
         canonical=page_url,
+        share_image=public_url(base_url, f"/{share_image_target(job)}"),
+        share_image_width=SHARE_IMAGE_WIDTH,
+        share_image_height=SHARE_IMAGE_HEIGHT,
         breadcrumbs=job.breadcrumbs,
         home_href=relative_route(job.route, "/"),
         favicon_href=relative_file(job.route, "favicon.svg"),
@@ -2571,6 +2793,9 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         title="Page not found",
         description="This page does not exist. Browse the ranked awards and their recipients instead.",
         canonical="",
+        share_image=public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}"),
+        share_image_width=SHARE_IMAGE_WIDTH,
+        share_image_height=SHARE_IMAGE_HEIGHT,
         breadcrumbs=(),
         home_href=root,
         favicon_href=root + "favicon.svg",
@@ -2619,6 +2844,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     try:
         shutil.copytree(website_dir / "static", staging / "static")
         shutil.copyfile(website_dir / "static" / "favicon.svg", staging / "favicon.svg")
+        write_share_images(staging, normalized_base_url, plan.jobs, website_dir / SHARE_FONT)
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
                 lambda job: _render_job(environment, staging, normalized_base_url, corrections_email, job),

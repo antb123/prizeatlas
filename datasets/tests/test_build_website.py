@@ -14,6 +14,8 @@ from unittest import mock
 from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
+from PIL import Image
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from website import build
@@ -263,6 +265,41 @@ class WebsiteBuildTests(unittest.TestCase):
         plan = build.create_site_plan(rankings, records, "https://example.org/", "2026-07-26")
         explorer = next(job for job in plan.jobs if job.route == build.EXPLORER_ROUTE)
         self.assertEqual("explorer.html", explorer.template)
+
+    def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
+        rankings = [
+            build.Ranking("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100, "Blurb.", "Reasoning."),
+        ]
+        records = [
+            award(
+                award_record_id="zoe",
+                award_wikidata_qid="Q1",
+                prize_name="Test Prize",
+                year="2000",
+                full_name="Zoë Alpha",
+                laureate_wikidata_qid="Q1",
+            ),
+            award(
+                award_record_id="elodie",
+                award_wikidata_qid="Q1",
+                prize_name="Test Prize",
+                year="2000",
+                full_name="Élodie Beta",
+                laureate_wikidata_qid="Q2",
+            ),
+        ]
+
+        plan = build.create_site_plan(rankings, records, "https://example.org/", "2026-07-29")
+        cards = {
+            job.context["share_card"].name: job.context["share_card"]
+            for job in plan.jobs
+            if job.template == "person.html"
+        }
+
+        self.assertEqual(1, cards["Zoë Alpha"].rank)
+        self.assertEqual(2, cards["Élodie Beta"].rank)
+        explorer_template = (Path(build.__file__).parent / "templates/explorer.html").read_text()
+        self.assertIn("points: (a, b) => a.p - b.p || a.c - b.c || b.id - a.id", explorer_template)
 
     def test_map_coordinates_aggregation_serialization_and_routes(self) -> None:
         self.assertEqual(((-180.0, -90.0), (180.0, 90.0)), build.parse_map_points("-180,-90;180,90", "r1", "affiliation_coordinates", True))
@@ -739,17 +776,67 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "2024",
                 "full_name": "Second Laureate",
                 "laureate_wikidata_qid": "Q2",
+                "high_school_subject": "Chemistry",
             },
         ]
         database = self.create_database(rankings, records)
 
-        build.build_site(database, "https://example.org/", self.website)
+        plan = build.build_site(database, "https://example.org/", self.website)
 
         winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
         self.assertIn('<meta property="og:title" content="Geoffrey Hinton — Nobel Prize for Physics, 2024">', winner)
-        self.assertIn('<meta name="twitter:card" content="summary">', winner)
+        self.assertIn('<meta name="twitter:card" content="summary_large_image">', winner)
         self.assertIn('<meta property="og:url" content="https://example.org/nobel-prize/physics/2024/geoffrey-hinton/">', winner)
+        self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', winner)
         self.assertIn("At the time: University of Toronto.", winner)
+
+        jobs = {job.route: job for job in plan.jobs}
+        cards = {
+            route: job.context["share_card"]
+            for route, job in jobs.items()
+            if "share_card" in job.context
+        }
+        self.assertEqual(
+            build.ShareCard("Laureate", "Geoffrey Hinton", 1, 1, ("Physics",), "geoffrey-hinton"),
+            cards["/people/geoffrey-hinton/"],
+        )
+        self.assertEqual(
+            build.ShareCard("Prize", "Nobel Prize", 1, 2, ("Chemistry", "Physics"), "nobel-prize"),
+            cards["/nobel-prize/"],
+        )
+        self.assertEqual(
+            build.ShareCard("Institution", "University of Toronto", 1, 1, ("Physics",), "university-of-toronto"),
+            cards["/affiliations/university-of-toronto/"],
+        )
+        image_urls = {
+            "/people/geoffrey-hinton/": "winner-geoffrey-hinton.png",
+            "/nobel-prize/": "prize-nobel-prize.png",
+            "/affiliations/university-of-toronto/": "institution-university-of-toronto.png",
+        }
+        for route, filename in image_urls.items():
+            html = (self.website / "dist" / route.strip("/") / "index.html").read_text()
+            url = f"https://example.org/static/share/{filename}"
+            self.assertIn(f'<meta property="og:image" content="{url}">', html)
+            self.assertIn('<meta property="og:image:width" content="1200">', html)
+            self.assertIn('<meta property="og:image:height" content="630">', html)
+            self.assertIn(f'<meta name="twitter:image" content="{url}">', html)
+            with Image.open(self.website / "dist/static/share" / filename) as image:
+                self.assertEqual(("PNG", "RGB", (1200, 630)), (image.format, image.mode, image.size))
+
+        fallback = self.website / "dist/static/share/default.png"
+        with Image.open(fallback) as image:
+            self.assertEqual(("PNG", "RGB", (1200, 630)), (image.format, image.mode, image.size))
+        fallback_bytes = fallback.read_bytes()
+        homepage = (self.website / "dist/index.html").read_text()
+        error_page = (self.website / "dist/404.html").read_text()
+        self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', homepage)
+        self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', error_page)
+        self.assertIn("<p class=\"eyebrow\">Top Institutions</p>", homepage)
+        self.assertIn("<h2>Institutions with the most award-winning laureates</h2>", homepage)
+        self.assertIn("not by institutional quality", homepage)
+        self.assertIn('href="affiliations/university-of-toronto/">University of Toronto</a>', homepage)
+        build.build_site(database, "https://example.org/", self.website)
+        self.assertEqual(fallback_bytes, fallback.read_bytes())
 
         block = winner.split('<script type="application/ld+json">')[1].split("</script>")[0]
         payload = json.loads(block)
@@ -1113,6 +1200,32 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Boston Institute</a>", united_states)
         self.assertIn("Boston", united_states)
         self.assertNotIn("Paris", united_states)
+
+    def test_repeated_parent_affiliation_counts_one_share_card_award(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "shared-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "affiliation_name": "University One",
+                "affiliation_sub_name": "Department One",
+            }
+        ]
+        extras = {
+            "shared-one": [{"affiliation_name": "University One", "affiliation_sub_name": "Department Two"}],
+        }
+        database = self.create_database(rankings, records, extras)
+
+        plan = build.build_site(database, "https://example.org/", self.website)
+
+        job = next(job for job in plan.jobs if job.route == "/affiliations/university-one/")
+        self.assertEqual(1, job.context["share_card"].award_count)
+        page = (self.website / "dist/affiliations/university-one/index.html").read_text()
+        self.assertIn("1 recorded award.", page)
 
     def test_affiliation_ranking_discloses_units_after_the_first_three(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

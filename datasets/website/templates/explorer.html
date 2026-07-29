@@ -250,7 +250,7 @@ const board = document.getElementById("board");
 const hits = document.getElementById("hits");
 const state = { q: "", key: "points", dir: -1 };
 const SORTS = {                                       // all ascending; state.dir flips them
-  points: (a, b) => a.p - b.p || a.c - b.c || b.n.localeCompare(a.n),
+  points: (a, b) => a.p - b.p || a.c - b.c || b.id - a.id,
   count: (a, b) => a.c - b.c || a.p - b.p || b.n.localeCompare(a.n),
   name: (a, b) => a.n.localeCompare(b.n),
 };

@@ -12,7 +12,10 @@
   {% if affiliation.profile and affiliation.profile.description %}
   <p>{{ affiliation.profile.description }}</p>
   {% endif %}
-  <p>{% if affiliation.count %}{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }} · {% endif %}{{ affiliation.awards | length }} recorded awards.</p>
+  <p>
+    {% if affiliation.count %}{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }} · {% endif %}
+    {{ award_count }} recorded {{ "award" if award_count == 1 else "awards" }}.
+  </p>
   {% if affiliation.profile %}
   <p class="winner-links">
     {% if affiliation.profile.application_url %}<a class="external-source" href="{{ affiliation.profile.application_url }}">How to Apply <span aria-hidden="true">↗</span></a>{% endif %}
