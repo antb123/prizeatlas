@@ -27,6 +27,7 @@ award_extra_affiliations       │
        ▼
 affiliations                        one profile per institution QID — logo, description, application URL
   affiliation_wikidata_qid (PK)     joined only on an exact nonblank QID; never by name, slug, or coordinates
+  kind                              university / institute / hospital / company / government / other / blank
 ```
 
 **Position is a sort key, not a rank.** Position 1 living in the flat columns is storage, not a claim of primacy.
@@ -111,7 +112,8 @@ CREATE TABLE affiliations (
     affiliation_wikidata_qid TEXT PRIMARY KEY,
     logo_url                 TEXT NOT NULL DEFAULT '',
     description              TEXT NOT NULL DEFAULT '',
-    application_url          TEXT NOT NULL DEFAULT ''
+    application_url          TEXT NOT NULL DEFAULT '',
+    kind                     TEXT NOT NULL DEFAULT ''
 ) STRICT;
 ```
 
@@ -119,6 +121,8 @@ One row per institution, not per award. `application_url` was added after `datas
 was written; that spec still describes three columns.
 
 - Attaches to an affiliation page only when the page's records carry exactly one distinct nonblank QID and that QID has a profile.
+- `kind` classifies profiles for filtered institution rankings. `scripts/classify_affiliations.py` derives it from
+  Wikidata P31, with the reviewed exceptions in `affiliation_kinds.tsv`; blank means unclassified.
 - One page carrying two different nonblank QIDs where either has a profile is a `BuildFailure`, not a guess.
 - **Neither URL is validated by anything.** `datasets-affiliation-metadata-20260726.md` specified an HTTPS/host/credentials
   gate for `logo_url`; it was never implemented. `validate_official_url` exists in `website/build.py` but is applied only to
@@ -235,7 +239,8 @@ In JSON-LD the `Organization` name stays the parent and the unit becomes a neste
 | `awards.affiliation_name`, `affiliation_sub_name` | `scripts/normalize_affiliations.py --apply` only | Derived and owned; the write is unguarded, which is what makes re-running a no-op. |
 | `awards.affiliation_city/country/coordinates/qid` | hand SQL by `award_record_id`, after two-source verification | Fill blanks only; never overwrite a curated value. No script does this — see §6.1. |
 | `award_extra_affiliations` (all) | `scripts/load_extra_affiliations.py` from `award_extra_affiliations.tsv` | Full replace on every run. Edit the TSV, reload. |
-| `affiliations` (all) | curated data work; `scripts/enrich_affiliations.py` for logo/description | Insert only after the QID identity audit. **`scripts/enrich_application_urls.py` is unsafe — do not run it, see §10.** |
+| `affiliations` logo/description/application URL | curated data work; `scripts/enrich_affiliations.py` for logo/description | Insert only after the QID identity audit. **`scripts/enrich_application_urls.py` is unsafe — do not run it, see §10.** |
+| `affiliations.kind` | `scripts/classify_affiliations.py --apply`; reviewed overrides in `affiliation_kinds.tsv` | Back up first. Dry-run is the default. |
 
 Two scripts are commonly mistaken for QID fillers and are not:
 
@@ -319,6 +324,7 @@ Run in this order after any affiliation write:
 
 | Check | Fatal | Groups | What it means |
 |---|---|---:|---|
+| `invalid-affiliation-kind` | yes | 0 | Profile kind is outside the six named values plus blank |
 | `coords-without-qid` | yes | 20 | Coordinates with nothing to source them from |
 | `institution-facts-disagree` | yes | 76 | One institution recorded with two different cities, coordinates, or QIDs |
 | `coords-shared-across-cities` | yes | 18 | One coordinate claimed by rows in different cities — one of them is wrong |

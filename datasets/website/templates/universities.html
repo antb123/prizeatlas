@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="view-tabs" aria-label="University views">
+  <a href="{{ href(universities_route) }}" aria-current="page">Overall</a>
+  <a class="tab-alt" href="{{ href(university_countries_route) }}">By country</a>
+</nav>
+<header class="page-intro">
+  <p class="eyebrow">Universities</p>
+  <h1>{{ title }}</h1>
+  <p>{{ "{:,}".format(total) }} universities and colleges, ranked by the {{ "{:,}".format(laureates) }} laureates
+  recorded at them. Institutes, laboratories, hospitals and companies are ranked separately under
+  <a href="{{ href(affiliations_route) }}">Institutions</a>.</p>
+  <p class="caveat">This counts award-time affiliations, not teaching quality, research output or overall university
+  quality. An affiliation is the one recorded when the award was made rather than a whole career, and a winner can
+  have several recorded for one award.</p>
+</header>
+<ol class="rank-list">
+  {% for university in universities %}
+  <li>
+    <span class="rank-position">{{ loop.index }}</span>
+    <div><a href="{{ href(university.route) }}">{{ university.name }}</a>
+      {% if university.units %}
+      <ul class="rank-units">
+        {% for unit, unit_count in university.units[:3] %}
+        <li>{{ unit }} <span class="rank-unit-count">{{ unit_count }}</span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    <span class="rank-count" style="--share: {{ university.count * 100 // leader }}">{{ university.count }}</span>
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}

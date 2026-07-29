@@ -56,6 +56,8 @@ TEMPLATES = (
     "affiliation_country.html",
     "affiliations.html",
     "affiliation.html",
+    "universities.html",
+    "university_countries.html",
     "subjects.html",
     "subject.html",
     "subject_affiliations.html",
@@ -80,6 +82,13 @@ COUNTRY_VIEWS = (
 RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "died"})
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
+UNIVERSITIES_ROUTE = "/universities/"
+UNIVERSITY_COUNTRIES_ROUTE = "/universities/countries/"
+# The one affiliations.kind that names a degree-granting university or college; institutes, laboratories, hospitals,
+# companies and government bodies are ranked under Institutions instead.
+UNIVERSITY_KIND = "university"
+UNIVERSITY_ROWS = 40
+COUNTRY_UNIVERSITY_ROWS = 10
 SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
 NEARBY_ROUTE = "/nearby/"
@@ -221,6 +230,7 @@ class AffiliationProfile:
     logo_url: str
     description: str
     application_url: str
+    kind: str
 
     @property
     def wikidata_url(self) -> str:
@@ -774,7 +784,7 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             """
         ).fetchall()
         profile_rows = connection.execute(
-            "SELECT affiliation_wikidata_qid, logo_url, description, application_url "
+            "SELECT affiliation_wikidata_qid, logo_url, description, application_url, kind "
             "FROM affiliations ORDER BY affiliation_wikidata_qid"
         ).fetchall()
         award_rows = connection.execute(f"SELECT {', '.join(AWARD_COLUMNS)} FROM awards").fetchall()
@@ -825,6 +835,7 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
             logo_url=_text(row["logo_url"]),
             description=_text(row["description"]),
             application_url=_text(row["application_url"]),
+            kind=_text(row["kind"]),
         )
         for row in profile_rows
     ]
@@ -1969,6 +1980,59 @@ def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardR
     return jobs
 
 
+def plan_university_pages(affiliations: list[Affiliation]) -> list[PageJob]:
+    """Rank universities and colleges alone, overall and by country.
+
+    Membership is the institution's recorded `kind`, never its name: ETH Zurich and Karolinska Institutet are
+    universities, the Institute for Advanced Study and a university's own medical centre are not. An institution
+    with no recorded kind is left out rather than guessed at.
+    """
+    universities = [
+        affiliation for affiliation in affiliations if affiliation.profile and affiliation.profile.kind == UNIVERSITY_KIND
+    ]
+    countries = plan_affiliation_countries(universities)
+    laureates = len({
+        link.record.laureate_wikidata_qid
+        for affiliation in universities
+        for link in affiliation.awards
+        if _nonblank(link.record.laureate_wikidata_qid)
+    })
+    return [
+        _page(
+            "universities.html",
+            UNIVERSITIES_ROUTE,
+            "Universities with the most award-winning laureates",
+            _clamp(
+                f"The {len(universities):,} universities and colleges recorded against these awards, ranked by the "
+                f"laureates affiliated with them at the time of the award."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("Institutions", AFFILIATIONS_ROUTE), Breadcrumb("Universities", None)),
+            universities=tuple(universities[:UNIVERSITY_ROWS]),
+            leader=universities[0].count if universities else 0,
+            total=len(universities),
+            laureates=laureates,
+        ),
+        _page(
+            "university_countries.html",
+            UNIVERSITY_COUNTRIES_ROUTE,
+            "Universities with the most award-winning laureates, by country",
+            _clamp(
+                f"{len(universities):,} universities and colleges in {len(countries)} countries, ranked within each "
+                f"country by the laureates recorded there."
+            ),
+            (
+                Breadcrumb("Home", "/"),
+                Breadcrumb("Institutions", AFFILIATIONS_ROUTE),
+                Breadcrumb("Universities", UNIVERSITIES_ROUTE),
+                Breadcrumb("By country", None),
+            ),
+            countries=tuple(countries),
+            rows=COUNTRY_UNIVERSITY_ROWS,
+            total=len(universities),
+        ),
+    ]
+
+
 def plan_home_page(
     rankings: list[Ranking],
     records: list[AwardRecord],
@@ -2196,6 +2260,7 @@ def create_site_plan(
     jobs.extend(plan_country_pages(country_places))
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
     jobs.extend(plan_affiliation_pages(affiliations, records))
+    jobs.extend(plan_university_pages(affiliations))
     jobs.append(plan_home_page(rankings, records, people, prize_routes, ranking_by_qid, record_routes))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records))
@@ -2344,6 +2409,8 @@ points that rank individuals by it, are editorial judgements rather than measure
 - Every winner of one prize in a single list: see the {plan.prize_count} `/{{prize}}/{WINNERS_SEGMENT}/` pages named under "Winner lists" below
 - [Countries]({public_url(base_url, COUNTRIES_ROUTE)}): {plan.country_count} countries of birth, with companion views by award-time institution and by death
 - [Institutions]({public_url(base_url, AFFILIATIONS_ROUTE)}): the universities, laboratories, and organizations where the recognized work was done
+- [Universities]({public_url(base_url, UNIVERSITIES_ROUTE)}): universities and colleges alone, ranked by laureate, and
+  [by country]({public_url(base_url, UNIVERSITY_COUNTRIES_ROUTE)})
 - [Subjects]({public_url(base_url, SUBJECTS_ROUTE)}): the same awards regrouped under {plan.subject_count} school subjects
 - [About]({public_url(base_url, ABOUT_ROUTE)}): scope, method, and the biases this collection inherits from the prizes themselves
 
@@ -2423,6 +2490,8 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
+        universities_route=UNIVERSITIES_ROUTE,
+        university_countries_route=UNIVERSITY_COUNTRIES_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
         nearby_route=NEARBY_ROUTE,

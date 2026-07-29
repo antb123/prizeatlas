@@ -61,6 +61,16 @@ CHECKS = (
         """,
     ),
     Check(
+        "invalid-affiliation-kind", True,
+        "affiliation kind outside the university, institute, hospital, company, government, other or blank vocabulary",
+        """
+        SELECT affiliation_wikidata_qid, kind
+        FROM affiliations
+        WHERE kind NOT IN ('', 'university', 'institute', 'hospital', 'company', 'government', 'other')
+        ORDER BY affiliation_wikidata_qid
+        """,
+    ),
+    Check(
         "institution-facts-disagree", True,
         "one institution recorded with two different cities, coordinates or QIDs",
         AFFILIATIONS + """

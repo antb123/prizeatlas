@@ -156,6 +156,10 @@ AFFILIATIONS = {
     "Western Reserve University School of Medicine": ("Western Reserve University", "School of Medicine"),
     "Tufts Medical College": ("Tufts University", "Medical College"),
     "University of Paris School of Medicine": ("University of Paris", "School of Medicine"),
+    "Universite de Paris": ("University of Paris", ""),
+    # The one matching row already carries this unit; the normalizer owns affiliation_sub_name and writes it
+    # unconditionally, so the reviewed mapping must preserve it.
+    "Université de Paris": ("University of Paris", "Laboratoire Immuno-Hématologie"),
     "The John Curtin School of Medical Research, The Australian National University": ("Australian National University", "John Curtin School of Medical Research"),
     "University of Nottingham, School of Physics and Astronomy": ("University of Nottingham", "School of Physics and Astronomy"),
     "University of Reading, Department of Meteorology": ("University of Reading", "Department of Meteorology"),

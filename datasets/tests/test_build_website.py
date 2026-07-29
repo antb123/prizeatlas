@@ -60,6 +60,7 @@ class WebsiteBuildTests(unittest.TestCase):
         rankings: list[tuple[str, str, str, str, int]],
         records: list[dict[str, str]],
         extras: dict[str, list[dict[str, str]]] | None = None,
+        profiles: list[tuple[str, str]] | None = None,
     ) -> Path:
         database = self.directory / "awards.sqlite3"
         columns = ", ".join(f'"{column}" TEXT' for column in build.AWARD_COLUMNS)
@@ -85,7 +86,8 @@ class WebsiteBuildTests(unittest.TestCase):
                     affiliation_wikidata_qid TEXT PRIMARY KEY,
                     logo_url TEXT NOT NULL DEFAULT '',
                     description TEXT NOT NULL DEFAULT '',
-                    application_url TEXT NOT NULL DEFAULT ''
+                    application_url TEXT NOT NULL DEFAULT '',
+                    kind TEXT NOT NULL DEFAULT ''
                 ) STRICT
                 """
             )
@@ -122,6 +124,10 @@ class WebsiteBuildTests(unittest.TestCase):
                     for record_id, rows in (extras or {}).items()
                     for position, extra in enumerate(rows, start=2)
                 ],
+            )
+            connection.executemany(
+                "INSERT INTO affiliations (affiliation_wikidata_qid, kind) VALUES (?, ?)",
+                profiles or (),
             )
         return database
 
@@ -1143,6 +1149,69 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertNotIn("rank-units", unitless)
         self.assertNotIn("<details", unitless)
         self.assertRegex(unitless, r'rank-count[^>]*>1<')
+
+    def test_university_pages_include_only_classified_universities(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "university-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q100",
+                "affiliation_name": "University One",
+                "affiliation_country": "United States",
+                "affiliation_wikidata_qid": "Q10",
+            },
+            {
+                "award_record_id": "institute-one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q200",
+                "affiliation_name": "Institute One",
+                "affiliation_country": "United States",
+                "affiliation_wikidata_qid": "Q20",
+            },
+            {
+                "award_record_id": "university-two",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2002",
+                "full_name": "Carol Gamma",
+                "laureate_wikidata_qid": "Q300",
+                "affiliation_name": "University Two",
+                "affiliation_country": "Belgium",
+                "affiliation_wikidata_qid": "Q30",
+            },
+        ]
+        database = self.create_database(
+            rankings,
+            records,
+            profiles=[("Q10", "university"), ("Q20", "institute"), ("Q30", "university")],
+        )
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        overall = (self.website / "dist/universities/index.html").read_text()
+        countries = (self.website / "dist/universities/countries/index.html").read_text()
+        institutions = (self.website / "dist/affiliations/index.html").read_text()
+        sitemap = (self.website / "dist/sitemap.xml").read_text()
+        llms = (self.website / "dist/llms.txt").read_text()
+
+        self.assertIn("Universities with the most award-winning laureates", overall)
+        self.assertIn(">University One</a>", overall)
+        self.assertIn(">University Two</a>", overall)
+        self.assertNotIn(">Institute One</a>", overall)
+        self.assertIn(">University One</a>", countries)
+        self.assertIn(">University Two</a>", countries)
+        self.assertNotIn(">Institute One</a>", countries)
+        self.assertIn('href="../universities/">Universities</a>', institutions)
+        self.assertIn("https://example.org/universities/", sitemap)
+        self.assertIn("https://example.org/universities/countries/", sitemap)
+        self.assertIn("[Universities](https://example.org/universities/)", llms)
 
     def test_subject_institutions_tab_ranks_by_in_subject_laureates(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
