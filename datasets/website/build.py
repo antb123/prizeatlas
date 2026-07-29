@@ -2596,7 +2596,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
 
 def _make_world_readable(root: Path) -> None:
     for path in (root, *root.rglob("*")):
-        path.chmod(0o2755 if path.is_dir() else 0o644)
+        path.chmod(0o2775 if path.is_dir() else 0o644)
 
 
 def _promote(staging: Path, dist: Path) -> None:
@@ -2617,8 +2617,8 @@ def _promote(staging: Path, dist: Path) -> None:
     if backup is not None:
         try:
             shutil.rmtree(backup)
-        except OSError:
-            print(f"website build warning operation=backup-cleanup path={backup}", file=sys.stderr)
+        except OSError as error:
+            print(f"website build warning operation=backup-cleanup path={backup} outcome=failed error={error}", file=sys.stderr)
 
 
 def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:

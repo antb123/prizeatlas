@@ -599,7 +599,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("https://example.org/awards/awards/", locations)
         for path in (self.website / "dist", *(self.website / "dist").rglob("*")):
             mode = stat.S_IMODE(path.stat().st_mode)
-            self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)
+            self.assertEqual(0o2775 if path.is_dir() else 0o644, mode, path)
 
         dist = self.website / "dist"
         generated = {path.resolve() for path in dist.rglob("*") if path.is_file()}
@@ -1800,6 +1800,19 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(50_001, len(page_locations))
         self.assertEqual(len(page_locations), len(set(page_locations)))
 
+    def test_generated_directories_stay_group_writable(self) -> None:
+        output = self.directory / "generated"
+        child = output / "child"
+        child.mkdir(parents=True)
+        generated_file = child / "index.html"
+        generated_file.write_text("generated")
+
+        build._make_world_readable(output)
+
+        self.assertEqual(0o2775, stat.S_IMODE(output.stat().st_mode))
+        self.assertEqual(0o2775, stat.S_IMODE(child.stat().st_mode))
+        self.assertEqual(0o644, stat.S_IMODE(generated_file.stat().st_mode))
+
     def test_worker_failure_preserves_output_and_uses_eight_workers(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
         records = [
@@ -1876,6 +1889,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(1, len(backups))
         self.assertEqual(b"old", (backups[0] / "old").read_bytes())
         self.assertIn("operation=backup-cleanup", errors.getvalue())
+        self.assertIn("error=forced cleanup failure", errors.getvalue())
 
 
 if __name__ == "__main__":
