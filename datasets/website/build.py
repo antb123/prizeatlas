@@ -314,6 +314,19 @@ class RecentSubjectAwards:
 
 
 @dataclass(frozen=True, slots=True)
+class PrizeLayout:
+    """Every route one prize owns, allocated before any of its pages are built."""
+    ranking: Ranking
+    route: str
+    records: list[AwardRecord]
+    routed_categories: bool
+    category_slugs: dict[str, str]
+    year_routes: dict[tuple[str | None, str], str]
+    year_records: dict[tuple[str | None, str], list[AwardRecord]]
+    record_routes: dict[str, str]
+
+
+@dataclass(frozen=True, slots=True)
 class SitePlan:
     jobs: tuple[PageJob, ...]
     prize_count: int
@@ -1275,16 +1288,7 @@ def plan_recent_subject_awards(records: Iterable[AwardRecord], record_routes: di
     return RecentSubjectAwards(earliest_year, latest_year, len(recent_records), sum(len(prizes) for _, prizes in groups), groups)
 
 
-def create_site_plan(
-    rankings: list[Ranking],
-    records: list[AwardRecord],
-    base_url: str,
-    generated: str,
-    profiles: Iterable[AffiliationProfile] = (),
-) -> SitePlan:
-    if not rankings or not records:
-        raise BuildFailure("ranking or awards table is empty")
-
+def index_rankings(rankings: list[Ranking]) -> dict[str, Ranking]:
     ranking_by_qid: dict[str, Ranking] = {}
     slugs: set[str] = set()
     scores: set[int] = set()
@@ -1306,7 +1310,10 @@ def create_site_plan(
         ranking_by_qid[ranking.qid] = ranking
         slugs.add(ranking.slug)
         scores.add(ranking.score)
+    return ranking_by_qid
 
+
+def index_records(records: list[AwardRecord]) -> dict[str, list[AwardRecord]]:
     live_names: dict[str, str] = {}
     records_by_qid: dict[str, list[AwardRecord]] = {}
     seen_record_ids: set[str] = set()
@@ -1325,13 +1332,10 @@ def create_site_plan(
         if previous_name != record.prize_name:
             raise BuildFailure(f"inconsistent prize name qid={record.award_wikidata_qid}")
         records_by_qid.setdefault(record.award_wikidata_qid, []).append(record)
+    return records_by_qid
 
-    if set(ranking_by_qid) != set(live_names):
-        raise BuildFailure("ranking rows do not match live awards")
-    for qid, prize_name in live_names.items():
-        if ranking_by_qid[qid].prize_name != prize_name:
-            raise BuildFailure(f"ranking prize mismatch qid={qid}")
 
+def index_profiles(profiles: Iterable[AffiliationProfile]) -> dict[str, AffiliationProfile]:
     profiles_by_qid: dict[str, AffiliationProfile] = {}
     for profile in profiles:
         if not WIKIDATA_QID.fullmatch(profile.qid):
@@ -1339,282 +1343,315 @@ def create_site_plan(
         if profile.qid in profiles_by_qid:
             raise BuildFailure(f"duplicate affiliation profile qid={profile.qid}")
         profiles_by_qid[profile.qid] = profile
+    return profiles_by_qid
 
-    rankings = sorted(rankings, key=lambda ranking: ranking.score, reverse=True)
+
+def layout_prize(ranking: Ranking, prize_records: list[AwardRecord]) -> PrizeLayout:
+    route = f"/{ranking.slug}/"
+    categories = {record.category for record in prize_records if _nonblank(record.category)}
+    routed_categories = len(categories) > 1 and ranking.slug not in YEAR_ROUTED_PRIZES
+    category_slugs = _category_slugs(categories) if routed_categories else {}
+    if routed_categories and any(not _nonblank(record.category) for record in prize_records):
+        raise BuildFailure(f"blank routed category qid={ranking.qid}")
+
+    parent_records: dict[str | None, list[AwardRecord]] = {}
+    for record in prize_records:
+        parent_records.setdefault(record.category if routed_categories else None, []).append(record)
+
+    year_routes: dict[tuple[str | None, str], str] = {}
+    year_records: dict[tuple[str | None, str], list[AwardRecord]] = {}
+    for category, parent_group in parent_records.items():
+        labels: dict[str, str] = {}
+        parent_route = route
+        if category is not None:
+            parent_route += f"{category_slugs[category]}/"
+        for record in parent_group:
+            year_slug = slugify(record.year)
+            previous = labels.setdefault(year_slug, record.year)
+            if previous != record.year:
+                raise BuildFailure(f"duplicate year slug qid={ranking.qid}")
+            key = (category, record.year)
+            year_routes[key] = parent_route + f"{year_slug}/"
+            year_records.setdefault(key, []).append(record)
+
+    record_routes: dict[str, str] = {}
+    for key, grouped_records in year_records.items():
+        winner_slugs: dict[str, str] = {}
+        for record in grouped_records:
+            winner_slug = slugify(record.full_name)
+            if winner_slug in winner_slugs:
+                raise BuildFailure(f"duplicate winner slug record_id={record.award_record_id}")
+            winner_slugs[winner_slug] = record.award_record_id
+            record_routes[record.award_record_id] = year_routes[key] + f"{winner_slug}/"
+
+    return PrizeLayout(
+        ranking,
+        route,
+        prize_records,
+        routed_categories,
+        category_slugs,
+        year_routes,
+        year_records,
+        record_routes,
+    )
+
+
+def _year_groups(
+    group: list[AwardRecord],
+    record_routes: dict[str, str],
+) -> tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]:
+    result: list[tuple[str, tuple[tuple[AwardRecord, str], ...]]] = []
+    for record in group:
+        if result and result[-1][0] == record.year:
+            prior = result[-1][1] + ((record, record_routes[record.award_record_id]),)
+            result[-1] = (record.year, prior)
+        else:
+            result.append((record.year, ((record, record_routes[record.award_record_id]),)))
+    return tuple(result)
+
+
+def plan_category_pages(layout: PrizeLayout) -> list[PageJob]:
+    if not layout.routed_categories:
+        return []
+
     jobs: list[PageJob] = []
-    prize_routes = {ranking.qid: f"/{ranking.slug}/" for ranking in rankings}
-    category_page_count = 0
-    year_page_count = 0
-    winner_page_count = 0
-    all_record_routes: dict[str, str] = {}
-    routes_by_laureate = person_routes(records)
-
-    for ranking in rankings:
-        prize_records = records_by_qid[ranking.qid]
-        categories = {record.category for record in prize_records if _nonblank(record.category)}
-        routed_categories = len(categories) > 1 and ranking.slug not in YEAR_ROUTED_PRIZES
-        category_slugs = _category_slugs(categories) if routed_categories else {}
-        if routed_categories and any(not _nonblank(record.category) for record in prize_records):
-            raise BuildFailure(f"blank routed category qid={ranking.qid}")
-
-        parent_records: dict[str | None, list[AwardRecord]] = {}
-        for record in prize_records:
-            parent_records.setdefault(record.category if routed_categories else None, []).append(record)
-
-        year_routes: dict[tuple[str | None, str], str] = {}
-        year_records: dict[tuple[str | None, str], list[AwardRecord]] = {}
-        for category, parent_group in parent_records.items():
-            labels: dict[str, str] = {}
-            parent_route = prize_routes[ranking.qid]
-            if category is not None:
-                parent_route += f"{category_slugs[category]}/"
-            for record in parent_group:
-                year_slug = slugify(record.year)
-                previous = labels.setdefault(year_slug, record.year)
-                if previous != record.year:
-                    raise BuildFailure(f"duplicate year slug qid={ranking.qid}")
-                key = (category, record.year)
-                year_routes[key] = parent_route + f"{year_slug}/"
-                year_records.setdefault(key, []).append(record)
-
-        for key, grouped_records in year_records.items():
-            winner_slugs: dict[str, str] = {}
-            for record in grouped_records:
-                winner_slug = slugify(record.full_name)
-                if winner_slug in winner_slugs:
-                    raise BuildFailure(f"duplicate winner slug record_id={record.award_record_id}")
-                winner_slugs[winner_slug] = record.award_record_id
-                all_record_routes[record.award_record_id] = year_routes[key] + f"{winner_slug}/"
-
-        category_links: list[tuple[str, str]] = []
-        if routed_categories:
-            for category in sorted(categories):
-                category_route = prize_routes[ranking.qid] + f"{category_slugs[category]}/"
-                category_links.append((category, category_route))
-                category_years = [
-                    (
-                        year,
-                        year_routes[(category, year)],
-                        _year_prefix(year, grouped[0].award_record_id),
-                        _by_motivation(
-                            (record, all_record_routes[record.award_record_id])
-                            for record in sorted(grouped, key=lambda item: item.award_record_id)
-                        ),
-                    )
-                    for (record_category, year), grouped in year_records.items()
-                    if record_category == category
-                ]
-                category_years.sort(key=lambda item: item[0], reverse=True)
-                category_years.sort(key=lambda item: item[2], reverse=True)
-                title = f"{ranking.prize_name} for {category}: Winners by Year"
-                category_records = [record for record in prize_records if record.category == category]
-                category_span = _year_span([record.year for record in category_records])
-                jobs.append(
-                    _page(
-                        "category.html",
-                        category_route,
-                        title,
-                        _clamp(
-                            f"All {len(category_records)} {ranking.prize_name} laureates in {category}, {category_span}, "
-                            f"with the citation for each award year."
-                        ),
-                        (
-                            Breadcrumb("Home", "/"),
-                            Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
-                            Breadcrumb(category, None),
-                        ),
-                        prize=ranking,
-                        category=category,
-                        years=tuple(category_years),
-                    )
-                )
-                category_page_count += 1
-
-        direct_years: list[tuple[str, str, int]] = []
-        if not routed_categories:
-            direct_years = [
-                (year, route, _year_prefix(year, year_records[(None, year)][0].award_record_id))
-                for (category, year), route in year_routes.items()
-                if category is None
-            ]
-            direct_years.sort(key=lambda item: item[0], reverse=True)
-            direct_years.sort(key=lambda item: item[2], reverse=True)
-
-        # Adjacent award years within one category, so a year page is never a dead end.
-        neighbours: dict[tuple[str | None, str], tuple[tuple[str, str] | None, tuple[str, str] | None]] = {}
-        years_by_category: dict[str | None, list[tuple[int, str, str]]] = {}
-        for (category_key, year), route in year_routes.items():
-            prefix = _year_prefix(year, year_records[(category_key, year)][0].award_record_id)
-            years_by_category.setdefault(category_key, []).append((prefix, year, route))
-        for category_key, entries in years_by_category.items():
-            entries.sort()
-            for index, (_, year, _route) in enumerate(entries):
-                earlier = entries[index - 1] if index else None
-                later = entries[index + 1] if index + 1 < len(entries) else None
-                neighbours[(category_key, year)] = (
-                    (earlier[1], earlier[2]) if earlier else None,
-                    (later[1], later[2]) if later else None,
-                )
-
-        ordered_records = _descending_records(prize_records)
-        recent_prefixes = {
-            _year_prefix(record.year, record.award_record_id)
-            for record in ordered_records
-        }
-        recent_prefixes = set(sorted(recent_prefixes, reverse=True)[:PRIZE_PAGE_YEARS])
-        recent = [record for record in ordered_records if _year_prefix(record.year, record.award_record_id) in recent_prefixes]
-
-        def group_prize_records(group: list[AwardRecord]) -> tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]:
-            result: list[tuple[str, tuple[tuple[AwardRecord, str], ...]]] = []
-            for record in group:
-                if result and result[-1][0] == record.year:
-                    prior = result[-1][1] + ((record, all_record_routes[record.award_record_id]),)
-                    result[-1] = (record.year, prior)
-                else:
-                    result.append((record.year, ((record, all_record_routes[record.award_record_id]),)))
-            return tuple(result)
-
-        prize_title = f"{ranking.prize_name}: Winners by Year"
-        prize_span = _year_span([record.year for record in prize_records])
-        winners_route = prize_routes[ranking.qid] + f"{WINNERS_SEGMENT}/"
-        jobs.append(
-            _page(
-                "prize.html",
-                prize_routes[ranking.qid],
-                prize_title,
-                _clamp(f"All {len(prize_records)} {ranking.prize_name} laureates, {prize_span}. {ranking.blurb}"),
-                (Breadcrumb("Home", "/"), Breadcrumb(ranking.prize_name, None)),
-                prize=ranking,
-                routed_categories=routed_categories,
-                category_links=tuple(category_links),
-                year_links=tuple(direct_years),
-                recent_groups=group_prize_records(recent),
-                recent_years=PRIZE_PAGE_YEARS,
-                winners_route=winners_route,
+    for category in sorted(layout.category_slugs):
+        category_route = layout.route + f"{layout.category_slugs[category]}/"
+        category_years = [
+            (
+                year,
+                layout.year_routes[(category, year)],
+                _year_prefix(year, grouped[0].award_record_id),
+                _by_motivation(
+                    (record, layout.record_routes[record.award_record_id])
+                    for record in sorted(grouped, key=lambda item: item.award_record_id)
+                ),
             )
-        )
-
-        # One page listing every recipient of the prize. The prize page above stops at the recent years, and only the
-        # prizes with standing categories have complete lists beneath them, so without this a crawler cannot reach the
-        # whole roll of an uncategorized prize from anything but its individual year pages.
-        ascending = sorted(
-            prize_records,
-            key=lambda record: (_year_prefix(record.year, record.award_record_id), record.year, record.award_record_id),
-        )
+            for (record_category, year), grouped in layout.year_records.items()
+            if record_category == category
+        ]
+        category_years.sort(key=lambda item: item[0], reverse=True)
+        category_years.sort(key=lambda item: item[2], reverse=True)
+        title = f"{layout.ranking.prize_name} for {category}: Winners by Year"
+        category_records = [record for record in layout.records if record.category == category]
+        category_span = _year_span([record.year for record in category_records])
         jobs.append(
             _page(
-                "winners.html",
-                winners_route,
-                f"{ranking.prize_name}: every winner",
-                _clamp(f"All {len(prize_records)} {ranking.prize_name} recipients, {prize_span}, in one list with a link to every award."),
+                "category.html",
+                category_route,
+                title,
+                _clamp(
+                    f"All {len(category_records)} {layout.ranking.prize_name} laureates in {category}, {category_span}, "
+                    f"with the citation for each award year."
+                ),
                 (
                     Breadcrumb("Home", "/"),
-                    Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
-                    Breadcrumb("Every winner", None),
+                    Breadcrumb(layout.ranking.prize_name, layout.route),
+                    Breadcrumb(category, None),
                 ),
-                prize=ranking,
-                prize_route=prize_routes[ranking.qid],
-                routed_categories=routed_categories,
-                winners=tuple((record, all_record_routes[record.award_record_id]) for record in ascending),
-                span=prize_span,
+                prize=layout.ranking,
+                category=category,
+                years=tuple(category_years),
+            )
+        )
+    return jobs
+
+
+def plan_prize_page(layout: PrizeLayout) -> PageJob:
+    category_links = (
+        tuple(
+            (category, layout.route + f"{layout.category_slugs[category]}/")
+            for category in sorted(layout.category_slugs)
+        )
+        if layout.routed_categories
+        else ()
+    )
+    direct_years: list[tuple[str, str, int]] = []
+    if not layout.routed_categories:
+        direct_years = [
+            (year, route, _year_prefix(year, layout.year_records[(None, year)][0].award_record_id))
+            for (category, year), route in layout.year_routes.items()
+            if category is None
+        ]
+        direct_years.sort(key=lambda item: item[0], reverse=True)
+        direct_years.sort(key=lambda item: item[2], reverse=True)
+
+    ordered_records = _descending_records(layout.records)
+    recent_prefixes = {
+        _year_prefix(record.year, record.award_record_id)
+        for record in ordered_records
+    }
+    recent_prefixes = set(sorted(recent_prefixes, reverse=True)[:PRIZE_PAGE_YEARS])
+    recent = [record for record in ordered_records if _year_prefix(record.year, record.award_record_id) in recent_prefixes]
+
+    prize_title = f"{layout.ranking.prize_name}: Winners by Year"
+    prize_span = _year_span([record.year for record in layout.records])
+    return _page(
+        "prize.html",
+        layout.route,
+        prize_title,
+        _clamp(f"All {len(layout.records)} {layout.ranking.prize_name} laureates, {prize_span}. {layout.ranking.blurb}"),
+        (Breadcrumb("Home", "/"), Breadcrumb(layout.ranking.prize_name, None)),
+        prize=layout.ranking,
+        routed_categories=layout.routed_categories,
+        category_links=category_links,
+        year_links=tuple(direct_years),
+        recent_groups=_year_groups(recent, layout.record_routes),
+        recent_years=PRIZE_PAGE_YEARS,
+        winners_route=layout.route + f"{WINNERS_SEGMENT}/",
+    )
+
+
+def plan_winners_page(layout: PrizeLayout) -> PageJob:
+    """List every recipient of one prize, including prizes without standing categories."""
+    ascending = sorted(
+        layout.records,
+        key=lambda record: (_year_prefix(record.year, record.award_record_id), record.year, record.award_record_id),
+    )
+    prize_span = _year_span([record.year for record in layout.records])
+    return _page(
+        "winners.html",
+        layout.route + f"{WINNERS_SEGMENT}/",
+        f"{layout.ranking.prize_name}: every winner",
+        _clamp(
+            f"All {len(layout.records)} {layout.ranking.prize_name} recipients, {prize_span}, "
+            "in one list with a link to every award."
+        ),
+        (
+            Breadcrumb("Home", "/"),
+            Breadcrumb(layout.ranking.prize_name, layout.route),
+            Breadcrumb("Every winner", None),
+        ),
+        prize=layout.ranking,
+        prize_route=layout.route,
+        routed_categories=layout.routed_categories,
+        winners=tuple((record, layout.record_routes[record.award_record_id]) for record in ascending),
+        span=prize_span,
+    )
+
+
+def _year_neighbours(
+    layout: PrizeLayout,
+) -> dict[tuple[str | None, str], tuple[tuple[str, str] | None, tuple[str, str] | None]]:
+    """Link adjacent award years within one category so a year page is never a dead end."""
+    neighbours: dict[tuple[str | None, str], tuple[tuple[str, str] | None, tuple[str, str] | None]] = {}
+    years_by_category: dict[str | None, list[tuple[int, str, str]]] = {}
+    for (category_key, year), route in layout.year_routes.items():
+        prefix = _year_prefix(year, layout.year_records[(category_key, year)][0].award_record_id)
+        years_by_category.setdefault(category_key, []).append((prefix, year, route))
+    for category_key, entries in years_by_category.items():
+        entries.sort()
+        for index, (_, year, _route) in enumerate(entries):
+            earlier = entries[index - 1] if index else None
+            later = entries[index + 1] if index + 1 < len(entries) else None
+            neighbours[(category_key, year)] = (
+                (earlier[1], earlier[2]) if earlier else None,
+                (later[1], later[2]) if later else None,
+            )
+    return neighbours
+
+
+def plan_year_pages(
+    layout: PrizeLayout,
+    base_url: str,
+    routes_by_laureate: dict[str, str],
+) -> list[PageJob]:
+    neighbours = _year_neighbours(layout)
+    jobs: list[PageJob] = []
+    for (routed_category, year), grouped_records in layout.year_records.items():
+        route = layout.year_routes[(routed_category, year)]
+        # A year-routed prize can award several topics in one year, so name the category in the heading only when
+        # the year has exactly one; otherwise each recipient group carries its own.
+        year_categories = {record.category for record in grouped_records if _nonblank(record.category)}
+        display_category = next(iter(year_categories)) if len(year_categories) == 1 else ""
+        ordered_group = sorted(grouped_records, key=lambda record: record.award_record_id)
+        roll_call = _names([record.full_name for record in ordered_group])
+        # The award leads, then the recipients: a long recipient name must not push the year page's description
+        # into looking identical to the winner page's, which leads with the name.
+        if display_category:
+            title = f"{layout.ranking.prize_name} for {display_category} {year}: Winners"
+            description = _clamp(f"{layout.ranking.prize_name} for {display_category}, {year}: awarded to {roll_call}.")
+        else:
+            title = f"{layout.ranking.prize_name} {year}: Winners"
+            description = _clamp(f"{layout.ranking.prize_name}, {year}: awarded to {roll_call}.")
+        crumbs = [Breadcrumb("Home", "/"), Breadcrumb(layout.ranking.prize_name, layout.route)]
+        if routed_category is not None:
+            crumbs.append(Breadcrumb(routed_category, layout.route + f"{layout.category_slugs[routed_category]}/"))
+        crumbs.append(Breadcrumb(year, None))
+        jobs.append(
+            _page(
+                "year.html",
+                route,
+                title,
+                description,
+                crumbs,
+                prize=layout.ranking,
+                category=display_category,
+                show_group_categories=len(year_categories) > 1,
+                year=year,
+                winners=_by_motivation((record, layout.record_routes[record.award_record_id]) for record in ordered_group),
+                earlier_year=neighbours[(routed_category, year)][0],
+                later_year=neighbours[(routed_category, year)][1],
             )
         )
 
-        for (routed_category, year), grouped_records in year_records.items():
-            route = year_routes[(routed_category, year)]
-            # A year-routed prize can award several topics in one year, so name the category in the heading only when
-            # the year has exactly one; otherwise each recipient group carries its own.
-            year_categories = {record.category for record in grouped_records if _nonblank(record.category)}
-            display_category = next(iter(year_categories)) if len(year_categories) == 1 else ""
-            ordered_group = sorted(grouped_records, key=lambda record: record.award_record_id)
-            roll_call = _names([record.full_name for record in ordered_group])
-            # The award leads, then the recipients: a long recipient name must not push the year page's description
-            # into looking identical to the winner page's, which leads with the name.
-            if display_category:
-                title = f"{ranking.prize_name} for {display_category} {year}: Winners"
-                description = _clamp(f"{ranking.prize_name} for {display_category}, {year}: awarded to {roll_call}.")
-            else:
-                title = f"{ranking.prize_name} {year}: Winners"
-                description = _clamp(f"{ranking.prize_name}, {year}: awarded to {roll_call}.")
-            crumbs = [Breadcrumb("Home", "/"), Breadcrumb(ranking.prize_name, prize_routes[ranking.qid])]
+        for record in ordered_group:
+            # Name first: people search for the person, not the prize, and the name survives SERP truncation.
+            award_label = (
+                f"{layout.ranking.prize_name} for {record.category}"
+                if _nonblank(record.category)
+                else layout.ranking.prize_name
+            )
+            winner_title = f"{record.full_name} — {award_label}, {record.year}"
+            winner_description = _winner_description(record, award_label)
+            winner_crumbs = [
+                Breadcrumb("Home", "/"),
+                Breadcrumb(layout.ranking.prize_name, layout.route),
+            ]
             if routed_category is not None:
-                crumbs.append(Breadcrumb(routed_category, prize_routes[ranking.qid] + f"{category_slugs[routed_category]}/"))
-            crumbs.append(Breadcrumb(year, None))
+                winner_crumbs.append(
+                    Breadcrumb(routed_category, layout.route + f"{layout.category_slugs[routed_category]}/")
+                )
+            winner_crumbs.extend((Breadcrumb(record.year, route), Breadcrumb(record.full_name, None)))
+            facts = tuple(
+                (label, getattr(record, attribute))
+                for label, attribute in FACT_FIELDS
+                if _nonblank(getattr(record, attribute))
+            )
             jobs.append(
                 _page(
-                    "year.html",
-                    route,
-                    title,
-                    description,
-                    crumbs,
-                    prize=ranking,
-                    category=display_category,
-                    show_group_categories=len(year_categories) > 1,
-                    year=year,
-                    winners=_by_motivation((record, all_record_routes[record.award_record_id]) for record in ordered_group),
-                    earlier_year=neighbours[(routed_category, year)][0],
-                    later_year=neighbours[(routed_category, year)][1],
+                    "winner.html",
+                    layout.record_routes[record.award_record_id],
+                    winner_title,
+                    winner_description,
+                    winner_crumbs,
+                    prize=layout.ranking,
+                    record=record,
+                    facts=facts,
+                    co_laureates=tuple(
+                        (other, layout.record_routes[other.award_record_id])
+                        for other in ordered_group
+                        if other.award_record_id != record.award_record_id
+                    ),
+                    person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
+                    affiliation_routes=tuple(
+                        f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
+                        if _nonblank(affiliation.name) and affiliation.name not in AFFILIATION_BLOCKLIST
+                        else ""
+                        for affiliation in record.affiliations
+                    ),
+                    schema={
+                        **_laureate_schema(record, public_url(base_url, layout.record_routes[record.award_record_id])),
+                        "award": f"{award_label}, {record.year}",
+                    },
+                    wikipedia_url=wikipedia_search_url(record.full_name),
                 )
             )
-            year_page_count += 1
+    return jobs
 
-            for record in ordered_group:
-                # Name first: people search for the person, not the prize, and the name survives SERP truncation.
-                award_label = f"{ranking.prize_name} for {record.category}" if _nonblank(record.category) else ranking.prize_name
-                winner_title = f"{record.full_name} — {award_label}, {record.year}"
-                winner_description = _winner_description(record, award_label)
-                winner_crumbs = [
-                    Breadcrumb("Home", "/"),
-                    Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
-                ]
-                if routed_category is not None:
-                    winner_crumbs.append(
-                        Breadcrumb(routed_category, prize_routes[ranking.qid] + f"{category_slugs[routed_category]}/")
-                    )
-                winner_crumbs.extend((Breadcrumb(record.year, route), Breadcrumb(record.full_name, None)))
-                facts = tuple(
-                    (label, getattr(record, attribute))
-                    for label, attribute in FACT_FIELDS
-                    if _nonblank(getattr(record, attribute))
-                )
-                jobs.append(
-                    _page(
-                        "winner.html",
-                        all_record_routes[record.award_record_id],
-                        winner_title,
-                        winner_description,
-                        winner_crumbs,
-                        prize=ranking,
-                        record=record,
-                        facts=facts,
-                        co_laureates=tuple(
-                            (other, all_record_routes[other.award_record_id])
-                            for other in ordered_group
-                            if other.award_record_id != record.award_record_id
-                        ),
-                        person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
-                        affiliation_routes=tuple(
-                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
-                            if _nonblank(affiliation.name) and affiliation.name not in AFFILIATION_BLOCKLIST
-                            else ""
-                            for affiliation in record.affiliations
-                        ),
-                        schema={
-                            **_laureate_schema(record, public_url(base_url, all_record_routes[record.award_record_id])),
-                            "award": f"{award_label}, {record.year}",
-                        },
-                        wikipedia_url=wikipedia_search_url(record.full_name),
-                    )
-                )
-                winner_page_count += 1
 
-    subject_counts: dict[str, int] = {}
-    for record in records:
-        subject_counts[record.high_school_subject] = subject_counts.get(record.high_school_subject, 0) + 1
-    subject_order = {
-        name: index for index, name in enumerate(sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)))
-    }
-    people = plan_people(records, routes_by_laureate, all_record_routes, subject_order)
+def plan_person_pages(people: list[Laureate], base_url: str) -> list[PageJob]:
+    jobs: list[PageJob] = []
     for person in people:
         prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
         span = _year_span([record.year for record, _ in person.awards])
@@ -1646,13 +1683,15 @@ def create_site_plan(
                 },
             )
         )
+    return jobs
 
-    affiliations = plan_affiliations(records, all_record_routes, profiles_by_qid)
-    country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
-    countries = country_places["Born"]
-    affiliation_countries = plan_affiliation_countries(affiliations)
-    subjects = plan_subjects(people, subject_counts, affiliations)
-    jobs.append(
+
+def plan_subject_pages(
+    subjects: list[Subject],
+    records: list[AwardRecord],
+    record_routes: dict[str, str],
+) -> list[PageJob]:
+    jobs = [
         _page(
             "subjects.html",
             SUBJECTS_ROUTE,
@@ -1662,11 +1701,11 @@ def create_site_plan(
             subjects=tuple(subjects),
             leader=subjects[0].award_count if subjects else 0,
         )
-    )
+    ]
     for subject in subjects:
         recent = plan_recent_subject_awards(
             (record for record in records if record.high_school_subject == subject.name),
-            all_record_routes,
+            record_routes,
         )
         jobs.append(
             _page(
@@ -1726,7 +1765,11 @@ def create_site_plan(
                 recent_end_year=recent.end_year,
             )
         )
-    recorded_affiliations = sum(1 for record in records if any(_nonblank(affiliation.name) for affiliation in record.affiliations))
+    return jobs
+
+
+def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
+    jobs: list[PageJob] = []
     for label, route in COUNTRY_VIEWS:
         places = country_places[label]
         covered = len({person.qid for place in places for person in place.people})
@@ -1827,8 +1870,19 @@ def create_site_plan(
                     view_route=route,
                 )
             )
-    recorded_affiliation_countries = sum(1 for record in records if any(_nonblank(affiliation.country) for affiliation in record.affiliations))
-    jobs.append(
+    return jobs
+
+
+def plan_affiliation_country_pages(
+    affiliation_countries: list[AffiliationCountry],
+    records: list[AwardRecord],
+) -> list[PageJob]:
+    recorded_affiliation_countries = sum(
+        1
+        for record in records
+        if any(_nonblank(affiliation.country) for affiliation in record.affiliations)
+    )
+    jobs = [
         _page(
             "affiliation_countries.html",
             COUNTRY_AFFILIATIONS_ROUTE,
@@ -1843,7 +1897,7 @@ def create_site_plan(
             recorded=recorded_affiliation_countries,
             total=len(records),
         )
-    )
+    ]
     for place in affiliation_countries:
         jobs.append(
             _page(
@@ -1865,7 +1919,16 @@ def create_site_plan(
                 leader=place.members[0].count if place.members else 0,
             )
         )
-    jobs.append(
+    return jobs
+
+
+def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardRecord]) -> list[PageJob]:
+    recorded_affiliations = sum(
+        1
+        for record in records
+        if any(_nonblank(affiliation.name) for affiliation in record.affiliations)
+    )
+    jobs = [
         _page(
             "affiliations.html",
             AFFILIATIONS_ROUTE,
@@ -1880,7 +1943,7 @@ def create_site_plan(
             recorded=recorded_affiliations,
             total=len(records),
         )
-    )
+    ]
     for affiliation in affiliations:
         span = _year_span([link.record.year for link in affiliation.awards])
         award_count = len(affiliation.awards)
@@ -1903,8 +1966,18 @@ def create_site_plan(
                 wikipedia_url=wikipedia_search_url(affiliation.name),
             )
         )
+    return jobs
 
-    # The homepage is planned last: it reports on the whole site, so it needs the laureates and their routes.
+
+def plan_home_page(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    people: list[Laureate],
+    prize_routes: dict[str, str],
+    ranking_by_qid: dict[str, Ranking],
+    record_routes: dict[str, str],
+) -> PageJob:
+    """Plan the homepage last because it reports on laureates and routes from the whole site."""
     year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
     latest_year = max(year_prefixes)
     # At most two per prize, so the list shows the breadth of a season rather than one prize's whole cohort.
@@ -1926,33 +1999,34 @@ def create_site_plan(
         (person for person in people if len(person.awards) > 1),
         key=lambda person: (-len(person.awards), _surname_key(person.name)),
     )
-    jobs.append(
-        _page(
-            "index.html",
-            "/",
-            "Prestigious Awards and Winners",
-            _clamp(
-                f"{len(people):,} laureates and {len(records):,} awards across {len(rankings)} international prizes, "
-                f"{min(year_prefixes)}-{latest_year}. Ranked, cross-referenced, and browsable by person."
-            ),
-            (),
-            prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
-            totals=(
-                (f"{len(people):,}", "laureates"),
-                (f"{len(records):,}", "awards"),
-                (f"{len(rankings)}", "prizes"),
-                (f"{min(year_prefixes)}-{latest_year}", "years"),
-                (f"{len({record.birth_country for record in records if _nonblank(record.birth_country)})}", "countries"),
-            ),
-            recent=tuple(
-                (record, all_record_routes[record.award_record_id], ranking_by_qid[record.award_wikidata_qid])
-                for record in recent[:HOMEPAGE_ROWS]
-            ),
-            decorated=tuple(decorated[:HOMEPAGE_ROWS]),
-        )
+    return _page(
+        "index.html",
+        "/",
+        "Prestigious Awards and Winners",
+        _clamp(
+            f"{len(people):,} laureates and {len(records):,} awards across {len(rankings)} international prizes, "
+            f"{min(year_prefixes)}-{latest_year}. Ranked, cross-referenced, and browsable by person."
+        ),
+        (),
+        prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
+        totals=(
+            (f"{len(people):,}", "laureates"),
+            (f"{len(records):,}", "awards"),
+            (f"{len(rankings)}", "prizes"),
+            (f"{min(year_prefixes)}-{latest_year}", "years"),
+            (f"{len({record.birth_country for record in records if _nonblank(record.birth_country)})}", "countries"),
+        ),
+        recent=tuple(
+            (record, record_routes[record.award_record_id], ranking_by_qid[record.award_wikidata_qid])
+            for record in recent[:HOMEPAGE_ROWS]
+        ),
+        decorated=tuple(decorated[:HOMEPAGE_ROWS]),
     )
 
+
+def plan_people_index(people: list[Laureate]) -> list[PageJob]:
     page_count = max(1, -(-len(people) // PEOPLE_PER_PAGE))
+    jobs: list[PageJob] = []
     for number in range(1, page_count + 1):
         page_people = people[(number - 1) * PEOPLE_PER_PAGE : number * PEOPLE_PER_PAGE]
         route = PEOPLE_ROUTE if number == 1 else f"{PEOPLE_ROUTE}page-{number}/"
@@ -1977,9 +2051,12 @@ def create_site_plan(
                 next_route=("" if number == page_count else f"{PEOPLE_ROUTE}page-{number + 1}/"),
             )
         )
+    return jobs
 
+
+def plan_map_pages(records: list[AwardRecord]) -> list[PageJob]:
     atlas_payload = map_json(map_payload(records))
-    jobs.append(
+    jobs = [
         _page(
             "map.html",
             MAP_ROUTE,
@@ -1989,7 +2066,7 @@ def create_site_plan(
             payload=atlas_payload,
             initial_subject="",
         )
-    )
+    ]
     for subject_name in SUBJECTS:
         jobs.append(
             _page(
@@ -2002,69 +2079,146 @@ def create_site_plan(
                 initial_subject=subject_name,
             )
         )
+    return jobs
 
-    jobs.append(
-        _page(
-            "explorer.html",
-            EXPLORER_ROUTE,
-            "Awards Data Explorer",
-            "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
-            (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
-            payload=explorer_json(explorer_payload(rankings, records, routes_by_laureate)),
-            generated=generated,
-        )
+
+def plan_explorer_page(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    routes_by_laureate: dict[str, str],
+    generated: str,
+) -> PageJob:
+    return _page(
+        "explorer.html",
+        EXPLORER_ROUTE,
+        "Awards Data Explorer",
+        "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
+        (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
+        payload=explorer_json(explorer_payload(rankings, records, routes_by_laureate)),
+        generated=generated,
     )
 
+
+def plan_nearby_page(
+    records: list[AwardRecord],
+    routes_by_laureate: dict[str, str],
+    affiliations: list[Affiliation],
+) -> PageJob:
     nearby = nearby_payload(records, routes_by_laureate, affiliations)
-    jobs.append(
-        _page(
-            "nearby.html",
-            NEARBY_ROUTE,
-            "Award Winners Near You",
-            "Find the laureate birthplaces and institutions closest to you, ranked by distance, using your browser's location.",
-            (Breadcrumb("Home", "/"), Breadcrumb("Nearby", None)),
-            payload=map_json(nearby),
-            places=len(nearby["places"]),
-            laureates=len(nearby["people"]),
-        )
+    return _page(
+        "nearby.html",
+        NEARBY_ROUTE,
+        "Award Winners Near You",
+        "Find the laureate birthplaces and institutions closest to you, ranked by distance, using your browser's location.",
+        (Breadcrumb("Home", "/"), Breadcrumb("Nearby", None)),
+        payload=map_json(nearby),
+        places=len(nearby["places"]),
+        laureates=len(nearby["people"]),
     )
 
-    jobs.append(
-        _page(
-            "about.html",
-            ABOUT_ROUTE,
-            "About This Site",
-            _clamp(
-                f"A free, static reference to {len(rankings)} international prizes and their {len(people):,} recipients, "
-                "sorted by school subject, country, and institution."
-            ),
-            (Breadcrumb("Home", "/"), Breadcrumb("About", None)),
-            totals=(
-                (f"{len(people):,}", "laureates"),
-                (f"{len(records):,}", "awards"),
-                (f"{len(rankings)}", "prizes"),
-                (f"{min(year_prefixes)}-{latest_year}", "years"),
-                (f"{len(subjects)}", "subjects"),
-                (f"{len(countries)}", "countries"),
-                (f"{len(affiliations):,}", "institutions"),
-            ),
-        )
+
+def plan_about_page(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    people: list[Laureate],
+    countries: list[Place],
+    subjects: list[Subject],
+    affiliations: list[Affiliation],
+) -> PageJob:
+    year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
+    latest_year = max(year_prefixes)
+    return _page(
+        "about.html",
+        ABOUT_ROUTE,
+        "About This Site",
+        _clamp(
+            f"A free, static reference to {len(rankings)} international prizes and their {len(people):,} recipients, "
+            "sorted by school subject, country, and institution."
+        ),
+        (Breadcrumb("Home", "/"), Breadcrumb("About", None)),
+        totals=(
+            (f"{len(people):,}", "laureates"),
+            (f"{len(records):,}", "awards"),
+            (f"{len(rankings)}", "prizes"),
+            (f"{min(year_prefixes)}-{latest_year}", "years"),
+            (f"{len(subjects)}", "subjects"),
+            (f"{len(countries)}", "countries"),
+            (f"{len(affiliations):,}", "institutions"),
+        ),
     )
 
+
+def create_site_plan(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    base_url: str,
+    generated: str,
+    profiles: Iterable[AffiliationProfile] = (),
+) -> SitePlan:
+    if not rankings or not records:
+        raise BuildFailure("ranking or awards table is empty")
+
+    ranking_by_qid = index_rankings(rankings)
+    records_by_qid = index_records(records)
+    profiles_by_qid = index_profiles(profiles)
+    if set(ranking_by_qid) != set(records_by_qid):
+        raise BuildFailure("ranking rows do not match live awards")
+    for qid, prize_records in records_by_qid.items():
+        if ranking_by_qid[qid].prize_name != prize_records[0].prize_name:
+            raise BuildFailure(f"ranking prize mismatch qid={qid}")
+
+    rankings = sorted(rankings, key=lambda ranking: ranking.score, reverse=True)
+    routes_by_laureate = person_routes(records)
+    prize_routes = {ranking.qid: f"/{ranking.slug}/" for ranking in rankings}
+    record_routes: dict[str, str] = {}
+    jobs: list[PageJob] = []
+    for ranking in rankings:
+        layout = layout_prize(ranking, records_by_qid[ranking.qid])
+        record_routes.update(layout.record_routes)
+        jobs.extend(plan_category_pages(layout))
+        jobs.append(plan_prize_page(layout))
+        jobs.append(plan_winners_page(layout))
+        jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate))
+
+    subject_counts = Counter(record.high_school_subject for record in records)
+    subject_order = {
+        name: index for index, name in enumerate(sorted(subject_counts, key=lambda subject: (-subject_counts[subject], subject)))
+    }
+    people = plan_people(records, routes_by_laureate, record_routes, subject_order)
+    affiliations = plan_affiliations(records, record_routes, profiles_by_qid)
+    country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
+    countries = country_places["Born"]
+    affiliation_countries = plan_affiliation_countries(affiliations)
+    subjects = plan_subjects(people, subject_counts, affiliations)
+
+    jobs.extend(plan_person_pages(people, base_url))
+    jobs.extend(plan_subject_pages(subjects, records, record_routes))
+    jobs.extend(plan_country_pages(country_places))
+    jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
+    jobs.extend(plan_affiliation_pages(affiliations, records))
+    jobs.append(plan_home_page(rankings, records, people, prize_routes, ranking_by_qid, record_routes))
+    jobs.extend(plan_people_index(people))
+    jobs.extend(plan_map_pages(records))
+    jobs.append(plan_explorer_page(rankings, records, routes_by_laureate, generated))
+    jobs.append(plan_nearby_page(records, routes_by_laureate, affiliations))
+    jobs.append(plan_about_page(rankings, records, people, countries, subjects, affiliations))
+
+    year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
     routes = [job.route for job in jobs]
     if len(routes) != len(set(routes)):
         raise BuildFailure("duplicate public route")
+    pages = Counter(job.template for job in jobs)
     return SitePlan(
         tuple(jobs),
         len(rankings),
-        category_page_count,
-        year_page_count,
-        winner_page_count,
+        pages["category.html"],
+        pages["year.html"],
+        pages["winner.html"],
         len(records),
         len(people),
         len(countries),
         len(subjects),
-        f"{min(year_prefixes)}-{latest_year}",
+        f"{min(year_prefixes)}-{max(year_prefixes)}",
     )
 
 
