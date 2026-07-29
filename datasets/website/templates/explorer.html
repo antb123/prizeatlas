@@ -85,8 +85,17 @@
   .explorer .chart-person-link { cursor: pointer; }
   .explorer .chart-person-link:hover .bar-label { fill: var(--accent); text-decoration: underline; }
   .explorer .bar-value { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
-  .explorer .dot { fill: var(--accent); fill-opacity: .45; stroke: var(--bg); stroke-width: 1; }
-  .explorer .dot.org { fill: #b45309; }
+  .explorer .dot-born { fill: #b45309; }
+  .explorer .dot-affiliated { fill: var(--accent); }
+  .explorer .link-line { stroke: var(--line); stroke-width: 3; }
+  .explorer .gap-value { font-size: 12px; font-variant-numeric: tabular-nums; fill: var(--muted); }
+  .explorer .gap-value.gain { fill: var(--accent); font-weight: 600; }
+  .explorer .legend { display: flex; gap: 1.5rem; margin: 0 0 .75rem; font-size: .82rem; color: var(--muted); }
+  .explorer .legend i { display: inline-block; width: .65em; height: .65em; border-radius: 50%; margin-right: .45em; }
+  .explorer .swatch-born { background: #b45309; }
+  .explorer .swatch-affiliated { background: var(--accent); }
+  .explorer .range-bar { fill: var(--accent-soft); }
+  .explorer .median-tick { stroke: var(--accent); stroke-width: 3; }
   .explorer .chart-select {
     margin: 0 0 1rem; padding: .4rem .6rem; font: inherit;
     border: 1px solid var(--line); border-radius: 6px; background: #fff;
@@ -176,15 +185,28 @@
     <figure id="country-chart"></figure>
   </section>
 
-  <section aria-labelledby="scatter-h">
-    <h2 id="scatter-h">Winning often versus winning big</h2>
+  <section aria-labelledby="age-h">
+    <h2 id="age-h">Age at first win, by subject</h2>
     <p class="section-note">
-      Recorded awards on the horizontal axis, total points on the vertical.
-      Both are discrete, so laureates land on a lattice: one bubble per position, its area the number of laureates sharing it.
-      The right edge belongs to serial winners; the top edge to those whose few wins carry the most weight.
-      Amber bubbles are organizations.
+      How old laureates were when they won their first recorded award, grouped by subject.
+      The bar spans the middle half of each subject — a quarter won younger, a quarter older — and the notch is the median.
+      Mathematics stands apart because the Fields Medal is only awarded under 40. Organizations and laureates with no birth year are excluded.
     </p>
-    <figure id="scatter-chart"></figure>
+    <figure id="age-chart"></figure>
+  </section>
+
+  <section aria-labelledby="flow-h">
+    <h2 id="flow-h">Where laureates go to win</h2>
+    <p class="section-note">
+      Each country's laureates per million people, counted twice: by where they were born, and by where they were working when the award came.
+      A bar running right means the country hosts more laureates than it raises; running left means its laureates won elsewhere.
+      Needs a published population figure and at least 5 laureates on one of the two measures.
+    </p>
+    <p class="legend">
+      <span><i class="swatch-born"></i>Born there</span>
+      <span><i class="swatch-affiliated"></i>Affiliated there</span>
+    </p>
+    <figure id="flow-chart"></figure>
   </section>
 
   <p class="explorer-note">
@@ -200,8 +222,9 @@
 const DATA = JSON.parse(document.getElementById("explorer-data").textContent);
 const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
+const SUBJECTS = DATA.subjects;           // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
-const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
+const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category, subjectIdx], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -474,44 +497,101 @@ countryLookup
   draw("bc");
 }
 
-/* ---------- scatter: count vs points ---------- */
+/* ---------- age at first win, by subject ---------- */
 {
-  const width = 860, height = 420, padL = 46, padR = 16, padT = 16, padB = 40;
-  const plotW = width - padL - padR, plotH = height - padT - padB;
-  const maxC = Math.max(...PEOPLE.map((p) => p.c));
-  const maxP = Math.ceil(Math.max(...PEOPLE.map((p) => p.p)));
-  const x = (c) => padL + ((c - 1) / (maxC - 1)) * plotW;
-  const y = (p) => padT + plotH - (p / maxP) * plotH;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Awards count versus points per laureate" });
-  for (let c = 1; c <= maxC; c++) {
-    el("line", { x1: x(c), y1: padT, x2: x(c), y2: padT + plotH, class: "grid" }, svg);
-    text(svg, x(c), padT + plotH + 18, String(c), "axis", "middle");
-  }
-  for (let p = 0; p <= maxP; p++) {
-    el("line", { x1: padL, y1: y(p), x2: width - padR, y2: y(p), class: "grid" }, svg);
-    text(svg, padL - 8, y(p) + 4, p.toFixed(1), "axis", "end");
-  }
-  text(svg, padL + plotW / 2, height - 4, "recorded awards", "axis", "middle");
-  text(svg, 12, padT + plotH / 2, "points", "axis", "middle").setAttribute("transform", `rotate(-90 12 ${padT + plotH / 2})`);
-  const cells = new Map();                            // (awards, points, organization) -> laureates sharing that spot
+  const MIN_LAUREATES = 20;                           // a handful of ages is an anecdote, not a distribution
+  const quantile = (sorted, q) => {                   // ages are integers; interpolate between the straddling pair
+    const pos = (sorted.length - 1) * q, low = Math.floor(pos);
+    return sorted[low] + (sorted[Math.ceil(pos)] - sorted[low]) * (pos - low);
+  };
+
+  const ages = new Map();
   for (const p of PEOPLE) {
-    const key = `${p.c}|${p.p}|${p.o}`;
-    if (!cells.has(key)) cells.set(key, { c: p.c, p: p.p, o: p.o, n: 0, names: [] });
-    const cell = cells.get(key);
-    cell.n += 1;
-    if (cell.names.length < 3) cell.names.push(p.n);
+    if (p.o || !p.by || !p.a.length) continue;
+    const [year, , , subjectIdx] = p.a[0];            // p.a is sorted by year, so this is the first win
+    const age = year - p.by;
+    if (age < 10 || age > 100) continue;              // guards against bad birth years in the source data
+    if (!ages.has(subjectIdx)) ages.set(subjectIdx, []);
+    ages.get(subjectIdx).push(age);
   }
-  const bubbles = [...cells.values()].sort((a, b) => b.n - a.n);
-  const maxN = bubbles[0].n;
-  for (const cell of bubbles) {
-    const r = 4 + Math.sqrt(cell.n / maxN) * 22;
-    const dot = el("circle", { cx: x(cell.c), cy: y(cell.p), r: r.toFixed(1), class: "dot" + (cell.o ? " org" : "") }, svg);
-    const noun = cell.o ? "organization" : "laureate";
-    const who = cell.n > cell.names.length ? `${cell.names.join(", ")} and ${cell.n - cell.names.length} more` : cell.names.join(", ");
-    const tip = el("title", {}, dot);
-    tip.textContent = `${cell.n} ${noun}${cell.n === 1 ? "" : "s"} — ${cell.c} award${cell.c === 1 ? "" : "s"}, ${cell.p.toFixed(2)} points · ${who}`;
+
+  const rows = [];
+  for (const [subjectIdx, values] of ages) {
+    if (values.length < MIN_LAUREATES) continue;
+    values.sort((a, b) => a - b);
+    rows.push({ name: SUBJECTS[subjectIdx], n: values.length, q1: quantile(values, .25), median: quantile(values, .5), q3: quantile(values, .75) });
   }
-  document.getElementById("scatter-chart").appendChild(svg);
+  rows.sort((a, b) => a.median - b.median || a.name.localeCompare(b.name));
+
+  const rowH = 30, labelW = 130, padR = 16, width = 860, padT = 26;
+  const plotL = labelW, plotR = width - padR;
+  const lo = Math.floor(Math.min(...rows.map((r) => r.q1)) / 10) * 10;
+  const hi = Math.ceil(Math.max(...rows.map((r) => r.q3)) / 10) * 10;
+  const x = (age) => plotL + ((age - lo) / (hi - lo)) * (plotR - plotL);
+  const height = padT + rows.length * rowH + 10;
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Age at first win by subject" });
+  for (let age = lo; age <= hi; age += 5) {
+    el("line", { x1: x(age), y1: padT - 8, x2: x(age), y2: height - 10, class: "grid" }, svg);
+    text(svg, x(age), padT - 14, String(age), "axis", "middle");
+  }
+  rows.forEach((r, i) => {
+    const y = padT + i * rowH + rowH / 2;
+    text(svg, labelW - 10, y + 4, r.name, "bar-label", "end");
+    el("rect", { x: x(r.q1), y: y - 8, width: Math.max(2, x(r.q3) - x(r.q1)), height: 16, rx: 2, class: "range-bar" }, svg);
+    el("line", { x1: x(r.median), y1: y - 10, x2: x(r.median), y2: y + 10, class: "median-tick" }, svg);
+    const hit = el("rect", { x: 0, y: padT + i * rowH, width, height: rowH, fill: "transparent" }, svg);
+    const tip = el("title", {}, hit);
+    tip.textContent = `${r.name} — median ${r.median.toFixed(0)}, middle half ${r.q1.toFixed(0)}–${r.q3.toFixed(0)} (${r.n} laureates)`;
+  });
+  document.getElementById("age-chart").appendChild(svg);
+}
+
+/* ---------- born versus affiliated, per million ---------- */
+{
+  const MIN_LAUREATES = 5;                            // one laureate over a small population is noise, not a rate
+  function tally(field) {
+    const counts = new Map();
+    for (const p of PEOPLE) {
+      const value = p[field];
+      const indices = Array.isArray(value) ? value : value === null ? [] : [value];
+      for (const i of indices) counts.set(i, (counts.get(i) || 0) + 1);
+    }
+    return counts;
+  }
+  const born = tally("bc"), affiliated = tally("ac");
+
+  const rows = [];
+  COUNTRIES.forEach((name, i) => {
+    const population = POPULATION[i];
+    const b = born.get(i) || 0, a = affiliated.get(i) || 0;
+    if (!population || Math.max(b, a) < MIN_LAUREATES) return;
+    const bornRate = (b / population) * 1e6, hereRate = (a / population) * 1e6;
+    rows.push({ name, b, a, bornRate, hereRate, gap: hereRate - bornRate });
+  });
+  rows.sort((first, second) => second.gap - first.gap);
+
+  const rowH = 22, labelW = 150, gapW = 62, width = 860, padT = 26;
+  const plotL = labelW, plotR = width - gapW;
+  const max = Math.ceil(Math.max(...rows.map((r) => Math.max(r.bornRate, r.hereRate))));
+  const x = (rate) => plotL + (rate / max) * (plotR - plotL);
+  const height = padT + rows.length * rowH + 10;
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Laureates per million by birth country and affiliation country" });
+  for (let tick = 0; tick <= max; tick++) {
+    el("line", { x1: x(tick), y1: padT - 8, x2: x(tick), y2: height - 10, class: "grid" }, svg);
+    text(svg, x(tick), padT - 14, String(tick), "axis", "middle");
+  }
+  rows.forEach((r, i) => {
+    const y = padT + i * rowH + rowH / 2;
+    text(svg, labelW - 10, y + 4, r.name.length > 20 ? r.name.slice(0, 19) + "…" : r.name, "bar-label", "end");
+    el("line", { x1: x(r.bornRate), y1: y, x2: x(r.hereRate), y2: y, class: "link-line" }, svg);
+    el("circle", { cx: x(r.bornRate), cy: y, r: 4.5, class: "dot-born" }, svg);
+    el("circle", { cx: x(r.hereRate), cy: y, r: 4.5, class: "dot-affiliated" }, svg);
+    text(svg, width - 8, y + 4, (r.gap >= 0 ? "+" : "−") + Math.abs(r.gap).toFixed(2), "gap-value" + (r.gap >= 0 ? " gain" : ""), "end");
+    const hit = el("rect", { x: 0, y: padT + i * rowH, width, height: rowH, fill: "transparent" }, svg);
+    const tip = el("title", {}, hit);
+    tip.textContent = `${r.name} — ${r.b} born (${r.bornRate.toFixed(2)} per million), ${r.a} affiliated (${r.hereRate.toFixed(2)} per million)`;
+  });
+  document.getElementById("flow-chart").appendChild(svg);
 }
 
 renderBoard();

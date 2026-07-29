@@ -34,6 +34,12 @@
       </ul>
     </section>
     {% endif %}
+    {% set correction = correction_href(record.award_record_id) %}
+    {% if correction %}
+    <p class="correction">Spotted something wrong on this page? <a href="{{ correction }}">Report a correction for this record</a>
+      <span class="record-id">{{ record.award_record_id }}</span>
+    </p>
+    {% endif %}
   </div>
   {% if facts or record.prize_share %}
   <aside class="facts" aria-label="Facts">

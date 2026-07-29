@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote_plus, urlsplit, urlunsplit
+from urllib.parse import quote, quote_plus, urlsplit, urlunsplit
 from xml.sax.saxutils import escape as xml_escape
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
@@ -42,6 +42,7 @@ TEMPLATES = (
     "base.html",
     "index.html",
     "prize.html",
+    "winners.html",
     "category.html",
     "year.html",
     "winner.html",
@@ -57,6 +58,7 @@ TEMPLATES = (
     "subjects.html",
     "subject.html",
     "subject_affiliations.html",
+    "subject_recent.html",
     "explorer.html",
     "map.html",
     "about.html",
@@ -89,6 +91,9 @@ AFFILIATION_ROWS = 40
 # Recorded in the affiliation column but not an institution.
 AFFILIATION_BLOCKLIST = frozenset({"Freelance"})
 PRIZE_PAGE_YEARS = 30
+SUBJECT_RECENT_YEARS = 3
+# The prize page shows recent years only. Its complete index of recipients lives one segment below.
+WINNERS_SEGMENT = "winners"
 DESCRIPTION_LIMIT = 160
 # Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
 # category yields a page per award; they browse by year instead.
@@ -290,9 +295,19 @@ class Subject:
     name: str
     route: str
     affiliations_route: str
+    recent_route: str
     award_count: int
     people: tuple[Laureate, ...]
     affiliations: tuple[RankedAffiliation, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class RecentSubjectAwards:
+    start_year: int
+    end_year: int
+    recipient_count: int
+    prize_count: int
+    groups: tuple[tuple[str, tuple[tuple[str, tuple[tuple[AwardRecord, str], ...]], ...]], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -306,6 +321,7 @@ class SitePlan:
     person_count: int
     country_count: int
     subject_count: int
+    year_span: str
 
 
 def slugify(value: str) -> str:
@@ -349,6 +365,31 @@ def validate_official_url(value: str) -> None:
 
 def public_url(base_url: str, route: str) -> str:
     return base_url + route.lstrip("/")
+
+
+def read_env(path: Path) -> dict[str, str]:
+    """Read KEY=VALUE lines from a .env file. A missing file is not an error — every setting it holds is optional."""
+    if not path.exists():
+        return {}
+    settings = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        key, separator, value = stripped.partition("=")
+        if separator:
+            settings[key.strip()] = value.strip().strip("\"'")
+    return settings
+
+
+def correction_mailto(email: str, page_url: str, record_id: str = "") -> str:
+    """Prefilled mailto: for a data correction. Empty when no address is configured, which hides the link entirely."""
+    if not email:
+        return ""
+    subject = f"Correction: {record_id or page_url}"
+    record_line = f"Record: {record_id}\n" if record_id else ""
+    body = f"Page: {page_url}\n{record_line}\nWhat is wrong:\n\n\nWhere it can be checked:\n\n"
+    return f"mailto:{quote(email)}?subject={quote(subject)}&body={quote(body)}"
 
 
 def wikipedia_search_url(name: str) -> str:
@@ -398,11 +439,17 @@ def explorer_payload(
     family_index = {ranking.prize_name: index for index, ranking in enumerate(rankings)}
     people: dict[str, dict[str, Any]] = {}
     countries: dict[str, int] = {}
+    subjects: dict[str, int] = {}
 
     def country_index(name: str) -> int:
         if name not in countries:
             countries[name] = len(countries)
         return countries[name]
+
+    def subject_index(name: str) -> int:
+        if name not in subjects:
+            subjects[name] = len(subjects)
+        return subjects[name]
 
     for record in records:
         year = _year_prefix(record.year, record.award_record_id)
@@ -425,7 +472,7 @@ def explorer_payload(
                 "by": None,
             },
         )
-        person["a"].append([year, family_index[record.prize_name], record.category or ""])
+        person["a"].append([year, family_index[record.prize_name], record.category or "", subject_index(record.high_school_subject)])
         if person["by"] is None:
             birth_match = YEAR_PREFIX.match(record.birth_date or "") or YEAR_PREFIX.match(record.birth_year or "")
             if birth_match:
@@ -444,7 +491,7 @@ def explorer_payload(
     ranked: list[dict[str, Any]] = []
     for person in people.values():
         person["a"].sort()
-        points = round(sum(rankings[family].score / 100 for _, family, _ in person["a"]), 2)
+        points = round(sum(rankings[family].score / 100 for _, family, _, _ in person["a"]), 2)
         ranked.append(
             {
                 "n": person["n"],
@@ -466,6 +513,7 @@ def explorer_payload(
     return {
         "families": [{"name": ranking.prize_name, "score": ranking.score} for ranking in rankings],
         "countries": country_names,
+        "subjects": list(subjects),
         "population": load_population(country_names, population_file),
         "people": ranked,
     }
@@ -1111,12 +1159,36 @@ def plan_subjects(people: list[Laureate], subject_counts: dict[str, int], affili
                 name,
                 route,
                 f"{route}{COUNTRY_AFFILIATIONS_SEGMENT}/",
+                f"{route}recent/",
                 subject_counts[name],
                 tuple(members),
                 by_subject.get(name, ()),
             )
         )
     return subjects
+
+
+def plan_recent_subject_awards(records: Iterable[AwardRecord], record_routes: dict[str, str]) -> RecentSubjectAwards:
+    subject_records = list(records)
+    latest_year = max(_year_prefix(record.year, record.award_record_id) for record in subject_records)
+    earliest_year = latest_year - SUBJECT_RECENT_YEARS + 1
+    recent_records = [
+        record
+        for record in subject_records
+        if earliest_year <= _year_prefix(record.year, record.award_record_id) <= latest_year
+    ]
+    recent_records.sort(key=lambda record: (record.prize_name, record.full_name, record.award_record_id))
+    recent_records.sort(key=lambda record: (_year_prefix(record.year, record.award_record_id), record.year), reverse=True)
+    by_year: dict[str, dict[str, list[tuple[AwardRecord, str]]]] = {}
+    for record in recent_records:
+        by_year.setdefault(record.year, {}).setdefault(record.prize_name, []).append(
+            (record, record_routes[record.award_record_id])
+        )
+    groups = tuple(
+        (year, tuple((prize_name, tuple(recipients)) for prize_name, recipients in prizes.items()))
+        for year, prizes in by_year.items()
+    )
+    return RecentSubjectAwards(earliest_year, latest_year, len(recent_records), sum(len(prizes) for _, prizes in groups), groups)
 
 
 def create_site_plan(
@@ -1319,15 +1391,14 @@ def create_site_plan(
             return tuple(result)
 
         prize_title = f"{ranking.prize_name}: Winners by Year"
+        prize_span = _year_span([record.year for record in prize_records])
+        winners_route = prize_routes[ranking.qid] + f"{WINNERS_SEGMENT}/"
         jobs.append(
             _page(
                 "prize.html",
                 prize_routes[ranking.qid],
                 prize_title,
-                _clamp(
-                    f"All {len(prize_records)} {ranking.prize_name} laureates, {_year_span([record.year for record in prize_records])}. "
-                    f"{ranking.blurb}"
-                ),
+                _clamp(f"All {len(prize_records)} {ranking.prize_name} laureates, {prize_span}. {ranking.blurb}"),
                 (Breadcrumb("Home", "/"), Breadcrumb(ranking.prize_name, None)),
                 prize=ranking,
                 routed_categories=routed_categories,
@@ -1335,6 +1406,33 @@ def create_site_plan(
                 year_links=tuple(direct_years),
                 recent_groups=group_prize_records(recent),
                 recent_years=PRIZE_PAGE_YEARS,
+                winners_route=winners_route,
+            )
+        )
+
+        # One page listing every recipient of the prize. The prize page above stops at the recent years, and only the
+        # prizes with standing categories have complete lists beneath them, so without this a crawler cannot reach the
+        # whole roll of an uncategorized prize from anything but its individual year pages.
+        ascending = sorted(
+            prize_records,
+            key=lambda record: (_year_prefix(record.year, record.award_record_id), record.year, record.award_record_id),
+        )
+        jobs.append(
+            _page(
+                "winners.html",
+                winners_route,
+                f"{ranking.prize_name}: every winner",
+                _clamp(f"All {len(prize_records)} {ranking.prize_name} recipients, {prize_span}, in one list with a link to every award."),
+                (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb(ranking.prize_name, prize_routes[ranking.qid]),
+                    Breadcrumb("Every winner", None),
+                ),
+                prize=ranking,
+                prize_route=prize_routes[ranking.qid],
+                routed_categories=routed_categories,
+                winners=tuple((record, all_record_routes[record.award_record_id]) for record in ascending),
+                span=prize_span,
             )
         )
 
@@ -1482,6 +1580,10 @@ def create_site_plan(
         )
     )
     for subject in subjects:
+        recent = plan_recent_subject_awards(
+            (record for record in records if record.high_school_subject == subject.name),
+            all_record_routes,
+        )
         jobs.append(
             _page(
                 "subject.html",
@@ -1515,6 +1617,29 @@ def create_site_plan(
                 ),
                 subject=subject,
                 leader=subject.affiliations[0].count if subject.affiliations else 0,
+            )
+        )
+        jobs.append(
+            _page(
+                "subject_recent.html",
+                subject.recent_route,
+                f"Recent {subject.name} prizes and recipients",
+                _clamp(
+                    f"{recent.recipient_count} recipients from {recent.prize_count} {subject.name} prize "
+                    f"{'edition' if recent.prize_count == 1 else 'editions'}, {recent.start_year}-{recent.end_year}."
+                ),
+                (
+                    Breadcrumb("Home", "/"),
+                    Breadcrumb("Subjects", SUBJECTS_ROUTE),
+                    Breadcrumb(subject.name, subject.route),
+                    Breadcrumb("Recent", None),
+                ),
+                subject=subject,
+                recent_groups=recent.groups,
+                recent_recipient_count=recent.recipient_count,
+                recent_prize_count=recent.prize_count,
+                recent_start_year=recent.start_year,
+                recent_end_year=recent.end_year,
             )
         )
     recorded_affiliations = sum(1 for record in records if any(_nonblank(affiliation.name) for affiliation in record.affiliations))
@@ -1841,6 +1966,7 @@ def create_site_plan(
         len(people),
         len(countries),
         len(subjects),
+        f"{min(year_prefixes)}-{latest_year}",
     )
 
 
@@ -1901,6 +2027,106 @@ def write_robots(output: Path, base_url: str) -> None:
     (output / "robots.txt").write_text(body, encoding="utf-8")
 
 
+def write_llms_txt(output: Path, base_url: str, plan: SitePlan, rankings: Iterable[Ranking]) -> None:
+    """Write /llms.txt: what the site holds, how its URLs are shaped, and where a machine reader should start.
+
+    The pages are already plain HTML, so this file guides rather than restates them. An agent that can build a URL from
+    a name does not have to crawl, and one that reads the whole sitemap learns nothing about which page answers what.
+    """
+    categories: dict[str, list[PageJob]] = {}
+    for job in plan.jobs:
+        if job.template == "category.html":
+            categories.setdefault(job.context["prize"].qid, []).append(job)
+
+    entries: list[str] = []
+    for ranking in sorted(rankings, key=lambda ranking: ranking.score, reverse=True):
+        prize_route = f"/{ranking.slug}/"
+        entries.append(
+            f"- [Every {ranking.prize_name} winner]({public_url(base_url, prize_route + WINNERS_SEGMENT + '/')}): "
+            f"score {ranking.score}/100. {ranking.blurb} Awarding body: {ranking.url}"
+        )
+        prize_categories = sorted(categories.get(ranking.qid, ()), key=lambda job: job.route)
+        indexes = "its categories and every award year" if prize_categories else "every award year"
+        entries.append(f"  - [{ranking.prize_name} by year]({public_url(base_url, prize_route)}): {indexes}")
+        for job in prize_categories:
+            entries.append(f"  - [{job.title}]({public_url(base_url, job.route)}): {job.description}")
+    prizes = "\n".join(entries)
+
+    subjects = "\n".join(
+        f"- [{job.title}]({public_url(base_url, job.route)}): {job.description} "
+        f"[Recent {job.context['subject'].name} prizes and recipients]"
+        f"({public_url(base_url, job.context['subject'].recent_route)}): latest three calendar years in the data."
+        for job in sorted((job for job in plan.jobs if job.template == "subject.html"), key=lambda job: job.route)
+    )
+    institution_count = sum(1 for job in plan.jobs if job.template == "affiliation.html")
+    body = f"""# Awards
+
+> A free, static reference to {plan.prize_count} international prize families and the {plan.person_count:,} people and organizations that have
+> received them, {plan.year_span}. Every prize, award year, recipient, person, country, institution, and school subject has its own page.
+
+Each of the {len(plan.jobs):,} pages is plain HTML that needs no JavaScript to read, and every route ends in a slash and is served from
+`index.html`. {public_url(base_url, "/sitemap.xml")} lists them all. Person and recipient pages embed schema.org JSON-LD — a `Person` or
+`Organization` carrying `birthDate`, `birthPlace`, `affiliation`, `award`, and a `sameAs` link to the laureate's Wikidata item — in a
+`<script type="application/ld+json">` block, which is the shortest path to one page's facts.
+
+The data is one row per recipient, compiled from each award's official record and cross-checked against Wikipedia and Wikidata. A blank
+field, or a key missing from that JSON-LD, means the value could not be confirmed, never that it was estimated. Places carry their
+present-day names, so a laureate born in Königsberg in 1904 is listed under Kaliningrad, Russia. The prestige score on each prize, and the
+points that rank individuals by it, are editorial judgements rather than measurements.
+
+## Where to start
+
+- [Prizes]({public_url(base_url, "/")}): the {plan.prize_count} award families, ranked by prestige score, each opening onto its categories, years, and recipients
+- [People]({public_url(base_url, PEOPLE_ROUTE)}): every recipient by surname; a person's page gathers all of their awards
+- Every winner of one prize in a single list: see the {plan.prize_count} `/{{prize}}/{WINNERS_SEGMENT}/` pages named under "Winner lists" below
+- [Countries]({public_url(base_url, COUNTRIES_ROUTE)}): {plan.country_count} countries of birth, with companion views by award-time institution and by death
+- [Institutions]({public_url(base_url, AFFILIATIONS_ROUTE)}): the universities, laboratories, and organizations where the recognized work was done
+- [Subjects]({public_url(base_url, SUBJECTS_ROUTE)}): the same awards regrouped under {plan.subject_count} school subjects
+- [About]({public_url(base_url, ABOUT_ROUTE)}): scope, method, and the biases this collection inherits from the prizes themselves
+
+## URL patterns
+
+Every slug is lowercase ASCII with hyphens for everything else: "Ngô Bao Châu" is `ngo-bao-chau`, "Earth Science" is `earth-science`.
+
+- `/{{prize}}/{WINNERS_SEGMENT}/` — every recipient of one prize in one table: year, category, and a link to each award
+- `/{{prize}}/{{category}}/{{year}}/{{name}}/` — one recipient of one award, with the citation. Prizes with a single standing category, or
+  with a topic chosen afresh each year, drop the `{{category}}` segment.
+- `/{{prize}}/{{category}}/{{year}}/` and `/{{prize}}/{{category}}/` — one award year, and one category across its years
+- `/people/{{name}}/` — one person and every award they hold
+- `/countries/{{country}}/`, `/countries/awarded/{{country}}/`, `/countries/died/{{country}}/` — laureates by birth, by institution at the
+  time of the award, and by death
+- `/countries/affiliations/{{country}}/` — the institutions in one country
+- `/affiliations/{{institution}}/` — one institution and its laureates
+- `/subjects/{{subject}}/` — one school subject
+- `/subjects/{{subject}}/recent/` — that subject's prize recipients from its latest recorded year and the two preceding calendar years
+
+The individual country and institution lists — {institution_count:,} institutions alone — are too many to name here; take them from the two
+indexes above or build them from these patterns.
+
+## Winner lists
+
+One entry per prize, each with its complete list of recipients first, then the by-year view and any category lists beneath it. A category
+list is complete for that category; the by-year page names winners only for the most recent {PRIZE_PAGE_YEARS} award years.
+
+{prizes}
+
+## Subject lists
+
+The same awards regrouped under the school subject each belongs to, so one page gathers every laureate in a field across all {plan.prize_count} prizes.
+
+{subjects}
+
+## Bulk data
+
+These two pages carry their data as embedded JSON rather than prose, so read the script block and skip the markup.
+
+- [Explorer]({public_url(base_url, EXPLORER_ROUTE)}): `<script id="explorer-data" type="application/json">` holds every laureate with their awards,
+  countries, and birth year under abbreviated keys — the whole collection in one request.
+- [Map]({public_url(base_url, MAP_ROUTE)}): `<script id="map-data" type="application/json">` holds birthplace and institution coordinates by subject.
+"""
+    (output / "llms.txt").write_text(body, encoding="utf-8")
+
+
 def _environment(website_dir: Path) -> Environment:
     environment = Environment(
         loader=FileSystemLoader(website_dir / "templates"),
@@ -1913,14 +2139,15 @@ def _environment(website_dir: Path) -> Environment:
     return environment
 
 
-def _render_job(environment: Environment, staging: Path, base_url: str, job: PageJob) -> str:
+def _render_job(environment: Environment, staging: Path, base_url: str, corrections_email: str, job: PageJob) -> str:
     target_directory = staging / job.route.strip("/")
     target_directory.mkdir(parents=True, exist_ok=True)
     template = environment.get_template(job.template)
+    page_url = public_url(base_url, job.route)
     html = template.render(
         title=job.title,
         description=job.description,
-        canonical=public_url(base_url, job.route),
+        canonical=page_url,
         breadcrumbs=job.breadcrumbs,
         home_href=relative_route(job.route, "/"),
         favicon_href=relative_file(job.route, "favicon.svg"),
@@ -1937,6 +2164,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, job: Pag
         about_route=ABOUT_ROUTE,
         structured_data=_structured_data(base_url, job),
         href=lambda target: relative_route(job.route, target),
+        correction_href=lambda record_id="": correction_mailto(corrections_email, page_url, record_id),
         **job.context,
     )
     (target_directory / "index.html").write_text(html, encoding="utf-8")
@@ -1969,6 +2197,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         about_route=ABOUT_ROUTE,
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
+        correction_href=lambda record_id="": "",  # The served URL is unknown at build time, so there is nothing to report against.
     )
     (output / "404.html").write_text(html, encoding="utf-8")
 
@@ -2002,6 +2231,8 @@ def _promote(staging: Path, dist: Path) -> None:
 
 def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:
     normalized_base_url = normalize_base_url(base_url)
+    corrections_email = read_env(website_dir.parent / ".env").get("CORRECTIONS_EMAIL", "")
+    print(f"website build config corrections_email={corrections_email or '(unset)'}")
     rankings, profiles, records = read_database(database)
     generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
     plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
@@ -2013,12 +2244,13 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
         shutil.copyfile(website_dir / "static" / "favicon.svg", staging / "favicon.svg")
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
-                lambda job: _render_job(environment, staging, normalized_base_url, job),
+                lambda job: _render_job(environment, staging, normalized_base_url, corrections_email, job),
                 plan.jobs,
             )
             list(rendered)
         write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
         write_robots(staging, normalized_base_url)
+        write_llms_txt(staging, normalized_base_url, plan, rankings)
         render_error_page(environment, staging, normalized_base_url)
         _make_world_readable(staging)
         _promote(staging, dist)

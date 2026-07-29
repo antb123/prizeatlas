@@ -218,6 +218,7 @@ class WebsiteBuildTests(unittest.TestCase):
             {
                 "families": [{"name": "First Prize", "score": 100}, {"name": "Second Prize", "score": 60}],
                 "countries": ["Belgium", "France", "United States", "Canada", "Switzerland", "Japan"],
+                "subjects": ["Physics"],
                 "population": [11, 22, 33, 44, 55, 66],
                 "people": [
                     {
@@ -226,7 +227,7 @@ class WebsiteBuildTests(unittest.TestCase):
                         "r": "../people/alice-example/",
                         "c": 2,
                         "p": 1.6,
-                        "a": [[1999, 1, ""], [2001, 0, "Physics"]],
+                        "a": [[1999, 1, "", 0], [2001, 0, "Physics", 0]],
                         "bc": 0,
                         "dc": 1,
                         "ac": [0, 2, 3, 4],
@@ -239,7 +240,7 @@ class WebsiteBuildTests(unittest.TestCase):
                         "r": "",
                         "c": 1,
                         "p": 0.6,
-                        "a": [[2002, 1, "Peace"]],
+                        "a": [[2002, 1, "Peace", 0]],
                         "bc": None,
                         "dc": None,
                         "ac": [5],
@@ -537,6 +538,70 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("<title>Japan Prize 2000: Winners</title>", year_html)
         self.assertIn('<p class="group-category">Life Sciences</p>', year_html)
         self.assertIn('<p class="group-category">Materials and Production</p>', year_html)
+
+    def test_correction_links_carry_the_page_and_the_record_id(self) -> None:
+        (self.directory / ".env").write_text("# corrections\nCORRECTIONS_EMAIL = 'fixme@example.org'\n", encoding="utf-8")
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        records = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "Geoffrey Hinton",
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Chemistry",
+                "year": "2024",
+                "full_name": "Second Laureate",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
+        self.assertIn("mailto:fixme%40example.org?subject=Correction%3A%20nobel-1", winner)
+        self.assertIn("Page%3A%20https%3A//example.org/nobel-prize/physics/2024/geoffrey-hinton/%0ARecord%3A%20nobel-1", winner)
+        self.assertIn('<span class="record-id">nobel-1</span>', winner)
+        # The footer reports the page it sits on and names no record.
+        home = (self.website / "dist/index.html").read_text()
+        self.assertIn("mailto:fixme%40example.org?subject=Correction%3A%20https%3A//example.org/", home)
+        self.assertNotIn("Record%3A", home)
+        # A 404 is served for arbitrary URLs, so it has no page of its own to report.
+        self.assertNotIn("mailto:", (self.website / "dist/404.html").read_text())
+
+    def test_correction_links_vanish_without_a_configured_address(self) -> None:
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        records = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "Geoffrey Hinton",
+            },
+            {
+                "award_record_id": "nobel-2",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Chemistry",
+                "year": "2024",
+                "full_name": "Second Laureate",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
+        self.assertNotIn("mailto:", winner)
+        self.assertNotIn("Report a correction", winner)
 
     def test_metadata_is_unique_and_structured_data_is_safe(self) -> None:
         rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
@@ -1139,6 +1204,111 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("https://example.org/awards/subjects/math/", locations)
         self.assertIn("https://example.org/awards/subjects/cs/", locations)
 
+    def test_subject_recent_pages_group_three_calendar_years_by_prize_and_recipient(self) -> None:
+        rankings = [
+            ("Q1", "Zeta Prize", "zeta-prize", "https://example.org/zeta", 100),
+            ("Q2", "Alpha Prize", "alpha-prize", "https://example.org/alpha", 50),
+        ]
+        records = [
+            {
+                "award_record_id": "math-old",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Zeta Prize",
+                "year": "2022",
+                "full_name": "Old Recipient",
+                "laureate_wikidata_qid": "Q100",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-2023",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Zeta Prize",
+                "year": "2023",
+                "full_name": "Third Year Recipient",
+                "laureate_wikidata_qid": "Q200",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-2024",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Zeta Prize",
+                "year": "2024",
+                "full_name": "Second Year Recipient",
+                "laureate_wikidata_qid": "Q300",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-alpha-a",
+                "award_wikidata_qid": "Q2",
+                "prize_name": "Alpha Prize",
+                "year": "2025",
+                "full_name": "Alice Alpha",
+                "laureate_wikidata_qid": "Q400",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-alpha-b",
+                "award_wikidata_qid": "Q2",
+                "prize_name": "Alpha Prize",
+                "year": "2025",
+                "full_name": "Bob Beta",
+                "laureate_wikidata_qid": "Q500",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "math-zeta",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Zeta Prize",
+                "year": "2025",
+                "full_name": "Zeta Recipient",
+                "laureate_wikidata_qid": "Q600",
+                "high_school_subject": "Math",
+            },
+            {
+                "award_record_id": "physics-2010",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Zeta Prize",
+                "year": "2010",
+                "full_name": "Physics Recipient",
+                "laureate_wikidata_qid": "Q700",
+                "high_school_subject": "Physics",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        math = (self.website / "dist/subjects/math/index.html").read_text()
+        recent = (self.website / "dist/subjects/math/recent/index.html").read_text()
+        self.assertIn('href="recent/">Recent</a>', math)
+        self.assertIn('href="../">People</a>', recent)
+        self.assertIn('href="../affiliations/">Institutions</a>', recent)
+        self.assertIn('aria-current="page">Recent</a>', recent)
+        self.assertIn("5 recipients from", recent)
+        self.assertIn("4 prize editions", recent)
+        self.assertIn("2023–2025", recent)
+        self.assertNotIn("Old Recipient", recent)
+
+        year_2025 = recent.index("<h3>2025</h3>")
+        year_2024 = recent.index("<h3>2024</h3>")
+        year_2023 = recent.index("<h3>2023</h3>")
+        self.assertLess(year_2025, year_2024)
+        self.assertLess(year_2024, year_2023)
+        latest = recent[year_2025:year_2024]
+        self.assertLess(latest.index("Alpha Prize"), latest.index("Zeta Prize"))
+        self.assertLess(latest.index("Alice Alpha"), latest.index("Bob Beta"))
+
+        # Every populated subject gets the same Recent view, even when only one year falls inside its window.
+        physics_recent = (self.website / "dist/subjects/physics/recent/index.html").read_text()
+        self.assertIn("2008–2010", physics_recent)
+        self.assertIn("Physics Recipient", physics_recent)
+
+        locations = [
+            element.text for element in ElementTree.parse(self.website / "dist/sitemap.xml").getroot().findall(".//{*}loc")
+        ]
+        self.assertIn("https://example.org/awards/subjects/math/recent/", locations)
+        self.assertIn("https://example.org/awards/subjects/physics/recent/", locations)
+
     def test_invalid_subject_fails_the_build(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
         database = self.create_database(
@@ -1292,6 +1462,98 @@ class WebsiteBuildTests(unittest.TestCase):
                     build.build_site(database, "https://example.org/", self.website)
                 self.assertEqual(b"previous", marker.read_bytes())
                 database.unlink()
+
+    def test_winners_page_lists_every_recipient_oldest_first(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": f"record-{number}",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "category": category,
+                "year": year,
+                "full_name": name,
+            }
+            for number, (year, category, name) in enumerate(
+                [
+                    ("2001", "Physics", "Recent Winner"),
+                    ("1950", "Physics", "Early Winner"),
+                    ("1950", "Chemistry", "Other Early Winner"),
+                ]
+            )
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        winners = (self.website / "dist/test-prize/winners/index.html").read_text()
+        self.assertIn("<h1>Test Prize: every winner</h1>", winners)
+        self.assertIn("<h2>3 recipients, 1950-2001</h2>", winners)
+        # Oldest first, and the category column appears because this prize routes by category.
+        self.assertEqual(
+            ["Early Winner", "Other Early Winner", "Recent Winner"],
+            re.findall(r'<td><a href="[^"]*">([^<]*)</a></td>', winners),
+        )
+        self.assertEqual(["1950", "1950", "2001"], re.findall(r"<td>(\d{4})</td>", winners))
+        self.assertIn('<td><a href="../physics/1950/early-winner/">Early Winner</a></td>', winners)
+
+        # The prize page still stops at the recent years, so it has to point at the complete list.
+        prize = (self.website / "dist/test-prize/index.html").read_text()
+        self.assertIn('<a href="winners/">every Test Prize winner</a>', prize)
+
+        locations = [
+            element.text for element in ElementTree.parse(self.website / "dist/sitemap.xml").getroot().findall(".//{*}loc")
+        ]
+        self.assertIn("https://example.org/awards/test-prize/winners/", locations)
+
+    def test_llms_txt_lists_every_prize_with_absolute_urls(self) -> None:
+        rankings = [
+            ("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100),
+            ("Q2", "Second Prize", "second-prize", "https://example.org/second", 40),
+        ]
+        records = [
+            {
+                "award_record_id": "one",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "1950",
+                "full_name": "Example Winner",
+            },
+            {
+                "award_record_id": "two",
+                "award_wikidata_qid": "Q2",
+                "prize_name": "Second Prize",
+                "year": "2000",
+                "full_name": "Other Winner",
+            },
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        llms = (self.website / "dist/llms.txt").read_text()
+        self.assertTrue(llms.startswith("# Awards\n"))
+        self.assertIn("1950-2000", llms)
+        self.assertIn("https://example.org/awards/sitemap.xml", llms)
+        # Highest score first, each prize named by its complete winner list and linked out to the awarding body.
+        self.assertEqual(
+            [
+                "- [Every Test Prize winner](https://example.org/awards/test-prize/winners/): score 100/100. ",
+                "- [Every Second Prize winner](https://example.org/awards/second-prize/winners/): score 40/100. ",
+            ],
+            [line[: line.index("Blurb.")] for line in llms.splitlines() if line.startswith("- [Every")],
+        )
+        self.assertIn("Awarding body: https://example.org/prize", llms)
+        # Neither prize has categories here, so the by-year line must not promise any.
+        self.assertIn("  - [Test Prize by year](https://example.org/awards/test-prize/): every award year\n", llms)
+        # Every subject page is named explicitly.
+        self.assertIn("- [Physics awards and laureates](https://example.org/awards/subjects/physics/): ", llms)
+        self.assertIn("[Recent Physics prizes and recipients](https://example.org/awards/subjects/physics/recent/)", llms)
+        # It is a guide to the site, not a page of it: no route, so no sitemap entry.
+        locations = [
+            element.text for element in ElementTree.parse(self.website / "dist/sitemap.xml").getroot().findall(".//{*}loc")
+        ]
+        self.assertNotIn("https://example.org/awards/llms.txt", locations)
 
     def test_sitemap_splits_at_url_limit(self) -> None:
         output = self.directory / "sitemaps"

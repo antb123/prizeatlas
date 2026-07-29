@@ -462,6 +462,18 @@ h3 {
   margin-top: 0;
 }
 
+.correction {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.record-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 .winner-list,
 .recipient-list {
   padding-left: 1.25rem;

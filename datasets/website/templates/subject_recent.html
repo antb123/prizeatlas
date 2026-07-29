@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_view_tabs.html" import view_tabs with context %}
+{% block content %}
+{{ view_tabs(subject.route, subject.affiliations_route, subject.recent_route, "recent") }}
+<header class="page-intro">
+  <p class="eyebrow">Recent awards</p>
+  <h1>{{ subject.name }}</h1>
+  <p>{{ recent_recipient_count }} {{ "recipient" if recent_recipient_count == 1 else "recipients" }} from
+    {{ recent_prize_count }} prize {{ "edition" if recent_prize_count == 1 else "editions" }},
+    {{ recent_start_year }}–{{ recent_end_year }}.</p>
+</header>
+<section>
+  <h2>Prizes and recipients</h2>
+  <div class="winner-groups">
+    {% for year, prizes in recent_groups %}
+    <section class="winner-group">
+      <h3>{{ year }}</h3>
+      {% for prize_name, recipients in prizes %}
+      <p class="group-category">{{ prize_name }}</p>
+      <ul class="winner-list">
+        {% for record, route in recipients %}
+        <li>
+          <a href="{{ href(route) }}">{{ record.full_name }}</a>
+          {% if record.category %}<span>{{ record.category }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+</section>
+<p><a href="{{ href(subjects_route) }}">All subjects</a></p>
+{% endblock %}

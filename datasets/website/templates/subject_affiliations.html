@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import view_tabs with context %}
 {% block content %}
-{{ view_tabs(subject.route, subject.affiliations_route, "institutions") }}
+{{ view_tabs(subject.route, subject.affiliations_route, subject.recent_route, "institutions") }}
 <header class="page-intro">
   <p class="eyebrow">Institutions</p>
   <h1>{{ subject.name }}</h1>

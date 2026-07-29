@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">{{ prize.prize_name }}</p>
+  <h1>{{ title }}</h1>
+  <p>Every recorded recipient in one list, oldest first. {{ prize.blurb }}</p>
+  <p><a href="{{ href(prize_route) }}">Browse {{ prize.prize_name }} by year</a></p>
+</header>
+<section>
+  <h2>{{ winners|length }} recipients, {{ span }}</h2>
+  <table class="winner-index">
+    <thead>
+      <tr>
+        <th scope="col">Year</th>
+        {% if routed_categories %}<th scope="col">Category</th>{% endif %}
+        <th scope="col">Winner</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record, route in winners %}
+      <tr>
+        <td>{{ record.year }}</td>
+        {% if routed_categories %}<td>{{ record.category }}</td>{% endif %}
+        <td><a href="{{ href(route) }}">{{ record.full_name }}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

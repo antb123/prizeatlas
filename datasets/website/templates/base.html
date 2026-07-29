@@ -47,6 +47,8 @@
   </main>
   <footer>
     <p>A static guide to international awards and their recipients. <a href="{{ href(about_route) }}">About this site</a></p>
+    {% set correction = correction_href() %}
+    {% if correction %}<p>Found an error on this page? <a href="{{ correction }}">Report a correction</a></p>{% endif %}
   </footer>
 </body>
 </html>

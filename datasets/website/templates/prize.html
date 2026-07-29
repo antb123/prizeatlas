@@ -35,7 +35,10 @@
 </section>
 <section>
   <h2>Recent winners</h2>
-  <p>The last {{ recent_years }} award years. Use the {% if routed_categories %}categories{% else %}years{% endif %} above for the full record.</p>
+  <p>
+    The last {{ recent_years }} award years. See <a href="{{ href(winners_route) }}">every {{ prize.prize_name }} winner</a> in one
+    list, or use the {% if routed_categories %}categories{% else %}years{% endif %} above.
+  </p>
   {{ winner_groups(recent_groups) }}
 </section>
 {% endblock %}
