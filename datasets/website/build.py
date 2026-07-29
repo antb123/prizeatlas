@@ -995,7 +995,9 @@ def _structured_data(base_url: str, job: PageJob) -> str:
                         "@type": "ListItem",
                         "position": position,
                         "name": crumb.label,
-                        **({"item": public_url(base_url, crumb.route)} if crumb.route else {}),
+                        # The last crumb names the page the reader is on. Where it links onward — a winner page
+                        # sends the name to the laureate — that link is for the reader, not a step in the trail.
+                        **({"item": public_url(base_url, crumb.route)} if crumb.route and position < len(job.breadcrumbs) else {}),
                     }
                     for position, crumb in enumerate(job.breadcrumbs, start=1)
                 ],
@@ -1653,6 +1655,7 @@ def plan_year_pages(
             )
             winner_title = f"{record.full_name} — {award_label}, {record.year}"
             winner_description = _winner_description(record, award_label)
+            person_route = routes_by_laureate.get(record.laureate_wikidata_qid, "")
             winner_crumbs = [
                 Breadcrumb("Home", "/"),
                 Breadcrumb(layout.ranking.prize_name, layout.route),
@@ -1665,7 +1668,8 @@ def plan_year_pages(
                 # A year-routed prize has no category page to link to, but the category is still where this award
                 # sits, and the trail is the only place the page names it.
                 winner_crumbs.append(Breadcrumb(record.category, None))
-            winner_crumbs.extend((Breadcrumb(record.year, route), Breadcrumb(record.full_name, None)))
+            # The trail is where a reader reaches for the person, so the name carries the link to their other awards.
+            winner_crumbs.extend((Breadcrumb(record.year, route), Breadcrumb(record.full_name, person_route or None)))
             jobs.append(
                 _page(
                     "winner.html",
@@ -1681,7 +1685,7 @@ def plan_year_pages(
                         for other in ordered_group
                         if other.award_record_id != record.award_record_id
                     ),
-                    person_route=routes_by_laureate.get(record.laureate_wikidata_qid, ""),
+                    person_route=person_route,
                     affiliation_routes=tuple(
                         f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
                         if _nonblank(affiliation.name) and affiliation.name not in AFFILIATION_BLOCKLIST

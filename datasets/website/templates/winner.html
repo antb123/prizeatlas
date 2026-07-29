@@ -6,7 +6,7 @@
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
-      <h1>{% if person_route %}<a href="{{ href(person_route) }}">{{ record.full_name }}</a>{% else %}{{ record.full_name }}{% endif %}</h1>
+      <h1>{{ record.full_name }}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
       <p class="ask-ai subject-badges" aria-label="Read more about this award">

@@ -623,18 +623,6 @@ h3 {
   text-decoration: none;
 }
 
-/* The name is the way to the laureate's other awards, so it carries a rule rather than the accent colour. */
-.winner-main h1 a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--rule);
-  text-decoration-thickness: 1px;
-}
-
-.winner-main h1 a:hover {
-  text-decoration-color: var(--accent);
-}
-
 .people-index {
   margin: 0;
   padding: 0;
