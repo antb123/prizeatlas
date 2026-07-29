@@ -2,29 +2,19 @@
 {% block content %}
 {% set ask_ai_topic = record.full_name %}
 {% if record.motivation %}{% set ask_ai_topic = ask_ai_topic ~ " — " ~ record.motivation %}{% endif %}
-{% set ask_ai_prompt = 'Explain to me in clear language: "' ~ ask_ai_topic ~ '"' %}
+{% set ask_ai_query = ('Explain to me in clear language: "' ~ ask_ai_topic ~ '"') | urlencode %}
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
-      {% if record.high_school_subject %}
-      <p class="eyebrow"><a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a></p>
-      {% endif %}
-      <h1>{{ record.full_name }}</h1>
+      <h1>{% if person_route %}<a href="{{ href(person_route) }}">{{ record.full_name }}</a>{% else %}{{ record.full_name }}{% endif %}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
-      <div class="ask-ai" aria-label="Ask an AI about this award">
-        <form action="https://chatgpt.com/" method="get" target="_blank" rel="noopener noreferrer">
-          <input type="hidden" name="q" value="{{ ask_ai_prompt }}">
-          <div class="ask-ai-actions">
-            <button type="submit" formaction="https://chatgpt.com/" title="{{ ask_ai_prompt }}">ChatGPT <span aria-hidden="true">↗</span></button>
-            <button type="submit" formaction="https://www.perplexity.ai/search" title="{{ ask_ai_prompt }}">Perplexity <span aria-hidden="true">↗</span></button>
-            <button type="submit" formaction="https://search.brave.com/ask" title="{{ ask_ai_prompt }}">Brave <span aria-hidden="true">↗</span></button>
-          </div>
-        </form>
-      </div>
-      <p class="winner-links">
-        {% if person_route %}<a class="person-link" href="{{ href(person_route) }}">All awards</a>{% endif %}
-        <a class="external-source" href="{{ wikipedia_url }}">Check Wikipedia <span aria-hidden="true">↗</span></a>
+      <p class="ask-ai subject-badges" aria-label="Read more about this award">
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
+        <a class="subject-badge" href="https://chatgpt.com/?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">ChatGPT <span aria-hidden="true">↗</span></a>
+        <a class="subject-badge" href="https://www.perplexity.ai/search?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Perplexity <span aria-hidden="true">↗</span></a>
+        <a class="subject-badge" href="https://search.brave.com/ask?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Brave <span aria-hidden="true">↗</span></a>
+        <a class="subject-badge" href="{{ wikipedia_url }}" target="_blank" rel="noopener noreferrer">Wikipedia <span aria-hidden="true">↗</span></a>
       </p>
     </header>
     {% if record.affiliations %}
@@ -47,20 +37,14 @@
       </ul>
     </section>
     {% endif %}
-    {% set correction = correction_href(record.award_record_id) %}
-    {% if correction %}
-    <p class="correction">Spotted something wrong on this page? <a href="{{ correction }}">Report a correction for this record</a>
-      <span class="record-id">{{ record.award_record_id }}</span>
-    </p>
-    {% endif %}
   </div>
   {% if facts or record.prize_share %}
   <aside class="facts" aria-label="Facts">
     <h2>Facts</h2>
     <dl>
       {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_share }}</dd></div>{% endif %}
-      {% for label, value in facts %}
-      <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+      {% for label, value, route in facts %}
+      <div><dt>{{ label }}</dt><dd>{% if route %}<a href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
       {% endfor %}
     </dl>
   </aside>

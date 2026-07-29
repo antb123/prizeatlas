@@ -47,7 +47,7 @@
     {% block content %}{% endblock %}
   </main>
   <footer>
-    {% set correction = correction_href() %}
+    {% set correction = correction_href(record.award_record_id if record is defined else '') %}
     <p><a href="{{ href(about_route) }}">About</a> · <a href="{{ csv_href }}" download>Download as CSV</a>{% if correction %} · <a href="{{ correction }}">Report correction</a>{% endif %}</p>
   </footer>
 </body>

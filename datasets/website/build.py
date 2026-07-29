@@ -906,20 +906,24 @@ def _winner_description(record: AwardRecord, award_label: str) -> str:
     return _clamp(candidate)
 
 
-def _facts(record: AwardRecord) -> tuple[tuple[str, str], ...]:
-    """Facts panel rows, minus anything the page already states.
+def _facts(record: AwardRecord) -> tuple[tuple[str, str, str], ...]:
+    """Facts panel rows as (label, value, route), minus anything the page already states.
 
     Type earns a row only for an organisation: 3047 of 3096 records are individuals, so on nearly every page the
     row reads "Individual" and tells the reader what the name above it already said. Birth year is dropped
     whenever a full birth date is present, for the same reason.
+
+    Only the birth country links out. Every one of the 92 recorded birth countries has a born-in page, whereas
+    death country has none for Singapore or Jamaica, and citizenship is a list with no view of its own.
     """
     skip = set()
     if record.laureate_type != "Organization":
         skip.add("laureate_type")
     if _nonblank(record.birth_date):
         skip.add("birth_year")
+    routes = {"birth_country": f"{COUNTRIES_ROUTE}{slugify(record.birth_country)}/"} if _nonblank(record.birth_country) else {}
     return tuple(
-        (label, getattr(record, attribute))
+        (label, getattr(record, attribute), routes.get(attribute, ""))
         for label, attribute in FACT_FIELDS
         if attribute not in skip and _nonblank(getattr(record, attribute))
     )
