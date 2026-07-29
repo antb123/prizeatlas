@@ -512,6 +512,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
         self.assertNotIn("<em>unsafe</em>", physics_html)
         self.assertIn('href="../"', physics_html)
+        self.assertIn('href="../../../../awards/">Awards</a>', physics_html)
         self.assertIn(
             'href="https://en.wikipedia.org/w/index.php?search=Ernest+Orlando+Lawrence"',
             physics_html,
@@ -520,12 +521,37 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="1939/ernest-orlando-lawrence/">Ernest Orlando Lawrence</a>', physics_category_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_category_html)
         home_html = (self.website / "dist/index.html").read_text()
+        self.assertIn("<h1>Prestigious Awards and Winners</h1>", home_html)
+        self.assertIn("<h2>Ranked awards</h2>", home_html)
+        self.assertIn("<span>Score</span>", home_html)
         self.assertIn(
             'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
             home_html,
         )
         self.assertIn('src="static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
+        self.assertIn('href="awards/">Awards</a>', home_html)
         self.assertTrue((self.website / "dist/static/logos/nobel-prize.png").is_file())
+        awards_html = (self.website / "dist/awards/index.html").read_text()
+        self.assertIn("<title>Awards</title>", awards_html)
+        self.assertIn('<link rel="canonical" href="https://example.org/awards/awards/">', awards_html)
+        self.assertEqual(len(rankings), awards_html.count("<article>"))
+        self.assertIn('href="../nobel-prize/">Nobel Prize</a>', awards_html)
+        self.assertIn('href="../turing-award/">Turing Award</a>', awards_html)
+        self.assertIn('href="../japan-prize/">Japan Prize</a>', awards_html)
+        self.assertIn('src="../static/logos/nobel-prize.png" alt="Nobel Prize logo"', awards_html)
+        self.assertIn('href="./">Awards</a>', awards_html)
+        for excluded in (
+            "Prestigious Awards and Winners",
+            "An editorial ranking",
+            "Most decorated",
+            "Recently awarded",
+            "Ranked awards",
+            '<dl class="totals">',
+            '<div class="rank">',
+            "<span>Score</span>",
+            "Blurb.",
+        ):
+            self.assertNotIn(excluded, awards_html)
         turing_html = turing.read_text()
         self.assertIn("<title>Organization Example — Turing Award for Computer science, 1989</title>", turing_html)
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)
@@ -564,6 +590,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("https://example.org/awards/map/", locations)
         self.assertIn("https://example.org/awards/map/biology/", locations)
         self.assertIn("https://example.org/awards/nearby/", locations)
+        self.assertIn("https://example.org/awards/awards/", locations)
         for path in (self.website / "dist", *(self.website / "dist").rglob("*")):
             mode = stat.S_IMODE(path.stat().st_mode)
             self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)
@@ -1512,6 +1539,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="/awards/static/style.css"', error_html)
         self.assertIn('href="/awards/favicon.svg"', error_html)
         self.assertIn('href="/awards/"', error_html)
+        self.assertIn('href="/awards/awards/">Awards</a>', error_html)
         self.assertIn('href="/awards/map/">Map</a>', error_html)
         self.assertNotIn("<link rel=\"canonical\"", error_html)
 

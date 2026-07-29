@@ -42,6 +42,7 @@ SITEMAP_BYTE_LIMIT = 52_428_800
 TEMPLATES = (
     "base.html",
     "index.html",
+    "awards.html",
     "prize.html",
     "winners.html",
     "category.html",
@@ -68,6 +69,7 @@ TEMPLATES = (
     "about.html",
     "404.html",
 )
+AWARDS_ROUTE = "/awards/"
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
 HOMEPAGE_ROWS = 8
@@ -2088,6 +2090,17 @@ def plan_home_page(
     )
 
 
+def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> PageJob:
+    return _page(
+        "awards.html",
+        AWARDS_ROUTE,
+        "Awards",
+        f"Browse {len(rankings)} international awards and their recipients.",
+        (),
+        prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
+    )
+
+
 def plan_people_index(people: list[Laureate]) -> list[PageJob]:
     page_count = max(1, -(-len(people) // PEOPLE_PER_PAGE))
     jobs: list[PageJob] = []
@@ -2262,6 +2275,7 @@ def create_site_plan(
     jobs.extend(plan_affiliation_pages(affiliations, records))
     jobs.extend(plan_university_pages(affiliations))
     jobs.append(plan_home_page(rankings, records, people, prize_routes, ranking_by_qid, record_routes))
+    jobs.append(plan_awards_page(rankings, prize_routes))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records))
     jobs.append(plan_explorer_page(rankings, records, routes_by_laureate, generated))
@@ -2485,6 +2499,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         style_href=relative_file(job.route, "static/style.css"),
         csv_href=relative_file(job.route, "awards.csv"),
         asset_href=lambda target: relative_file(job.route, target) if target else "",
+        awards_route=AWARDS_ROUTE,
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
@@ -2522,6 +2537,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
         csv_href=root + "awards.csv",
+        awards_route=AWARDS_ROUTE,
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
