@@ -1783,19 +1783,25 @@ class WebsiteBuildTests(unittest.TestCase):
         marker.write_bytes(b"previous")
         real_executor = build.ThreadPoolExecutor
         workers: list[int] = []
+        staging_modes: list[int] = []
 
         def executor(*args: object, **kwargs: object) -> object:
             workers.append(kwargs["max_workers"])
             return real_executor(*args, **kwargs)
 
+        def fail_render(_environment: object, staging: Path, *_args: object) -> None:
+            staging_modes.append(stat.S_IMODE(staging.stat().st_mode))
+            raise RuntimeError("render failed")
+
         with (
             mock.patch.object(build, "ThreadPoolExecutor", side_effect=executor),
-            mock.patch.object(build, "_render_job", side_effect=RuntimeError("render failed")),
+            mock.patch.object(build, "_render_job", side_effect=fail_render),
             self.assertRaises(RuntimeError),
         ):
             build.build_site(database, "https://example.org/", self.website)
 
         self.assertEqual([8], workers)
+        self.assertEqual({0o2775}, set(staging_modes))
         self.assertEqual(b"previous", marker.read_bytes())
 
     def test_promotion_failure_rolls_back_previous_output(self) -> None:

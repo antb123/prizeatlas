@@ -2575,6 +2575,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
     environment = _environment(website_dir)
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
+    staging.chmod(0o2775)
     dist = website_dir / "dist"
     try:
         shutil.copytree(website_dir / "static", staging / "static")
