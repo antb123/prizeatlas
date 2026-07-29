@@ -15,7 +15,7 @@ builder=""
 # Without this, a script that exits early leaves the build orphaned and still writing a staging directory.
 trap 'rm -f "$log"; [[ -n "$builder" ]] && kill "$builder" 2>/dev/null; true' EXIT
 
-uv run --with jinja2 python -m website.build --base-url "$base" >"$log" 2>&1 &
+uv run website/build.py --base-url "$base" >"$log" 2>&1 &
 builder=$!
 
 # build.py writes into website/.dist-staging-* and swaps it into place at the end, so the staging tree is the progress meter.

@@ -119,7 +119,11 @@ SHARE_IMAGE_WIDTH = 1200
 SHARE_IMAGE_HEIGHT = 630
 SHARE_IMAGE_DIRECTORY = "static/share"
 SHARE_IMAGE_FALLBACK = f"{SHARE_IMAGE_DIRECTORY}/default.png"
-SHARE_FONT = "static/fonts/noto-sans-cjk.ttc"
+SHARE_IMAGE_LAUREATES = f"{SHARE_IMAGE_DIRECTORY}/laureates.png"
+SHARE_IMAGE_INSTITUTIONS = f"{SHARE_IMAGE_DIRECTORY}/institutions.png"
+SHARE_IMAGE_UNIVERSITIES = f"{SHARE_IMAGE_DIRECTORY}/universities.png"
+SHARE_IMAGE_MAP = f"{SHARE_IMAGE_DIRECTORY}/map.png"
+SHARE_IMAGE_NEARBY = f"{SHARE_IMAGE_DIRECTORY}/nearby.png"
 # Prizes whose "category" is a topic chosen afresh each year rather than a standing division. Routing those by
 # category yields a page per award; they browse by year instead.
 YEAR_ROUTED_PRIZES = frozenset({"japan-prize"})
@@ -893,15 +897,38 @@ def _page(
 
 
 def share_image_target(job: PageJob) -> str:
+    if job.route.startswith(PEOPLE_ROUTE):
+        return SHARE_IMAGE_LAUREATES
+    if job.route.startswith(AFFILIATIONS_ROUTE):
+        return SHARE_IMAGE_INSTITUTIONS
+    if job.route.startswith(UNIVERSITIES_ROUTE):
+        return SHARE_IMAGE_UNIVERSITIES
+    if job.route == MAP_ROUTE:
+        return SHARE_IMAGE_MAP
+    if job.route == NEARBY_ROUTE:
+        return SHARE_IMAGE_NEARBY
     card = job.context.get("share_card")
     if card is None:
         return SHARE_IMAGE_FALLBACK
     if not isinstance(card, ShareCard):
         raise BuildFailure(f"invalid share card route={job.route}")
-    prefix = {"Laureate": "winner", "Prize": "prize", "Institution": "institution"}.get(card.kind)
-    if prefix is None or not SLUG.fullmatch(card.slug):
+    if card.kind != "Prize" or not SLUG.fullmatch(card.slug):
         raise BuildFailure(f"invalid share card route={job.route}")
-    return f"{SHARE_IMAGE_DIRECTORY}/{prefix}-{card.slug}.png"
+    return f"{SHARE_IMAGE_DIRECTORY}/prize-{card.slug}.png"
+
+
+def share_description(job: PageJob) -> str:
+    card = job.context.get("share_card")
+    if card is None:
+        return job.description
+    if not isinstance(card, ShareCard) or card.rank < 1 or card.award_count < 1 or not card.subjects:
+        raise BuildFailure(f"invalid share card route={job.route}")
+    award_label = "award" if card.award_count == 1 else "awards"
+    return (
+        f"{card.kind} rank #{card.rank:,}. "
+        f"{card.award_count:,} recorded {award_label}. "
+        f"Subjects: {', '.join(card.subjects)}."
+    )
 
 
 def _clamp(text: str, limit: int = DESCRIPTION_LIMIT) -> str:
@@ -2574,9 +2601,9 @@ These three pages carry their data as embedded JSON rather than prose, so read t
     (output / "llms.txt").write_text(body, encoding="utf-8")
 
 
-def _share_font(font_path: Path, size: int, fonts: dict[int, ImageFont.FreeTypeFont]) -> ImageFont.FreeTypeFont:
+def _share_font(size: int, fonts: dict[int, ImageFont.FreeTypeFont]) -> ImageFont.FreeTypeFont:
     if size not in fonts:
-        fonts[size] = ImageFont.truetype(str(font_path), size)
+        fonts[size] = ImageFont.load_default(size=size)
     return fonts[size]
 
 
@@ -2617,7 +2644,6 @@ def _share_ellipsize(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeT
 def _share_fit(
     draw: ImageDraw.ImageDraw,
     text: str,
-    font_path: Path,
     fonts: dict[int, ImageFont.FreeTypeFont],
     max_width: int,
     max_lines: int,
@@ -2625,11 +2651,11 @@ def _share_fit(
     minimum_size: int,
 ) -> tuple[ImageFont.FreeTypeFont, list[str]]:
     for size in range(start_size, minimum_size - 1, -2):
-        font = _share_font(font_path, size, fonts)
+        font = _share_font(size, fonts)
         lines = _share_wrap(draw, text, font, max_width)
         if len(lines) <= max_lines:
             return font, lines
-    font = _share_font(font_path, minimum_size, fonts)
+    font = _share_font(minimum_size, fonts)
     lines = _share_wrap(draw, text, font, max_width)
     if len(lines) > max_lines:
         remaining = " ".join(lines[max_lines - 1 :])
@@ -2653,10 +2679,10 @@ def _draw_share_lines(
 
 def _write_share_image(
     target: Path,
-    font_path: Path,
     fonts: dict[int, ImageFont.FreeTypeFont],
     page_url: str,
     card: ShareCard | None,
+    generic: str | None = None,
 ) -> None:
     paper = (244, 240, 231)
     surface = (251, 248, 241)
@@ -2668,28 +2694,36 @@ def _write_share_image(
     draw = ImageDraw.Draw(image)
     draw.rounded_rectangle((48, 42, 1152, 588), radius=30, fill=surface, outline=rule, width=2)
     draw.rounded_rectangle((48, 42, 66, 588), radius=9, fill=accent)
-    draw.text((96, 78), "PRIZE ATLAS", font=_share_font(font_path, 28, fonts), fill=accent)
+    draw.text((96, 78), "PRIZE ATLAS", font=_share_font(28, fonts), fill=accent)
 
     if card is None:
-        name_font, name_lines = _share_fit(draw, "Recognition for work with lasting impact", font_path, fonts, 1008, 2, 66, 46)
+        title, subtitle = {
+            None: ("Recognition for work with lasting impact", "Ranked awards, laureates and institutions"),
+            "Laureates": ("Prize-winning laureates", "Explore recipients across major international awards"),
+            "Institutions": ("Award-linked institutions", "Affiliations recorded when prizes were awarded"),
+            "Universities": ("Universities with award-winning laureates", "Award-time affiliations, not institutional quality"),
+            "Map": ("The Prize Atlas map", "Birthplaces and award-time affiliations around the world"),
+            "Nearby": ("Winners near you", "Explore laureates and institutions by distance"),
+        }[generic]
+        name_font, name_lines = _share_fit(draw, title, fonts, 1008, 2, 66, 46)
         _draw_share_lines(draw, 96, 174, name_lines, name_font, ink, 12)
         draw.text(
             (96, 350),
-            "Ranked awards, laureates and institutions",
-            font=_share_font(font_path, 30, fonts),
+            subtitle,
+            font=_share_font(30, fonts),
             fill=muted,
         )
     else:
-        if card.rank < 1 or card.award_count < 1 or not card.subjects:
+        if card.kind != "Prize" or card.rank < 1 or card.award_count < 1 or not card.subjects:
             raise BuildFailure(f"invalid share card slug={card.slug}")
-        kind_font = _share_font(font_path, 24, fonts)
+        kind_font = _share_font(24, fonts)
         kind = card.kind.upper()
         draw.text((1104 - _share_text_width(draw, kind, kind_font), 82), kind, font=kind_font, fill=muted)
-        name_font, name_lines = _share_fit(draw, card.name, font_path, fonts, 1008, 2, 66, 42)
+        name_font, name_lines = _share_fit(draw, card.name, fonts, 1008, 2, 66, 42)
         _draw_share_lines(draw, 96, 145, name_lines, name_font, ink, 10)
         draw.line((96, 326, 1104, 326), fill=rule, width=2)
-        label_font = _share_font(font_path, 20, fonts)
-        value_font = _share_font(font_path, 50, fonts)
+        label_font = _share_font(20, fonts)
+        value_font = _share_font(50, fonts)
         draw.text((96, 360), f"{card.kind.upper()} RANK", font=label_font, fill=muted)
         draw.text((96, 388), f"#{card.rank:,}", font=value_font, fill=ink)
         draw.text((340, 360), "RECORDED AWARDS", font=label_font, fill=muted)
@@ -2698,7 +2732,6 @@ def _write_share_image(
         subjects_font, subject_lines = _share_fit(
             draw,
             " · ".join(card.subjects),
-            font_path,
             fonts,
             494,
             3,
@@ -2707,27 +2740,35 @@ def _write_share_image(
         )
         _draw_share_lines(draw, 610, 392, subject_lines, subjects_font, ink, 7)
 
-    url_font, url_lines = _share_fit(draw, page_url, font_path, fonts, 1008, 2, 22, 16)
+    url_font, url_lines = _share_fit(draw, page_url, fonts, 1008, 2, 22, 16)
     _draw_share_lines(draw, 96, 526, url_lines, url_font, accent, 4)
     target.parent.mkdir(parents=True, exist_ok=True)
     image.save(target, format="PNG", compress_level=9)
 
 
-def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob], font_path: Path) -> None:
-    if not font_path.is_file():
-        raise BuildFailure("share card font is missing")
+def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> None:
     fonts: dict[int, ImageFont.FreeTypeFont] = {}
-    _write_share_image(output / SHARE_IMAGE_FALLBACK, font_path, fonts, base_url, None)
+    generic_images = (
+        (SHARE_IMAGE_FALLBACK, None, "/"),
+        (SHARE_IMAGE_LAUREATES, "Laureates", PEOPLE_ROUTE),
+        (SHARE_IMAGE_INSTITUTIONS, "Institutions", AFFILIATIONS_ROUTE),
+        (SHARE_IMAGE_UNIVERSITIES, "Universities", UNIVERSITIES_ROUTE),
+        (SHARE_IMAGE_MAP, "Map", MAP_ROUTE),
+        (SHARE_IMAGE_NEARBY, "Nearby", NEARBY_ROUTE),
+    )
+    for target, generic, route in generic_images:
+        _write_share_image(output / target, fonts, public_url(base_url, route), None, generic)
+
     owners: dict[str, str] = {}
     for job in jobs:
         card = job.context.get("share_card")
-        if card is None:
+        if not isinstance(card, ShareCard) or card.kind != "Prize":
             continue
         target = share_image_target(job)
         if target in owners:
             raise BuildFailure(f"duplicate share image target={target} routes={owners[target]},{job.route}")
         owners[target] = job.route
-        _write_share_image(output / target, font_path, fonts, public_url(base_url, job.route), card)
+        _write_share_image(output / target, fonts, public_url(base_url, job.route), card)
 
 
 def _environment(website_dir: Path) -> Environment:
@@ -2750,6 +2791,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
     html = template.render(
         title=job.title,
         description=job.description,
+        share_description=share_description(job),
         canonical=page_url,
         share_image=public_url(base_url, f"/{share_image_target(job)}"),
         share_image_width=SHARE_IMAGE_WIDTH,
@@ -2792,6 +2834,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
     html = environment.get_template("404.html").render(
         title="Page not found",
         description="This page does not exist. Browse the ranked awards and their recipients instead.",
+        share_description="This page does not exist. Browse the ranked awards and their recipients instead.",
         canonical="",
         share_image=public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}"),
         share_image_width=SHARE_IMAGE_WIDTH,
@@ -2844,7 +2887,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     try:
         shutil.copytree(website_dir / "static", staging / "static")
         shutil.copyfile(website_dir / "static" / "favicon.svg", staging / "favicon.svg")
-        write_share_images(staging, normalized_base_url, plan.jobs, website_dir / SHARE_FONT)
+        write_share_images(staging, normalized_base_url, plan.jobs)
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
                 lambda job: _render_job(environment, staging, normalized_base_url, corrections_email, job),

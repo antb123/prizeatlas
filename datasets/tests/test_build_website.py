@@ -809,9 +809,15 @@ class WebsiteBuildTests(unittest.TestCase):
             cards["/affiliations/university-of-toronto/"],
         )
         image_urls = {
-            "/people/geoffrey-hinton/": "winner-geoffrey-hinton.png",
+            "/": "default.png",
+            "/people/": "laureates.png",
+            "/people/geoffrey-hinton/": "laureates.png",
             "/nobel-prize/": "prize-nobel-prize.png",
-            "/affiliations/university-of-toronto/": "institution-university-of-toronto.png",
+            "/affiliations/": "institutions.png",
+            "/affiliations/university-of-toronto/": "institutions.png",
+            "/universities/": "universities.png",
+            "/map/": "map.png",
+            "/nearby/": "nearby.png",
         }
         for route, filename in image_urls.items():
             html = (self.website / "dist" / route.strip("/") / "index.html").read_text()
@@ -822,6 +828,34 @@ class WebsiteBuildTests(unittest.TestCase):
             self.assertIn(f'<meta name="twitter:image" content="{url}">', html)
             with Image.open(self.website / "dist/static/share" / filename) as image:
                 self.assertEqual(("PNG", "RGB", (1200, 630)), (image.format, image.mode, image.size))
+
+        self.assertEqual(
+            {
+                "default.png",
+                "institutions.png",
+                "laureates.png",
+                "map.png",
+                "nearby.png",
+                "prize-nobel-prize.png",
+                "universities.png",
+            },
+            {path.name for path in (self.website / "dist/static/share").glob("*.png")},
+        )
+        person = (self.website / "dist/people/geoffrey-hinton/index.html").read_text()
+        prize = (self.website / "dist/nobel-prize/index.html").read_text()
+        institution = (self.website / "dist/affiliations/university-of-toronto/index.html").read_text()
+        self.assertIn(
+            '<meta property="og:description" content="Laureate rank #1. 1 recorded award. Subjects: Physics.">',
+            person,
+        )
+        self.assertIn(
+            '<meta property="og:description" content="Prize rank #1. 2 recorded awards. Subjects: Chemistry, Physics.">',
+            prize,
+        )
+        self.assertIn(
+            '<meta property="og:description" content="Institution rank #1. 1 recorded award. Subjects: Physics.">',
+            institution,
+        )
 
         fallback = self.website / "dist/static/share/default.png"
         with Image.open(fallback) as image:
