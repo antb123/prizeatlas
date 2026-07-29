@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import datetime
 import hashlib
 import json
@@ -2124,6 +2125,17 @@ def write_robots(output: Path, base_url: str) -> None:
     (output / "robots.txt").write_text(body, encoding="utf-8")
 
 
+def write_dataset_csv(output: Path, records: Iterable[AwardRecord]) -> None:
+    """Dump the award records as RFC 4180 CSV, ordered by award_record_id for reproducible builds."""
+    with (output / "awards.csv").open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(AWARD_COLUMNS)
+        writer.writerows(
+            [getattr(record, column) for column in AWARD_COLUMNS]
+            for record in sorted(records, key=lambda record: record.award_record_id)
+        )
+
+
 def write_llms_txt(output: Path, base_url: str, plan: SitePlan, rankings: Iterable[Ranking]) -> None:
     """Write /llms.txt: what the site holds, how its URLs are shaped, and where a machine reader should start.
 
@@ -2250,6 +2262,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         home_href=relative_route(job.route, "/"),
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
+        csv_href=relative_file(job.route, "awards.csv"),
         asset_href=lambda target: relative_file(job.route, target) if target else "",
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
@@ -2285,6 +2298,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         home_href=root,
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
+        csv_href=root + "awards.csv",
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
@@ -2350,6 +2364,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
             list(rendered)
         write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
         write_robots(staging, normalized_base_url)
+        write_dataset_csv(staging, records)
         write_llms_txt(staging, normalized_base_url, plan, rankings)
         render_error_page(environment, staging, normalized_base_url)
         _make_world_readable(staging)

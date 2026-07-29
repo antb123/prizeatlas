@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import re
 import shutil
@@ -1450,6 +1451,53 @@ class WebsiteBuildTests(unittest.TestCase):
         locations = [element.text for element in root.findall(".//{*}loc")]
         self.assertEqual(len(plan.jobs), len(locations))
         self.assertNotIn("https://example.org/awards/404.html", locations)
+
+    def test_dataset_csv_dumps_every_award_and_is_linked_from_every_footer(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "test-02",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "category": "Mathematics",
+                "full_name": "Second Winner",
+                "laureate_wikidata_qid": "Q10",
+                "motivation": 'For saying "hello", clearly',
+                "affiliation_name": "First Institute",
+                "affiliation_country": "France",
+                "affiliation_wikidata_qid": "Q2",
+            },
+            {
+                "award_record_id": "test-01",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2000",
+                "category": "Physics",
+                "full_name": "First Winner",
+                "laureate_wikidata_qid": "Q11",
+            },
+        ]
+        database = self.create_database(
+            rankings,
+            records,
+            {"test-02": [{"affiliation_name": "Second Institute", "affiliation_country": "France"}]},
+        )
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        with (self.website / "dist/awards.csv").open(newline="") as handle:
+            rows = list(csv.reader(handle))
+        self.assertEqual(list(build.AWARD_COLUMNS), rows[0])
+        self.assertEqual(len(records), len(rows) - 1)
+        self.assertEqual(["test-01", "test-02"], [row[0] for row in rows[1:]])
+        self.assertEqual('For saying "hello", clearly', rows[2][build.AWARD_COLUMNS.index("motivation")])
+        self.assertEqual("First Institute", rows[2][build.AWARD_COLUMNS.index("affiliation_name")])
+
+        nested_html = (self.website / "dist/test-prize/physics/2000/index.html").read_text()
+        self.assertIn('href="../../../awards.csv" download', nested_html)
+        error_html = (self.website / "dist/404.html").read_text()
+        self.assertIn('href="/awards/awards.csv" download', error_html)
 
     def test_latest_thirty_prefixes_and_same_prefix_labels(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
