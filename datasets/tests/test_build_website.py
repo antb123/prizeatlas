@@ -355,6 +355,67 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("map.html", biology.template)
         self.assertEqual("Biology", biology.context["initial_subject"])
 
+    def test_nearby_payload_groups_places_and_people(self) -> None:
+        records = [
+            award(
+                award_record_id="r3",
+                full_name="Zed < Example",
+                laureate_wikidata_qid="Q3",
+                birth_city="Shared",
+                birth_country="France",
+                birth_coordinates="2,48",
+                affiliation_name="Common Institute",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2,48",
+            ),
+            award(
+                award_record_id="r1",
+                full_name="Alice & Example",
+                laureate_wikidata_qid="Q1",
+                birth_city="Shared",
+                birth_country="France",
+                birth_coordinates="2,48",
+                affiliation_name="Common Institute",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2,48",
+            ),
+            award(
+                award_record_id="r2",
+                full_name="Alice & Example",
+                laureate_wikidata_qid="Q1",
+                affiliation_name="Common Institute",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2,48",
+            ),
+            award(
+                award_record_id="r4",
+                full_name="Bob Example",
+                laureate_wikidata_qid="Q2",
+                affiliation_name="Other Institute",
+                affiliation_city="Paris",
+                affiliation_country="France",
+                affiliation_coordinates="2,48",
+            ),
+        ]
+        routes = {"Q1": "/people/alice/", "Q2": "/people/bob/", "Q3": "/people/zed/"}
+
+        payload = build.nearby_payload(records, routes)
+        self.assertEqual(
+            [["Alice & Example", "../people/alice/"], ["Bob Example", "../people/bob/"], ["Zed < Example", "../people/zed/"]],
+            payload["people"],
+        )
+        self.assertEqual(["a", "b"], [place["k"] for place in payload["places"]])
+        institution, birthplace = payload["places"]
+        self.assertEqual("Common Institute", institution["n"])
+        self.assertEqual(1, institution["x"])
+        self.assertEqual([0, 1, 2], institution["p"])
+        self.assertEqual([0, 2], birthplace["p"])
+        self.assertEqual(build.map_json(payload), build.map_json(build.nearby_payload(list(reversed(records)), routes)))
+        self.assertNotIn("<", build.map_json(payload))
+
     def test_complete_build_routes_metadata_escaping_and_relative_links(self) -> None:
         rankings = [
             ("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
@@ -476,6 +537,12 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('event.key !== "Enter" && event.key !== " "', map_html)
         self.assertIn("prefers-reduced-motion: reduce", map_html)
         self.assertIn('const plannedSubject = "Biology";', biology_map_html)
+        nearby_html = (self.website / "dist/nearby/index.html").read_text()
+        nearby_data = re.search(r'<script id="nearby-data" type="application/json">(.*?)</script>', nearby_html, re.DOTALL)
+        self.assertIsNotNone(nearby_data)
+        self.assertEqual({"people", "places"}, set(json.loads(nearby_data.group(1))))
+        explorer_html = (self.website / "dist/explorer/index.html").read_text()
+        self.assertIn('href="../nearby/">Find the winners nearest you</a>', explorer_html)
 
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
@@ -486,6 +553,7 @@ class WebsiteBuildTests(unittest.TestCase):
         )
         self.assertIn("https://example.org/awards/map/", locations)
         self.assertIn("https://example.org/awards/map/biology/", locations)
+        self.assertIn("https://example.org/awards/nearby/", locations)
         for path in (self.website / "dist", *(self.website / "dist").rglob("*")):
             mode = stat.S_IMODE(path.stat().st_mode)
             self.assertEqual(0o2755 if path.is_dir() else 0o644, mode, path)

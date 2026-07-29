@@ -60,6 +60,7 @@ TEMPLATES = (
     "subject_affiliations.html",
     "subject_recent.html",
     "explorer.html",
+    "nearby.html",
     "map.html",
     "about.html",
     "404.html",
@@ -80,6 +81,7 @@ AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
+NEARBY_ROUTE = "/nearby/"
 MAP_ROUTE = "/map/"
 ABOUT_ROUTE = "/about/"
 SUBJECTS = (
@@ -628,8 +630,71 @@ def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]
     return result
 
 
-def map_json(payload: dict[str, list[dict[str, object]]]) -> str:
+def map_json(payload: dict[str, Any]) -> str:
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False).replace("<", "\\u003c")
+
+
+def nearby_payload(records: list[AwardRecord], routes_by_laureate: dict[str, str]) -> dict[str, Any]:
+    """Return every recorded coordinate grouped into places and their laureates."""
+    people: dict[str, str] = {}
+    routed_people: set[str] = set()
+    places: dict[tuple[str, tuple[float, float]], dict[str, Any]] = {}
+
+    def add(kind: str, point: tuple[float, float], name: str, where: str, record: AwardRecord) -> None:
+        key = record.laureate_wikidata_qid or f"row:{record.award_record_id}"
+        people[key] = min(people.get(key, record.full_name), record.full_name)
+        if record.laureate_wikidata_qid:
+            routed_people.add(key)
+        place = places.setdefault(
+            (kind, point),
+            {"names": Counter(), "where": {}, "people": set()},
+        )
+        place["names"][name] += 1
+        place["where"].setdefault(name, Counter())[where] += 1
+        place["people"].add(key)
+
+    for record in records:
+        if _nonblank(record.birth_coordinates):
+            point = parse_map_points(record.birth_coordinates, record.award_record_id, "birth_coordinates", multiple=False)[0]
+            city = record.birth_city.strip()
+            country = record.birth_country.strip()
+            add("b", point, city or country or "Unnamed birthplace", country if city else "", record)
+
+        for affiliation in record.affiliations:
+            if not _nonblank(affiliation.coordinates):
+                continue
+            point = parse_map_points(affiliation.coordinates, record.award_record_id, "affiliation_coordinates", multiple=False)[0]
+            city = affiliation.city.strip()
+            country = affiliation.country.strip()
+            name = affiliation.name.strip()
+            where_parts = [part for part in (city, country) if part]
+            if not name:
+                name = where_parts.pop(0) if where_parts else "Unnamed institution"
+            add("a", point, name, ", ".join(where_parts), record)
+
+    ordered_people = sorted(people, key=lambda key: (people[key], key))
+    person_index = {key: index for index, key in enumerate(ordered_people)}
+    result_places: list[dict[str, Any]] = []
+    for (kind, point), place in sorted(places.items()):
+        headline = min(place["names"].items(), key=lambda item: (-item[1], item[0]))[0]
+        where = min(place["where"][headline].items(), key=lambda item: (-item[1], item[0]))[0]
+        result_places.append(
+            {
+                "k": kind,
+                "g": [point[0], point[1]],
+                "n": headline,
+                "w": where,
+                "x": len(place["names"]) - 1,
+                "p": [person_index[key] for key in sorted(place["people"], key=lambda key: (people[key], key))],
+            }
+        )
+    return {
+        "people": [
+            [people[key], relative_route(NEARBY_ROUTE, routes_by_laureate[key]) if key in routed_people else ""]
+            for key in ordered_people
+        ],
+        "places": result_places,
+    }
 
 
 def _descending_records(records: Iterable[AwardRecord]) -> list[AwardRecord]:
@@ -1931,6 +1996,20 @@ def create_site_plan(
         )
     )
 
+    nearby = nearby_payload(records, routes_by_laureate)
+    jobs.append(
+        _page(
+            "nearby.html",
+            NEARBY_ROUTE,
+            "Award Winners Near You",
+            "Find the laureate birthplaces and institutions closest to you, ranked by distance, using your browser's location.",
+            (Breadcrumb("Home", "/"), Breadcrumb("Nearby", None)),
+            payload=map_json(nearby),
+            places=len(nearby["places"]),
+            laureates=len(nearby["people"]),
+        )
+    )
+
     jobs.append(
         _page(
             "about.html",
@@ -2118,11 +2197,12 @@ The same awards regrouped under the school subject each belongs to, so one page 
 
 ## Bulk data
 
-These two pages carry their data as embedded JSON rather than prose, so read the script block and skip the markup.
+These three pages carry their data as embedded JSON rather than prose, so read the script block and skip the markup.
 
 - [Explorer]({public_url(base_url, EXPLORER_ROUTE)}): `<script id="explorer-data" type="application/json">` holds every laureate with their awards,
   countries, and birth year under abbreviated keys — the whole collection in one request.
 - [Map]({public_url(base_url, MAP_ROUTE)}): `<script id="map-data" type="application/json">` holds birthplace and institution coordinates by subject.
+- [Nearby]({public_url(base_url, NEARBY_ROUTE)}): `<script id="nearby-data" type="application/json">` holds `people` and coordinate-grouped `places` for browser-side proximity.
 """
     (output / "llms.txt").write_text(body, encoding="utf-8")
 
@@ -2160,6 +2240,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
+        nearby_route=NEARBY_ROUTE,
         map_route=MAP_ROUTE,
         about_route=ABOUT_ROUTE,
         structured_data=_structured_data(base_url, job),
@@ -2193,6 +2274,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         affiliations_route=AFFILIATIONS_ROUTE,
         subjects_route=SUBJECTS_ROUTE,
         explorer_route=EXPLORER_ROUTE,
+        nearby_route=NEARBY_ROUTE,
         map_route=MAP_ROUTE,
         about_route=ABOUT_ROUTE,
         structured_data="",

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block head %}
+  <style>
+    .locate { margin: 2rem 0; }
+    .locate button {
+      min-height: 2.45rem;
+      padding: .5rem .75rem;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      color: var(--ink);
+      background: var(--surface);
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color .15s ease, opacity .15s ease, background .15s ease;
+    }
+    .locate button:hover { color: var(--accent); background: var(--paper); }
+    .locate button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .locate button:disabled { cursor: wait; opacity: .55; }
+    #status { min-height: 1.6em; margin: .75rem 0 0; color: var(--muted); }
+    .privacy { color: var(--muted); font-size: .875rem; }
+    .near-list { margin: 1rem 0 2rem; padding: 0; list-style: none; }
+    .near-list > li { padding: 1rem 0; border-top: 1px solid var(--rule); }
+    .near-meta { margin: 0 0 .3rem; color: var(--muted); font-size: .8125rem; font-variant-numeric: tabular-nums; }
+    .near-name { margin: 0; font-size: 1.0625rem; font-weight: 500; line-height: 1.25; }
+    .near-where { margin: .2rem 0 .5rem; color: var(--muted); font-size: .875rem; }
+    .near-dot { display: inline-block; width: .55rem; height: .55rem; margin: 0 .3rem; border-radius: 50%; vertical-align: .02rem; }
+    .near-dot.birth { background: var(--birth); }
+    .near-dot.institution { background: var(--institution); }
+    .near-list .rank-units { margin: 0; }
+    :root { --birth: #9a6035; --institution: #346d76; }
+    @media (prefers-color-scheme: dark) {
+      :root { --birth: #d3a06e; --institution: #86b5bc; }
+    }
+    @media (min-width: 40rem) {
+      .near-list > li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); column-gap: 1rem; }
+      .near-meta { grid-row: 1 / span 3; }
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <header class="page-intro">
+    <p class="eyebrow">Nearby</p>
+    <h1>Award winners near you</h1>
+    <p>The recorded birthplaces and institutions closest to wherever you are.</p>
+  </header>
+
+  <section class="locate">
+    <button id="locate" type="button">Use my location</button>
+    <p id="status" role="status"></p>
+    <p class="privacy">Your position stays in this browser. The whole dataset already arrived with this page, so there is nothing to send.</p>
+  </section>
+
+  <h2 id="near-h" tabindex="-1" hidden>Near you</h2>
+  <ol id="near-list" class="near-list"></ol>
+
+  <p class="footnote">{{ "{:,}".format(places) }} places and {{ "{:,}".format(laureates) }} laureates carry coordinates. Every place is on the <a href="{{ href(map_route) }}">Map</a>; every country is under <a href="{{ href(countries_route) }}">Countries</a>.</p>
+
+  <script id="nearby-data" type="application/json">{{ payload|safe }}</script>
+  <script>
+    (() => {
+      "use strict";
+      const button = document.getElementById("locate");
+      const status = document.getElementById("status");
+      const heading = document.getElementById("near-h");
+      const list = document.getElementById("near-list");
+      let located = false;
+
+      const esc = (value) => String(value).replace(/[&<>"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[character]);
+      const formatDistance = (distance) => {
+        if (distance < 1) return "under 1 km";
+        if (distance < 10) return `${distance.toFixed(1)} km`;
+        return `${Math.round(distance).toLocaleString("en")} km`;
+      };
+      const distance = (latitude, longitude, point) => {
+        const radians = Math.PI / 180;
+        const deltaLatitude = (point[1] - latitude) * radians;
+        const deltaLongitude = (point[0] - longitude) * radians;
+        const a = Math.sin(deltaLatitude / 2) ** 2 + Math.cos(latitude * radians) * Math.cos(point[1] * radians) * Math.sin(deltaLongitude / 2) ** 2;
+        return 2 * 6371 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      };
+      const clearResults = () => {
+        list.replaceChildren();
+        heading.hidden = true;
+      };
+      const show = (latitude, longitude, fromFragment) => {
+        const payload = JSON.parse(document.getElementById("nearby-data").textContent);
+        const nearest = payload.places.map((place) => ({...place, d: distance(latitude, longitude, place.g)})).sort((left, right) => left.d - right.d).slice(0, 25);
+        if (!nearest.length) return;
+        const closest = nearest[0];
+        heading.textContent = closest.d > 500 ? "Closest anywhere" : "Near you";
+        heading.hidden = false;
+        list.innerHTML = nearest.map((place) => {
+          const names = place.p.map((index) => payload.people[index]);
+          const visible = names.slice(0, 4).map(([name, route]) => route ? `<a href="${esc(route)}">${esc(name)}</a>` : esc(name));
+          const extra = names.length - visible.length;
+          const where = place.w ? `<p class="near-where">${esc(place.w)}${place.x ? ` · + ${place.x} other name${place.x === 1 ? "" : "s"} recorded here` : ""}</p>` : place.x ? `<p class="near-where">+ ${place.x} other name${place.x === 1 ? "" : "s"} recorded here</p>` : "";
+          return `<li><p class="near-meta">${formatDistance(place.d)} · <span class="near-dot ${place.k === "b" ? "birth" : "institution"}"></span>${place.k === "b" ? "Born here" : "Worked here"}</p><p class="near-name">${esc(place.n)}</p>${where}<p class="rank-units">${visible.join(", ")}</p>${extra ? `<p class="rank-units-more">+ ${extra} more</p>` : ""}</li>`;
+        }).join("");
+        if (closest.d > 500) {
+          status.textContent = `Nothing recorded near you — the closest is ${formatDistance(closest.d)} away.`;
+        } else {
+          status.textContent = `${nearest.length} places within ${formatDistance(nearest.at(-1).d)}. Nearest: ${closest.n}.`;
+        }
+        if (fromFragment) status.textContent += ` Showing places near ${latitude.toFixed(2)}, ${longitude.toFixed(2)} — from the address bar, not your location.`;
+        heading.focus();
+      };
+      const fragment = location.hash.match(/^#at=([^,]+),([^,]+)$/);
+      const latitude = fragment ? Number(fragment[1]) : NaN;
+      const longitude = fragment ? Number(fragment[2]) : NaN;
+      const hasFragment = Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
+
+      if (!window.isSecureContext || !navigator.geolocation) {
+        button.remove();
+        status.innerHTML = `Your browser cannot share a location here. You can still explore the <a href="{{ href(map_route) }}">Map</a>.`;
+      } else {
+        button.addEventListener("click", () => {
+          button.disabled = true;
+          button.setAttribute("aria-busy", "true");
+          status.textContent = "Waiting for your browser to share a location…";
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              button.disabled = false;
+              button.removeAttribute("aria-busy");
+              if (!located) button.textContent = "Update my location";
+              located = true;
+              show(position.coords.latitude, position.coords.longitude, false);
+            },
+            (error) => {
+              button.disabled = false;
+              button.removeAttribute("aria-busy");
+              clearResults();
+              status.textContent = error.code === 1
+                ? "Location not shared — nothing was sent anywhere. You can try again from the padlock in the address bar, or open the Map."
+                : error.code === 2
+                  ? "Your device could not work out where it is. Try again in a moment, or open the Map."
+                  : "That took too long. Try again — a second attempt is usually faster.";
+            },
+            {timeout: 10000, maximumAge: located ? 0 : 300000},
+          );
+        });
+      }
+      if (hasFragment) show(latitude, longitude, true);
+    })();
+  </script>
+{% endblock %}
