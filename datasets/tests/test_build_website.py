@@ -266,6 +266,23 @@ class WebsiteBuildTests(unittest.TestCase):
         explorer = next(job for job in plan.jobs if job.route == build.EXPLORER_ROUTE)
         self.assertEqual("explorer.html", explorer.template)
 
+    def test_explorer_section_order_and_chart_limits(self) -> None:
+        explorer_html = (Path(build.__file__).parent / "templates/explorer.html").read_text()
+        section_markers = (
+            'id="local-winners"',
+            'id="board-h"',
+            'id="country-h"',
+            'id="young-h"',
+            'id="age-h"',
+            'id="flow-h"',
+            'id="time-h"',
+        )
+        section_positions = [explorer_html.index(marker) for marker in section_markers]
+
+        self.assertEqual(sorted(section_positions), section_positions)
+        self.assertIn("PEOPLE.filter((p) => p.bc === countryIdx).slice(0, TOP_N)", explorer_html)
+        self.assertIn("PEOPLE.filter((p) => p.by && p.a.some(([year]) => year - p.by < 40)).slice(0, TOP_N)", explorer_html)
+
     def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
         rankings = [
             build.Ranking("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100, "Blurb.", "Reasoning."),
@@ -867,7 +884,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', error_page)
         self.assertIn("<p class=\"eyebrow\">Top Institutions</p>", homepage)
         self.assertIn("<h2>Institutions with the most award-winning laureates</h2>", homepage)
-        self.assertIn("not by institutional quality", homepage)
+        self.assertNotIn("not by institutional quality", homepage)
         self.assertIn('href="affiliations/university-of-toronto/">University of Toronto</a>', homepage)
         build.build_site(database, "https://example.org/", self.website)
         self.assertEqual(fallback_bytes, fallback.read_bytes())

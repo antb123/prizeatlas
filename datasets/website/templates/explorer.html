@@ -125,6 +125,13 @@
     <ul class="stats" id="stats"></ul>
   </header>
 
+  <section id="local-winners" aria-labelledby="local-winners-h">
+    <h2 id="local-winners-h">Top winners in your country</h2>
+    <p class="section-note" id="local-winners-note">Detecting your country…</p>
+    <figure id="local-winners-chart"></figure>
+    <p class="section-note"><a href="{{ href(nearby_route) }}">Find the winners nearest you</a></p>
+  </section>
+
   <section aria-labelledby="board-h">
     <h2 id="board-h">Leaderboard</h2>
     <p class="section-note">The top 7 are shown — search to find anyone else. Click a row to see the full award record behind the score. Click a column heading to re-sort.</p>
@@ -145,29 +152,6 @@
     </table>
   </section>
 
-  <section id="local-winners" aria-labelledby="local-winners-h">
-    <h2 id="local-winners-h">Top winners in your country</h2>
-    <p class="section-note" id="local-winners-note">Detecting your country…</p>
-    <figure id="local-winners-chart"></figure>
-    <p class="section-note"><a href="{{ href(nearby_route) }}">Find the winners nearest you</a></p>
-  </section>
-
-  <section aria-labelledby="young-h">
-    <h2 id="young-h">Career totals of early winners</h2>
-    <p class="section-note">
-      Laureates who won at least one award before turning 40, ranked by their lifetime points — these are finished careers, not people who are young now.
-      Age comes from birth year, so it may be off by one.
-    </p>
-    <figure id="young-chart"></figure>
-  </section>
-
-  <section aria-labelledby="time-h">
-    <h2 id="time-h">Awards by decade</h2>
-    <p class="section-note">How many awards each prize family has handed out over time. The final decade is marked&nbsp;* because it is still running.</p>
-    <select class="chart-select" id="family-select" aria-label="Prize family"></select>
-    <figure id="time-chart"></figure>
-  </section>
-
   <section aria-labelledby="country-h">
     <h2 id="country-h">Laureates by country</h2>
     <p class="section-note">
@@ -184,6 +168,15 @@
       <option value="pa">Affiliations / 1m</option>
     </select>
     <figure id="country-chart"></figure>
+  </section>
+
+  <section aria-labelledby="young-h">
+    <h2 id="young-h">Career totals of early winners</h2>
+    <p class="section-note">
+      Laureates who won at least one award before turning 40, ranked by their lifetime points — these are finished careers, not people who are young now.
+      Age comes from birth year, so it may be off by one.
+    </p>
+    <figure id="young-chart"></figure>
   </section>
 
   <section aria-labelledby="age-h">
@@ -208,6 +201,13 @@
       <span><i class="swatch-affiliated"></i>Affiliated there</span>
     </p>
     <figure id="flow-chart"></figure>
+  </section>
+
+  <section aria-labelledby="time-h">
+    <h2 id="time-h">Awards by decade</h2>
+    <p class="section-note">How many awards each prize family has handed out over time. The final decade is marked&nbsp;* because it is still running.</p>
+    <select class="chart-select" id="family-select" aria-label="Prize family"></select>
+    <figure id="time-chart"></figure>
   </section>
 
   <p class="explorer-note">
@@ -361,7 +361,7 @@ countryLookup
     const countryName = aliases[country] || new Intl.DisplayNames(["en"], { type: "region" }).of(country);
     const countryIdx = COUNTRIES.indexOf(countryName);
     if (countryIdx < 0) throw new Error("country is not represented");
-    const local = PEOPLE.filter((p) => p.bc === countryIdx).slice(0, 25);
+    const local = PEOPLE.filter((p) => p.bc === countryIdx).slice(0, TOP_N);
     if (!local.length) throw new Error("country has no birth records");
 
     const rowH = 24, labelW = 215, valueW = 48, width = 860, height = local.length * rowH + 8;
@@ -389,7 +389,7 @@ countryLookup
 
 /* ---------- top winners under 40 ---------- */
 {
-  const young = PEOPLE.filter((p) => p.by && p.a.some(([year]) => year - p.by < 40)).slice(0, 25);
+  const young = PEOPLE.filter((p) => p.by && p.a.some(([year]) => year - p.by < 40)).slice(0, TOP_N);
   const rowH = 24, labelW = 215, valueW = 48, width = 860, height = young.length * rowH + 8;
   const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Top winners under 40 by points" });
   const max = young.length ? young[0].p : 1;
