@@ -47,9 +47,8 @@
     {% block content %}{% endblock %}
   </main>
   <footer>
-    <p>A static guide to international awards and their recipients. <a href="{{ href(about_route) }}">About this site</a> · <a href="{{ csv_href }}" download>Download the data (CSV)</a></p>
     {% set correction = correction_href() %}
-    {% if correction %}<p>Found an error on this page? <a href="{{ correction }}">Report a correction</a></p>{% endif %}
+    <p><a href="{{ href(about_route) }}">About</a> · <a href="{{ csv_href }}" download>Download as CSV</a>{% if correction %} · <a href="{{ correction }}">Report correction</a>{% endif %}</p>
   </footer>
 </body>
 </html>
