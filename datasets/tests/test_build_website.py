@@ -534,22 +534,22 @@ class WebsiteBuildTests(unittest.TestCase):
         awards_html = (self.website / "dist/awards/index.html").read_text()
         self.assertIn("<title>Awards</title>", awards_html)
         self.assertIn('<link rel="canonical" href="https://example.org/awards/awards/">', awards_html)
+        home_awards = re.search(r'<section id="ranked-awards">.*?</section>', home_html, re.DOTALL)
+        awards_page_awards = re.search(r'<section id="ranked-awards">.*?</section>', awards_html, re.DOTALL)
+        self.assertIsNotNone(home_awards)
+        self.assertIsNotNone(awards_page_awards)
+        self.assertEqual(home_awards.group(0), awards_page_awards.group(0).replace('="../', '="'))
         self.assertEqual(len(rankings), awards_html.count("<article>"))
-        self.assertIn('href="../nobel-prize/">Nobel Prize</a>', awards_html)
-        self.assertIn('href="../turing-award/">Turing Award</a>', awards_html)
-        self.assertIn('href="../japan-prize/">Japan Prize</a>', awards_html)
         self.assertIn('src="../static/logos/nobel-prize.png" alt="Nobel Prize logo"', awards_html)
+        self.assertIn("<p>Blurb.</p>", awards_html)
+        self.assertIn("<span>Score</span> 100", awards_html)
         self.assertIn('href="./">Awards</a>', awards_html)
         for excluded in (
             "Prestigious Awards and Winners",
             "An editorial ranking",
             "Most decorated",
             "Recently awarded",
-            "Ranked awards",
             '<dl class="totals">',
-            '<div class="rank">',
-            "<span>Score</span>",
-            "Blurb.",
         ):
             self.assertNotIn(excluded, awards_html)
         turing_html = turing.read_text()

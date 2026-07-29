@@ -1,23 +1,4 @@
 {% extends "base.html" %}
 {% block content %}
-<header class="page-intro">
-  <h1>Awards</h1>
-</header>
-<ul class="ranking">
-  {% for prize, route in prizes %}
-  <li>
-    <article>
-      <div class="award-identity">
-        {% if prize.logo %}<img class="award-logo" src="{{ asset_href(prize.logo) }}" alt="{{ prize.prize_name }} logo">{% endif %}
-      </div>
-      <div>
-        <h3>
-          <a href="{{ href(route) }}">{{ prize.prize_name }}</a>
-          <a class="external-link" href="{{ prize.url }}" aria-label="{{ prize.prize_name }} official website" title="Official website">↗</a>
-        </h3>
-      </div>
-    </article>
-  </li>
-  {% endfor %}
-</ul>
+{% include "_awards.html" %}
 {% endblock %}

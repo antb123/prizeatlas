@@ -43,6 +43,7 @@ TEMPLATES = (
     "base.html",
     "index.html",
     "awards.html",
+    "_awards.html",
     "prize.html",
     "winners.html",
     "category.html",
