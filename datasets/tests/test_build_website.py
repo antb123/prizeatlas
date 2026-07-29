@@ -401,8 +401,9 @@ class WebsiteBuildTests(unittest.TestCase):
             ),
         ]
         routes = {"Q1": "/people/alice/", "Q2": "/people/bob/", "Q3": "/people/zed/"}
+        affiliations = [build.Affiliation("Common Institute", "common-institute", "/affiliations/common-institute/", 2, (), (), (), None)]
 
-        payload = build.nearby_payload(records, routes)
+        payload = build.nearby_payload(records, routes, affiliations)
         self.assertEqual(
             [["Alice & Example", "../people/alice/"], ["Bob Example", "../people/bob/"], ["Zed < Example", "../people/zed/"]],
             payload["people"],
@@ -411,9 +412,11 @@ class WebsiteBuildTests(unittest.TestCase):
         institution, birthplace = payload["places"]
         self.assertEqual("Common Institute", institution["n"])
         self.assertEqual(1, institution["x"])
+        self.assertEqual("../affiliations/common-institute/", institution["r"])
+        self.assertEqual(2, institution["c"])
         self.assertEqual([0, 1, 2], institution["p"])
         self.assertEqual([0, 2], birthplace["p"])
-        self.assertEqual(build.map_json(payload), build.map_json(build.nearby_payload(list(reversed(records)), routes)))
+        self.assertEqual(build.map_json(payload), build.map_json(build.nearby_payload(list(reversed(records)), routes, affiliations)))
         self.assertNotIn("<", build.map_json(payload))
 
     def test_complete_build_routes_metadata_escaping_and_relative_links(self) -> None:

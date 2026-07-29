@@ -634,24 +634,38 @@ def map_json(payload: dict[str, Any]) -> str:
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False).replace("<", "\\u003c")
 
 
-def nearby_payload(records: list[AwardRecord], routes_by_laureate: dict[str, str]) -> dict[str, Any]:
+def nearby_payload(
+    records: list[AwardRecord],
+    routes_by_laureate: dict[str, str],
+    affiliations: Iterable[Affiliation] = (),
+) -> dict[str, Any]:
     """Return every recorded coordinate grouped into places and their laureates."""
     people: dict[str, str] = {}
     routed_people: set[str] = set()
     places: dict[tuple[str, tuple[float, float]], dict[str, Any]] = {}
+    affiliations_by_slug = {affiliation.slug: affiliation for affiliation in affiliations}
 
-    def add(kind: str, point: tuple[float, float], name: str, where: str, record: AwardRecord) -> None:
+    def add(
+        kind: str,
+        point: tuple[float, float],
+        name: str,
+        where: str,
+        record: AwardRecord,
+        affiliation: Affiliation | None = None,
+    ) -> None:
         key = record.laureate_wikidata_qid or f"row:{record.award_record_id}"
         people[key] = min(people.get(key, record.full_name), record.full_name)
         if record.laureate_wikidata_qid:
             routed_people.add(key)
         place = places.setdefault(
             (kind, point),
-            {"names": Counter(), "where": {}, "people": set()},
+            {"names": Counter(), "where": {}, "people": set(), "affiliations": {}},
         )
         place["names"][name] += 1
         place["where"].setdefault(name, Counter())[where] += 1
         place["people"].add(key)
+        if affiliation is not None:
+            place["affiliations"][name] = affiliation
 
     for record in records:
         if _nonblank(record.birth_coordinates):
@@ -670,7 +684,8 @@ def nearby_payload(records: list[AwardRecord], routes_by_laureate: dict[str, str
             where_parts = [part for part in (city, country) if part]
             if not name:
                 name = where_parts.pop(0) if where_parts else "Unnamed institution"
-            add("a", point, name, ", ".join(where_parts), record)
+            matched_affiliation = affiliations_by_slug.get(affiliation_slug(name)) if affiliation.name.strip() else None
+            add("a", point, name, ", ".join(where_parts), record, matched_affiliation)
 
     ordered_people = sorted(people, key=lambda key: (people[key], key))
     person_index = {key: index for index, key in enumerate(ordered_people)}
@@ -678,6 +693,7 @@ def nearby_payload(records: list[AwardRecord], routes_by_laureate: dict[str, str
     for (kind, point), place in sorted(places.items()):
         headline = min(place["names"].items(), key=lambda item: (-item[1], item[0]))[0]
         where = min(place["where"][headline].items(), key=lambda item: (-item[1], item[0]))[0]
+        affiliation = place["affiliations"].get(headline)
         result_places.append(
             {
                 "k": kind,
@@ -686,6 +702,8 @@ def nearby_payload(records: list[AwardRecord], routes_by_laureate: dict[str, str
                 "w": where,
                 "x": len(place["names"]) - 1,
                 "p": [person_index[key] for key in sorted(place["people"], key=lambda key: (people[key], key))],
+                "r": relative_route(NEARBY_ROUTE, affiliation.route) if affiliation else "",
+                "c": affiliation.count if affiliation else 0,
             }
         )
     return {
@@ -1996,7 +2014,7 @@ def create_site_plan(
         )
     )
 
-    nearby = nearby_payload(records, routes_by_laureate)
+    nearby = nearby_payload(records, routes_by_laureate, affiliations)
     jobs.append(
         _page(
             "nearby.html",

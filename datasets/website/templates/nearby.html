@@ -96,7 +96,8 @@
           const visible = names.slice(0, 4).map(([name, route]) => route ? `<a href="${esc(route)}">${esc(name)}</a>` : esc(name));
           const extra = names.length - visible.length;
           const where = place.w ? `<p class="near-where">${esc(place.w)}${place.x ? ` · + ${place.x} other name${place.x === 1 ? "" : "s"} recorded here` : ""}</p>` : place.x ? `<p class="near-where">+ ${place.x} other name${place.x === 1 ? "" : "s"} recorded here</p>` : "";
-          return `<li><p class="near-meta">${formatDistance(place.d)} · <span class="near-dot ${place.k === "b" ? "birth" : "institution"}"></span>${place.k === "b" ? "Born here" : "Worked here"}</p><p class="near-name">${esc(place.n)}</p>${where}<p class="rank-units">${visible.join(", ")}</p>${extra ? `<p class="rank-units-more">+ ${extra} more</p>` : ""}</li>`;
+          const name = place.r ? `<a href="${esc(place.r)}">${esc(place.n)} (${place.c})</a>` : esc(place.n);
+          return `<li><p class="near-meta">${formatDistance(place.d)} · <span class="near-dot ${place.k === "b" ? "birth" : "institution"}"></span>${place.k === "b" ? "Born here" : "Worked here"}</p><p class="near-name">${name}</p>${where}<p class="rank-units">${visible.join(", ")}</p>${extra ? `<p class="rank-units-more">+ ${extra} more</p>` : ""}</li>`;
         }).join("");
         if (closest.d > 500) {
           status.textContent = `Nothing recorded near you — the closest is ${formatDistance(closest.d)} away.`;
