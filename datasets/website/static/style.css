@@ -730,6 +730,51 @@ h3 {
   line-height: 1.45;
 }
 
+.ask-ai {
+  max-width: 46rem;
+  margin-block: 1.75rem;
+  padding-block: 1rem;
+  border-block: 1px solid var(--rule);
+}
+
+.ask-ai-label {
+  margin: 0 0 0.65rem;
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ask-ai-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ask-ai-actions button {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.ask-ai-actions button:hover {
+  border-color: var(--accent);
+}
+
+.ask-ai-actions button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .winner-links {
   display: flex;
   flex-wrap: wrap;

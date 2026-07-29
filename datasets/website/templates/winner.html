@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+{% set ask_ai_topic = record.full_name %}
+{% if record.motivation %}{% set ask_ai_topic = ask_ai_topic ~ " — " ~ record.motivation %}{% endif %}
+{% set ask_ai_prompt = 'Explain to me in clear language: "' ~ ask_ai_topic ~ '"' %}
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
@@ -9,9 +12,20 @@
       <h1>{{ record.full_name }}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if record.biographical_note %}<p class="lead">{{ record.biographical_note }}</p>{% endif %}
+      <div class="ask-ai" aria-label="Ask an AI about this award">
+        <p class="ask-ai-label">Ask AI</p>
+        <form action="https://chatgpt.com/" method="get" target="_blank" rel="noopener noreferrer">
+          <input type="hidden" name="q" value="{{ ask_ai_prompt }}">
+          <div class="ask-ai-actions">
+            <button type="submit" formaction="https://chatgpt.com/" title="{{ ask_ai_prompt }}">ChatGPT <span aria-hidden="true">↗</span></button>
+            <button type="submit" formaction="https://www.perplexity.ai/search" title="{{ ask_ai_prompt }}">Perplexity <span aria-hidden="true">↗</span></button>
+            <button type="submit" formaction="https://search.brave.com/ask" title="{{ ask_ai_prompt }}">Brave <span aria-hidden="true">↗</span></button>
+          </div>
+        </form>
+      </div>
       <p class="winner-links">
-        {% if person_route %}<a class="person-link" href="{{ href(person_route) }}">All awards won by {{ record.full_name }}</a>{% endif %}
-        <a class="external-source" href="{{ wikipedia_url }}">Find {{ record.full_name }} on Wikipedia <span aria-hidden="true">↗</span></a>
+        {% if person_route %}<a class="person-link" href="{{ href(person_route) }}">All awards</a>{% endif %}
+        <a class="external-source" href="{{ wikipedia_url }}">Check Wikipedia <span aria-hidden="true">↗</span></a>
       </p>
     </header>
     {% if record.affiliations %}

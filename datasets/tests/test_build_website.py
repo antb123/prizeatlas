@@ -517,6 +517,12 @@ class WebsiteBuildTests(unittest.TestCase):
             'href="https://en.wikipedia.org/w/index.php?search=Ernest+Orlando+Lawrence"',
             physics_html,
         )
+        self.assertIn('name="q" value="Explain to me in clear language: &#34;Ernest Orlando Lawrence — &lt;em&gt;unsafe&lt;/em&gt;&#34;"', physics_html)
+        self.assertIn('formaction="https://chatgpt.com/"', physics_html)
+        self.assertIn('formaction="https://www.perplexity.ai/search"', physics_html)
+        self.assertIn('formaction="https://search.brave.com/ask"', physics_html)
+        self.assertEqual(3, physics_html.count('title="Explain to me in clear language:'))
+        self.assertIn('name="q" value="Explain to me in clear language: &#34;Organization Example&#34;"', turing.read_text())
         physics_category_html = physics_category.read_text()
         self.assertIn('href="1939/ernest-orlando-lawrence/">Ernest Orlando Lawrence</a>', physics_category_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_category_html)
@@ -892,10 +898,11 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="../../nobel-prize/medicine/2012/shinya-yamanaka/"', person_html)
 
         linked = (self.website / "dist/nobel-prize/medicine/2012/shinya-yamanaka/index.html").read_text()
-        self.assertIn("All awards won by Shinya Yamanaka", linked)
+        self.assertIn(">All awards</a>", linked)
+        self.assertIn("Check Wikipedia", linked)
         # A record without a laureate QID cannot be merged, so it gets no person page and no link.
         unlinked = (self.website / "dist/nobel-prize/physics/2012/unlinked-laureate/index.html").read_text()
-        self.assertNotIn("All awards won by", unlinked)
+        self.assertNotIn(">All awards</a>", unlinked)
         self.assertFalse((self.website / "dist/people/unlinked-laureate").exists())
 
         index_html = (self.website / "dist/people/index.html").read_text()
