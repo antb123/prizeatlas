@@ -9,8 +9,6 @@ import stat
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
-from io import StringIO
 from pathlib import Path
 from unittest import mock
 from urllib.parse import urlsplit
@@ -1852,44 +1850,35 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual({0o2775}, set(staging_modes))
         self.assertEqual(b"previous", marker.read_bytes())
 
-    def test_promotion_failure_rolls_back_previous_output(self) -> None:
+    def test_promotion_replaces_generated_output_without_backup(self) -> None:
         staging = self.website / ".dist-staging-test"
         dist = self.website / "dist"
         staging.mkdir()
         dist.mkdir()
         (staging / "new").write_bytes(b"new")
         (dist / "old").write_bytes(b"old")
-        real_rename = Path.rename
 
-        def rename(path: Path, target: Path) -> Path:
-            if path == staging:
-                raise OSError("forced promotion failure")
-            return real_rename(path, target)
+        build._promote(staging, dist)
 
-        with mock.patch.object(Path, "rename", autospec=True, side_effect=rename), self.assertRaises(OSError):
+        self.assertEqual(b"new", (dist / "new").read_bytes())
+        self.assertFalse((dist / "old").exists())
+        self.assertFalse(staging.exists())
+        self.assertEqual([], list(self.website.glob(".dist-backup-*")))
+
+    def test_dist_cleanup_failure_does_not_promote_staging(self) -> None:
+        staging = self.website / ".dist-staging-test"
+        dist = self.website / "dist"
+        staging.mkdir()
+        dist.mkdir()
+        (staging / "new").write_bytes(b"new")
+        (dist / "old").write_bytes(b"old")
+
+        with mock.patch.object(build.shutil, "rmtree", side_effect=OSError("forced cleanup failure")), self.assertRaises(OSError):
             build._promote(staging, dist)
 
         self.assertEqual(b"old", (dist / "old").read_bytes())
         self.assertTrue(staging.is_dir())
-
-    def test_backup_cleanup_failure_keeps_new_output_active(self) -> None:
-        staging = self.website / ".dist-staging-test"
-        dist = self.website / "dist"
-        staging.mkdir()
-        dist.mkdir()
-        (staging / "new").write_bytes(b"new")
-        (dist / "old").write_bytes(b"old")
-        errors = StringIO()
-
-        with mock.patch.object(build.shutil, "rmtree", side_effect=OSError("forced cleanup failure")), redirect_stderr(errors):
-            build._promote(staging, dist)
-
-        self.assertEqual(b"new", (dist / "new").read_bytes())
-        backups = list(self.website.glob(".dist-backup-*"))
-        self.assertEqual(1, len(backups))
-        self.assertEqual(b"old", (backups[0] / "old").read_bytes())
-        self.assertIn("operation=backup-cleanup", errors.getvalue())
-        self.assertIn("error=forced cleanup failure", errors.getvalue())
+        self.assertEqual([], list(self.website.glob(".dist-backup-*")))
 
 
 if __name__ == "__main__":

@@ -2600,25 +2600,9 @@ def _make_world_readable(root: Path) -> None:
 
 
 def _promote(staging: Path, dist: Path) -> None:
-    backup: Path | None = None
     if dist.exists():
-        backup = Path(tempfile.mkdtemp(prefix=".dist-backup-", dir=dist.parent))
-        backup.rmdir()
-        dist.rename(backup)
-    try:
-        staging.rename(dist)
-    except OSError as promotion_error:
-        if backup is not None:
-            try:
-                backup.rename(dist)
-            except OSError as rollback_error:
-                raise BuildFailure(f"promotion and rollback failed: {rollback_error}") from promotion_error
-        raise
-    if backup is not None:
-        try:
-            shutil.rmtree(backup)
-        except OSError as error:
-            print(f"website build warning operation=backup-cleanup path={backup} outcome=failed error={error}", file=sys.stderr)
+        shutil.rmtree(dist)
+    staging.rename(dist)
 
 
 def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:
