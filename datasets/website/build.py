@@ -168,8 +168,10 @@ AWARD_COLUMNS = (
     "death_country",
     "biographical_note",
     "high_school_subject",
-    "openalex_id",
-    "orcid",
+    "orc_id",
+    "affiliate_ror",
+    "author_openalex_id",
+    "institution_openalex_id",
 )
 
 
@@ -220,8 +222,10 @@ class AwardRecord:
     death_country: str
     biographical_note: str
     high_school_subject: str
-    openalex_id: str
-    orcid: str
+    orc_id: str
+    affiliate_ror: str
+    author_openalex_id: str
+    institution_openalex_id: str
     affiliations: tuple[AwardAffiliation, ...] = ()
 
 

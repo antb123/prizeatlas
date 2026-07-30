@@ -1,8 +1,8 @@
 ## Goals
 
-Add `openalex_id` and `orcid` as optional researcher identifiers on every row of the authoritative `awards` table and on the static website's `AwardRecord` data model.
+Add `orc_id`, `affiliate_ror`, `author_openalex_id`, and `institution_openalex_id` as optional researcher and institution identifiers on every row of the authoritative `awards` table and on the static website's `AwardRecord` data model.
 
-The change MUST preserve all 3,096 existing award rows, every existing value and `award_record_id`, and the current website behavior. A completed build SHALL carry both new values through the read model and append them to the generated `awards.csv`; it shall not display them in HTML.
+The change MUST preserve all 3,096 existing award rows, every existing value and `award_record_id`, and the current website behavior. A completed build SHALL carry all four new values through the read model and append them to the generated `awards.csv`; it shall not display them in HTML.
 
 ## Background
 
@@ -14,23 +14,24 @@ The test database and record helper derive their columns from `AWARD_COLUMNS` (`
 
 ## Assumptions
 
-1. **Load-bearing:** `openalex_id` stores a compact OpenAlex Author ID such as `A1969205032`, not an OpenAlex URL or a work/institution ID.
-2. **Load-bearing:** `orcid` stores the canonical hyphenated 16-digit form exemplified by `0000-0002-0254-0778`, without an `https://orcid.org/` prefix.
-3. **Load-bearing:** The supplied ORCID is a format example only; no award row is assigned either identifier in this change because no laureate or `award_record_id` was specified.
-4. Both fields are present on organization rows for a uniform row schema but remain blank; they describe individual researchers.
-5. Empty string is the repository's unset-value representation for newly appended text fields and MUST be the non-null default.
-6. The fields are not unique at award-row level because one researcher can have several award rows carrying the same OpenAlex ID and ORCID.
-7. Identifier discovery, backfilling, validation, HTML display, linking, identity merging, and API access are out of scope.
+1. **Load-bearing:** `orc_id` stores the canonical hyphenated 16-digit ORCID form exemplified by `0000-0002-0254-0778`, without an `https://orcid.org/` prefix.
+2. **Load-bearing:** `author_openalex_id` stores a compact OpenAlex Author ID such as `A1969205032`, and `institution_openalex_id` stores a compact OpenAlex Institution ID such as `I136199984`.
+3. **Load-bearing:** `affiliate_ror` stores the compact ROR identifier such as `03vek6s52`, without an `https://ror.org/` prefix.
+4. **Load-bearing:** The supplied ORCID is a format example only; no award row is assigned any identifier in this change because no laureate or `award_record_id` was specified.
+5. The author fields are present on organization rows for a uniform row schema but remain blank. The institution fields describe the row's primary flat affiliation; extending them to `award_extra_affiliations` is out of scope.
+6. Empty string is the repository's unset-value representation for newly appended text fields and MUST be the non-null default.
+7. The fields are not unique at award-row level because one researcher or institution can occur on several award rows.
+8. Identifier discovery, backfilling, validation, HTML display, linking, identity merging, and API access are out of scope.
 
 ## Scope
 
-Estimated implementation: about 10 changed lines across 3 files, plus two SQLite `ALTER TABLE` statements.
+Estimated implementation: about 18 changed lines across 3 files, plus four SQLite `ALTER TABLE` statements.
 
 | File | Current range | Required change |
 |---|---:|---|
-| `datasets/awards.sqlite3` | `awards` schema positions 0–31 | Append schema positions 32–33 as `openalex_id` and `orcid`; do not update row values. |
-| `datasets/website/build.py` | `141-171`, `190-221` | Append the two names to `AWARD_COLUMNS` and matching string fields to `AwardRecord`. |
-| `datasets/tests/test_build_website.py` | `1730-1763` | Give one fixture record both identifiers and assert their names, order, and values in generated `awards.csv`. |
+| `datasets/awards.sqlite3` | `awards` schema positions 0–31 | Append schema positions 32–35 with the four requested names; do not update row values. |
+| `datasets/website/build.py` | `141-172`, `192-224` | Append the four names to `AWARD_COLUMNS` and matching string fields to `AwardRecord`. |
+| `datasets/tests/test_build_website.py` | `1723-1774` | Give one fixture record all four identifiers and assert their names, order, and values in generated `awards.csv`. |
 
 No template, enrichment script, validator, index, lookup table, route, or archived CSV changes are included.
 
@@ -39,31 +40,33 @@ No template, enrichment script, validator, index, lookup table, route, or archiv
 The live database MUST be backed up before either schema statement, following the repository's database safety rule. The migration then appends the fields in this order:
 
 ```sql
-ALTER TABLE awards ADD COLUMN openalex_id TEXT NOT NULL DEFAULT '';
-ALTER TABLE awards ADD COLUMN orcid TEXT NOT NULL DEFAULT '';
+ALTER TABLE awards ADD COLUMN orc_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE awards ADD COLUMN affiliate_ror TEXT NOT NULL DEFAULT '';
+ALTER TABLE awards ADD COLUMN author_openalex_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE awards ADD COLUMN institution_openalex_id TEXT NOT NULL DEFAULT '';
 ```
 
-Both statements MUST run in one short transaction. The implementation MUST first inspect `PRAGMA table_info(awards)` and fail without writing if exactly one field already exists or if an existing same-named field has a different type, nullability, or default. It MAY treat two correctly defined existing fields as an already-applied no-op.
+All four statements MUST run in one short transaction. The implementation MUST first inspect `PRAGMA table_info(awards)` and fail without writing if only some fields already exist or if an existing same-named field has a different type, nullability, or default. It MAY treat four correctly defined existing fields as an already-applied no-op.
 
 No `UNIQUE`, `CHECK`, or ordinary index is added. A row-level uniqueness constraint would reject legitimate repeated researchers, and format validation or lookup behavior was not requested.
 
-### Requirement: Optional fields on every row — both identifier columns MUST exist with blank defaults
+### Requirement: Optional fields on every row — all four identifier columns MUST exist with blank defaults
 
 #### Scenario: Existing database receives the fields
 
-- WHEN the two schema statements are applied to the current 3,096-row `awards` table
-- THEN `PRAGMA table_info(awards)` reports `openalex_id` and `orcid` as the final two `TEXT NOT NULL DEFAULT ''` columns
+- WHEN the four schema statements are applied to the current 3,096-row `awards` table
+- THEN `PRAGMA table_info(awards)` reports `orc_id`, `affiliate_ror`, `author_openalex_id`, and `institution_openalex_id` as the final four `TEXT NOT NULL DEFAULT ''` columns
 - AND the row count and all 3,096 existing `award_record_id` values remain unchanged
-- AND every existing row has `''` in both new fields
+- AND every existing row has `''` in all four new fields
 
 #### Scenario: Repeated researcher identifiers
 
-- WHEN two award rows later carry the same OpenAlex ID or ORCID
+- WHEN two award rows later carry the same ORCID, OpenAlex ID, or ROR ID
 - THEN the schema accepts both rows
 
 ## Website record and export
 
-`openalex_id` and `orcid` MUST be appended, in that order, to `AWARD_COLUMNS` and to the required string fields of `AwardRecord` immediately before the defaulted `affiliations` field. Appending preserves every existing public CSV column position and matches SQLite's appended physical order.
+`orc_id`, `affiliate_ror`, `author_openalex_id`, and `institution_openalex_id` MUST be appended, in that order, to `AWARD_COLUMNS` and to the required string fields of `AwardRecord` immediately before the defaulted `affiliations` field. Appending preserves every existing public CSV column position and matches SQLite's appended physical order.
 
 The existing single control path MUST remain unchanged: `read_database` selects `AWARD_COLUMNS`, constructs `AwardRecord`, and `write_dataset_csv` emits `AWARD_COLUMNS`. No identifier-specific parsing, normalization, rendering, or branching is introduced.
 
@@ -71,20 +74,20 @@ The existing single control path MUST remain unchanged: `read_database` selects 
 
 #### Scenario: Nonblank identifiers are exported
 
-- WHEN a test award row contains `openalex_id = 'A1969205032'` and `orcid = '0000-0002-0254-0778'`
+- WHEN a test award row contains representative nonblank values in all four new fields
 - THEN `read_database` returns an `AwardRecord` with those exact values
-- AND generated `awards.csv` appends headers `openalex_id,orcid` after all existing headers
-- AND the same row contains both exact values under those headers
+- AND generated `awards.csv` appends headers `orc_id,affiliate_ror,author_openalex_id,institution_openalex_id` after all existing headers
+- AND the same row contains all four exact values under those headers
 
 #### Scenario: Blank identifiers do not change HTML
 
-- WHEN all live rows have blank `openalex_id` and `orcid`
+- WHEN all live rows have blank values in the four new fields
 - THEN the static build succeeds without any template changes
 - AND no identifier URL or label is added to generated HTML
 
 ## Compatibility and failure behavior
 
-The downloadable `awards.csv` gains two trailing columns. This is an additive public schema change, not a compatibility guarantee: header-aware consumers can discover the new fields, while consumers that require the previous exact header width can break and must be updated. Existing column names, order, and values remain unchanged before the two-field append. The archived 26-column CSV snapshots under `datasets/old/` remain unchanged.
+The downloadable `awards.csv` gains four trailing columns. This is an additive public schema change, not a compatibility guarantee: header-aware consumers can discover the new fields, while consumers that require the previous exact header width can break and must be updated. Existing column names, order, and values remain unchanged before the four-field append. The archived 26-column CSV snapshots under `datasets/old/` remain unchanged.
 
 A pre-migration database lacks required selected columns and will continue to make the website build fail with SQLite's missing-column error. This is intentional: there is one authoritative database and no fallback schema or silent default path.
 
@@ -94,7 +97,7 @@ No new logging is required. SQLite command failure, a failed integrity check, or
 
 ## Security and data handling
 
-The fields are public researcher identifiers and are exported only through the already-public dataset download. This change does not make network requests or accept untrusted identifiers as commands, paths, policy, or identity-merging keys.
+The fields are public researcher and institution identifiers and are exported only through the already-public dataset download. This change does not make network requests or accept untrusted identifiers as commands, paths, policy, or identity-merging keys.
 
 Values remain opaque stored text. Future enrichment MUST verify ownership before assigning an identifier and is outside this change.
 
@@ -102,7 +105,7 @@ Values remain opaque stored text. Future enrichment MUST verify ownership before
 
 Implementation verification MUST include:
 
-1. Before and after schema comparison showing only `openalex_id` and `orcid` were appended.
+1. Before and after schema comparison showing only `orc_id`, `affiliate_ror`, `author_openalex_id`, and `institution_openalex_id` were appended.
 2. Attach the pre-change backup read-only and compare all original 32-column tuples in both directions; both set differences MUST return zero rows, proving every prior value and row was preserved.
 3. Before and after checks showing the row count remains 3,096 and `COUNT(DISTINCT award_record_id)` remains 3,096.
 4. `sqlite3 datasets/awards.sqlite3 "PRAGMA integrity_check;"` returning exactly `ok`.
