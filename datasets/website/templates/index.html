@@ -60,5 +60,35 @@
   </ol>
 </section>
 {% endif %}
+{% if top_women %}
+<section>
+  <h2>Top women</h2>
+  <ol class="highlights">
+    {% for person in top_women %}
+    <li>
+      <a href="{{ href(person.route) }}">{{ person.name }}</a>
+      <span>
+        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+        {{ person.awards | length }} {{ "award" if person.awards | length == 1 else "awards" }}
+      </span>
+    </li>
+    {% endfor %}
+  </ol>
+  <p>{{ women_pct }}% of winners are women.</p>
+</section>
+{% endif %}
+{% if top_countries %}
+<section>
+  <h2>Top countries</h2>
+  <ol class="highlights">
+    {% for country in top_countries %}
+    <li>
+      <a href="{{ href(country.route) }}">{{ country.name }}</a>
+      <span>{{ country.people | length }} {{ "laureate" if country.people | length == 1 else "laureates" }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
 {% include "_awards.html" %}
 {% endblock %}

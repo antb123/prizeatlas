@@ -2168,6 +2168,7 @@ def plan_home_page(
     records: list[AwardRecord],
     people: list[Laureate],
     affiliations: list[Affiliation],
+    country_places: dict[str, list[Place]],
     prize_routes: dict[str, str],
     ranking_by_qid: dict[str, Ranking],
     record_routes: dict[str, str],
@@ -2194,6 +2195,13 @@ def plan_home_page(
         (person for person in people if len(person.awards) > 1),
         key=lambda person: (-len(person.awards), _surname_key(person.name)),
     )
+    women = sorted(
+        (person for person in people if any(record.sex == "Female" for record, _ in person.awards)),
+        key=lambda person: (-len(person.awards), _surname_key(person.name)),
+    )
+    sexed_records = sum(1 for record in records if record.sex in ("Female", "Male"))
+    women_pct = round(100 * sum(1 for record in records if record.sex == "Female") / sexed_records) if sexed_records else 0
+    top_countries = country_places["Awarded"][:7]
     return _page(
         "index.html",
         "/",
@@ -2216,6 +2224,9 @@ def plan_home_page(
             for record in recent[:HOMEPAGE_ROWS]
         ),
         decorated=tuple(decorated[:HOMEPAGE_ROWS]),
+        top_women=tuple(women[:HOMEPAGE_ROWS]),
+        women_pct=women_pct,
+        top_countries=tuple(top_countries),
         top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
     )
 
@@ -2403,7 +2414,7 @@ def create_site_plan(
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
     jobs.extend(plan_affiliation_pages(affiliations, records))
     jobs.extend(plan_university_pages(affiliations))
-    jobs.append(plan_home_page(rankings, records, people, affiliations, prize_routes, ranking_by_qid, record_routes))
+    jobs.append(plan_home_page(rankings, records, people, affiliations, country_places, prize_routes, ranking_by_qid, record_routes))
     jobs.append(plan_awards_page(rankings, prize_routes))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records))
