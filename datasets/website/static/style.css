@@ -738,7 +738,8 @@ h3 {
 }
 
 .external-source {
-  font-weight: 700;
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .facts dl,
