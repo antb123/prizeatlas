@@ -1801,6 +1801,7 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
         birth_country = next((record.birth_country for record, _ in person.awards if _nonblank(record.birth_country)), "")
         death_date = next((record.death_date for record, _ in person.awards if _nonblank(record.death_date)), "")
         lifespan = f"{birth_year}–{death_date[:4]}" if birth_year and len(death_date) >= 4 else ""
+        author_openalex_id = next((record.author_openalex_id for record, _ in person.awards if _nonblank(record.author_openalex_id)), "")
         jobs.append(
             _page(
                 "person.html",
@@ -1816,6 +1817,8 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
                 birth_country=birth_country,
                 sex=next((record.sex[:1] for record, _ in person.awards if _nonblank(record.sex)), ""),
                 lifespan=lifespan,
+                wikipedia_url=wikipedia_search_url(person.name),
+                author_openalex_id=author_openalex_id,
                 schema={
                     **_laureate_schema(latest, public_url(base_url, person.route)),
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],

@@ -8,6 +8,10 @@
     <a class="birth-country" href="{{ href(countries_route ~ (birth_country | slugify) ~ '/') }}">{{ birth_country }}</a>{% endif %}{% if sex %}{% if lifespan or birth_year or birth_country %} · {% endif %}
     {{ sex }}{% endif %}</p>
   {% endif %}
+  <p class="winner-links">
+    <a class="external-source" href="{{ wikipedia_url }}">Wikipedia <span aria-hidden="true">↗</span></a>
+    {% if author_openalex_id %}<a class="external-source" href="https://openalex.org/authors/{{ author_openalex_id }}">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
+  </p>
 </header>
 <section>
   <h2>Awards</h2>
