@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-{% set ask_ai_topic = record.full_name %}
-{% if record.motivation %}{% set ask_ai_topic = ask_ai_topic ~ " — " ~ record.motivation %}{% endif %}
+{% set ask_ai_topic = record.full_name ~ " awarded " ~ record.prize_name ~ ((" in " ~ record.category) if record.category else "") ~ " " ~ record.year %}
+{% if record.motivation %}{% set ask_ai_topic = ask_ai_topic ~ " " ~ record.motivation %}{% endif %}
 {% set ask_ai_query = ('Explain to me in clear language: "' ~ ask_ai_topic ~ '"') | urlencode %}
 <article class="winner-article">
   <div class="winner-main">
@@ -19,6 +19,7 @@
         <a href="https://www.perplexity.ai/search?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Perplexity <span aria-hidden="true">↗</span></a>
         <a href="https://search.brave.com/ask?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Brave <span aria-hidden="true">↗</span></a>
         <a href="{{ wikipedia_url }}" target="_blank" rel="noopener noreferrer">Wikipedia <span aria-hidden="true">↗</span></a>
+        {% if record.author_openalex_id %}<a href="https://openalex.org/authors/{{ record.author_openalex_id }}" target="_blank" rel="noopener noreferrer">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
       </p>
     </header>
     {% if record.affiliations %}

@@ -274,6 +274,7 @@ class Affiliation:
     awards: tuple[AwardLink, ...]
     subjects: tuple[tuple[str, str], ...]
     profile: AffiliationProfile | None
+    openalex_id: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -1195,6 +1196,11 @@ def plan_affiliations(
         matched_profiles = [profiles_by_qid[qid] for qid in qids if qid in profiles_by_qid]
         if matched_profiles and len(qids) != 1:
             raise BuildFailure(f"conflicting affiliation metadata route={AFFILIATIONS_ROUTE}{slug}/ qids={','.join(sorted(qids))}")
+        openalex_ids = {
+            link.record.institution_openalex_id
+            for link in awards
+            if link.affiliation.position == 1 and _nonblank(link.record.institution_openalex_id)
+        }
         affiliations.append(
             Affiliation(
                 display,
@@ -1205,6 +1211,7 @@ def plan_affiliations(
                 tuple(awards),
                 subjects,
                 matched_profiles[0] if matched_profiles else None,
+                next(iter(openalex_ids), ""),
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))

@@ -20,6 +20,7 @@
   <p class="winner-links">
     {% if affiliation.profile.application_url %}<a class="external-source" href="{{ affiliation.profile.application_url }}">How to Apply <span aria-hidden="true">↗</span></a>{% endif %}
     <a class="external-source" href="{{ wikipedia_url }}">Wikipedia <span aria-hidden="true">↗</span></a>
+    {% if affiliation.openalex_id %}<a class="external-source" href="https://openalex.org/institutions/{{ affiliation.openalex_id }}">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
   </p>
   {% endif %}
 </header>
