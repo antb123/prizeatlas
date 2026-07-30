@@ -709,8 +709,22 @@ h3 {
   line-height: 1.45;
 }
 
-.ask-ai {
+.page-intro > p.ask-ai {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
   margin-block: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.ask-ai a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.ask-ai a:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .subject-badge:hover {

@@ -9,12 +9,16 @@
       <h1>{{ record.full_name }}</h1>
       {% if record.motivation %}<p class="citation">{{ record.motivation }}</p>{% endif %}
       {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
-      <p class="ask-ai subject-badges" aria-label="Read more about this award">
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
-        <a class="subject-badge" href="https://chatgpt.com/?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">ChatGPT <span aria-hidden="true">↗</span></a>
-        <a class="subject-badge" href="https://www.perplexity.ai/search?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Perplexity <span aria-hidden="true">↗</span></a>
-        <a class="subject-badge" href="https://search.brave.com/ask?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Brave <span aria-hidden="true">↗</span></a>
-        <a class="subject-badge" href="{{ wikipedia_url }}" target="_blank" rel="noopener noreferrer">Wikipedia <span aria-hidden="true">↗</span></a>
+      {% if record.high_school_subject %}
+      <p class="subject-badges">
+        <a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>
+      </p>
+      {% endif %}
+      <p class="ask-ai" aria-label="Read more about this award">
+        <a href="https://chatgpt.com/?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">ChatGPT <span aria-hidden="true">↗</span></a>
+        <a href="https://www.perplexity.ai/search?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Perplexity <span aria-hidden="true">↗</span></a>
+        <a href="https://search.brave.com/ask?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Brave <span aria-hidden="true">↗</span></a>
+        <a href="{{ wikipedia_url }}" target="_blank" rel="noopener noreferrer">Wikipedia <span aria-hidden="true">↗</span></a>
       </p>
     </header>
     {% if record.affiliations %}
@@ -44,7 +48,7 @@
     <dl>
       {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_share }}</dd></div>{% endif %}
       {% for label, value, route in facts %}
-      <div><dt>{{ label }}</dt><dd>{% if route %}<a href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
+      <div><dt>{{ label }}</dt><dd>{% if route %}<a class="{{ 'birth-country' if label == 'Birth country' else '' }}" href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
       {% endfor %}
     </dl>
   </aside>
