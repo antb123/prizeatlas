@@ -1735,6 +1735,8 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "First Institute",
                 "affiliation_country": "France",
                 "affiliation_wikidata_qid": "Q2",
+                "openalex_id": "A1969205032",
+                "orcid": "0000-0002-0254-0778",
             },
             {
                 "award_record_id": "test-01",
@@ -1757,10 +1759,13 @@ class WebsiteBuildTests(unittest.TestCase):
         with (self.website / "dist/awards.csv").open(newline="") as handle:
             rows = list(csv.reader(handle))
         self.assertEqual(list(build.AWARD_COLUMNS), rows[0])
+        self.assertEqual(["openalex_id", "orcid"], list(build.AWARD_COLUMNS[-2:]))
         self.assertEqual(len(records), len(rows) - 1)
         self.assertEqual(["test-01", "test-02"], [row[0] for row in rows[1:]])
         self.assertEqual('For saying "hello", clearly', rows[2][build.AWARD_COLUMNS.index("motivation")])
         self.assertEqual("First Institute", rows[2][build.AWARD_COLUMNS.index("affiliation_name")])
+        self.assertEqual("A1969205032", rows[2][build.AWARD_COLUMNS.index("openalex_id")])
+        self.assertEqual("0000-0002-0254-0778", rows[2][build.AWARD_COLUMNS.index("orcid")])
 
         nested_html = (self.website / "dist/test-prize/physics/2000/index.html").read_text()
         self.assertIn('href="../../../awards.csv" download', nested_html)
