@@ -880,6 +880,8 @@ class WebsiteBuildTests(unittest.TestCase):
         fallback_bytes = fallback.read_bytes()
         homepage = (self.website / "dist/index.html").read_text()
         error_page = (self.website / "dist/404.html").read_text()
+        self.assertNotIn('href="people/">People</a>', homepage.split("</header>", 1)[0])
+        self.assertIn('href="people/">People</a>', homepage.split("<footer>", 1)[1])
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', homepage)
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', error_page)
         self.assertNotIn("Laureates recognized by the widest range of these prizes.", homepage)
@@ -1044,8 +1046,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         index_html = (self.website / "dist/people/index.html").read_text()
         self.assertIn('href="shinya-yamanaka/"', index_html)
-        # The header People link resolves from every depth.
-        self.assertIn('href="people/"', (self.website / "dist/index.html").read_text())
+        # The footer People link resolves from nested pages.
         self.assertIn('href="../people/"', (self.website / "dist/nobel-prize/index.html").read_text())
         self.assertIn('href="../../../../people/"', linked)
 
