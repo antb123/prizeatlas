@@ -277,9 +277,6 @@ hand work, one `award_record_id` at a time:
 
 Never bulk-fill by name match. A QID borrowed from a same-named row is the defect this whole section exists to prevent.
 
-`datasets/awards_affiliations.tsv` (3091 rows) is a **working set**, not a store: no script reads it and nothing is
-generated from it. Never treat it as authoritative and never load from it.
-
 ### 5.2 Filling a position-1 ROR ID — preview, review, then apply
 
 `affiliate_ror` is filled only by an exact ROR `external_ids` crosswalk from the row's already-verified uppercase Wikidata

@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
-USER_AGENT = "nobel-nominatim-affiliation-check/1.0 (https://bpventures.us; datasets cleanup)"
+USER_AGENT = "PrizeAtlas-nominatim-affiliation-check/1.0 (https://prizeatlas.org/)"
 MATCH_DEGREES = 0.3
 RATE_LIMIT = 1.0
 

@@ -25,7 +25,7 @@ import urllib.request
 from os import path
 
 WIKI = "https://www.wikidata.org/w/api.php"
-UA = {"User-Agent": "crafoord-enrich/1.0 (nobel datasets cleanup)"}
+UA = {"User-Agent": "PrizeAtlas-crafoord-enrich/1.0 (https://prizeatlas.org/)"}
 DELAY = 2.5
 SEX = {"Q6581097": "Male", "Q6581072": "Female"}
 

@@ -15,7 +15,7 @@ import urllib.request
 
 DB_PATH = "awards.sqlite3"
 WIKIDATA_API = "https://www.wikidata.org/w/api.php"
-USER_AGENT = "AwardAffiliationsEnricher/1.0 (https://github.com/nobel; awards-enrichment)"
+USER_AGENT = "PrizeAtlas-affiliation-enricher/1.0 (https://prizeatlas.org/)"
 
 # Common Wikidata country QID -> English name
 COUNTRY_MAP = {

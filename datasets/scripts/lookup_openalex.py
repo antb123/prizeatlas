@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 API_URL = "https://api.openalex.org/institutions"
-USER_AGENT = "nobel-openalex-lookup/1.0 (https://bpventures.us; awards affiliation enrichment)"
+USER_AGENT = "PrizeAtlas-openalex-lookup/1.0 (https://prizeatlas.org/)"
 REPORT_VERSION = 1
 REQUEST_INTERVAL = 0.1
 REQUEST_TIMEOUT = 20

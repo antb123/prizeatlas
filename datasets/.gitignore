@@ -1,4 +1,3 @@
-/.env
 /awards.sqlite3-shm
 /awards.sqlite3-wal
 /awards.sqlite3.*
@@ -7,8 +6,6 @@
 /website/.dist-staging-*/
 /website/.dist-backup-*/
 /map-mvp/dist/
-__pycache__/
-*~
 /old/
 /trash/
 /.nominatim-cache.json

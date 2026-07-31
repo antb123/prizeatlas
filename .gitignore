@@ -1,1 +1,14 @@
 /trash/
+
+# Local developer state: never part of a release.
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+.DS_Store

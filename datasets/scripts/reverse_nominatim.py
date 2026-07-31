@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 URL = "https://nominatim.openstreetmap.org/reverse"
-USER_AGENT = "nobel-reverse-lookup/1.0 (https://bpventures.us; datasets cleanup)"
+USER_AGENT = "PrizeAtlas-reverse-lookup/1.0 (https://prizeatlas.org/)"
 
 
 def parse_coordinates(value: str) -> tuple[float, float]:

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 API_URL = "https://api.ror.org/v2/organizations"
-USER_AGENT = "nobel-ror-lookup/1.0 (https://bpventures.us; awards affiliation enrichment)"
+USER_AGENT = "PrizeAtlas-ror-lookup/1.0 (https://prizeatlas.org/)"
 REPORT_VERSION = 1
 REQUEST_INTERVAL = 0.16
 REQUEST_TIMEOUT = 20

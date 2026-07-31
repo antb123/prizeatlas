@@ -14,7 +14,7 @@ from typing import Any
 
 WD_API = "https://www.wikidata.org/w/api.php"
 WP_API = "https://en.wikipedia.org/w/api.php"
-USER_AGENT = "nobel-coordinate-lookup/1.0 (https://bpventures.us; datasets cleanup)"
+USER_AGENT = "PrizeAtlas-coordinate-lookup/1.0 (https://prizeatlas.org/)"
 EARTH_GLOBES = {
     "http://www.wikidata.org/entity/Q2",
     "https://www.wikidata.org/entity/Q2",

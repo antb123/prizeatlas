@@ -17,7 +17,7 @@ import urllib.parse
 import urllib.request
 
 WIKI = "https://www.wikidata.org/w/api.php"
-UA = {"User-Agent": "fields-enrich/1.0 (nobel datasets cleanup)"}
+UA = {"User-Agent": "PrizeAtlas-fields-enrich/1.0 (https://prizeatlas.org/)"}
 
 
 DELAY = 3.0  # polite pause before every request

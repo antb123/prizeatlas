@@ -65,9 +65,23 @@ There is no Node.js install, application server, Docker setup, or database
 migration. The recommended path uses [uv](https://docs.astral.sh/uv/), which
 installs the builder's declared dependencies automatically.
 
+This is a collection of executable scripts, not an installable Python package:
+there is deliberately no `pyproject.toml` or `uv sync` step. Run a tool with
+`uv run`; each script that needs a third-party package declares it inline. The
+committed `datasets/website/build.py.lock` pins the static builder's packages.
+
 The macOS and Linux shortcut is [`startdev.sh`](startdev.sh): it builds the
 static site and serves `datasets/website/dist/` at the chosen local port. Stop
 it with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+
+## Build for nginx
+
+The production command only builds static files; nginx serves the resulting
+`datasets/website/dist/` directory:
+
+```sh
+./start.sh https://prizeatlas.org/
+```
 
 ### Download data only
 

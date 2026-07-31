@@ -2,7 +2,7 @@
 
 Spec: `docs/specs/datasets-affiliation-sub-name-20260725.md`. Read the **Assumptions** block of the spec before starting any task; each block below is otherwise self-contained.
 
-Working directory: `/home/antb2/dev/rsync/nobel/datasets`. Database: `awards.sqlite3`.
+Working directory: `datasets/`. Database: `awards.sqlite3`.
 
 **Hard ordering: T1 → T3 → T5.** The migration must land before the normalizer writes, and the normalizer must run before the site build can be verified.
 

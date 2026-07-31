@@ -2,7 +2,7 @@
 
 ## Context
 
-- Database: `/home/antb2/dev/rsync/nobel/datasets/awards.sqlite3`, table `awards` — sole source of truth. Run everything from the `datasets/` directory.
+- Database: `awards.sqlite3`, table `awards` — sole source of truth. Run everything from the `datasets/` directory.
 - Target columns: `affiliation_name`, `affiliation_city`, `affiliation_country` (not coordinates — separate later phase).
 - Select rows by exact `award_record_id`. Never by name.
 

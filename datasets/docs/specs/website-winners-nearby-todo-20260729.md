@@ -3,7 +3,7 @@
 Spec: `datasets/docs/specs/website-winners-nearby-20260729.md`. Read its **Assumptions** block before starting any task
 below; every block assumes it and nothing else.
 
-All paths are relative to `/home/antb2/dev/rsync/nobel`. Line numbers are as of 20260729 against the current working
+All paths are relative to the repository root. Line numbers are as of 20260729 against the current working
 tree — re-grep before editing, the file has moved under this spec once already.
 
 ```

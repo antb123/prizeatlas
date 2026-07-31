@@ -27,8 +27,7 @@ The future explorer will load all 12 canonical datasets as independent award rec
 person across records. Educational links concern concepts associated with an award, such as relativity or the photoelectric effect, rather
 than being embedded as Markdown in names or motivation text.
 
-The parent directory is a newly initialized Git worktree. Under the current execution identity, Git commands require the per-command
-safe-directory override `-c safe.directory=/home/antb2/dev/rsync/nobel`; implementation MUST NOT change global Git configuration.
+The parent directory is a newly initialized Git worktree. Implementation MUST NOT change global Git configuration.
 
 ## Assumptions
 

@@ -75,7 +75,7 @@ import urllib.request
 # --- Wikidata / Wikipedia endpoints -----------------------------------------
 WD_API = "https://www.wikidata.org/w/api.php"
 WP_API = "https://en.wikipedia.org/w/api.php"
-UA = {"User-Agent": "nobel-datasets-enrich/1.0 (https://bpventures.us; datasets cleanup)"}
+UA = {"User-Agent": "PrizeAtlas-enrich/1.0 (https://prizeatlas.org/)"}
 
 # --- Wikidata properties (P) and items (Q) we rely on -----------------------
 P_INSTANCE_OF = "P31"   # what kind of thing the item is

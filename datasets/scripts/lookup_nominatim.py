@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 URL = "https://nominatim.openstreetmap.org/search"
-USER_AGENT = "nobel-city-lookup/1.0 (https://bpventures.us; datasets cleanup)"
+USER_AGENT = "PrizeAtlas-city-lookup/1.0 (https://prizeatlas.org/)"
 
 
 def search(city: str, country: str, state: str | None, cache_path: Path) -> list[dict[str, Any]]:

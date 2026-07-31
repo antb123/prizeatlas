@@ -20,7 +20,7 @@ from pathlib import Path
 DB_PATH = "awards.sqlite3"
 OVERRIDES = Path("affiliation_kinds.tsv")
 WIKIDATA_API = "https://www.wikidata.org/w/api.php"
-USER_AGENT = "AwardAffiliationsClassifier/1.0 (https://github.com/nobel; awards-enrichment)"
+USER_AGENT = "PrizeAtlas-affiliation-classifier/1.0 (https://prizeatlas.org/)"
 BATCH_SIZE = 50
 
 # First rule that matches an instance-of label wins, so a university hospital is a hospital and not a university.
