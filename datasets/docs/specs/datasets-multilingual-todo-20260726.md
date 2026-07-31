@@ -1,6 +1,6 @@
 # TODO — Multilingual awards website (en/es/fr)
 
-Execution plan for `docs/datasets-multilingual-20260726.md`. Each block is self-contained: a sub-agent runs one block
+Execution plan for `docs/specs/datasets-multilingual-20260726.md`. Each block is self-contained: a sub-agent runs one block
 plus the spec's **Assumptions** section, with no other context.
 
 Read the Assumptions block before starting any task. The load-bearing ones are 1 (motivations are never translated),

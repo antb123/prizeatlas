@@ -1,6 +1,6 @@
 # TODO — affiliation sub-name
 
-Spec: `docs/datasets-affiliation-sub-name-20260725.md`. Read the **Assumptions** block of the spec before starting any task; each block below is otherwise self-contained.
+Spec: `docs/specs/datasets-affiliation-sub-name-20260725.md`. Read the **Assumptions** block of the spec before starting any task; each block below is otherwise self-contained.
 
 Working directory: `/home/antb2/dev/rsync/nobel/datasets`. Database: `awards.sqlite3`.
 

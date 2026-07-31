@@ -1,6 +1,6 @@
 # Non-science move and restore implementation
 
-Specification: `docs/datasets-non-science-move-restore-20260731.md`
+Specification: `docs/specs/datasets-non-science-move-restore-20260731.md`
 
 ## Shared assumptions
 

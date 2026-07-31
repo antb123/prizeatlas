@@ -1,6 +1,6 @@
 # TODO — Explorer integration into the awards website
 
-Execution plan for `docs/datasets-explorer-integration-20260726.md`. Each block is self-contained: a sub-agent runs one
+Execution plan for `docs/specs/datasets-explorer-integration-20260726.md`. Each block is self-contained: a sub-agent runs one
 block plus the spec's **Assumptions** section, with no other context.
 
 Read the Assumptions block before starting any task. The load-bearing ones are 1 (explorer keeps its own look),
@@ -32,7 +32,7 @@ first turns an irreversible delete into a revertible diff, and makes `git mv` / 
 **Steps:**
 1. Confirm the directory is untracked: `git status --porcelain explorer/` → `?? datasets/explorer/`.
 2. Stage and commit the explorer exactly as it stands, before any integration edit:
-   `git add explorer/ docs/datasets-explorer-integration-20260726.md docs/datasets-explorer-integration-todo-20260726.md`
+   `git add explorer/ docs/specs/datasets-explorer-integration-20260726.md docs/specs/datasets-explorer-integration-todo-20260726.md`
    then commit as `chore: track the standalone explorer before folding it into the website`.
 3. Do **not** modify any explorer file in this task. The commit must capture the working version — the one that
    currently builds a passing page — so it is a usable reference.

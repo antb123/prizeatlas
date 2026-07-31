@@ -1,6 +1,6 @@
 # TODO — Refactor `create_site_plan` — 20260726
 
-Spec: `docs/datasets-build-refactor-20260726.md`. Read its **Assumptions** block before starting any task below; each
+Spec: `docs/specs/datasets-build-refactor-20260726.md`. Read its **Assumptions** block before starting any task below; each
 task assumes it.
 
 ## Rules for every task

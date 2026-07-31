@@ -1,6 +1,6 @@
 # TODO — Winners near me
 
-Spec: `datasets/docs/website-winners-nearby-20260729.md`. Read its **Assumptions** block before starting any task
+Spec: `datasets/docs/specs/website-winners-nearby-20260729.md`. Read its **Assumptions** block before starting any task
 below; every block assumes it and nothing else.
 
 All paths are relative to `/home/antb2/dev/rsync/nobel`. Line numbers are as of 20260729 against the current working

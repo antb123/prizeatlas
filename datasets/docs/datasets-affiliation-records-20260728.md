@@ -41,10 +41,13 @@ In this order. Never skip to a later source when an earlier one answers the ques
 |---|---|---|
 | 1 | The award's own website (list in `AGENTS.md` per prize family) | `affiliation_name`, and `affiliation_city` / `affiliation_country` where the citation gives them |
 | 2 | Wikidata, matched by QID | `affiliation_wikidata_qid`, and coordinates via `scripts/lookup_coordinates.py` |
-| 3 | Nominatim, as the second opinion on a place | confirmation only — `scripts/lookup_nominatim.py`, `scripts/reverse_nominatim.py` |
+| 4 | ROR, matched by the row's exact Wikidata QID | position-1 `awards.affiliate_ror` via `scripts/lookup_ror.py` |
+| 5 | OpenAlex, matched by the row's curated `affiliate_ror` | position-1 `awards.institution_openalex_id` via `scripts/lookup_openalex.py` |
+| 6 | Nominatim, as the second opinion on a place | confirmation only — `scripts/lookup_nominatim.py`, `scripts/reverse_nominatim.py` |
 
-The award site names the institution; Wikidata identifies it. A QID is written only after the institution has been matched
-to that exact item — the same name is not proof.
+The award site names the institution; Wikidata identifies it; ROR supplements that verified identity. OpenAlex follows ROR and supplies a citation-metric identifier. A QID is written only
+after the institution has been matched to that exact item — the same name is not proof. ROR never replaces Wikidata and is
+not an identity source for `affiliation_sub_name`.
 
 **The QID identifies the ranked parent in `affiliation_name`, never the unit in `affiliation_sub_name`.** Every UC campus
 row carries `Q184478` (the system) and every Harvard unit row carries `Q13371` (the university). Units have no QID column;
@@ -67,6 +70,8 @@ which they may do for any rule here (§6 rule 0).
 | `affiliation_city` | TEXT | `''` | City alone, today's name. No `City, ST`. Describes the **unit**, not the parent — see §4.4. |
 | `affiliation_country` | TEXT | `''` | Modern country. Single-valued: the `;` convention is retired for affiliations (it survives only in `citizenship_countries`). |
 | `affiliation_coordinates` | TEXT | `''` | `longitude,latitude`, four decimals. Written only after the named place is verified by two sources. |
+| `affiliate_ror` | TEXT NOT NULL DEFAULT `''` | `''` | Compact nine-character ROR ID for this position-1 parent, without `https://ror.org/`. It does not describe the sub-name or positions 2+. |
+| `institution_openalex_id` | TEXT NOT NULL DEFAULT `''` | `''` | Compact OpenAlex Institution ID such as `I136199984`, without `https://openalex.org/`. Position-1 only; populated by exact ROR echo via `scripts/lookup_openalex.py`. |
 
 The six columns are wholly blank on 323 rows: that award has no position-1 affiliation. If it also has no extras row, it
 has no recorded affiliation at all, and no affiliation section renders.
@@ -238,6 +243,8 @@ In JSON-LD the `Organization` name stays the parent and the unit becomes a neste
 |---|---|---|
 | `awards.affiliation_name`, `affiliation_sub_name` | `scripts/normalize_affiliations.py --apply` only | Derived and owned; the write is unguarded, which is what makes re-running a no-op. |
 | `awards.affiliation_city/country/coordinates/qid` | hand SQL by `award_record_id`, after two-source verification | Fill blanks only; never overwrite a curated value. No script does this — see §6.1. |
+| `awards.affiliate_ror` | `scripts/lookup_ror.py --apply` from one reviewed preview report | Position 1 only. Exact Wikidata crosswalk, blank-only guarded write; see §5.2. |
+| `awards.institution_openalex_id` | `scripts/lookup_openalex.py --apply` from one reviewed preview report | Position 1 only. Exact ROR echo, blank-only guarded write; see §5.3. |
 | `award_extra_affiliations` (all) | `scripts/load_extra_affiliations.py` from `award_extra_affiliations.tsv` | Full replace on every run. Edit the TSV, reload. |
 | `affiliations` logo/description/application URL | curated data work; `scripts/enrich_affiliations.py` for logo/description | Insert only after the QID identity audit. **`scripts/enrich_application_urls.py` is unsafe — do not run it, see §10.** |
 | `affiliations.kind` | `scripts/classify_affiliations.py --apply`; reviewed overrides in `affiliation_kinds.tsv` | Back up first. Dry-run is the default. |
@@ -273,6 +280,93 @@ Never bulk-fill by name match. A QID borrowed from a same-named row is the defec
 `datasets/awards_affiliations.tsv` (3091 rows) is a **working set**, not a store: no script reads it and nothing is
 generated from it. Never treat it as authoritative and never load from it.
 
+### 5.2 Filling a position-1 ROR ID — preview, review, then apply
+
+`affiliate_ror` is filled only by an exact ROR `external_ids` crosswalk from the row's already-verified uppercase Wikidata
+QID. Names, acronyms, scores, result order, and ROR relationships never establish a writable match. A missing or malformed
+QID stays blank; there is no name fallback.
+
+Before making a request, `scripts/lookup_ror.py` views position 1 and every extra affiliation as one relation. A QID under
+more than one nonblank parent name, or a parent name under more than one nonblank QID, blocks the selected row until the
+identity conflict is curated. Exactly one active or inactive ROR record containing the QID is confirmable. A withdrawn
+record is blocked, and its successor is review information rather than a substitute.
+
+Research is always a JSON preview. Bounded work repeats the exact selector once per assigned row:
+
+```
+uv run scripts/lookup_ror.py --db awards.sqlite3 \
+  --record-id abel_prize-000001 \
+  --record-id abel_prize-000002 > ror-preview.json
+```
+
+Use `--all` only when the curator explicitly authorizes a whole-database backfill. Inspect and retain the complete report as
+claim-level provenance; it contains the stored and ROR names and locations, record status, source URL, compact ROR ID, and
+the exact Wikidata external IDs. Then back up and apply that exact artifact without another network request:
+
+```
+cp awards.sqlite3 awards.sqlite3.$(date +%Y%m%d-%H%M%S).ror.bak
+uv run scripts/lookup_ror.py --db awards.sqlite3 --apply ror-preview.json
+```
+
+Apply accepts only a versioned, structurally valid preview. One short transaction updates only `affiliate_ror`, by exact
+`award_record_id`, when the researched parent name and QID are unchanged and the target cell is still blank. Any drift
+rolls back the whole batch; there is no overwrite mode. Preserve a before list of every nonblank value and compare it
+byte-for-byte afterward:
+
+```
+sqlite3 -tabs awards.sqlite3 \
+  "SELECT award_record_id, affiliate_ror FROM awards WHERE affiliate_ror <> '' ORDER BY award_record_id;"
+```
+
+### 5.3 Filling a position-1 OpenAlex Institution ID — preview, review, then apply
+
+`institution_openalex_id` is filled only when OpenAlex returns a singleton institution object whose `ror` field equals
+`https://ror.org/<affiliate_ror>` exactly. The lookup key is the row's already-curated `affiliate_ror`, not its Wikidata
+QID; OpenAlex accepts a ROR URL at `/institutions/{id}` and the response's `ror` field is the verification. Names,
+display-name differences, scores, and result order never establish a writable match. A row whose `affiliate_ror` is
+blank or malformed stays blank; there is no name or Wikidata fallback.
+
+`scripts/lookup_openalex.py` reuses the ROR identity gates: one QID under more than one nonblank parent name, or one
+parent name under more than one nonblank QID, blocks the selected row until curated. The same gate covers `awards` and
+`award_extra_affiliations` together.
+
+The optional `OPENALEX_API` value lives in `datasets/.env` (or the `OPENALEX_API` environment variable, which takes
+precedence). Singleton retrieval is free; the key only raises the daily free-usage budget for any future list-endpoint
+call. The tool never logs the key, and the report's `request_url` omits it.
+
+Research is always a JSON preview. `--all` selects only actionable rows (`affiliate_ror <> '' AND
+institution_openalex_id = ''`); the `blocked_missing_ror` and `unchanged` statuses appear only when an explicit
+`--record-id` deliberately targets such a row:
+
+```
+uv run scripts/lookup_openalex.py --db awards.sqlite3 \
+  --record-id abel_prize-000001 \
+  --record-id abel_prize-000002 > openalex-preview.json
+
+uv run scripts/lookup_openalex.py --db awards.sqlite3 --all > openalex-preview.json
+```
+
+Inspect and retain the report as claim-level provenance; it contains the stored and OpenAlex names, request URL,
+record payload (or `null` for HTTP 404), status, and exact ROR echo. Then back up and apply that exact artifact without
+another network request:
+
+```
+cp awards.sqlite3 awards.sqlite3.$(date +%Y%m%d-%H%M%S).openalex.bak
+uv run scripts/lookup_openalex.py --db awards.sqlite3 --apply openalex-preview.json
+```
+
+Apply accepts only a versioned, structurally valid preview. One short transaction updates only `institution_openalex_id`,
+by exact `award_record_id`, when the researched parent name, `COALESCE(affiliation_wikidata_qid, '')`, and
+`affiliate_ror` are unchanged and the target cell is still blank. For each confirmed result the report's
+`openalex_record.ror` must equal the snapshotted ROR URL and `updates.institution_openalex_id` must equal the compact
+suffix of `openalex_record.id`. Any drift rolls back the whole batch; there is no overwrite mode. Preserve a before
+list of every nonblank value and compare it byte-for-byte afterward:
+
+```
+sqlite3 -tabs awards.sqlite3 \
+  "SELECT award_record_id, institution_openalex_id FROM awards WHERE institution_openalex_id <> '' ORDER BY award_record_id;"
+```
+
 ## 6. Rules for agents — entering data
 
 **0. The person directing the work overrides every rule in this file.** These rules are the default for an agent working
@@ -306,6 +400,8 @@ once. A curator who repeats or confirms an instruction has decided, and the deci
 14. **Type the apostrophe the institution uses, and check both forms before adding a name.** `'` (U+0027) and `’` (U+2019)
     are different values under SQLite's BINARY collation, so `Children's` and `Children’s` are two institutions to every
     query, every ranking, and the `AFFILIATIONS` disjointness guard. Both forms are live in the data today.
+15. **A ROR ID follows only the §5.2 preview-review-backup-apply path.** Store the compact ID on position 1 only; never copy
+    it by institution name or write one for an extra affiliation.
 
 ## 7. Rules for agents — validating data
 
@@ -315,8 +411,9 @@ Run in this order after any affiliation write:
 1. sqlite3 awards.sqlite3 "PRAGMA integrity_check;"          → must be exactly ok (file health only, says nothing about correctness)
 2. uv run scripts/validate_awards.py                          → 9 checks; bare invocation runs all of them, there is no --all
 3. uv run scripts/normalize_affiliations.py                   → dry run; read the report before ever passing --apply
-4. uv run pytest tests/ ; uv run ruff check
-5. uv run website/build.py --base-url https://example.org/awards/   → the build is the last gate; it fails on QID conflicts
+4. uv run pytest tests/test_lookup_ror.py ; uv run pytest tests/ ; uv run ruff check
+5. compare the before/after nonblank affiliate_ror lists from §5.2 and require every pre-existing value to be unchanged
+6. uv run website/build.py --base-url https://example.org/awards/   → the build is the last gate; it fails on QID conflicts
 ```
 
 `validate_awards.py` splits its checks into fatal invariants (non-zero exits 1) and counted backlogs. Use
@@ -353,13 +450,13 @@ different sub-names is the model working; differing cities on the *same* sub-nam
 
 **Read `sub-name-is-the-institution` carefully before acting on it.** It is a containment test — `sub_name LIKE name || '%'
 OR sub_name LIKE '%' || name || '%'` — so the campus naming rule trips it by design: 16 groups / 170 rows today, of which
-152 rows are `University of California ← University of California, <campus>` and are exactly what §4.1 prescribes. The
-genuine defects inside it are the ones where the sub-name restates the parent with nothing added:
+152 rows are `University of California ← University of California, <campus>` and are exactly what §4.1 prescribes.
+Google DeepMind is intentionally represented as a subsidiary affiliation of Google; its containment hit is not a defect.
+The genuine defects inside this check are:
 
 | Parent | Sub-name | Rows |
 |---|---|---:|
 | `University College London` | `University College London` | 6 |
-| `Google` | `Google DeepMind` | 6 |
 | `Thomas J. Watson Research Center` | `IBM Thomas J. Watson Research Center` | 6 |
 
 The check also misses the reverse direction — parent contains sub-name — which is the same defect written backwards:
@@ -495,7 +592,8 @@ quoting any of it as current; treat them as the baseline to diff against, not as
 - **`'` and `’` are different institutions to SQLite.** `Q1164246` (St. Jude Children's, 4 rows) and `Q1000479` (Boston
   Children's, 2 rows) are the QIDs where both forms are in play. The normalizer's `--suggest` scores such pairs ~0.97 and
   will offer them; its disjointness guard compares raw strings and will not catch a curly-apostrophe duplicate. §7 Query C.
-- 16 groups trip `sub-name-is-the-institution`, but only 3 of them are defects (§7). Exact sub-name-equals-parent is
+- 16 groups trip `sub-name-is-the-institution`; Google DeepMind is an intentional subsidiary affiliation, and only 2
+  of the remaining groups are defects (§7). Exact sub-name-equals-parent is
   6 rows, all `University College London`.
 - `The Ohio State University` carries both `Columbus` and `Columbus, OH`; 70 groups use the `City, ST` form against the
   bare-city house style.

@@ -137,7 +137,7 @@ Expected implementation:
 - `tests/test_arts_dump.py:1-116`, approximately 150 changed or added lines;
 - `.gitignore:1-15`, two added ignore entries for `/arts.json` and `/non_science.json`.
 
-Total expected implementation scope is four files and approximately 400 changed or added lines. The implementation TODO is `docs/datasets-non-science-move-restore-todo-20260731.md`.
+Total expected implementation scope is four files and approximately 400 changed or added lines. The implementation TODO is `docs/specs/datasets-non-science-move-restore-todo-20260731.md`.
 
 Focused tests MUST cover:
 

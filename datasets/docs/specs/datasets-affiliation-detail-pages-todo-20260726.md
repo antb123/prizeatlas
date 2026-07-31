@@ -1,6 +1,6 @@
 # TODO — affiliation detail pages (2026-07-26)
 
-Spec: `docs/datasets-affiliation-detail-pages-20260726.md`
+Spec: `docs/specs/datasets-affiliation-detail-pages-20260726.md`
 
 Run from `datasets/`. Do not expand scope. Branch per team convention before coding.
 

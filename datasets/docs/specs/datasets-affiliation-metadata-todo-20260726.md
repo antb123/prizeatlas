@@ -1,6 +1,6 @@
 # TODO — affiliation metadata
 
-Spec: `docs/datasets-affiliation-metadata-20260726.md`
+Spec: `docs/specs/datasets-affiliation-metadata-20260726.md`
 
 ## Shared assumptions
 

@@ -10,7 +10,7 @@ This is a data-collection backlog, not a software implementation plan. Each numb
 - The table preserves the 26 CSV fields and adds `prize_name`, `award_wikidata_qid`, and `laureate_wikidata_qid`.
 - All records have a unique `award_record_id`; `prize_name` and `award_wikidata_qid` are populated for all 13 prize families, and 114 existing person/organization QIDs have been carried into `laureate_wikidata_qid`.
 - All 13 read-only CSV snapshots retain the canonical ordered 26-column header.
-- The original 12-file canonical conversion is structurally complete. The older `docs/datasets-canonical-csv-schema-todo-20260723.md` has obsolete row-count and empty-coordinate checks and MUST NOT be executed literally.
+- The original 12-file canonical conversion is structurally complete. The older `docs/specs/datasets-canonical-csv-schema-todo-20260723.md` has obsolete row-count and empty-coordinate checks and MUST NOT be executed literally.
 - Blank cells are not automatically errors. A task is complete when every assigned row has been checked against the allowed sources and every blank is classified as filled, inapplicable, or unresolved.
 - `uv run scripts/import_sqlite.py` replaces the database from the CSV snapshots. Once SQLite enrichment begins, agents MUST NOT run the importer because it would discard SQLite-only changes.
 

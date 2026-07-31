@@ -53,7 +53,7 @@ Sixteen implementation files, approximately 1,550 lines, plus the live `award_ra
 | `award_ranking.toml` | existing lines 1-97 | Add one curated SEO slug to each prize. |
 | `scripts/load_award_ranking.py` | existing lines 1-141 | Validate, migrate, and load the slug column and unique index. |
 | `tests/test_load_award_ranking.py` | existing lines 1-136 | Prove slug validation, uniqueness, migration, and rollback. |
-| `docs/datasets-award-ranking-20260725.md` | existing lines 1-119 | Add the slug to the ranking-table contract. |
+| `docs/specs/datasets-award-ranking-20260725.md` | existing lines 1-119 | Add the slug to the ranking-table contract. |
 | `website/build.py` | new file, lines 1-300 | Read, validate, route, render the site with eight worker threads, and generate the sitemap. |
 | `website/build.py.lock` | new generated file, lines 1-30 | Lock the inline Jinja dependency. |
 | `website/templates/base.html` | new file, lines 1-70 | Shared document shell, document metadata, SEO metadata, breadcrumbs, navigation, and footer. |

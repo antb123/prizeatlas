@@ -261,4 +261,4 @@ reads as flat grey body copy. Italic or a smaller measure would let the names ca
   switch to direct links. §3.1 depends on this landing first.
 - **Geographic and demographic pages.** `birth_coordinates` (97% populated), `sex` (3,048),
   `death_date` (1,672) are unused but that is a feature, not cleanup.
-  See `docs/datasets-umap-winner-locations-20260725.md`.
+  See `docs/specs/datasets-umap-winner-locations-20260725.md`.

@@ -12,7 +12,7 @@ Person pages already list awards oldest-first (`plan_people` `build.py:537-540`)
 
 Live data has at least two parent pairs that `slugify` to the same slug (casing only): Caltech and UCLouvain. Fail-closed like countries would block the full site build; this feature folds those pairs instead.
 
-Prerequisite: `docs/datasets-affiliation-sub-name-20260725.md` (parent vs unit column).
+Prerequisite: `docs/specs/datasets-affiliation-sub-name-20260725.md` (parent vs unit column).
 
 ## Assumptions
 

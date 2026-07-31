@@ -1,6 +1,6 @@
 # Awards website cleanup TODO
 
-Implement `docs/datasets-website-cleanup-20260725.md` on its own branch. Use conventional commits, do not merge
+Implement `docs/specs/datasets-website-cleanup-20260725.md` on its own branch. Use conventional commits, do not merge
 until reviewed, and squash-merge into `202607`.
 
 Rebuild and re-check after every task: `uv run website/build.py` → `dist/` regenerates without a `BuildFailure`

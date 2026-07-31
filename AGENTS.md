@@ -253,6 +253,9 @@ under `old/`; the live data for each is the matching `award_record_id` prefix in
 - japan_prize.csv
   official:   https://www.japanprize.jp/en/
   wikipedia:  https://en.wikipedia.org/wiki/Japan_Prize
+- kavli_prize (SQLite prefix only; no legacy CSV)
+  official:   https://www.kavliprize.org/
+  wikipedia:  https://en.wikipedia.org/wiki/Kavli_Prize
 - kyoto_prize.csv
   official:   https://www.kyotoprize.org/en/
   wikipedia:  https://en.wikipedia.org/wiki/Kyoto_Prize
@@ -262,6 +265,9 @@ under `old/`; the live data for each is the matching `award_record_id` prefix in
 - max_planck_medal.csv
   official:   https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille
   wikipedia:  https://en.wikipedia.org/wiki/Max_Planck_Medal
+- millennium_technology_prize (SQLite prefix only; no legacy CSV)
+  official:   https://millenniumprize.org/
+  wikipedia:  https://en.wikipedia.org/wiki/Millennium_Technology_Prize
 - nobel.csv
   official:   https://www.nobelprize.org
   wikipedia:  https://en.wikipedia.org/wiki/List_of_Nobel_laureates

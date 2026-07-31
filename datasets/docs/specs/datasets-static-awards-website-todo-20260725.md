@@ -1,6 +1,6 @@
 # Static awards website implementation TODO
 
-Implement `docs/datasets-static-awards-website-20260725.md` on its own branch. Use conventional commits, do not merge
+Implement `docs/specs/datasets-static-awards-website-20260725.md` on its own branch. Use conventional commits, do not merge
 until reviewed, and squash-merge into `202607`.
 
 ## WEB-0 — Curated prize slugs
@@ -14,7 +14,7 @@ Files:
 - `award_ranking.toml`, existing lines 1-97;
 - `scripts/load_award_ranking.py`, existing lines 1-141;
 - `tests/test_load_award_ranking.py`, existing lines 1-136;
-- `docs/datasets-award-ranking-20260725.md`, existing lines 1-119.
+- `docs/specs/datasets-award-ranking-20260725.md`, existing lines 1-119.
 
 Relevant assumptions:
 

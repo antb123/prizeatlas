@@ -21,7 +21,7 @@ the archived CSVs.
 (`website/build.py:482-558`) derives the atlas from the two coordinate columns. Where a field is blank the page is
 silently thinner; where a field is malformed the page is silently wrong.
 
-Two prior findings motivated this census. `docs/datasets-site-roadmap-todo-20260726.md` §4 asserts gaps that this
+Two prior findings motivated this census. `docs/specs/datasets-site-roadmap-todo-20260726.md` §4 asserts gaps that this
 document partly corrects (see Assumption 3 and the census note on birth data). Separately, several award records were
 observed to list more than one institution — the case this schema cannot currently represent, described under
 [Multiple affiliations](#multiple-affiliations-per-award-record).

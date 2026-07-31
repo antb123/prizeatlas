@@ -3,7 +3,7 @@
 ## Goal
 
 Find birth coordinates that point at the wrong place. Phase 1
-(`docs/bulk-birth-coordinates-20260725.md`) fills cells; this decides whether what landed is
+(`docs/specs/bulk-birth-coordinates-20260725.md`) fills cells; this decides whether what landed is
 right.
 
 Report only. It prints offending rows and changes nothing.

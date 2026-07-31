@@ -35,7 +35,9 @@ The HHMI and Berkeley figures are the ones this change moves. Earlier drafts of 
 1. **(Load-bearing)** Position is a stable sort key, not a rank. Position 1 living in the flat columns is a storage detail, not a claim of primacy — everything above `read_database()` sees one uniform tuple.
 2. **(Load-bearing)** Only reviewed affiliations are loaded. The input is a committed TSV, not a prose parser. Rows that were not reviewed by hand do not go in.
 3. **(Load-bearing)** The flat columns are NOT dropped and NOT rewritten. No maintenance script changes.
-4. Unknown QIDs and locations stay blank. Never borrow either from a same-named row — that is what split Berkeley 34/28.
+4. Unknown QIDs stay blank. Never borrow a QID or coordinate from a same-named row — that is what split Berkeley 34/28.
+   A hand-verified city/country may carry a city-level `longitude,latitude` coordinate without an organization QID. Such
+   a point represents the recorded locality, not an unverified institutional street address.
 5. The site output **will** change, by exactly the reviewed additions. Byte-identity is not the gate here; a reviewed delta is.
 6. `affiliation_wikidata_qid` holds SQL `NULL` on 436 rows. `_text()` at `:640` already flattens this on read, so composition inherits the existing behaviour and no migration is needed.
 
@@ -74,7 +76,9 @@ CREATE TABLE award_extra_affiliations (
 
 `CHECK (position >= 2)` is what makes the two stores disjoint by construction. Full location columns are carried per row so nothing is ever resolved by joining on an institution name.
 
-No `CHECK (coordinates = '' OR wikidata_qid <> '')` — hand-verified coordinates without a QID are legitimate. SQLite does not enforce the foreign key unless `PRAGMA foreign_keys = ON`, which this codebase does not set; the clause is documentation, and orphan detection belongs in the validator.
+No `CHECK (coordinates = '' OR wikidata_qid <> '')` — hand-verified coordinates without a QID are legitimate for both
+primary and secondary affiliations. A coordinate without a QID must be a documented city-level point for the recorded
+city/country; it must not imply an unverified institutional address. The validator therefore permits this case.
 
 ## Data flow
 

@@ -102,6 +102,31 @@ Rows with these identities must remain without coordinates until their instituti
 
 ## Safe continuation point
 
+When an affiliation has no organization QID but its recorded city and country are independently verified, a city-level
+`longitude,latitude` coordinate is permitted. It represents the recorded locality, not the organization's exact premises,
+and must not be copied from another same-named affiliation. The no-QID coordinate validator must permit this documented
+exception.
+
+### 20260728: reviewed no-QID city points
+
+Nominatim returned the following city-level points for reviewed affiliations without an organization QID. Each value is
+stored in `longitude,latitude` order and is deliberately a locality point rather than an asserted office, laboratory, or
+campus address.
+
+| Affiliation | Recorded city/country | Coordinate |
+|---|---|---|
+| Alphanosos | Riom, France | `3.1140583,45.8930120` |
+| Animal Biotechnology Cambridge Ltd. | Cambridge, United Kingdom | `0.1391537,52.1975846` |
+| Atomic Tags, Inc. | La Jolla, United States | `-117.2575702,32.8458529` |
+| Farms of Texas Company | Alvin, United States | `-95.2441009,29.4238472` |
+| HelpMate Robotics Inc. | Danbury, United States | `-73.4540111,41.3948170` |
+| Intermetallics Co., Ltd. | Kyoto, Japan | `135.7681441,35.0115754` |
+| Maiman Associates | Marina del Rey, United States | `-118.4486470,33.9776848` |
+| Maiman Associates | Los Angeles, United States | `-118.2427660,34.0536909` |
+| Molecular Geriatrics Corporation | Vernon Hills, United States | `-87.9649487,42.2373152` |
+| Optoelectronics Technology Research Laboratory | Tsukuba, Japan | `140.0772790,36.0833265` |
+| Physicomedical Institute | Minneapolis, United States | `-93.2654692,44.9772995` |
+
 Before any database write:
 
 1. Re-read the live rows because `awards.sqlite3` already contained unrelated uncommitted user changes when research began.

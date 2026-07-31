@@ -3,7 +3,7 @@
 Two cross-cutting views for a student audience: where laureates were **born**, and which **institutions** they were at.
 Both cut across prizes, which the current prize → category → year → person structure cannot do.
 
-Companion to `docs/datasets-website-cleanup-20260725.md`. Discipline tags are a separate, larger idea and are **not**
+Companion to `docs/specs/datasets-website-cleanup-20260725.md`. Discipline tags are a separate, larger idea and are **not**
 in this spec.
 
 ## Data as it stands

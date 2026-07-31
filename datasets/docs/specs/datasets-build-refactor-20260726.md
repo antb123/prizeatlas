@@ -35,9 +35,9 @@ The safety net is strong: `tests/test_build_website.py` is 1228 lines / 22 tests
 `build_site()` against a temporary SQLite database and assert on rendered HTML, routes, sitemaps, and metadata. All 22
 pass at `4ad1cfd`. That is what makes a mechanical refactor of this size safe in one pass.
 
-Prior specs that shaped this function: `docs/datasets-website-cleanup-20260725.md`,
-`docs/datasets-explorer-integration-20260726.md`, `docs/datasets-subject-taxonomy-20260726.md`,
-`docs/website-map-integration-20260726.md`. A pending spec, `docs/datasets-multilingual-20260726.md`, plans to
+Prior specs that shaped this function: `docs/specs/datasets-website-cleanup-20260725.md`,
+`docs/specs/datasets-explorer-integration-20260726.md`, `docs/specs/datasets-subject-taxonomy-20260726.md`,
+`docs/specs/website-map-integration-20260726.md`. A pending spec, `docs/specs/datasets-multilingual-20260726.md`, plans to
 parameterise this function by language — that work gets materially easier against small functions, and this refactor
 is a prerequisite worth doing first.
 
@@ -320,7 +320,7 @@ The only changes that are not pure code movement. Each is behaviour-identical.
 - `_year_prefix()` is called repeatedly on the same values (`website/build.py:1139`, `1177`, `1188`, `1202`, `1206`,
   `1520`, `1526`, `1528`). Caching it is a performance change, not a clarity change. Leave it.
 - `plan_places()` returning a two-tuple and doing two jobs — a known wart from
-  `docs/datasets-country-institutions-cleanup-20260726.md`. Not this spec.
+  `docs/specs/datasets-country-institutions-cleanup-20260726.md`. Not this spec.
 - `read_database()`, `_render_job()`, `build_site()`, `write_sitemaps()`, and the map/explorer payload builders. All
   are at most 90 lines and are not touched.
 - No template, no CSS, no SQL, no CLI change.
