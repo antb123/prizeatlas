@@ -106,7 +106,7 @@ Steps:
    ```
 
 **Verify:**
-- `uv run website/build.py --base-url https://prestigious-awards.abarker324753.chatgpt.site/` exits 0.
+- `uv run website/build.py --base-url https://example.org/awards/` exits 0.
 - Page count is within a handful of the 7,265 baseline — this change adds no routes.
 - `uv run ruff check website/build.py` clean.
 
@@ -140,7 +140,7 @@ Steps:
 2. `affiliations.html` line 12: the loop currently unpacks `{% for name, count in affiliations %}`. Update it for the shape T4 returns and render the sub-buckets as a nested list beneath each parent. Parents with no sub-buckets MUST render exactly as they do today — no empty `<ul>`, no placeholder row.
 
 **Verify:**
-- `uv run website/build.py --base-url https://prestigious-awards.abarker324753.chatgpt.site/` exits 0.
+- `uv run website/build.py --base-url https://example.org/awards/` exits 0.
 - Rendered `/affiliations/` shows the Harvard nesting; a parent with no units (e.g. `Rockefeller University`) renders as a plain row with no empty list markup.
 - No raw Jinja braces in the output.
 
