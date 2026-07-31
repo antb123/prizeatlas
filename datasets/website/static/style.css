@@ -123,6 +123,37 @@ footer {
   border-top: 1px solid var(--rule);
 }
 
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.footer-badge:hover {
+  color: var(--accent);
+}
+
+.footer-badge svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 h1,
 h2,
 h3,
@@ -202,6 +233,18 @@ h3 {
   width: 3.25rem;
   aspect-ratio: 1;
   object-fit: contain;
+}
+
+@media (prefers-color-scheme: light) {
+  .award-logo[src$="the-brain-prize.svg"] {
+    filter: invert(1);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .award-logo[src$="millennium-technology-prize.svg"] {
+    filter: invert(1);
+  }
 }
 
 .award-identity {
@@ -740,6 +783,12 @@ h3 {
 .external-source {
   color: var(--muted);
   font-weight: 400;
+}
+
+.ror-tag {
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.6;
 }
 
 .facts dl,

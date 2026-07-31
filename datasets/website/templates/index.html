@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">An editorial ranking</p>
-  <h1>Prestigious Awards and Winners</h1>
-  <p>Explore international prizes and the people and organizations recognized by them.</p>
+  <h1>{{ hero_heading }}</h1>
+  <p>Honoring the people behind the prizes — global citizens who've advanced humanity's knowledge and quality of life.</p>
 </header>
 <dl class="totals">
   {% for value, label in totals %}
   <div>
-    <dt>{% if label == "prizes" %}<a href="#ranked-awards">{{ value }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
-    <dd>{% if label == "prizes" %}<a href="#ranked-awards">{{ label }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
+    <dt>{% if label == "prizes" %}<a href="{{ href(awards_route) }}">{{ value }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
+    <dd>{% if label == "prizes" %}<a href="{{ href(awards_route) }}">{{ label }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
   </div>
   {% endfor %}
 </dl>
@@ -31,7 +30,6 @@
 {% endif %}
 {% if top_institutions %}
 <section>
-  <p class="eyebrow">Top Institutions</p>
   <h2>Affiliated Institutions</h2>
   <ol class="highlights">
     {% for affiliation in top_institutions %}
@@ -85,6 +83,20 @@
     <li>
       <a href="{{ href(country.route) }}">{{ country.name }}</a>
       <span>{{ country.people | length }} {{ "laureate" if country.people | length == 1 else "laureates" }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% if affiliation_rates %}
+<section>
+  <h2>Laureates by country</h2>
+  <p>Affiliations / 1m</p>
+  <ol class="highlights">
+    {% for country, rate in affiliation_rates %}
+    <li>
+      <a href="{{ href(country.route) }}">{{ country.name }}</a>
+      <span>{{ "%.1f" | format(rate) }} / 1m</span>
     </li>
     {% endfor %}
   </ol>

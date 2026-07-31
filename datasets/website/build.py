@@ -275,6 +275,7 @@ class Affiliation:
     subjects: tuple[tuple[str, str], ...]
     profile: AffiliationProfile | None
     openalex_id: str
+    ror: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -860,6 +861,9 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
                 "shaw-prize": "static/logos/shaw-prize.ico",
                 "japan-prize": "static/logos/japan-prize.png",
                 "breakthrough-prize": "static/logos/breakthrough-prize.png",
+                "kavli-prize": "static/logos/kavli-prize.svg",
+                "millennium-technology-prize": "static/logos/millennium-technology-prize.svg",
+                "the-brain-prize": "static/logos/the-brain-prize.svg",
                 "sveriges-riksbank-prize-in-economic-sciences": "static/logos/sveriges-riksbank-prize-in-economic-sciences.png",
             }.get(_text(row["slug"]), ""),
         )
@@ -1144,6 +1148,18 @@ def plan_country_places(
     return countries
 
 
+def plan_per_capita_places(places: Iterable[Place], population_file: Path = POPULATION_FILE) -> list[tuple[Place, float]]:
+    """Rank country places by distinct laureates per million people, matching the Explorer rate views."""
+    places = list(places)
+    populations = load_population([place.name for place in places], population_file)
+    rates = [
+        (place, len(place.people) / population * 1_000_000)
+        for place, population in zip(places, populations, strict=True)
+        if population and len(place.people) >= 5
+    ]
+    return sorted(rates, key=lambda entry: (-entry[1], entry[0].name))
+
+
 def plan_affiliations(
     records: list[AwardRecord],
     record_routes: dict[str, str],
@@ -1201,6 +1217,11 @@ def plan_affiliations(
             for link in awards
             if link.affiliation.position == 1 and _nonblank(link.record.institution_openalex_id)
         }
+        rors = {
+            link.record.affiliate_ror
+            for link in awards
+            if link.affiliation.position == 1 and _nonblank(link.record.affiliate_ror)
+        }
         affiliations.append(
             Affiliation(
                 display,
@@ -1212,6 +1233,7 @@ def plan_affiliations(
                 subjects,
                 matched_profiles[0] if matched_profiles else None,
                 next(iter(openalex_ids), ""),
+                next(iter(rors), ""),
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
@@ -1802,11 +1824,12 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
         death_date = next((record.death_date for record, _ in person.awards if _nonblank(record.death_date)), "")
         lifespan = f"{birth_year}–{death_date[:4]}" if birth_year and len(death_date) >= 4 else ""
         author_openalex_id = next((record.author_openalex_id for record, _ in person.awards if _nonblank(record.author_openalex_id)), "")
+        orc_id = next((record.orc_id for record, _ in person.awards if _nonblank(record.orc_id)), "")
         jobs.append(
             _page(
                 "person.html",
                 person.route,
-                f"{person.name}: awards and recognition",
+                f"{person.name} — {_names(prizes, limit=2)} ({span})",
                 _clamp(
                     f"{person.name} won {len(person.awards)} recorded {'award' if len(person.awards) == 1 else 'awards'} "
                     f"({span}): {_names(prizes, limit=4)}."
@@ -1819,6 +1842,7 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
                 lifespan=lifespan,
                 wikipedia_url=wikipedia_search_url(person.name),
                 author_openalex_id=author_openalex_id,
+                orc_id=orc_id,
                 schema={
                     **_laureate_schema(latest, public_url(base_url, person.route)),
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
@@ -2097,11 +2121,12 @@ def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardR
     for rank, affiliation in enumerate(affiliations, start=1):
         span = _year_span([link.record.year for link in affiliation.awards])
         award_count = len({link.record.award_record_id for link in affiliation.awards})
+        prizes = list(dict.fromkeys(link.record.prize_name for link in affiliation.awards))
         jobs.append(
             _page(
                 "affiliation.html",
                 affiliation.route,
-                f"{affiliation.name}: laureate awards",
+                f"{affiliation.name} — {_names(prizes, limit=2)} ({span})",
                 _clamp(
                     f"{affiliation.name} records {award_count} "
                     f"{'award' if award_count == 1 else 'awards'} ({span}) across {affiliation.count} "
@@ -2220,15 +2245,22 @@ def plan_home_page(
     sexed_records = sum(1 for record in records if record.sex in ("Female", "Male"))
     women_pct = round(100 * sum(1 for record in records if record.sex == "Female") / sexed_records) if sexed_records else 0
     top_countries = country_places["Awarded"][:7]
+    affiliation_rates = plan_per_capita_places(country_places["Awarded"])
+    # Nobel Prize and Fields Medal are the two prizes people actually search for by name; the rest of the
+    # roster is named only by count, so that count must track `rankings` instead of drifting into a stale "dozen".
+    other_prize_count = len(rankings) - 2
+    hero_heading = f"Nobel Prize, Fields Medal & {other_prize_count} More Awards"
     return _page(
         "index.html",
         "/",
-        "Prestigious Awards and Winners",
+        f"PrizeAtlas: {hero_heading}",
         _clamp(
-            f"{len(people):,} laureates and {len(records):,} awards across {len(rankings)} international prizes, "
-            f"{min(year_prefixes)}-{latest_year}. Ranked, cross-referenced, and browsable by person."
+            f"The Nobel Prize, Fields Medal, and {other_prize_count} more: {len(people):,} laureates and "
+            f"{len(records):,} awards across {len(rankings)} international prizes, {min(year_prefixes)}-{latest_year}. "
+            "Free, fast, and sourced from Wikidata, Wikipedia, and ROR."
         ),
         (),
+        hero_heading=hero_heading,
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
         totals=(
             (f"{len(people):,}", "laureates"),
@@ -2245,6 +2277,7 @@ def plan_home_page(
         top_women=tuple(women[:HOMEPAGE_ROWS]),
         women_pct=women_pct,
         top_countries=tuple(top_countries),
+        affiliation_rates=tuple(affiliation_rates[:HOMEPAGE_ROWS]),
         top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
     )
 
@@ -2253,9 +2286,9 @@ def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> P
     return _page(
         "awards.html",
         AWARDS_ROUTE,
-        "Awards",
+        "International awards",
         f"Browse {len(rankings)} international awards and their recipients.",
-        (),
+        (Breadcrumb("Home", "/"), Breadcrumb("Awards", None)),
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
     )
 
@@ -2296,7 +2329,7 @@ def plan_map_pages(records: list[AwardRecord]) -> list[PageJob]:
         _page(
             "map.html",
             MAP_ROUTE,
-            "Awards Atlas: Birthplaces and Institutions",
+            "Map: Birthplaces and Institutions",
             "Explore where international award recipients were born and the institutions where they worked.",
             (),
             payload=atlas_payload,
@@ -2308,7 +2341,7 @@ def plan_map_pages(records: list[AwardRecord]) -> list[PageJob]:
             _page(
                 "map.html",
                 f"{MAP_ROUTE}{slugify(subject_name)}/",
-                f"{subject_name} Awards Atlas: Birthplaces and Institutions",
+                f"{subject_name} Map: Birthplaces and Institutions",
                 f"Map recorded birthplaces and affiliated institutions for international awards classified under {subject_name}.",
                 (),
                 payload=atlas_payload,
@@ -2325,7 +2358,7 @@ def plan_explorer_page(
     return _page(
         "explorer.html",
         EXPLORER_ROUTE,
-        "Awards Data Explorer",
+        "Data Explorer",
         "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
         (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
         payload=explorer_json(payload),
@@ -2559,7 +2592,7 @@ def write_llms_txt(output: Path, base_url: str, plan: SitePlan, rankings: Iterab
         for job in sorted((job for job in plan.jobs if job.template == "subject.html"), key=lambda job: job.route)
     )
     institution_count = sum(1 for job in plan.jobs if job.template == "affiliation.html")
-    body = f"""# Awards
+    body = f"""# PrizeAtlas
 
 > A free, static reference to {plan.prize_count} international prize families and the {plan.person_count:,} people and organizations that have
 > received them, {plan.year_span}. Every prize, award year, recipient, person, country, institution, and school subject has its own page.
@@ -2723,7 +2756,7 @@ def _write_share_image(
     draw = ImageDraw.Draw(image)
     draw.rounded_rectangle((48, 42, 1152, 588), radius=30, fill=surface, outline=rule, width=2)
     draw.rounded_rectangle((48, 42, 66, 588), radius=9, fill=accent)
-    draw.text((96, 78), "PRIZE ATLAS", font=_share_font(28, fonts), fill=accent)
+    draw.text((96, 78), "PRIZEATLAS", font=_share_font(28, fonts), fill=accent)
 
     if card is None:
         title, subtitle = {
@@ -2731,7 +2764,7 @@ def _write_share_image(
             "Laureates": ("Prize-winning laureates", "Explore recipients across major international awards"),
             "Institutions": ("Award-linked institutions", "Affiliations recorded when prizes were awarded"),
             "Universities": ("Universities with award-winning laureates", "Award-time affiliations, not institutional quality"),
-            "Map": ("The Prize Atlas map", "Birthplaces and award-time affiliations around the world"),
+            "Map": ("The PrizeAtlas map", "Birthplaces and award-time affiliations around the world"),
             "Nearby": ("Winners near you", "Explore laureates and institutions by distance"),
         }[generic]
         name_font, name_lines = _share_fit(draw, title, fonts, 1008, 2, 66, 46)
@@ -2936,16 +2969,35 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     return plan
 
 
+def build_home_page(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> None:
+    """Update the homepage in an existing site build without rewriting every generated file."""
+    normalized_base_url = normalize_base_url(base_url)
+    output = website_dir / "dist"
+    if not output.is_dir():
+        raise BuildFailure("website/dist is missing; run a full website build first")
+    corrections_email = read_env(website_dir.parent / ".env").get("CORRECTIONS_EMAIL", "")
+    rankings, profiles, records = read_database(database)
+    generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
+    plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
+    home = next(job for job in plan.jobs if job.route == "/")
+    _render_job(_environment(website_dir), output, normalized_base_url, corrections_email, home)
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--database", type=Path, default=DATASET_DIR / "awards.sqlite3")
+    parser.add_argument("--home-only", action="store_true", help="update website/dist/index.html only")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
+        if args.home_only:
+            build_home_page(args.database.resolve(), args.base_url)
+            print("website home page complete")
+            return 0
         plan = build_site(args.database.resolve(), args.base_url)
     except Exception as error:  # noqa: BLE001 - every worker failure must map to exit status 1.
         print(f"website build failed: {error}", file=sys.stderr)
