@@ -4,6 +4,12 @@ set -euo pipefail
 
 port="${1:-8000}"
 base="http://localhost:${port}/"
+
+if ss -H -ltn "sport = :$port" | grep -q .; then
+	echo "website server port already in use port=$port" >&2
+	exit 1
+fi
+
 cd "$(dirname "${BASH_SOURCE[0]}")/datasets"
 
 # The previous build's page count is the denominator. First run has no dist, so progress counts up without a percentage.
