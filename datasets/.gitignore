@@ -1,5 +1,4 @@
 /.env
-/awards.sqlite3
 /awards.sqlite3-shm
 /awards.sqlite3-wal
 /awards.sqlite3.*
@@ -13,5 +12,6 @@ __pycache__/
 /old/
 /trash/
 /.nominatim-cache.json
-/arts.json
-/non_science.json
+/.nominatim-birth-cache.json
+/.nominatim-reverse-cache.json
+/data/
