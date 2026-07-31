@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Check the award data against the invariants it is supposed to hold, and report what breaks them.
 
 The awards table repeats an institution's facts on every row that names it. Berkeley appears 62 times, so its city,

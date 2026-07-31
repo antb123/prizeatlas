@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Look up and apply exact Wikidata-to-ROR affiliation crosswalks."""
 
 from __future__ import annotations

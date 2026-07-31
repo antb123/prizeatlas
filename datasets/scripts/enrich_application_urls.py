@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """
 Populate affiliations.application_url in awards.sqlite3.
 

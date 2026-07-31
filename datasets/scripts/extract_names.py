@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Dump id<TAB>full_name<TAB>citizenship for lasker_awards.csv laureates."""
 import csv
 

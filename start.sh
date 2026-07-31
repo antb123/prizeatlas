@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Build the static awards website for nginx. Usage: ./start.sh [https://example.org/awards/]
 set -euo pipefail
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Restructure breakthrough.csv: split lumped laureate rows into one row per person.
 
 - SPLIT: full_name lists several named people -> one row each. First person keeps

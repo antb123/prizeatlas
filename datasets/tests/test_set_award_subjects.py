@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 import sqlite3
 import unittest
 from pathlib import Path
@@ -40,7 +41,7 @@ def create_test_db(tmp_path: Path) -> Path:
 class TestSetAwardSubjects(unittest.TestCase):
     def test_classify_ladder(self):
         self.assertEqual(classify({"prize_name": "Fields Medal", "category": ""}), "Math")
-        self.assertEqual(classify({"prize_name": "Turing Award", "category": ""}), "Computer Science")
+        self.assertEqual(classify({"prize_name": "Turing Award", "category": ""}), "CS")
         self.assertEqual(classify({"prize_name": "Japan Prize", "category": "Healthcare and Medical Technology"}), "Biology")
         self.assertIsNone(classify({"prize_name": "Japan Prize", "category": "Unknown Subject XYZ"}))
 
@@ -63,7 +64,7 @@ class TestSetAwardSubjects(unittest.TestCase):
             conn.close()
 
             self.assertEqual(res["abel_prize-000001"], "Math")
-            self.assertEqual(res["turing_award-000001"], "Computer Science")
+            self.assertEqual(res["turing_award-000001"], "CS")
             self.assertEqual(res["japan_prize-000001"], "Biology")  # Medical keyword beats CS
             self.assertEqual(res["kyoto_prize-000002"], "Math")  # Kyoto override
 

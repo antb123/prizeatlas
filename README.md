@@ -77,13 +77,16 @@ it with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 ## Build for nginx
 
 The production command only builds static files; nginx serves the resulting
-`datasets/website/dist/` directory. It reads `BASE_URL` from `datasets/.env`:
+`datasets/website/dist/` directory. Set its canonical URL once from the
+sanitized template:
 
 ```sh
+cp datasets/.env.example datasets/.env
 ./start.sh
 ```
 
-Pass a URL only to override that setting for another deployment.
+It reads `BASE_URL` from `datasets/.env`; pass a URL only to override that
+setting for another deployment.
 
 ### Download data only
 
@@ -169,7 +172,13 @@ python -m http.server 8000 --directory website/dist
 Run the focused website tests from `datasets/` with:
 
 ```sh
-uv run python -m unittest tests/test_build_website.py
+uv run --with jinja2==3.1.6 --with pillow==11.3.0 python -m unittest tests/test_build_website.py
+```
+
+Run the full suite, including the country-boundary checks, with:
+
+```sh
+uv run --with jinja2==3.1.6 --with pillow==11.3.0 --with 'shapely>=2,<3' python -m unittest discover tests
 ```
 
 ## Python standards
@@ -191,8 +200,8 @@ Before committing Python changes, run:
 
 ```sh
 cd datasets
-ruff check website/build.py
-uv run python -m unittest tests/test_build_website.py
+uvx ruff check website/build.py
+uv run --with jinja2==3.1.6 --with pillow==11.3.0 python -m unittest tests/test_build_website.py
 ```
 
 ## Data principles

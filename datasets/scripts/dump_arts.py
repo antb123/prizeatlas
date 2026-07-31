@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Dump and remove non-science awards from awards.sqlite3."""
 
 from __future__ import annotations

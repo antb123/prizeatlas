@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Stop the website dev server started by startdev.sh. Usage: ./stopdev.sh [port]
 set -euo pipefail
 

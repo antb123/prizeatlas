@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Merge lasker_batch*.tsv biographical data into lasker_awards.csv.
 
 Each batch line is pipe-delimited:

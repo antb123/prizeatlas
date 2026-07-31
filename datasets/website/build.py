@@ -5,6 +5,7 @@
 #     "pillow==11.3.0",
 # ]
 # ///
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Build the static awards website from awards.sqlite3."""
 
 from __future__ import annotations

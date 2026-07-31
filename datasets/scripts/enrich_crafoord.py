@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Enrich crafoord.csv from Wikidata (scripted, cheap, source-verified).
 
 Run from the datasets/ directory. Fills ONLY empty cells:

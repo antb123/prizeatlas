@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Load the reviewed second-and-later affiliations into awards.sqlite3.
 
 The six flat `awards.affiliation_*` columns are position 1; this table is positions 2+, so the two stores are disjoint

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """
 Classify each affiliation in awards.sqlite3 as a university, hospital, institute, company or government body.
 

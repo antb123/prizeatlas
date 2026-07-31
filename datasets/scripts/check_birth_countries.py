@@ -2,6 +2,7 @@
 # /// script
 # dependencies = ["pycountry"]
 # ///
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Print birth coordinates whose reverse-geocoded country disagrees with the database."""
 
 import csv

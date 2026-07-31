@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Build the awards website and serve it on localhost. Usage: ./startdev.sh [port]
 set -euo pipefail
 

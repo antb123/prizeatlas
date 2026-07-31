@@ -3,6 +3,7 @@
 # requires-python = ">=3.12"
 # dependencies = ["pycountry==24.6.1"]
 # ///
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Fix defects in the awards table rather than working around them at render time.
 
 Three kinds of defect, all of them visible on the site today:

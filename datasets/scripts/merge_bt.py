@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Merge bt_batch*.tsv into breakthrough.csv, filling ONLY blank cells.
 
 Batch line: record_id|birth_date|birth_year|birth_city|birth_country|

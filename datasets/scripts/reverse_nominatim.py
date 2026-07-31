@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Reverse lookup longitude,latitude with OpenStreetMap Nominatim and print JSON."""
 
 from __future__ import annotations

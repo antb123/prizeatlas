@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Give Shaw Prize records their category, and a prize share computed within it.
 
 The Shaw Prize is three separate prizes awarded the same year: Astronomy, Life Science and Medicine, and Mathematical

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Generate the disposable standalone awards map MVP."""
 
 from __future__ import annotations

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Enrich fields.csv with Wikidata-born/-died data for Fields Medalists.
 
 Looks up each laureate by name via Wikidata search, then batches a single

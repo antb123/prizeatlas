@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Load the complete award prestige ranking into awards.sqlite3."""
 
 from __future__ import annotations

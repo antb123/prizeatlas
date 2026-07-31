@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
 """Collapse affiliation names that are one institution written several ways, and roll constituent units into their parent.
 
 "Massachusetts Institute of Technology" and "Massachusetts Institute of Technology (MIT)" are the same place, and a

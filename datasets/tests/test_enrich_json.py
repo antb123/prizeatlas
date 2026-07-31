@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 from __future__ import annotations
 
 import contextlib
@@ -76,7 +77,7 @@ class EnrichJsonTests(unittest.TestCase):
                 writer.writerow(row)
             original = path.read_bytes()
 
-            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float, overwrite: bool) -> None:
                 candidate["source_laureate_id"] = qid
                 candidate["laureate_type"] = "Individual"
                 candidate["birth_date"] = "1900-01-02"
@@ -117,7 +118,7 @@ class EnrichJsonTests(unittest.TestCase):
                 full_name="Example Person",
             )
 
-            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float, overwrite: bool) -> None:
                 candidate["source_laureate_id"] = qid
                 candidate["laureate_type"] = "Individual"
                 candidate["birth_date"] = "1900-01-02"
@@ -179,7 +180,7 @@ class EnrichJsonTests(unittest.TestCase):
                     """
                 )
 
-            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float, overwrite: bool) -> None:
                 candidate["laureate_type"] = "Individual"
 
             output = io.StringIO()
@@ -229,7 +230,7 @@ class EnrichJsonTests(unittest.TestCase):
                     """
                 )
 
-            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float) -> None:
+            def fill(candidate: dict, qid: str, entity: dict, verdict: str, delay: float, overwrite: bool) -> None:
                 candidate["laureate_type"] = "Individual"
 
             output = io.StringIO()
