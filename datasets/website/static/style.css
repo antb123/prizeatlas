@@ -849,6 +849,65 @@ dd {
   margin-top: 0.75rem;
 }
 
+@media (max-width: 52rem) {
+  .site-header > p {
+    display: none;
+  }
+
+  .site-nav-toggle {
+    margin-left: auto;
+    padding: 0;
+  }
+
+  .site-nav-toggle summary {
+    list-style: none;
+    cursor: pointer;
+    color: var(--accent);
+    padding: 0.4rem 0.6rem;
+    margin: -0.4rem -0.6rem;
+  }
+
+  .site-nav-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .site-nav-toggle summary::before {
+    content: "☰ ";
+    font-weight: bold;
+  }
+
+  .site-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    border-top: 1px solid var(--rule);
+    padding-top: 0.5rem;
+  }
+
+  .site-nav a {
+    padding-block: 0.5rem;
+    display: block;
+    border-bottom: 1px solid var(--rule);
+  }
+}
+
+@media (min-width: 52rem) {
+  .site-nav-toggle {
+    display: contents;
+  }
+
+  .site-nav-toggle summary {
+    display: none;
+  }
+
+  .site-nav-toggle[open] .site-nav {
+    display: flex;
+  }
+}
+
 @media (min-width: 64rem) {
   .site-header,
   .breadcrumbs,

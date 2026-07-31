@@ -26,15 +26,18 @@
   <header class="site-header">
     <a class="site-name" href="{{ home_href }}">PrizeAtlas</a>
     <p>Recognition for work with lasting impact</p>
-    <nav class="site-nav" aria-label="Sections">
-      <a href="{{ href(awards_route) }}">Awards</a>
-      <a href="{{ href(subjects_route) }}">Subjects</a>
-      <a href="{{ href(countries_route) }}">Countries</a>
-      <a href="{{ href(affiliations_route) }}">Institutions</a>
-      <a href="{{ href(map_route) }}">Map</a>
-      <a href="{{ href(nearby_route) }}">Nearby</a>
-      <a href="{{ href(explorer_route) }}">Explorer</a>
-    </nav>
+    <details class="site-nav-toggle" open>
+      <summary>Menu</summary>
+      <nav class="site-nav" aria-label="Sections">
+        <a href="{{ href(awards_route) }}">Awards</a>
+        <a href="{{ href(subjects_route) }}">Subjects</a>
+        <a href="{{ href(countries_route) }}">Countries</a>
+        <a href="{{ href(affiliations_route) }}">Institutions</a>
+        <a href="{{ href(map_route) }}">Map</a>
+        <a href="{{ href(nearby_route) }}">Nearby</a>
+        <a href="{{ href(explorer_route) }}">Explorer</a>
+      </nav>
+    </details>
   </header>
   {% if breadcrumbs %}
   <nav class="breadcrumbs" aria-label="Breadcrumb">
