@@ -101,6 +101,9 @@ wget -O awards.csv https://prizeatlas.org/awards.csv
 The SQLite file is the source-of-truth database. The CSV is a flat export of
 the same award records, convenient for spreadsheets and data tools.
 
+**For complete documentation on the datasets** — including the data dictionary,
+schema, usage examples, licensing, and how to query — see [DATA.md](DATA.md).
+
 ### macOS
 
 After cloning or downloading the repository, install `uv` once and run the
