@@ -1107,6 +1107,104 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("\\u003c/script>", rendered)
         self.assertEqual("</script><script>alert(1)</script>", json.loads(rendered)["@graph"][0]["affiliation"]["name"])
 
+    def test_index_pages_carry_item_list_structured_data(self) -> None:
+        def item_list(route: str) -> list[dict]:
+            html = (self.website / "dist" / route.strip("/") / "index.html").read_text()
+            block = html.split('<script type="application/ld+json">')[1].split("</script>")[0]
+            graph = {entry["@type"]: entry for entry in json.loads(block)["@graph"]}
+            return graph["ItemList"]["itemListElement"]
+
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        records = [
+            {
+                "award_record_id": "nobel-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Nobel Prize",
+                "category": "Physics",
+                "year": "2024",
+                "full_name": "Geoffrey Hinton",
+                "laureate_wikidata_qid": "Q92894",
+                "birth_country": "United Kingdom",
+                "affiliation_name": "University of Toronto",
+            },
+        ]
+        database = self.create_database(rankings, records)
+        build.build_site(database, "https://example.org/", self.website)
+
+        self.assertEqual(
+            [{"@type": "ListItem", "position": 1, "name": "Nobel Prize", "url": "https://example.org/nobel-prize/"}],
+            item_list("/awards/"),
+        )
+        self.assertEqual(
+            [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Geoffrey Hinton",
+                    "url": "https://example.org/people/geoffrey-hinton/",
+                }
+            ],
+            item_list("/people/"),
+        )
+        self.assertEqual(
+            [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "University of Toronto",
+                    "url": "https://example.org/affiliations/university-of-toronto/",
+                }
+            ],
+            item_list("/affiliations/"),
+        )
+        self.assertEqual(
+            [{"@type": "ListItem", "position": 1, "name": "Physics", "url": "https://example.org/subjects/physics/"}],
+            item_list("/subjects/"),
+        )
+        self.assertEqual(
+            [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "United Kingdom",
+                    "url": "https://example.org/countries/united-kingdom/",
+                }
+            ],
+            item_list("/countries/"),
+        )
+        self.assertEqual(
+            [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Geoffrey Hinton",
+                    "url": "https://example.org/nobel-prize/2024/geoffrey-hinton/",
+                }
+            ],
+            item_list("/nobel-prize/winners/"),
+        )
+
+        # A prize with more winners than ITEM_LIST_CAP still renders every winner on the page itself, but the
+        # structured-data block stays capped so the JSON-LD parsed before first paint never balloons with it.
+        with mock.patch.object(build, "ITEM_LIST_CAP", 1):
+            many_records = records + [
+                {
+                    "award_record_id": "nobel-2",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Nobel Prize",
+                    "category": "Chemistry",
+                    "year": "2024",
+                    "full_name": "Second Laureate",
+                    "laureate_wikidata_qid": "Q2",
+                }
+            ]
+            (self.directory / "awards.sqlite3").unlink()
+            capped_database = self.create_database(rankings, many_records)
+            build.build_site(capped_database, "https://example.org/", self.website)
+            winners_html = (self.website / "dist/nobel-prize/winners/index.html").read_text()
+            self.assertEqual(1, len(item_list("/nobel-prize/winners/")))
+            self.assertIn(">Second Laureate</a>", winners_html)
+
         # The homepage has no breadcrumbs and no laureate, so it emits no structured data at all.
         self.assertNotIn("application/ld+json", (self.website / "dist/index.html").read_text())
 

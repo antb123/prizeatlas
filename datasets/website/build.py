@@ -78,6 +78,9 @@ TEMPLATES = (
 AWARDS_ROUTE = "/awards/"
 PEOPLE_ROUTE = "/people/"
 PEOPLE_PER_PAGE = 200
+# Caps the ItemList structured-data block so a large page (a century of Nobel winners) doesn't add outsized
+# JSON-LD parse weight to first load; the visible HTML list itself is never truncated.
+ITEM_LIST_CAP = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
@@ -1128,6 +1131,16 @@ def _structured_data(base_url: str, job: PageJob) -> str:
         )
     if schema := job.context.get("schema"):
         graph.append(schema)
+    if item_list := job.context.get("item_list"):
+        graph.append(
+            {
+                "@type": "ItemList",
+                "itemListElement": [
+                    {"@type": "ListItem", "position": position, "name": name, "url": public_url(base_url, route)}
+                    for position, (name, route) in enumerate(item_list, start=1)
+                ],
+            }
+        )
     if not graph:
         return ""
     # Escaping "<" keeps a "</script>" inside any field from closing the block early; it stays valid JSON.
@@ -1747,6 +1760,9 @@ def plan_winners_page(layout: PrizeLayout) -> PageJob:
         prize_route=layout.route,
         routed_categories=layout.routed_categories,
         winners=tuple((record, layout.record_routes[record.award_record_id]) for record in ascending),
+        item_list=tuple(
+            (record.full_name, layout.record_routes[record.award_record_id]) for record in ascending[:ITEM_LIST_CAP]
+        ),
         span=prize_span,
     )
 
@@ -1943,6 +1959,7 @@ def plan_subject_pages(
             "Browse awards and laureates by high school subject.",
             (Breadcrumb("Home", "/"), Breadcrumb("Subjects", None)),
             subjects=tuple(subjects),
+            item_list=tuple((subject.name, subject.route) for subject in subjects),
             leader=subjects[0].award_count if subjects else 0,
         )
     ]
@@ -2079,6 +2096,7 @@ def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
                 _clamp(description),
                 index_breadcrumbs,
                 countries=tuple(places),
+                item_list=tuple((place.name, place.route) for place in places[:ITEM_LIST_CAP]),
                 leader=len(places[0].people) if places else 0,
                 tab=label,
                 eyebrow=f"{label} in",
@@ -2183,6 +2201,7 @@ def plan_affiliation_pages(affiliations: list[Affiliation], records: list[AwardR
             ),
             (Breadcrumb("Home", "/"), Breadcrumb("Institutions", None)),
             affiliations=tuple(affiliations[:AFFILIATION_ROWS]),
+            item_list=tuple((affiliation.name, affiliation.route) for affiliation in affiliations[:AFFILIATION_ROWS]),
             leader=affiliations[0].count if affiliations else 0,
             recorded=recorded_affiliations,
             total=len(records),
@@ -2362,6 +2381,7 @@ def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> P
         f"Browse {len(rankings)} international awards and their recipients.",
         (Breadcrumb("Home", "/"), Breadcrumb("Awards", None)),
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
+        item_list=tuple((ranking.prize_name, prize_routes[ranking.qid]) for ranking in rankings),
     )
 
 
@@ -2386,6 +2406,7 @@ def plan_people_index(people: list[Laureate]) -> list[PageJob]:
                 f"Browse every laureate on record, listed by surname. Page {number} of {page_count}.",
                 crumbs,
                 people=tuple(page_people),
+                item_list=tuple((person.name, person.route) for person in page_people),
                 page_number=number,
                 page_count=page_count,
                 previous_route=("" if number == 1 else PEOPLE_ROUTE if number == 2 else f"{PEOPLE_ROUTE}page-{number - 1}/"),
