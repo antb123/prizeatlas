@@ -13,3 +13,5 @@ __pycache__/
 /old/
 /trash/
 /.nominatim-cache.json
+/arts.json
+/non_science.json
