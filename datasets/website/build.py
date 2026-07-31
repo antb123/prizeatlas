@@ -907,7 +907,6 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
                 "kavli-prize": "static/logos/kavli-prize.svg",
                 "millennium-technology-prize": "static/logos/millennium-technology-prize.svg",
                 "the-brain-prize": "static/logos/the-brain-prize.svg",
-                "sveriges-riksbank-prize-in-economic-sciences": "static/logos/sveriges-riksbank-prize-in-economic-sciences.png",
             }.get(_text(row["slug"]), ""),
         )
         for row in ranking_rows

@@ -125,11 +125,3 @@ url = "https://breakthroughprize.org/"
 score = 66
 blurb = "Founded in 2012 by a group of technology entrepreneurs to reward achievements in fundamental physics, life sciences, and mathematics. Awarded annually at a televised ceremony in the Los Angeles area of California. Carries a prize of $3 million per award, the largest of any prize on this site."
 reasoning = "Its recipients are strong, but the award is too young to show comparable lasting impact as an institution."
-
-[Q47170]
-prize_name = "Sveriges Riksbank Prize in Economic Sciences"
-slug = "sveriges-riksbank-prize-in-economic-sciences"
-url = "https://www.nobelprize.org/prizes/economic-sciences/"
-score = 60
-blurb = "An economic sciences prize established by Sveriges Riksbank in 1968 and first awarded in 1969, with laureates selected by the Royal Swedish Academy of Sciences. Presented every year alongside the Nobel Prizes on 10 December in Stockholm, Sweden. Carries a prize of roughly $1.1 million, split among co-recipients."
-reasoning = "Its recipients have influenced economic knowledge, but it is a separate and younger award than the Nobel Prizes."
