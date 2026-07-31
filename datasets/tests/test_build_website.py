@@ -2154,6 +2154,126 @@ class WebsiteBuildTests(unittest.TestCase):
                 self.assertEqual(b"previous", marker.read_bytes())
                 database.unlink()
 
+    def test_category_routed_prize_gets_a_year_page_spanning_every_category(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": f"record-{number}",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "category": category,
+                "year": year,
+                "full_name": name,
+            }
+            for number, (year, category, name) in enumerate(
+                [
+                    ("1950", "Physics", "Physics Winner"),
+                    ("1950", "Chemistry", "Chemistry Winner"),
+                    ("1951", "Physics", "Later Winner"),
+                ]
+            )
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        year_page = (self.website / "dist/test-prize/1950/index.html").read_text()
+        self.assertIn("<h1>Test Prize 1950: Winners</h1>", year_page)
+        self.assertIn("Physics Winner", year_page)
+        self.assertIn("Chemistry Winner", year_page)
+        # Spanning categories means each group has to name its own.
+        self.assertIn('<p class="group-category">Physics</p>', year_page)
+        self.assertIn('<p class="group-category">Chemistry</p>', year_page)
+        self.assertIn('rel="next" href="../1951/"', year_page)
+
+        # The per-category year pages stay: the two scopes answer different questions.
+        self.assertTrue((self.website / "dist/test-prize/physics/1950/index.html").exists())
+
+        # The prize page indexes categories and years both, and is the only route into the year pages.
+        prize = (self.website / "dist/test-prize/index.html").read_text()
+        self.assertIn("<h2>Categories</h2>", prize)
+        self.assertIn("<h2>Award years</h2>", prize)
+        self.assertIn('<li><a href="1950/">1950</a></li>', prize)
+
+        locations = [
+            element.text for element in ElementTree.parse(self.website / "dist/sitemap.xml").getroot().findall(".//{*}loc")
+        ]
+        self.assertIn("https://example.org/awards/test-prize/1950/", locations)
+
+    def test_year_routed_prize_gains_no_duplicate_year_page(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "record-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "1950",
+                "full_name": "Only Winner",
+            }
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        # A prize without routed categories already files its years at the top level; nothing extra is planned.
+        self.assertIn("<h1>Test Prize 1950: Winners</h1>", (self.website / "dist/test-prize/1950/index.html").read_text())
+        prize = (self.website / "dist/test-prize/index.html").read_text()
+        self.assertNotIn("<h2>Categories</h2>", prize)
+        self.assertIn("<h2>Award years</h2>", prize)
+
+    def test_winner_facts_carry_registry_ids_as_readable_text(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "record-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Named Winner",
+                "laureate_wikidata_qid": "Q80917",
+                "orc_id": "0009-0003-1393-0987",
+                "author_openalex_id": "A5083138872",
+                "affiliate_ror": "01hhn8329",
+                "affiliation_name": "Test University",
+            }
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        winner = (self.website / "dist/test-prize/2001/named-winner/index.html").read_text()
+        # The id has to be page text, not just an href, or nothing reading the page can match it.
+        self.assertIn("<dt>ORCID</dt><dd><a href=\"https://orcid.org/0009-0003-1393-0987\"", winner)
+        self.assertIn(">0009-0003-1393-0987</a>", winner)
+        self.assertIn(">Q80917</a>", winner)
+        self.assertIn(">A5083138872</a>", winner)
+        self.assertIn(">01hhn8329</a>", winner)
+        self.assertIn("<dt>Affiliated with</dt>", winner)
+        self.assertIn("<h2>Affiliated at time of winning</h2>", winner)
+
+    def test_winner_facts_omit_registry_ids_the_record_lacks(self) -> None:
+        rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
+        records = [
+            {
+                "award_record_id": "record-1",
+                "award_wikidata_qid": "Q1",
+                "prize_name": "Test Prize",
+                "year": "2001",
+                "full_name": "Bare Winner",
+                "laureate_wikidata_qid": "Q80917",
+            }
+        ]
+        database = self.create_database(rankings, records)
+
+        build.build_site(database, "https://example.org/awards/", self.website)
+
+        winner = (self.website / "dist/test-prize/2001/bare-winner/index.html").read_text()
+        self.assertIn("<dt>WDATA</dt>", winner)
+        self.assertNotIn("<dt>ORCID</dt>", winner)
+        self.assertNotIn("<dt>OpenAlex</dt>", winner)
+        self.assertNotIn("<dt>ROR</dt>", winner)
+        self.assertNotIn("<dt>Affiliated with</dt>", winner)
+
     def test_winners_page_lists_every_recipient_oldest_first(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
         records = [

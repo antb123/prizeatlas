@@ -144,6 +144,12 @@ FACT_FIELDS = (
     ("Death city", "death_city"),
     ("Death country", "death_country"),
 )
+IDENTIFIER_FIELDS = (
+    ("ORCID", "orc_id", "https://orcid.org/"),
+    ("WDATA", "laureate_wikidata_qid", "https://www.wikidata.org/wiki/"),
+    ("OpenAlex", "author_openalex_id", "https://openalex.org/authors/"),
+    ("ROR", "affiliate_ror", "https://ror.org/"),
+)
 AWARD_COLUMNS = (
     "award_record_id",
     "year",
@@ -377,6 +383,7 @@ class PrizeLayout:
     year_routes: dict[tuple[str | None, str], str]
     year_records: dict[tuple[str | None, str], list[AwardRecord]]
     record_routes: dict[str, str]
+    prize_year_routes: dict[str, str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -1056,6 +1063,21 @@ def _facts(record: AwardRecord, birth_countries: frozenset[str]) -> tuple[tuple[
     )
 
 
+def _identifiers(record: AwardRecord) -> tuple[tuple[str, str, str], ...]:
+    """Facts panel rows as (label, value, url) for the registry ids this award carries.
+
+    The id itself is the link text. Until now it lived only inside an href, so nothing that reads page text —
+    a search engine, a retrieval agent — could match the literal "Q80917" against the laureate it names.
+
+    ROR identifies the institution, not the person, and belongs to the affiliation recorded at the time of the award.
+    """
+    return tuple(
+        (label, getattr(record, attribute), prefix + getattr(record, attribute))
+        for label, attribute, prefix in IDENTIFIER_FIELDS
+        if _nonblank(getattr(record, attribute))
+    )
+
+
 def _note(text: str) -> str:
     """Biographical note with the date-only parentheticals removed, since Facts lists Born and Died already.
 
@@ -1601,6 +1623,18 @@ def layout_prize(ranking: Ranking, prize_records: list[AwardRecord]) -> PrizeLay
             year_routes[key] = parent_route + f"{year_slug}/"
             year_records.setdefault(key, []).append(record)
 
+    # A category-routed prize also owns one page per year across every category: /nobel-prize/1921/. Nothing else
+    # answers "Nobel Prize winners 1921" in one page, because its years are filed under the category.
+    prize_year_routes: dict[str, str] = {}
+    if routed_categories:
+        prize_year_labels: dict[str, str] = {}
+        for record in prize_records:
+            year_slug = slugify(record.year)
+            previous = prize_year_labels.setdefault(year_slug, record.year)
+            if previous != record.year:
+                raise BuildFailure(f"duplicate year slug qid={ranking.qid}")
+            prize_year_routes[record.year] = route + f"{year_slug}/"
+
     record_routes: dict[str, str] = {}
     for key, grouped_records in year_records.items():
         winner_slugs: dict[str, str] = {}
@@ -1620,6 +1654,7 @@ def layout_prize(ranking: Ranking, prize_records: list[AwardRecord]) -> PrizeLay
         year_routes,
         year_records,
         record_routes,
+        prize_year_routes,
     )
 
 
@@ -1693,15 +1728,23 @@ def plan_prize_page(layout: PrizeLayout, rank: int, subject_order: dict[str, int
         if layout.routed_categories
         else ()
     )
-    direct_years: list[tuple[str, str, int]] = []
-    if not layout.routed_categories:
+    if layout.routed_categories:
+        # The prize owns an all-category page per year, and this is the only index that reaches them.
+        first_records: dict[str, str] = {}
+        for record in layout.records:
+            first_records.setdefault(record.year, record.award_record_id)
+        direct_years = [
+            (year, route, _year_prefix(year, first_records[year]))
+            for year, route in layout.prize_year_routes.items()
+        ]
+    else:
         direct_years = [
             (year, route, _year_prefix(year, layout.year_records[(None, year)][0].award_record_id))
             for (category, year), route in layout.year_routes.items()
             if category is None
         ]
-        direct_years.sort(key=lambda item: item[0], reverse=True)
-        direct_years.sort(key=lambda item: item[2], reverse=True)
+    direct_years.sort(key=lambda item: item[0], reverse=True)
+    direct_years.sort(key=lambda item: item[2], reverse=True)
 
     ordered_records = _descending_records(layout.records)
     recent_prefixes = {
@@ -1789,6 +1832,58 @@ def _year_neighbours(
     return neighbours
 
 
+def plan_prize_year_pages(layout: PrizeLayout) -> list[PageJob]:
+    """One page per award year across every category of a category-routed prize: /nobel-prize/1921/.
+
+    The category year pages under it stay: this page is their union, and the two scopes answer different questions.
+    Year-routed prizes already have exactly this page, so they get nothing here.
+    """
+    if not layout.routed_categories:
+        return []
+
+    by_year: dict[str, list[AwardRecord]] = {}
+    for record in layout.records:
+        by_year.setdefault(record.year, []).append(record)
+    years = sorted(by_year, key=lambda year: _year_prefix(year, by_year[year][0].award_record_id))
+
+    jobs: list[PageJob] = []
+    for index, year in enumerate(years):
+        ordered_group = sorted(by_year[year], key=lambda record: record.award_record_id)
+        roll_call = _names([record.full_name for record in ordered_group])
+        earlier = years[index - 1] if index else None
+        later = years[index + 1] if index + 1 < len(years) else None
+        # A shared citation only ever spans one category, so group inside a category. Left to itself _by_motivation
+        # would read two categories whose motivations match — or are both blank — as one shared award.
+        by_category: dict[str, list[AwardRecord]] = {}
+        for record in ordered_group:
+            by_category.setdefault(record.category, []).append(record)
+        winners = tuple(
+            group
+            for category in sorted(by_category)
+            for group in _by_motivation(
+                (record, layout.record_routes[record.award_record_id]) for record in by_category[category]
+            )
+        )
+        jobs.append(
+            _page(
+                "year.html",
+                layout.prize_year_routes[year],
+                f"{layout.ranking.prize_name} {year}: Winners",
+                _clamp(f"{layout.ranking.prize_name}, {year}: awarded to {roll_call}."),
+                [Breadcrumb("Home", "/"), Breadcrumb(layout.ranking.prize_name, layout.route), Breadcrumb(year, None)],
+                prize=layout.ranking,
+                category="",
+                # The whole point of this page is that it spans categories, so every group has to name its own.
+                show_group_categories=True,
+                year=year,
+                winners=winners,
+                earlier_year=(earlier, layout.prize_year_routes[earlier]) if earlier else None,
+                later_year=(later, layout.prize_year_routes[later]) if later else None,
+            )
+        )
+    return jobs
+
+
 def plan_year_pages(
     layout: PrizeLayout,
     base_url: str,
@@ -1867,6 +1962,17 @@ def plan_year_pages(
                     winner_crumbs,
                     record=record,
                     facts=_facts(record, birth_countries),
+                    identifiers=_identifiers(record),
+                    affiliation_names=tuple(
+                        (
+                            affiliation.name,
+                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
+                            if affiliation.name not in AFFILIATION_BLOCKLIST
+                            else "",
+                        )
+                        for affiliation in record.affiliations
+                        if _nonblank(affiliation.name)
+                    ),
                     biographical_note=_note(record.biographical_note),
                     co_laureates=tuple(
                         (other, layout.record_routes[other.award_record_id])
@@ -2561,6 +2667,7 @@ def create_site_plan(
     jobs.extend(plan_person_pages(people, base_url, explorer["people"]))
     for layout in layouts:
         jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate, birth_countries))
+        jobs.extend(plan_prize_year_pages(layout))
     jobs.extend(plan_subject_pages(subjects, records, record_routes))
     jobs.extend(plan_country_pages(country_places))
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))

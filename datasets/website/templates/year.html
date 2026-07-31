@@ -13,6 +13,10 @@
       <h3>
         {% for record, route in members %}<a href="{{ href(route) }}">{{ record.full_name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
       </h3>
+      {% set subject = members[0][0].high_school_subject %}
+      {% if subject %}
+      <p class="subject-badges"><a class="subject-badge" href="{{ href(subjects_route ~ (subject | slugify) ~ '/') }}">{{ subject }}</a></p>
+      {% endif %}
       {% if motivation %}<p>{{ motivation }}</p>{% endif %}
     </li>
     {% endfor %}

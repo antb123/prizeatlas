@@ -803,6 +803,29 @@ h3 {
   border-top: 1px solid var(--rule);
 }
 
+/* Four registry ids stacked like the facts above them would nearly double the panel, so label and value share a
+   line and the group closes ranks: only the first row keeps a rule, and the ids read as one block. */
+.facts dl div.identifier {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding-block: 0.3rem;
+}
+
+.facts dl div.identifier + div.identifier {
+  border-top: none;
+}
+
+.facts dl div.identifier dt {
+  flex: none;
+  width: 5rem;
+}
+
+.facts dl div.identifier dd {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
 dt {
   color: var(--muted);
   font-size: 0.75rem;
