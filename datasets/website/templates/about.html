@@ -87,16 +87,77 @@
   <h2>Where the data comes from</h2>
   <p>
     One row per recipient, compiled from each award's official record and cross-checked against Wikipedia and Wikidata.
-    Fields are verified individually rather than imported wholesale, and the standing rule is to leave a cell blank
-    rather than guess: a missing birthplace here means nobody could confirm it, not that it was rounded to something
-    plausible. Places use their present-day names, so a laureate born in Königsberg in 1904 is listed under Kaliningrad,
-    Russia.
+    Institutions are keyed off their Wikidata entry and matched against the Research Organization Registry (ROR) and
+    OpenAlex to resolve a name to a specific place and to link out to that organization's own record, and laureates
+    are linked to their ORCID identifier where one exists. Fields are verified individually rather than
+    imported wholesale, and the standing rule is to leave a cell blank rather than guess: a missing birthplace here
+    means nobody could confirm it, not that it was rounded to something plausible. Places use their present-day names,
+    so a laureate born in Königsberg in 1904 is listed under Kaliningrad, Russia.
   </p>
   <p>
     The pages themselves are generated from that database by a build script and served as fixed files. Nothing is
     assembled while you read it, and nothing about your visit is recorded. The one exception is the explorer, which may
     ask a public service which country you are browsing from in order to show your country's laureates first; if that
     request fails the rest of the page is unaffected.
+  </p>
+</section>
+<section>
+  <h2>Design philosophy</h2>
+  <p>
+    This site is built to work first on a phone with a slow connection, then on a desktop — not the other way around.
+    That means plain HTML, small pages, and no framework weighing down a Chromebook in a school with one bar of
+    signal or a browser in a market where bandwidth is expensive. The goal is the same on every device: free, fast,
+    and informative, with nothing standing between a reader and the answer.
+  </p>
+  <p>
+    All of the data behind these pages is released under CC0 and can be downloaded for free. References throughout
+    point back to their sources — the awarding body's own record, Wikidata, Wikipedia, the Research Organization
+    Registry (ROR), and OpenAlex — so a fact here can always be traced to where it came from.
+  </p>
+  <p>
+    A laureate's page is meant to be a beginning, not an ending. Alongside the citation, every one links out to
+    ChatGPT, Perplexity, Brave, and Wikipedia with the award already framed as a question, so a reader who wants more
+    than the summary can go get it in one click. Where a laureate's OpenAlex record exists, that page links there
+    too, which is where the trail goes from a plain-language explanation to the specific papers the person actually
+    wrote — the same site works whether the reader is meeting the subject for the first time or already reading the
+    literature. Institution pages do the same for a different question: where an affiliation publishes how to apply,
+    that link is here too, for anyone weighing where they might study next.
+  </p>
+  <p>
+    The map and the nearby page turn the same data into geography. The map plots birthplaces against the institutions
+    where laureates later worked, filterable by subject, so a reader can drill into one region or one field at a
+    time. Nearby does the same from wherever the reader actually is, using their location to surface the closest
+    laureate birthplaces and institutions.
+  </p>
+  <p>
+    Choosing which prizes belong here came down to four questions, all pointed at the sciences: has the prize stood
+    the test of time, with a history longer than twenty years? Does it carry serious funds, more than a million
+    dollars? Is it a science prize? And are its winners actually drawn from around the world, rather than mostly one
+    country? We're glad to add a prize that clears the bar — open an issue on GitHub or send us an email, and we'll
+    add it. The longer aim is a site where, a century from now, a good number of today's winners are still remembered
+    the way Einstein is. On most prizes only a handful will ever reach that, so the prize list itself is chosen with
+    a power-law bet in mind, not an expectation that every winner on it will last.
+  </p>
+  <p>
+    Everything is also searchable by high school subject — Biology, Chemistry, Physics, Math, and the rest — because
+    the site is built primarily for science and math students. We like literature and the arts as much as anyone, but
+    early on we chose to keep this collection focused rather than trying to cover every field at once.
+  </p>
+  <p>
+    We think many of these people are adding to the knowledge of humanity and promoting humanity's quality of life
+    going forward. These people should be treasured not only as national heroes but as global citizens who have
+    promoted humanity. We only removed the Nobel Prize in Literature and other arts prizes to simplify the process,
+    not that these other awards are less in any way.
+  </p>
+</section>
+<section>
+  <h2>Which prizes make the list</h2>
+  <p>
+    A prize is included if it clears at least one of three bars: recipients clearly drawn from around the world
+    rather than one country, a history longer than 25 years, or a purse over one million dollars. Meeting any single
+    bar is enough — the Breakthrough Prize qualifies on its purse alone at fourteen years old, the Shaw Prize the same
+    way at twenty-two, and the Abel Prize on its international recipient list at twenty-three. Everything else on the
+    list clears the age bar outright, several of them by a century or more.
   </p>
 </section>
 <section>
