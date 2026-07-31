@@ -5,7 +5,18 @@ set -euo pipefail
 port="${1:-8000}"
 base="http://localhost:${port}/"
 
-if ss -H -ltn "sport = :$port" | grep -q .; then
+if ! python3 - "$port" <<'PY'
+import socket
+import sys
+
+with socket.socket() as listener:
+    listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        listener.bind(("127.0.0.1", int(sys.argv[1])))
+    except OSError:
+        raise SystemExit(1)
+PY
+then
 	echo "website server port already in use port=$port" >&2
 	exit 1
 fi

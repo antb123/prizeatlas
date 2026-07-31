@@ -57,17 +57,100 @@ This keeps page delivery fast, makes deployments inexpensive, and leaves very
 little runtime infrastructure that can fail. The visitor-country ranking is the
 only optional runtime request; the rest of the site works without it.
 
-## Build locally
+## Run locally
 
-From the `datasets/` directory:
+Local development is deliberately small: Python 3.12 or newer, the included
+SQLite database, and the builder's two declared packages (Jinja and Pillow).
+There is no Node.js install, application server, Docker setup, or database
+migration. The recommended path uses [uv](https://docs.astral.sh/uv/), which
+installs the builder's declared dependencies automatically.
+
+The macOS and Linux shortcut is [`startdev.sh`](startdev.sh): it builds the
+static site and serves `datasets/website/dist/` at the chosen local port. Stop
+it with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+
+### Download data only
+
+If you only need the data, download the current public snapshot without
+cloning the code or building the site:
 
 ```sh
-uv run website/build.py --base-url https://example.org/awards/
+wget -O awards.sqlite3 https://prizeatlas.org/awards.sqlite3
+wget -O awards.csv https://prizeatlas.org/awards.csv
 ```
 
-The generated site is written to `datasets/website/dist/`.
+The SQLite file is the source-of-truth database. The CSV is a flat export of
+the same award records, convenient for spreadsheets and data tools.
 
-Run the website tests with:
+### macOS
+
+After cloning or downloading the repository, install `uv` once and run the
+shortcut from its root:
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+cd prizeatlas
+./startdev.sh
+```
+
+Open [http://localhost:8000/](http://localhost:8000/) or the
+[Explorer](http://localhost:8000/explorer/). Pass a port if 8000 is in use:
+`./startdev.sh 8080`.
+
+### Linux
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+cd prizeatlas
+./startdev.sh
+```
+
+Then open [http://localhost:8000/](http://localhost:8000/). Use
+`./startdev.sh 8080` to choose another port.
+
+### Windows (PowerShell)
+
+`startdev.sh` is a Bash helper, so Windows uses the same two underlying
+commands directly:
+
+```powershell
+winget install --id=astral-sh.uv -e
+Set-Location prizeatlas\datasets
+uv run website/build.py --base-url http://localhost:8000/
+py -m http.server 8000 --directory website/dist
+```
+
+Open [http://localhost:8000/](http://localhost:8000/) while the final command
+is running.
+
+### pip alternative
+
+If you prefer `pip`, create a virtual environment and install only the two
+builder dependencies before running the same build and static server.
+
+macOS/Linux:
+
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install 'jinja2==3.1.6' 'pillow==11.3.0'
+cd datasets
+python website/build.py --base-url http://localhost:8000/
+python -m http.server 8000 --directory website/dist
+```
+
+Windows PowerShell:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install 'jinja2==3.1.6' 'pillow==11.3.0'
+Set-Location datasets
+python website/build.py --base-url http://localhost:8000/
+python -m http.server 8000 --directory website/dist
+```
+
+Run the focused website tests from `datasets/` with:
 
 ```sh
 uv run python -m unittest tests/test_build_website.py
@@ -107,4 +190,4 @@ uses Wikidata QIDs for stable identities and structured facts, and Wikipedia
 for approachable background and discovery links. Material is linked rather
 than copied when reuse rights are unclear.
 
-See `datasets/AGENTS.md` for the full validation and build rules.
+See [`AGENTS.md`](AGENTS.md) for the full validation and build rules.
