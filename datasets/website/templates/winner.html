@@ -23,13 +23,15 @@
       </p>
     </header>
     {% if record.affiliations %}
-    <section>
+    <section class="winner-affiliations">
       <h2>Affiliated at time of winning</h2>{% for affiliation in record.affiliations %}{% set route = affiliation_routes[loop.index0] %}
+      <div>
       {% if affiliation.sub_name %}<p>{{ affiliation.sub_name }}</p>{% endif %}
       {% if affiliation.name %}<p>{% if route %}<a href="{{ href(route) }}">{{ affiliation.name }}</a>{% else %}{{ affiliation.name }}{% endif %}</p>{% endif %}
       {% if affiliation.city or affiliation.country %}
-      <p>{{ affiliation.city }}{% if affiliation.city and affiliation.country %}, {% endif %}{{ affiliation.country }}</p>
-      {% endif %}{% endfor %}
+      <p class="place">{{ affiliation.city }}{% if affiliation.city and affiliation.country %}, {% endif %}{{ affiliation.country }}</p>
+      {% endif %}
+      </div>{% endfor %}
     </section>
     {% endif %}
     {% if co_laureates %}
@@ -51,9 +53,6 @@
       {% for label, value, route in facts %}
       <div><dt>{{ label }}</dt><dd>{% if route %}<a class="{{ 'birth-country' if label == 'Birth country' else '' }}" href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
       {% endfor %}
-      {% if affiliation_names %}
-      <div><dt>Affiliated with</dt><dd>{% for name, route in affiliation_names %}{% if route %}<a href="{{ href(route) }}">{{ name }}</a>{% else %}{{ name }}{% endif %}{% if not loop.last %}<br>{% endif %}{% endfor %}</dd></div>
-      {% endif %}
       {% for label, value, url in identifiers %}
       <div class="identifier"><dt>{{ label }}</dt><dd><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ value }}</a></dd></div>
       {% endfor %}

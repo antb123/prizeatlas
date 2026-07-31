@@ -752,6 +752,23 @@ h3 {
   font-size: 1.2rem;
 }
 
+/* Institution, unit, and place are one address, so they close ranks and only separate affiliations get air. */
+.winner-affiliations h2 {
+  margin-bottom: 0.75rem;
+}
+
+.winner-affiliations p {
+  margin-block: 0.15rem;
+}
+
+.winner-affiliations p.place {
+  color: var(--muted);
+}
+
+.winner-affiliations div + div {
+  margin-top: 1rem;
+}
+
 /* The citation is the reason the page exists, so it sits directly under the name. */
 .page-intro > p.citation {
   max-width: 44rem;

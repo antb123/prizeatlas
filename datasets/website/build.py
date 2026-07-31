@@ -1963,16 +1963,6 @@ def plan_year_pages(
                     record=record,
                     facts=_facts(record, birth_countries),
                     identifiers=_identifiers(record),
-                    affiliation_names=tuple(
-                        (
-                            affiliation.name,
-                            f"{AFFILIATIONS_ROUTE}{affiliation_slug(affiliation.name)}/"
-                            if affiliation.name not in AFFILIATION_BLOCKLIST
-                            else "",
-                        )
-                        for affiliation in record.affiliations
-                        if _nonblank(affiliation.name)
-                    ),
                     biographical_note=_note(record.biographical_note),
                     co_laureates=tuple(
                         (other, layout.record_routes[other.award_record_id])
