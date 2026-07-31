@@ -52,8 +52,6 @@ KYOTO = {
     "kyoto_prize-000095": "Math",
     "kyoto_prize-000107": "Math",
     "kyoto_prize-000119": "Math",
-    # Lit (Cognitive science)
-    "kyoto_prize-000011": "Lit",
     # Earth and planetary sciences, astronomy and astrophysics split
     "kyoto_prize-000008": "Physics",
     "kyoto_prize-000020": "Earth Science",
@@ -71,41 +69,46 @@ BIO_KEYWORDS = ("Medic", "Bio", "Health", "Neuro", "Cell", "Genom", "Psychol", "
 CS_KEYWORDS_1 = ("Information", "Comput", "Electro", "Communication", "Media")
 EARTH_KEYWORDS = ("Environment", "Earth", "Global Change", "Resources, Energy", "Marine", "Sustainable")
 CS_KEYWORDS_2 = ("Material", "Production", "Engineering", "Technolog", "Aerospace", "City Planning", "Complexity", "Devices")
+PRIZE_SUBJECTS = {
+    "Fields Medal": "Math",
+    "Abel Prize": "Math",
+    "Turing Award": "CS",
+    "Max Planck Medal": "Physics",
+    "Canada Gairdner International Award": "Biology",
+    "Lasker Award": "Biology",
+    "The Brain Prize": "Biology",
+}
+CATEGORY_SUBJECTS = {
+    "Physics": "Physics",
+    "Fundamental Physics": "Physics",
+    "Astronomy": "Physics",
+    "Chemistry": "Chemistry",
+    "Mathematics": "Math",
+    "Mathematical Sciences": "Math",
+    "Applied Mathematics": "Math",
+    "Medicine": "Biology",
+    "Life Sciences": "Biology",
+    "Biosciences": "Biology",
+    "Polyarthritis": "Biology",
+    "Life Science and Medicine": "Biology",
+    "Agriculture": "Biology",
+    "Literature": "Lit",
+    "Peace": "History",
+    "Economics": "Economics",
+    "Arts": "Arts",
+    "Arts and Philosophy": "Arts",
+    "Geosciences": "Earth Science",
+}
 
 
 def classify(record: dict[str, str]) -> str | None:
     prize_name = record.get("prize_name", "") or ""
     category = record.get("category", "") or ""
 
-    if prize_name in ("Fields Medal", "Abel Prize"):
-        return "Math"
-    if prize_name == "Turing Award":
-        return "CS"
-    if prize_name == "Max Planck Medal":
-        return "Physics"
-    if prize_name in ("Canada Gairdner International Award", "Lasker Award"):
-        return "Biology"
-
-    if category in ("Physics", "Fundamental Physics"):
-        return "Physics"
-    if category == "Chemistry":
-        return "Chemistry"
-    if category in ("Mathematics", "Mathematical Sciences", "Applied Mathematics"):
-        return "Math"
-    if category in ("Medicine", "Life Sciences", "Biosciences", "Polyarthritis", "Life Science and Medicine", "Agriculture"):
-        return "Biology"
-    if category == "Literature":
-        return "Lit"
-    if category == "Peace":
-        return "History"
-    if category == "Economics":
-        return "Economics"
-    if category in ("Arts", "Arts and Philosophy"):
-        return "Arts"
-    if category == "Astronomy":
-        return "Physics"
-    if category == "Geosciences":
-        return "Earth Science"
+    if subject := PRIZE_SUBJECTS.get(prize_name):
+        return subject
+    if subject := CATEGORY_SUBJECTS.get(category):
+        return subject
 
     category_lower = category.lower()
 

@@ -17,9 +17,17 @@ CACHE = Path(".nominatim-birth-cache.json")
 OUTPUT = Path("birth_country_mismatches.tsv")
 
 
+# Names search_fuzzy cannot resolve. Without an entry here the code falls through to comparing the
+# database name against Nominatim's LOCAL-LANGUAGE name, which reports a false mismatch: the Congo
+# row was flagged only because Nominatim answers "République démocratique du Congo".
+ALIASES = {
+    "Turkey": "Türkiye",
+    "Democratic Republic of the Congo": "Congo, The Democratic Republic of the",
+}
+
+
 def country_code(name):
-    if name == "Turkey":
-        name = "Türkiye"
+    name = ALIASES.get(name, name)
     try:
         return pycountry.countries.search_fuzzy(name)[0].alpha_2.lower()
     except LookupError:
@@ -39,7 +47,7 @@ for coordinates in sorted({row["birth_coordinates"] for row in rows}):
     try:
         longitude, latitude = reverse_nominatim.parse_coordinates(coordinates)
         lookups[coordinates] = reverse_nominatim.clean(reverse_nominatim.lookup(longitude, latitude, CACHE))
-    except Exception as error:
+    except (OSError, TypeError, ValueError) as error:
         print(f"lookup failed coordinates={coordinates} error={error}", file=sys.stderr)
 
 with OUTPUT.open("w", newline="") as file:

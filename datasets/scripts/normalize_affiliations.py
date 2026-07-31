@@ -35,7 +35,11 @@ from pathlib import Path
 #   Stockholm School of Economics                            independent
 #   The Netherlands School of Economics                      independent; later folded into Erasmus University, which
 #                                                            is not the same entity as at award time
-#   Toulouse School of Economics (TSE)                       grande école, ranked standalone
+#   Toulouse School of Economics (TSE)                       grande école, ranked standalone. A grand établissement
+#                                                            with its own board (§4.2 tests 1-2 both say independent),
+#                                                            and Wikidata lists four parents — Toulouse Capitole,
+#                                                            University of Toulouse, CNRS, INRAE — so "two parents
+#                                                            means neither" applies. The Nobel source names TSE itself.
 #   Baylor College of Medicine                               separated from Baylor University in 1969
 #   New York Medical College                                 independent
 #   Albert Einstein College of Medicine                      left Yeshiva University; independent
@@ -76,21 +80,34 @@ AFFILIATIONS = {
     "Hebrew University of Jerusalem, Israel": ("Hebrew University of Jerusalem", ""),
     "Collège de France, France": ("Collège de France", ""),
     "University of Toronto, Canada": ("University of Toronto", ""),
+    "University of Toronto Ontario Cancer Institute": ("University of Toronto", "Ontario Cancer Institute"),
+    "The University of Tokyo": ("University of Tokyo", ""),
+    "University of Pisa, Italy": ("University of Pisa", ""),
+    "Graz University": ("University of Graz", ""),
     "University of Washington, Seattle": ("University of Washington", ""),
+    "University of Wisconsin": ("University of Wisconsin–Madison", ""),
     "Institut des Hautes Études Scientifiques, France": ("Institut des Hautes Études Scientifiques", ""),
     "Institut des Hautes Études Scientifiques, Bures-sur-Yvette": ("Institut des Hautes Études Scientifiques", ""),
     "NIH": ("National Institutes of Health", ""),
     "NIH, National Institutes of Health": ("National Institutes of Health", ""),
-    # No campus is named, and inventing one would be fabrication. Labelled so a reader can see the gap.
-    "University of California": ("University of California (campus unspecified)", ""),
+    # "University of California" is NOT aliased. It is the ranked parent of the campus sub-names (Berkeley, San
+    # Francisco, Los Angeles, …) that carry all 149 of its rows. An earlier entry rewrote it to
+    # "University of California (campus unspecified)"; that predated the campus hierarchy and a single --apply would
+    # have flattened every parent and orphaned its campuses. The gap it was labelling no longer exists — where no
+    # campus is known the sub-name is simply blank, which is a recorded fact and needs no separate name.
     # Confirmed by hand from --suggest output. Case, punctuation, and one misspelling.
     "Université Libre de Bruxelles": ("Université libre de Bruxelles", ""),
     "University of Washighton": ("University of Washington", ""),
     "University of California at Berkeley": ("University of California, Berkeley", ""),
-    "Karolinska Institute": ("Karolinska Institutet", ""),
+    # The sub-name is carried, not blanked: the UPDATE below is unguarded on affiliation_sub_name, so an empty
+    # sub here would silently destroy "Karolinska Institutet, Nobel Medical Institute" on the one matching row.
+    # The parent restatement is dropped and the real unit kept.
+    "Karolinska Institute": ("Karolinska Institutet", "Nobel Medical Institute"),
     "Technion - Israel Institute of Technology": ("Technion – Israel Institute of Technology", ""),
     "Technion-Israel Institute of Technology": ("Technion – Israel Institute of Technology", ""),
-    "Memorial Sloan Kettering Cancer Center": ("Memorial Sloan-Kettering Cancer Center", ""),
+    "Memorial Sloan-Kettering Cancer Center": ("Memorial Sloan Kettering Cancer Center", ""),
+    "Osaka University": ("University of Osaka", ""),
+    "The University of Osaka": ("University of Osaka", ""),
     "Brigham and Women's Hospital": ("Brigham and Women’s Hospital", ""),
     "University of Illinois at Urbana-Champaign": ("University of Illinois at Urbana–Champaign", ""),
     "University of Colorado Boulder": ("University of Colorado, Boulder", ""),
@@ -103,13 +120,71 @@ AFFILIATIONS = {
         ("Kavli Institute for the Physics and Mathematics of the Universe, University of Tokyo", ""),
     "Institute of Genetics and Molecular Cellular Biology": ("Institute of Genetics and Molecular and Cellular Biology", ""),
     "National Heart, Lung and Blood Institute, National Institutes of Health": ("National Heart, Lung, and Blood Institute, National Institutes of Health", ""),
+    "French National Centre for Scientific Research (CNRS)": ("Centre National de la Recherche Scientifique", ""),
+    "Commissariat à l'Energie Atomique": ("Commissariat à l'Énergie Atomique", ""),
+    "Pasteur Institute": ("Institut Pasteur", ""),
+    "Joseph Fourier University": ("Université Grenoble Alpes", ""),
+    # "Toulouse University" is NOT aliased. The bare name is ambiguous between Toulouse Capitole (law/economics,
+    # 1969), Toulouse - Jean Jaurès, Toulouse III - Paul Sabatier (sciences), and the pre-1969 University of
+    # Toulouse they were split from. Aliasing it to Capitole put Paul Sabatier — a chemist, dean of the SCIENCES
+    # faculty — in the law university, 57 years before it existed. Resolve such a row by hand from the award source.
+
+    # --- spelling variants found by the shared-coordinate scan, 20260729 ---
+    # Each pair below was detected by two names sitting on one exact coordinate. Every one carries the SAME QID on
+    # both sides, so merging the name completes the identity instead of creating a name with two QIDs (§7 query B).
+    # Pairs whose QIDs differ (UCLA/Q174710 vs the UC system, NCI vs NIH, SUNY
+    # Downstate vs the SUNY system, Weill Cornell vs Cornell) are deliberately absent: those need a QID decision
+    # first, and a name merge alone would make them worse.
+    "The University of Chicago": ("University of Chicago", ""),
+    "University of Texas": ("University of Texas at Austin", ""),
+    "Rice University, Houston, TX": ("Rice University", ""),
+    "North Carolina State University, NC": ("North Carolina State University", ""),
+    "The Jackson Laboratory": ("Jackson Laboratory", ""),
+    "Marine Biological Laboratory (MBL)": ("Marine Biological Laboratory", ""),
+    "The J. David Gladstone Institutes": ("Gladstone Institutes", ""),
+    "University College": ("University of Liverpool", ""),
+    # "University of Colorado Boulder" already has an entry above; not repeated here.
+    "Dana-Farber Cancer Institute": ("Dana–Farber Cancer Institute", ""),
+    "The University of Massachusetts Medical School": ("University of Massachusetts", "UMass Chan Medical School"),
+    "Technical University": ("Technical University of Munich", ""),
+    "Swiss Federal Institute of Technology in Zurich, Switzerland": ("ETH Zurich", ""),
+    "Frankfurt-on-the-Main University": ("Goethe University Frankfurt", ""),
+    "ESPCI Paris, PSL University": ("ESPCI Paris", ""),
+    "US House of Representatives": ("United States House of Representatives", ""),
+    "US Senate": ("United States Senate", ""),
+    "Mount Sinai School of Medicine": ("Icahn School of Medicine at Mount Sinai", ""),
+    # Sub-name carried deliberately — an empty one here would destroy "Institute for Genomic Biology".
+    "University of Illinois": ("University of Illinois Urbana-Champaign", "Institute for Genomic Biology"),
+    # Berlin: all four spellings already carry Q152087. §9 warns a post-1948 row might belong to Freie Universität
+    # instead; checked row by row and none does — 1901-1942 predate the split, and the 2018-2021 rows are Peter
+    # Hegemann, who is genuinely at Humboldt.
+    "Berlin University": ("Humboldt University of Berlin", ""),
+    "University of Berlin": ("Humboldt University of Berlin", ""),
+    "Humboldt-Universität zu Berlin": ("Humboldt University of Berlin", ""),
 
     # --- constituent units ---
+    # Curator-directed subsidiary roll-up; the award row carries Google's Q95 as the ranked parent identity.
+    "DeepMind": ("Google", "Google DeepMind"),
+    "Faculty of Engineering, Lund University": ("Lund University", "Lund Institute of Technology"),
     # The sub-name is the unit's *current* name, not the name as recorded: Cornell's medical college was renamed in
     # 1998 and UMass's in 2021, and bucketing on the recorded spelling would split one school into two units, which
     # is the same fragmentation this table exists to remove. How fully the name is written varies by parent —
     # "Harvard Medical School" reads correctly in full, "School of Medicine" reads correctly under Johns Hopkins.
     "Massachusetts Institute of Technology, Laboratory for Computer Science": ("Massachusetts Institute of Technology", "Laboratory for Computer Science"),
+    "Regulation of Retroviral Infections Unit, Virology Department, Institut Pasteur": ("Institut Pasteur", "Regulation of Retroviral Infections Unit, Virology Department"),
+    "Viral Oncology Unit The Pasteur Institute": ("Institut Pasteur", "Viral Oncology Unit"),
+    "Genoscope": ("Commissariat à l'Énergie Atomique", "Genoscope"),
+    "Institute of Molecular and Cellular Biology, CNRS": ("Centre National de la Recherche Scientifique", "Institute of Molecular and Cellular Biology"),
+    "Hôpital Europeen Georges Pompidou": ("Assistance Publique – Hôpitaux de Paris", "Hôpital Européen Georges-Pompidou"),
+    "Saint Louis Hospital Paris": ("Assistance Publique – Hôpitaux de Paris", "Hôpital Saint-Louis"),
+    "University of Paris VI": ("Sorbonne University", ""),
+    "Université Louis Pasteur": ("University of Strasbourg", ""),
+    "École municipale de physique et de chimie industrielles (Municipal School of Industrial Physics and Chemistry)": ("ESPCI Paris", ""),
+    "Leipzig University": ("University of Leipzig", ""),
+    "Heidelberg University": ("University of Heidelberg", ""),
+    "Ludwig-Maximilians-Universität München": ("LMU Munich", ""),
+    "Washington University": ("Washington University in St. Louis", ""),
+    "Basel University": ("University of Basel", ""),
     "Harvard Medical School": ("Harvard University", "Harvard Medical School"),
     "Harvard School of Public Health": ("Harvard University", "Harvard School of Public Health"),
     "Harvard University, Lyman Laboratory": ("Harvard University", "Lyman Laboratory"),
@@ -125,7 +200,8 @@ AFFILIATIONS = {
     "Department of Biology, Stanford University": ("Stanford University", "Department of Biology"),
     "University of Massachusetts Medical School": ("University of Massachusetts", "UMass Chan Medical School"),
     "UMass Chan Medical School": ("University of Massachusetts", "UMass Chan Medical School"),
-    "University of California School of Medicine": ("University of California (campus unspecified)", "School of Medicine"),
+    # The source names no campus, so the roll-up names none either — inventing one would be fabrication.
+    "University of California School of Medicine": ("University of California", "School of Medicine"),
     "University of Pennsylvania School of Medicine": ("University of Pennsylvania", "School of Medicine"),
     "Perelman School of Medicine, University of Pennsylvania": ("University of Pennsylvania", "Perelman School of Medicine"),
     "University of Pennsylvania, Department of Landscape Architecture and Regional Planning":
@@ -143,8 +219,8 @@ AFFILIATIONS = {
     "University of Washington, Department of Atmospheric Sciences": ("University of Washington", "Department of Atmospheric Sciences"),
     "Boston University School of Medicine": ("Boston University", "School of Medicine"),
     "Kobe University School of Medicine": ("Kobe University", "School of Medicine"),
-    "Graduate School of Medicine, Osaka University": ("Osaka University", "Graduate School of Medicine"),
-    "Graduate School of Frontier Bioscience, Osaka University": ("Osaka University", "Graduate School of Frontier Bioscience"),
+    "Graduate School of Medicine, Osaka University": ("University of Osaka", "Graduate School of Medicine"),
+    "Graduate School of Frontier Bioscience, Osaka University": ("University of Osaka", "Graduate School of Frontier Bioscience"),
     "New York University School of Medicine": ("New York University", "School of Medicine"),
     "New York University, College of Medicine": ("New York University", "School of Medicine"),
     "NYU Stern School of Business": ("New York University", "Stern School of Business"),
@@ -152,7 +228,7 @@ AFFILIATIONS = {
     "University of Pittsburgh School of Medicine": ("University of Pittsburgh", "School of Medicine"),
     "University of Utah School of Medicine": ("University of Utah", "School of Medicine"),
     "University of Cincinnati College of Medicine": ("University of Cincinnati", "College of Medicine"),
-    "Washington University School of Medicine": ("Washington University", "School of Medicine"),
+    "Washington University School of Medicine": ("Washington University in St. Louis", "School of Medicine"),
     "Western Reserve University School of Medicine": ("Western Reserve University", "School of Medicine"),
     "Tufts Medical College": ("Tufts University", "Medical College"),
     "University of Paris School of Medicine": ("University of Paris", "School of Medicine"),
@@ -172,6 +248,7 @@ AFFILIATIONS = {
         ("Weizmann Institute of Science", "Department of Computer Science and Applied Mathematics"),
     "University of California San Diego, School of Medicine, Department of Pediatrics": ("University of California, San Diego", "School of Medicine, Department of Pediatrics"),
     "Ruijin Hospital, School of Medicine, Shanghai Jiao Tong University": ("Shanghai Jiao Tong University", "Ruijin Hospital, School of Medicine"),
+    "CNRS (VERIMAG)": ("Centre National de la Recherche Scientifique", "VERIMAG"),
 }
 
 

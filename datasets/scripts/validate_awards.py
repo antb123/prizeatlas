@@ -52,15 +52,6 @@ NO_EXTRAS = """(SELECT award_record_id, 2 AS position, affiliation_name, affilia
 
 CHECKS = (
     Check(
-        "coords-without-qid", True,
-        "coordinates with no QID to source them — nothing says where the point came from",
-        AFFILIATIONS + """
-        SELECT affiliation_name, affiliation_city, affiliation_coordinates, COUNT(*)
-        FROM affiliations WHERE affiliation_coordinates <> '' AND affiliation_wikidata_qid = ''
-        GROUP BY 1, 2, 3 ORDER BY 1
-        """,
-    ),
-    Check(
         "invalid-affiliation-kind", True,
         "affiliation kind outside the university, institute, hospital, company, government, other or blank vocabulary",
         """

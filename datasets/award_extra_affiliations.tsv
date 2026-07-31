@@ -1,85 +1,95 @@
 award_record_id	affiliation_name	affiliation_sub_name	affiliation_city	affiliation_country	affiliation_coordinates	affiliation_wikidata_qid
-breakthrough-000002	Kavli Institute for Theoretical Physics		Santa Barbara	United States		
-breakthrough-000002	University of California	University of California, Santa Barbara	Santa Barbara	United States		Q184478
-breakthrough-000011	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000012	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000002	Kavli Institute for Theoretical Physics		Santa Barbara	United States	-119.8409,34.4140	Q1295525
+breakthrough-000002	University of California	University of California, Santa Barbara	Santa Barbara	United States	-119.8464,34.4163	Q184478
+breakthrough-000011	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000012	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000015	Massachusetts Institute of Technology		Cambridge	United States		
-breakthrough-000015	Harvard Medical School		Boston	United States		
-breakthrough-000017	NewYork-Presbyterian Hospital		New York	United States		
+breakthrough-000015	Harvard University	Harvard Medical School	Boston	United States	-71.1039,42.3369	Q13371
+breakthrough-000017	NewYork–Presbyterian Hospital	NewYork-Presbyterian Hospital	New York	United States	-73.9427,40.8413	Q975653
 breakthrough-000019	Massachusetts Institute of Technology		Cambridge	United States		
-breakthrough-000020	Gladstone Institutes		San Francisco	United States		
-breakthrough-000020	University of California	University of California, San Francisco	San Francisco	United States		Q184478
+breakthrough-000020	Gladstone Institutes		San Francisco	United States	-122.3941,37.7676	Q5566337
+breakthrough-000020	University of California	University of California, San Francisco	San Francisco	United States	-122.4581,37.7628	Q184478
 breakthrough-000031	Lawrence Berkeley National Laboratory		Berkeley	United States		
-breakthrough-000034	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000034	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000034	Lawrence Berkeley National Laboratory		Berkeley	United States		
 breakthrough-000039	Stony Brook University	Simons Center for Geometry and Physics	Stony Brook	United States	-73.1246,40.9173	Q969850
-breakthrough-000047	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000047	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000050	Institute for Advanced Study		Princeton	United States		
-breakthrough-000056	Texas Children's Hospital		Houston	United States		
-breakthrough-000056	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000057	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000058	Brigham and Women's Hospital		Boston	United States		
-breakthrough-000058	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000065	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000067	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000056	Texas Children's Hospital		Houston	United States	-95.4016,29.7077	Q7707563
+breakthrough-000056	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000057	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000058	Brigham and Women’s Hospital		Boston	United States	-71.1068,42.3362	Q2900977
+breakthrough-000058	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000065	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000067	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000070	University of Dundee		Dundee	United Kingdom	-2.9803,56.4572	Q1249005
-breakthrough-000074	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000075	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000076	Centre National de la Recherche Scientifique					Q280413
+breakthrough-000074	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000075	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000076	Centre National de la Recherche Scientifique		Paris	France	2.2640,48.8477	Q280413
 breakthrough-000077	Stanford University		Stanford	United States	-122.1700,37.4275	Q41506
-breakthrough-000079	University of California	University of California, Los Angeles	Los Angeles	United States		Q184478
-breakthrough-000080	Academia Sinica Institute of Astronomy and Astrophysics		Taipei	Taiwan		
+breakthrough-000079	University of California	University of California, Los Angeles	Los Angeles	United States	-118.4428,34.0722	Q184478
+breakthrough-000080	Academia Sinica Institute of Astronomy and Astrophysics		Taipei	Taiwan	121.5382,25.0225	Q10875095
 breakthrough-000080	University of Arizona		Tucson	United States	-110.9525,32.2319	Q503419
 breakthrough-000080	University of Chicago		Chicago	United States	-87.5997,41.7897	Q131252
-breakthrough-000080	East Asian Observatory		Hilo	United States		
+breakthrough-000080	East Asian Observatory		Hilo	United States		Q65271229
 breakthrough-000080	Goethe University Frankfurt		Frankfurt	Germany	8.6694,50.1279	Q50662
-breakthrough-000080	Smithsonian Astrophysical Observatory		Cambridge	United States		
-breakthrough-000080	Institut de radioastronomie millimétrique		Grenoble	France		
-breakthrough-000080	Large Millimeter Telescope Alfonso Serrano			Mexico		
-breakthrough-000080	Max Planck Institute for Radio Astronomy		Bonn	Germany		
-breakthrough-000080	MIT Haystack Observatory		Westford	United States		
-breakthrough-000080	National Astronomical Observatory of Japan		Mitaka	Japan		
-breakthrough-000080	Perimeter Institute for Theoretical Physics		Waterloo	Canada		
+breakthrough-000080	Smithsonian Astrophysical Observatory		Cambridge	United States	-71.1284,42.3815	Q1755255
+breakthrough-000080	Institut de radioastronomie millimétrique		Grenoble	France	5.7607,45.1936	Q921803
+breakthrough-000080	Large Millimeter Telescope	Large Millimeter Telescope Alfonso Serrano	Sierra Negra	Mexico	-97.3147,18.9858	Q1805920
+breakthrough-000080	Max Planck Society	Max Planck Institute for Radio Astronomy	Bonn	Germany	7.1025,50.7353	Q158085
+breakthrough-000080	MIT Haystack Observatory		Westford	United States	-71.4882,42.6233	Q5687260
+breakthrough-000080	National Astronomical Observatory of Japan		Mitaka	Japan	139.5377,35.6755	Q1327713
+breakthrough-000080	Perimeter Institute for Theoretical Physics		Waterloo	Canada	-80.5280,43.4654	Q2004561
 breakthrough-000080	Radboud University		Nijmegen	Netherlands	5.8653,51.8194	Q632004
-breakthrough-000081	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000084	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000089	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000090	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000095	RIKEN			Japan		
+breakthrough-000081	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000084	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000089	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000090	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000095	RIKEN	RIKEN Center for Advanced Photonics	Wako	Japan	139.6160,35.7788	Q1153275
 breakthrough-000096	National Institute of Standards and Technology		Boulder	United States		
-breakthrough-000096	University of Colorado Boulder		Boulder	United States	-105.2672,40.0067	Q736674
+breakthrough-000096	University of Colorado, Boulder		Boulder	United States	-105.2672,40.0067	Q736674
 breakthrough-000098	University of Pennsylvania		Philadelphia	United States	-75.1936,39.9519	Q49117
-breakthrough-000105	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-breakthrough-000105	Marine Biological Laboratory		Woods Hole	United States		
+breakthrough-000105	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+breakthrough-000105	Marine Biological Laboratory		Woods Hole	United States	-70.6728,41.5261	Q500632
 breakthrough-000113	University of Tübingen		Tübingen	Germany	9.0589,48.5250	Q153978
-breakthrough-000113	German Center for Neurodegenerative Diseases		Tübingen	Germany		
-breakthrough-000116	Sinai Health		Toronto	Canada		
+breakthrough-000113	German Center for Neurodegenerative Diseases		Tübingen	Germany	9.0410,48.5320	Q1206136
+breakthrough-000116	Sinai Health System	Sinai Health	Toronto	Canada	-79.3553,43.6658	Q48865137
 breakthrough-000116	University of Toronto		Toronto	Canada	-79.3957,43.6629	Q180865
-breakthrough-000117	Harvard University		Cambridge	United States		Q13371
-breakthrough-000117	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000117	Harvard University		Cambridge	United States	-71.1169,42.3744	Q13371
+breakthrough-000117	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000125	University of Pennsylvania		Philadelphia	United States		
 breakthrough-000125	Rockefeller University		New York	United States	-73.9556,40.7625	Q270272
-breakthrough-000126	VIB		Antwerp	Belgium		
+breakthrough-000126	Flanders Institute for Biotechnology	VIB	Antwerp	Belgium	4.4050,51.1609	Q2463367
 breakthrough-000126	Mayo Clinic		Jacksonville	United States		
-breakthrough-000127	Dana-Farber Cancer Institute		Boston	United States		
-breakthrough-000127	Harvard Medical School		Boston	United States		
-breakthrough-000127	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
+breakthrough-000127	Dana–Farber Cancer Institute		Boston	United States	-71.1072,42.3380	Q1159198
+breakthrough-000127	Harvard University	Harvard Medical School	Boston	United States	-71.1039,42.3369	Q13371
+breakthrough-000127	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 breakthrough-000129	Institut des Hautes Études Scientifiques		Bures-sur-Yvette	France		
-breakthrough-000130	Kavli Institute for Theoretical Physics		Santa Barbara	United States		
+breakthrough-000130	Kavli Institute for Theoretical Physics		Santa Barbara	United States	-119.8409,34.4140	Q1295525
 breakthrough-000139	Space Telescope Science Institute		Baltimore	United States		
 fields-000017	Institute for Advanced Study		Princeton	United States		
 japan_prize-000002	Weizmann Institute of Science		Rehovot	Israel		
-japan_prize-000032	National Cancer Center		Tokyo	Japan		
-japan_prize-000092	Meijo University	Graduate School of Science and Technology	Nagoya	Japan		Q847117
+japan_prize-000032	National Cancer Center		Tokyo	Japan	139.7681,35.6656	Q11421209
+japan_prize-000092	Meijo University	Graduate School of Science and Technology	Nagoya	Japan	136.9760,35.1360	Q847117
 japan_prize-000101	Massachusetts Institute of Technology		Cambridge	United States		
 japan_prize-000102	University of Pennsylvania	Perelman School of Medicine	Philadelphia	United States		
 japan_prize-000102	University of Szeged		Szeged	Hungary	20.1461,46.2502	Q369839
-japan_prize-000108	Howard Hughes Medical Institute		Chevy Chase	United States		Q1512226
-lasker_awards-000003	Staten Island Marine Hospital		New York	United States		
-lasker_awards-000157	Harvard Medical School		Boston	United States		
-lasker_awards-000294	Eleanor Naylor Dana Charitable Trust					
-nobel-000354	Royal Society		Oxford	United Kingdom		
+japan_prize-000108	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+lasker_awards-000003	United States Public Health Service	Staten Island Marine Hospital	New York	United States	-74.0758,40.6222	Q476322
+lasker_awards-000157	Harvard University	Harvard Medical School	Boston	United States	-71.1039,42.3369	Q13371
+lasker_awards-000294	Eleanor Naylor Dana Charitable Trust		New York	United States		
+lasker_awards-000375	Francis Crick Institute		London	United Kingdom	-0.1289,51.5316	Q326044
+nobel-000354	Royal Society		London	United Kingdom	-0.1322,51.5061	Q123885
 shaw_prize-000081	Cornell University	Weill Cornell Graduate School of Medical Sciences	New York	United States	-73.9541,40.7645	Q49115
 shaw_prize-000099	Tel Aviv University		Tel Aviv	Israel	34.8050,32.1125	Q319239
 shaw_prize-000110	Princeton University		Princeton	United States	-74.6561,40.3453	Q21578
 shaw_prize-000114	Tsinghua University	Yau Mathematical Sciences Center	Beijing	China	116.3267,40.0000	Q16955
+brain_prize-000036	King’s College London		London	United Kingdom	-0.1161,51.5119	Q245247
+brain_prize-000037	Massachusetts General Hospital		Boston	United States	-71.0689,42.3628	Q126412
+brain_prize-000038	Rigshospitalet		Copenhagen	Denmark		Q3357360
+brain_prize-000039	Friedrich Miescher Institute for Biomedical Research		Basel	Switzerland		Q1461161
+brain_prize-000040	Karolinska Institutet		Stockholm	Sweden	18.0267,59.3489	Q219564
+brain_prize-000045	University of California	University of California, San Diego	La Jolla	United States	-117.2361,32.8789	Q184478
+brain_prize-000047	Hebrew University of Jerusalem		Jerusalem	Israel	35.2000,31.7758	Q174158
+brain_prize-000048	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
+brain_prize-000050	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
