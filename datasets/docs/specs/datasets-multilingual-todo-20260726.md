@@ -1,355 +1,300 @@
-# TODO — Multilingual awards website (en/es/fr)
-
-Execution plan for `docs/specs/datasets-multilingual-20260726.md`. Each block is self-contained: a sub-agent runs one block
-plus the spec's **Assumptions** section, with no other context.
-
-Read the Assumptions block before starting any task. The load-bearing ones are 1 (motivations are never translated),
-2 (English stays at the root), 3 (localized slugs), 5 (the build MUST stay offline), 6 (MT is an authoring step, not a
-build step), 7 (Wikidata covers 14/14 prizes but only 304/943 institutions) and 11 (English source strings MUST avoid
-grammatical gender).
-
-**Verification commands used throughout** — the suite is `unittest`, *not* pytest, which is not installed:
-
-```
-uv run python -m unittest tests/test_build_website.py     # baseline: 18 tests passing
-ruff check <file>
-uv run website/build.py --base-url https://example.org/awards/
-```
-
-```
-T1 (en.toml) ──┬── T3 (translate script) ── T4 (es/fr.toml) ──┐
-               │                                              │
-               └── T5 (build.py) ──┬── T6  (base.html)        │
-                                   ├── T7  (12 templates)     ├── T10 (tests) ── T12 (gate)
-                                   ├── T8  (explorer.html)    │
-                                   └──────────────────────────┘
-T2 (wikidata labels) ─────────────────────────────────────────┤
-T9 (style.css) ───────────────────────────────────────────────┤
-T11 (AGENTS.md) ──────────────────────────────────────────────┘
-```
-
-**T1 and T5 are the two serial bottlenecks.** T1 gates all translation work; T5 is the sole owner of `website/build.py`
-and gates every template task.
-
----
-
-## T1 — Author the English catalogue, `website/i18n/en.toml`
-
-**Depends-on:** none. **Serial — gates T3 and T5.**
-
-**Files:** `website/i18n/en.toml` (new)
-
-**Why first:** every other language is machine translated *from* this file, so a gendered or malformed English string
-propagates into both target languages and is expensive to unwind later.
-
-**Steps:**
-
-1. Create `website/i18n/` and `en.toml` with four sections: `code`, `prefix`, `[segments]`, `[ui]`, `[terms.*]`,
-   `[ranking.*]`.
-2. `code = "en"`, `prefix = ""` (English is at the root — Assumption 2).
-3. `[segments]` — the four route segments: `people`, `countries`, `affiliations`, `explorer`. English values are the
-   current literals from `website/build.py:55-60`: `people`, `countries`, `affiliations`, `explorer`.
-4. `[ui]` — **all keys MUST be quoted strings**, e.g. `"site.name" = "Awards"`. A bare `site.name = …` is a TOML
-   dotted key and parses as a nested table, which will not match the flat `language.text("site.name")` lookup.
-   Populate from:
-   - `website/templates/base.html:21-30` — site name, tagline, four nav labels.
-   - The 59 literal UI strings across the other 13 templates in `website/templates/`.
-   - `FACT_FIELDS` (`website/build.py:72-82`) — nine field labels.
-   - The generated-prose sites in `create_site_plan()`: lines 874, 940, 1064, 1066, 1081, and the `Breadcrumb("Home",
-     "/")` label recurring at 878, 943, 969, 997, 1049, 1069.
-   - Plural pairs as `<key>.one` / `<key>.other`.
-5. **Gender-neutral phrasing is mandatory (Assumption 11).** Spanish and French inflect for gender and MT cannot
-   choose correctly from an isolated string. The database holds 227 female and 2,820 male laureates, so a masculine
-   default is wrong on 227 people's pages. Rewrite person-agreeing participles as nouns:
-   - `Born` → a birth-date *label* (`Birth`), not a participle → `Nacimiento` / `Naissance`, never `Nacido`/`Nacida`.
-   - `Died` → `Death`. `Winner` (lines 865, 933, 964, 967) → `Recipient` or an equivalent non-inflecting noun.
-   - Audit every `[ui]` value for an adjective or participle that would agree with a person.
-6. `[terms.prize]`, `[terms.category]`, `[terms.country]` — identity mappings for English (`"Physics" = "Physics"`).
-   Source the exact strings from the database so they match at lookup time:
-   `sqlite3 awards.sqlite3 "SELECT DISTINCT prize_name FROM awards;"` (14), `… category … WHERE category<>''` (90),
-   `… birth_country … WHERE birth_country<>''` (92). Countries and categories have **no QID column**, so these are
-   hand-authored in every language (Assumption 7).
-7. `[ranking.<award_wikidata_qid>]` — `blurb` and `reasoning` per prize, copied from the `award_ranking` table for
-   English. 14 entries, 4,844 chars total.
-
-**Verify:**
-- `uv run python -c` is not permitted; validate by parsing in a test added in T10, or with
-  `jq -e . <(…)` equivalent — simplest is: the file loads under `tomllib` in T10's catalogue test.
-- Every `[ui]` key is a quoted string: `grep -c '^[a-z]' website/i18n/en.toml` → `0` inside the `[ui]` block.
-- `[terms.prize]` has 14 entries, `[terms.category]` 90, `[terms.country]` 92, `[ranking.*]` 14 tables.
-- No `[ui]` value contains a gendered participle — reviewed by hand against step 5.
-
----
-
-## T2 — Fetch Wikidata labels, `scripts/fetch_wikidata_labels.py`
-
-**Depends-on:** none. **Parallel-safe.**
-
-**Files:** `scripts/fetch_wikidata_labels.py` (new), `website/i18n/labels.toml` (new, generated then committed)
-
-**Steps:**
-
-1. Write the script to read distinct `award_wikidata_qid` and `affiliation_wikidata_qid` from `awards.sqlite3`
-   (read-only, `?mode=ro` as `read_database()` does at `website/build.py:420`).
-2. Query the Wikidata `wbgetentities` API in batches of 50 QIDs, requesting `labels` for `en`, `es`, `fr`.
-3. Write `website/i18n/labels.toml` as one table per QID:
-   ```toml
-   [Q38104]
-   en = "Nobel Prize"
-   es = "Premio Nobel"
-   fr = "prix Nobel"
-   ```
-4. Print coverage on completion: `resolved=N missing=M`, so drift is visible.
-5. Run it once and commit the generated `labels.toml`. **The build never calls this script** (Assumption 5).
-
-**Verify:**
-- `ruff check scripts/fetch_wikidata_labels.py` → clean.
-- All 14 prize QIDs resolve. Institution coverage is expected around 304 of 943 distinct names (Assumption 7) — a
-  lower number is a finding to report, not a failure.
-- `website/i18n/labels.toml` parses as TOML and is committed.
-
----
-
-## T3 — Translation script, `scripts/translate_catalogue.py`
-
-**Depends-on:** T1. **Parallel-safe** once T1 lands.
-
-**Files:** `scripts/translate_catalogue.py` (new)
-
-**Steps:**
-
-1. Read `website/i18n/en.toml`, write `website/i18n/es.toml` and `fr.toml`. Runs on demand only — never during a
-   build (Assumption 6).
-2. **Placeholder integrity check — the critical one.** Catalogue values carry `str.format` fields such as
-   `"The birthplaces of {count} laureates across {countries} countries."` MT engines rename, space, or drop these
-   (`{count}` → `{cuenta}` → `KeyError` at render, inside a worker thread, on one page in 24,624). For every string,
-   compare the **multiset of placeholder names** in source and translation. On any difference, fail naming the key,
-   the language and the differing placeholders, and write **no** output file. Reordering placeholders within the
-   sentence MUST be accepted — Spanish and French word order legitimately differs.
-3. **Glossary** — pin recurring terms so they do not drift between strings:
-   `laureate` → `laureado`/`lauréat`, `award` → `premio`/`prix`, `prize` → `premio`/`prix`,
-   `institution` → `institución`/`institution`. Apply as a pre/post-processing termbase.
-4. **Review markers** — each entry may be marked reviewed. Marked strings are left **byte-identical** on regeneration;
-   only unmarked strings are rewritten. Without this the first human correction is silently reverted by the next run.
-5. Report `translated=N preserved=M failed=K` on completion.
-6. Do not translate: `[ranking.*]` blurbs are translated, but award **motivations** never enter the catalogue at all
-   (Assumption 1) — they are read from the database and rendered as-is.
-
-**Verify:**
-- `ruff check scripts/translate_catalogue.py` → clean.
-- Unit-tested in T10: a string whose translation drops a placeholder MUST raise; a string whose translation reorders
-  placeholders MUST pass; a reviewed string MUST survive regeneration byte-identical.
-
----
-
-## T4 — Generate and commit `es.toml` and `fr.toml`
-
-**Depends-on:** T3. **Serial.**
-
-**Files:** `website/i18n/es.toml` (new), `website/i18n/fr.toml` (new)
-
-**Steps:**
-
-1. Run `scripts/translate_catalogue.py` for both languages.
-2. Set `prefix = "/es"` and `prefix = "/fr"`; translate `[segments]` to `personas`/`paises`/`instituciones`/
-   `explorador` and `personnes`/`pays`/`institutions`/`explorateur`.
-3. Review and mark the ~200 highest-visibility strings: nav labels, page headings, the 14 prize names, the 92 country
-   names. These are where a wrong word is most visible. Leave the long tail machine-quality.
-4. Check French plural handling: French uses the singular for 0 (`0 lauréat`), unlike English and Spanish
-   (Assumption 10). Ensure `<key>.one` / `<key>.other` values suit that rule.
-5. Commit both files.
-
-**Verify:**
-- Both files parse as TOML and carry every key present in `en.toml` — no missing keys, checked in T10.
-- Placeholder check passed for every string (T3 step 2 would have failed the run otherwise).
-- `[segments]` values differ from English in both files.
-
----
-
-## T5 — `Language` model, routing, keys and hreflang in `website/build.py`
-
-**Depends-on:** T1. **Serial — sole owner of `website/build.py`. Gates T6, T7, T8.**
-
-**Files:** `website/build.py`
-
-**Steps:**
-
-1. Add a frozen `Language` dataclass with `code`, `prefix`, `segments`, `ui`, `terms`, and methods:
-   - `route(segment, *parts) -> str` — `/es/personas/marie-curie/`
-   - `text(key, **fields) -> str` — hand-authored `[ui]`; **raises `BuildFailure`** on miss
-   - `term(kind, value) -> str` — `[terms.*]`; **raises `BuildFailure`** on miss
-   - `plural(count, key) -> str` — honours French 0-is-singular (Assumption 10)
-   - `entity_label(qid, fallback) -> str` — `labels.toml`; **returns `fallback`** on miss
-   These are two deliberately different contracts: closed vocabularies fail, the open institution set falls back.
-2. Add `load_languages(website_dir) -> tuple[Language, ...]` performing **preflight validation before any planning or
-   rendering**: all `[segments]` keys present, every required `[ui]` key present, and a `[terms.*]` entry for each
-   prize/category/country actually present in the database. Rendering runs in a `ThreadPoolExecutor`
-   (`website/build.py:1385-1390`), where a mid-render `BuildFailure` surfaces from a worker thread and is far harder
-   to diagnose.
-3. **Delete** `PEOPLE_ROUTE`, `COUNTRIES_ROUTE`, `AFFILIATIONS_ROUTE`, `EXPLORER_ROUTE` (`website/build.py:55-60`).
-   Replace every reference with `language.route(...)`. Call sites include `plan_places()` (592), `person_routes()`
-   (690), `create_site_plan()` (737) throughout, and the render kwargs at 1309-1312 and 1327-1330.
-4. Add `key: str` and `language: Language` to `PageJob` (`website/build.py:188`). Key formats are fixed and MUST NOT
-   embed any localized string — use the table in the spec's *Page identity and hreflang* section. Person keys are
-   unconditionally QID-based: `person_routes()` already skips records without a `laureate_wikidata_qid`
-   (`website/build.py:690-712`, *"a wrong merge is worse than a missing page"*), so there are no un-QID person pages
-   and none may be introduced.
-5. Apply the slug policy from the spec: route segments, category slugs and country slugs are localized; prize, person
-   and institution slugs are **not**. Prize slugs stay `award_ranking.slug` because that value is also the key of the
-   logo map in `read_database()` (`website/build.py:446-459`) — localizing it silently breaks logo resolution.
-6. Run the existing duplicate-route guard (`website/build.py` route uniqueness check) **per language**, and include
-   the colliding route *and* the language in the error. Localized category/country slugs are newly derived and can
-   collide where English did not.
-7. Replace bare `{:,}` number formatting (e.g. `website/build.py:1066`) with `format_number(value, language)` —
-   English `1,234`, Spanish and French `1 234`.
-8. Change `create_site_plan()` (737) to take `language`, and `build_site()` (1374) to loop the languages, merge the
-   three job lists, and group by `key` to build `alternates: dict[str, str]` (language code → route). Pass
-   `alternates` and `lang` into `_render_job()` (1296).
-9. A page MUST have an entry for every configured language, or the build fails — this is the guard against a
-   localized plan silently dropping pages.
-
-**Verify:**
-- `ruff check website/build.py` → clean.
-- `grep -c 'PEOPLE_ROUTE\|COUNTRIES_ROUTE\|AFFILIATIONS_ROUTE\|EXPLORER_ROUTE' website/build.py` → `0`.
-- Full verification is T12; this task's own gate is ruff plus the T10 tests.
+# TODO — Multilingual PrizeAtlas (English, Spanish, French)
 
----
+Implementation plan for `datasets/docs/specs/datasets-multilingual-20260726.md`. Run commands from `datasets/`. The current baseline is 48 passing website tests and a 7,345-page build. The repository uses its current no-branch workflow; preserve unrelated changes, especially the closed mobile navigation in `website/templates/base.html:29`.
 
-## T6 — `base.html`: lang attribute, nav, switcher, hreflang
+## T1 — Author the complete English catalogue
 
-**Depends-on:** T5. **Parallel-safe** with T7, T8 (distinct files).
+**ID:** T1 — Create the route and copy source of truth.
 
-**Files:** `website/templates/base.html`
+**Depends-on:** none.
 
-**Steps:**
-1. `<html lang="{{ lang }}">` (line 2).
-2. Replace the site name, tagline and four nav labels (lines 21-30) with `text()` lookups.
-3. Emit `<link rel="alternate" hreflang="…">` for each entry in `alternates`, plus `x-default` pointing at English.
-4. Add a language switcher built **from the same `alternates` map** — switching language MUST keep the visitor on the
-   equivalent page (`/es/personas/marie-curie/` → `/fr/personnes/marie-curie/`), never the language home page.
+**Files:** `website/i18n/en.toml` (new).
 
-**Verify:** covered by T12; `404.html` must still render, since it shares this base and uses `render_error_page()`
-(`website/build.py:1321`).
+**Assumptions:**
 
----
+1. English remains at the root with no `/en/` routes or redirects.
+2. Semantic segments and category/country/subject slugs are localized; prize, person, institution, year, and recipient components remain canonical.
+3. Motivations, biographical notes, institution descriptions, personal names, constituent units, and city names remain source text.
+5. `website/i18n/en.toml` is the hand-authored catalogue source.
+6. Missing closed-vocabulary entries fail preflight.
+11. English person-facing copy uses neutral nouns such as “Birth”, “Death”, and “Recipient”.
 
-## T7 — The other 12 templates
+**Steps → verify:**
 
-**Depends-on:** T5. **Parallel-safe** with T6, T8.
+1. Create the top-level `code`, `prefix`, and parseable `reviewed` fields plus `segments`, flat quoted `ui`, `terms.prize`, `terms.category`, `terms.country`, `terms.subject`, `terms.laureate_type`, and `ranking.<qid>.blurb` sections.
+2. Pin every English semantic segment to the current route constants/nested components in `website/build.py:79-108,122,2500`.
+3. Extract all generated and template UI, metadata, accessibility, browser, share-image, and `llms.txt` copy from `website/build.py:954-3136` and the 29 loaded templates.
+4. Include all 16 prizes, 86 nonblank categories, 87 rendered country tokens, both laureate types, all live subjects, and all 10 configured `SUBJECTS` values used by map routes.
+5. Copy the 16 rendered English ranking blurbs; do not copy unused ranking reasoning or excluded source prose.
+6. Define one/other plural pairs and explicit `{field}` placeholders with an allowed field set per browser string.
+7. Verify with the catalogue tests added in T10: TOML parses, every required key exists, English prefix/segments are pinned, English route-driving term slugs equal source slugs, and no excluded source prose appears.
 
-**Files:** `website/templates/` — `index.html`, `prize.html`, `category.html`, `year.html`, `winner.html`,
-`person.html`, `people.html`, `countries.html`, `country.html`, `affiliations.html`, `affiliation.html`, `404.html`
+## T2 — Fetch committed Wikidata institution labels
 
-**Steps:**
-1. Replace all 59 literal UI strings with `text()` lookups against keys authored in T1.
-2. Leave award motivations untouched — they render from the database in their original language, introduced by the
-   translated `"motivation.label"` (Assumption 1).
+**ID:** T2 — Build the explicit label-authoring command and label snapshot.
 
-**Verify:** no bare English sentence remains in any template — spot-check with
-`grep -n '>[A-Z][a-z]\{3,\}' website/templates/*.html`, allowing only Jinja expressions and attribute values.
+**Depends-on:** none.
 
----
+**Files:** `scripts/fetch_wikidata_labels.py` (new); `website/i18n/labels.toml` (new, generated).
 
-## T8 — `explorer.html`
-
-**Depends-on:** T5. **Parallel-safe** with T6, T7.
-
-**Files:** `website/templates/explorer.html`
-
-**Steps:**
-1. Replace UI literals — dropdown options, section notes, headings — with `text()` lookups.
-2. Strings built in JavaScript (tooltips such as `"${n} laureates per million"`, `"Organization"`, `"awards"`,
-   `"partial decade"`) MUST NOT be translated inline. Add a `strings` object to the payload, populated from the
-   catalogue at build time, and have the JS read `STRINGS.perMillion` and friends. One JS file serves all three
-   languages.
-3. Localize the payload's `countries` array via `term("country", …)` so chart bars label in the page language.
-   Ordering is by count and therefore unaffected.
-4. Leave the `api.country.is` geo-IP lookup alone; translate only its surrounding labels.
-
-**Verify:** the built explorer page's JSON payload parses; extract the page script and run `node --check` → clean.
-
----
-
-## T9 — Language switcher styling
-
-**Depends-on:** none. **Parallel-safe.**
-
-**Files:** `website/static/style.css`
-
-**Steps:**
-1. Style the switcher added in T6, matching the existing header treatment.
-2. Respect the existing light/dark variables at `website/static/style.css:1-23` — use `var(--ink)`, `var(--muted)`,
-   `var(--rule)`; do **not** introduce new `:root` variables.
-
-**Verify:** the switcher is legible in both colour schemes.
-
----
-
-## T10 — Tests
-
-**Depends-on:** T4, T5. **Files:** `tests/test_build_website.py`
-
-**Steps:**
-1. Catalogue: all three files parse; `es.toml` and `fr.toml` carry every key present in `en.toml`; `[terms.*]` covers
-   every prize/category/country present in the database.
-2. Preflight: a catalogue missing a required key raises `BuildFailure` naming key and language, **before** any page is
-   planned.
-3. Fallback: an institution with no QID, or a QID with no label, renders under its recorded name without failing.
-4. Placeholder integrity: a translation that drops a placeholder raises; one that reorders placeholders passes; a
-   reviewed string survives regeneration byte-identical.
-5. Routing: Spanish person pages live under `/es/personas/`; English pages contain no `/en/`; an accented category
-   such as `Física` slugifies to `fisica`.
-6. Collisions: two categories translating to the same slug in one language fail, with route and language named.
-7. hreflang reciprocity: `/es/personas/marie-curie/` lists `/people/marie-curie/` as its `en` alternate, and that
-   English page lists the Spanish route as its `es` alternate.
-8. Parity: every page key exists in all three languages; total page count is 3× the single-language count.
-9. Motivation integrity: a winner page's motivation text is byte-identical across all three languages.
-
-**Verify:** `uv run python -m unittest tests/test_build_website.py` → all pass. Baseline is 18 tests; this task adds
-to that count.
-
----
-
-## T11 — Update `AGENTS.md`
-
-**Depends-on:** none. **Parallel-safe.**
-
-**Files:** `AGENTS.md`
-
-**Steps:**
-1. Document the multilingual build under the static-website section: three languages, English at the root, `/es/` and
-   `/fr/` prefixes, localized segments and category/country slugs.
-2. Document that catalogues live in `website/i18n/`, that `en.toml` is the hand-authored source of truth, and that
-   `es.toml`/`fr.toml` are machine translated by `scripts/translate_catalogue.py` and committed.
-3. State plainly that **the build is offline** — neither `scripts/fetch_wikidata_labels.py` nor
-   `scripts/translate_catalogue.py` runs during `website/build.py`.
-4. Note that award motivations are never translated.
-
-**Verify:** `AGENTS.md` names no command that does not exist, and describes the offline-build guarantee.
-
----
-
-## T12 — Full build and final gate
-
-**Depends-on:** T1-T11. **Serial — final gate.**
-
-**Files:** none modified; this task verifies.
-
-**Steps:**
-1. `uv run website/build.py --base-url https://example.org/awards/`.
-2. Confirm every check below. On any failure, stop and report — do not paper over it.
-
-**Verify:**
-- **English URLs unchanged:** every route present in the pre-change `dist/` still exists at the identical path;
-  `dist/people/index.html`, `dist/countries/index.html`, `dist/explorer/index.html` all present; no English page path
-  contains `/en/`.
-- **Page count:** 3 × the single-language count (8,208 → **24,624**).
-- **Sitemap:** contains all three languages and stays under the 50,000-URL single-file limit that `write_sitemaps()`
-  (`website/build.py:1233`) guards — 24,624 is within it, but the margin is now 2×.
-- **hreflang:** reciprocal between every language pair, with `x-default` on English.
-- **Switcher:** from `/es/personas/marie-curie/`, choosing French lands on `/fr/personnes/marie-curie/`.
-- **Motivations:** byte-identical across all three languages for the same award record.
-- **404:** `dist/404.html` renders without an undefined-variable error under `StrictUndefined`.
-- **Offline:** the build makes no network request — neither label fetching nor translation runs during it.
-- `uv run python -m unittest tests/test_build_website.py` → all pass.
-- `ruff check website/build.py scripts/fetch_wikidata_labels.py scripts/translate_catalogue.py` → clean.
+**Assumptions:**
+
+3. Institution fallback names and constituent units remain recorded source text.
+4. Label fetching is an explicit authoring command; the website build stays offline.
+6. Missing Spanish/French institution labels fall back instead of failing.
+13. Authoring credentials and network clients never enter `website/build.py`.
+
+**Steps → verify:**
+
+1. Read distinct nonblank affiliation QIDs from both primary award affiliations and `award_extra_affiliations` using a read-only SQLite connection.
+2. Request only Spanish and French Wikidata labels in bounded batches with a timeout; validate exact QIDs and string values.
+3. Write deterministic TOML through a temporary file and replace `labels.toml` only after the complete response validates.
+4. Log only QIDs needed to diagnose a miss and aggregate `resolved=N missing=M`; never log response bodies or labels.
+5. Run the command once to create the committed snapshot.
+6. Verify with T10 mocked tests: exact QID union, batching, stable ordering, malformed/failing response rollback with byte-identical destination, and safe logs; run `uv run ruff check scripts/fetch_wikidata_labels.py`.
+
+## T3 — Implement catalogue translation and validation
+
+**ID:** T3 — Translate unreviewed catalogue values without losing corrections.
+
+**Depends-on:** T1.
+
+**Files:** `scripts/translate_catalogue.py` (new).
+
+**Assumptions:**
+
+3. Excluded source prose never enters the translation catalogue.
+4. Machine translation runs only as an authoring command.
+5. Spanish/French are committed machine-translated drafts with durable reviewed-key manifests.
+6. Missing closed vocabulary fails; no incomplete target is written.
+13. Provider selection and credentials are isolated to this command.
+
+**Steps → verify:**
+
+1. Read `en.toml` and an existing target catalogue; accept only `es` or `fr` targets.
+2. Preserve every target value named by its parseable `reviewed` list byte-for-byte; fail if a reviewed key is absent.
+3. Translate only unreviewed values through the configured authoring provider and glossary.
+4. Compare the multiset of `{field}` placeholders for every source/target value, including browser strings; allow reordering but reject renamed, added, removed, malformed, or duplicated fields.
+5. Validate complete structural/key parity before atomically replacing the destination. On any provider, parse, placeholder, or validation error, leave it byte-identical.
+6. Print `translated=N preserved=M failed=K` without source/target prose or credentials.
+7. Verify with T10 mocked tests for placeholder reordering/failures, reviewed preservation, complete rollback, glossary application, safe logging, and provider failure; run `uv run ruff check scripts/translate_catalogue.py`.
+
+## T4 — Generate Spanish and French catalogues
+
+**ID:** T4 — Commit complete target-language catalogues.
+
+**Depends-on:** T1, T3.
+
+**Files:** `website/i18n/es.toml` (new); `website/i18n/fr.toml` (new).
+
+**Assumptions:**
+
+1. Prefixes are `/es/` and `/fr/`.
+2. Every semantic segment and category/country/subject slug is localized.
+5. Generated catalogues are committed and reviewed keys survive regeneration.
+6. Closed-vocabulary misses fail the build.
+9. Dates remain ISO; numeric values do not change.
+10. Browser/server plural selection uses each language code.
+
+**Steps → verify:**
+
+1. Run T3 for Spanish and French and set every semantic segment, including winners, country views, recent, map, about, and pagination.
+2. Review and mark navigation, accessibility/error text, 16 prize names, 87 country names, 10 subjects, 86 categories, and high-visibility headings.
+3. Confirm every English key and placeholder multiset exists in both targets and every route-driving term produces a nonblank ASCII-folded slug.
+4. Verify French one/other behavior for 0, 1, and 2 and verify Spanish/English behavior for the same values in T10.
+
+## T5 — Localize planning, routing, generated outputs, and render control
+
+**ID:** T5 — Make `Language` an explicit value through the one website build path.
+
+**Depends-on:** T1, T2, T4.
+
+**Files:** `website/build.py:38-3224`.
+
+**Assumptions:**
+
+1. English URLs remain rooted and unchanged.
+2. Semantic/category/country/subject paths localize; canonical entity components do not.
+3. Source prose remains unchanged.
+4. The website build performs no translation/label network work.
+6. Closed lookups fail; institution labels fall back.
+7. Stable page keys join locale siblings.
+8. Identity, rank, membership, and ordering remain canonical.
+9. Pure server number formatting changes presentation only.
+10. Plurals use the locale code.
+12. The root 404 remains English.
+13. Provider code stays outside the builder.
+
+**Steps → verify:**
+
+1. Add the immutable language/catalogue value and load/validate all committed TOML after the single database read but before planning or staging.
+2. Enforce exact English prefix/segments and source-equivalent English category/country/configured-subject slugs.
+3. Keep canonical source names/control tokens separate from localized display labels throughout country, affiliation, subject, Explorer, map, facts, and share-card logic; never group, join, rank, or branch on translated text.
+4. Route every current page family through language-owned segments, including nested country views, winner lists, people pagination, subject recent pages, institution-country pages, and all 10 map subject pages.
+5. Add the complete stable key map from the spec to `PageJob`; require exactly one en/es/fr member per key and reject per-locale/cross-locale route or slug collisions before staging.
+6. Build reciprocal alternate maps and classify share images from keys/templates rather than English route prefixes.
+7. Localize titles, descriptions, breadcrumbs, facts, terms, ranking blurbs, JSON-LD display values, social descriptions/cards, and pure/thread-safe server number/plural formatting; English institution display always uses the recorded name.
+8. Preserve raw canonical keys beside localized labels in Explorer/map/nearby payloads so filters, geo-IP matching, membership, and ranks do not change.
+9. Generate root, Spanish, and French `llms.txt`; retain one root CSV/robots/sitemap; preserve current English share paths and write target-locale shares under locale directories.
+10. Keep `render_error_page()` English with empty alternates. Make `build_home_page()` validate the same catalogues but rewrite only the English root homepage. Keep CLI completion counts truthful for the combined plan.
+11. Retain current pre-promotion cleanup and existing `_promote()` semantics; do not claim or implement rollback-safe promotion in this feature.
+12. Verify with T10 tests and `uv run ruff check website/build.py`; the actual build gate is T12.
+
+## T6 — Localize site chrome and style the switcher
+
+**ID:** T6 — Render language metadata/navigation consistently at every depth.
+
+**Depends-on:** T5.
+
+**Files:** `website/templates/base.html:1-71`; `website/static/style.css:57-91,852-910`.
+
+**Assumptions:**
+
+1. English root and `/es/`/`/fr/` prefixes are fixed.
+7. The stable-key alternate map drives both `hreflang` and switching.
+12. Root 404 is English.
+14. The user's closed mobile navigation at `base.html:29` must survive.
+
+**Steps → verify:**
+
+1. Set the HTML language, localize chrome/metadata/accessibility/footer copy, and emit canonical plus reciprocal en/es/fr and English `x-default` alternates.
+2. Build the switcher from the exact alternate map so it keeps the current stable page identity.
+3. Handle empty alternates for root 404 without `StrictUndefined` failures.
+4. Add compact switcher styles using current variables and responsive navigation; do not restore `open` on the mobile details element.
+5. Verify via T10 rendered-page assertions at root and deep routes, 404 rendering, and a source diff proving line 29 stays closed.
+
+## T7 — Localize server-rendered page templates
+
+**ID:** T7 — Move non-browser page UI to catalogue lookups.
+
+**Depends-on:** T5.
+
+**Files:** `website/templates/index.html:1-120`; `website/templates/awards.html:1-9`; `website/templates/_awards.html:1-21`; `website/templates/prize.html:1-48`; `website/templates/winners.html:1-30`; `website/templates/category.html:1-28`; `website/templates/year.html:1-31`; `website/templates/winner.html:1-64`; `website/templates/person.html:1-33`; `website/templates/people.html:1-26`; `website/templates/_view_tabs.html:1-18`; `website/templates/countries.html:1-20`; `website/templates/country.html:1-22`; `website/templates/affiliation_countries.html:1-22`; `website/templates/affiliation_country.html:1-29`; `website/templates/affiliations.html:1-44`; `website/templates/affiliation.html:1-43`; `website/templates/universities.html:1-34`; `website/templates/university_countries.html:1-34`; `website/templates/subjects.html:1-21`; `website/templates/subject.html:1-27`; `website/templates/subject_affiliations.html:1-29`; `website/templates/subject_recent.html:1-34`.
+
+**Assumptions:**
+
+2. Display terms and relevant slugs localize; proper-name slugs do not.
+3. Motivations, notes, institution descriptions, people, units, and cities remain source text.
+6. Required UI/terms never silently fall back.
+8. Membership and ordering remain canonical.
+9. Dates remain ISO.
+11. Person-facing copy is gender-neutral.
+
+**Steps → verify:**
+
+1. Replace every visible English UI literal, plural branch, table/control/accessibility label, and generated link phrase with catalogue output from T5.
+2. Render translated prize/category/country/subject/laureate-type terms and exact-QID institution labels without using display strings for conditions such as the birth-country fact class.
+3. Keep motivations, biographical notes, institution descriptions, names, units, cities, identifiers, brands, official URLs, and registry names unchanged.
+4. Localize the wrapper of the Ask-AI query while retaining cited source text; keep all query construction escaped.
+5. Verify via T10 snapshots/assertions for every template family, byte-equal excluded prose, and no required bare English UI in Spanish/French output.
+
+## T8 — Localize Explorer, map, and nearby browser UI safely
+
+**ID:** T8 — Translate runtime interactions without changing their data joins.
+
+**Depends-on:** T5.
+
+**Files:** `website/templates/explorer.html:1-658`; `website/templates/map.html:1-477`; `website/templates/nearby.html:1-148`.
+
+**Assumptions:**
+
+3. Names, cities, motivations, and other excluded source data remain unchanged.
+6. Missing browser UI strings fail preflight.
+8. Rankings, membership, and ordering remain canonical.
+9. Runtime numbers use the page locale without changing values.
+10. Runtime plurals use `Intl.PluralRules`.
+
+**Steps → verify:**
+
+1. Replace HTML copy, controls, help/error/privacy text, chart labels, popups, tooltips, result rows, and all accessibility text with catalogue strings.
+2. Emit browser strings once as `<script type="application/json">` using `<`-safe JSON; parse them as data and interpolate only validated `{field}` placeholders.
+3. Insert catalogue output through DOM text/attribute APIs; remove any path that places catalogue strings in `innerHTML`, executable source, `eval`, or `Function`.
+4. Keep canonical country/subject/record keys and localized display labels separately; preserve Explorer geo-IP alias matching, map filters, payload indexes, nearby routes, and server rank order.
+5. Use `Intl.NumberFormat(language.code)` and `Intl.PluralRules(language.code)` for runtime output and locale-aware sorting only for translated display labels.
+6. Verify in T10 by parsing each JSON payload, syntax-checking built scripts, exercising representative success/error states, testing malicious `<script>` catalogue text, and comparing English versus localized record selections/ranks.
+
+## T9 — Localize editorial About copy and keep root 404 compatible
+
+**ID:** T9 — Translate long-form site copy and the English error document.
+
+**Depends-on:** T5.
+
+**Files:** `website/templates/about.html:1-170`; `website/templates/404.html:1-17`.
+
+**Assumptions:**
+
+3. Source dataset prose is excluded, but authored website editorial copy is translated.
+6. Required UI copy fails on a miss.
+12. The one root 404 remains English.
+
+**Steps → verify:**
+
+1. Replace all About editorial copy, headings, totals, link phrases, and accessibility text with catalogue values while preserving brand/license/official-link identities.
+2. Replace 404 literals with catalogue lookups that render from the English language object and empty alternates.
+3. Verify About renders in all three plans, 404 renders once at root, and no locale-specific server error behavior is introduced.
+
+## T10 — Extend focused tests
+
+**ID:** T10 — Prove catalogue, authoring, routing, rendering, and compatibility contracts.
+
+**Depends-on:** T2, T3, T4, T5, T6, T7, T8, T9.
+
+**Files:** `tests/test_build_website.py:135-2475`.
+
+**Assumptions:** all 14 assumptions from the specification, including English URL stability, source-prose preservation, offline build behavior, canonical ordering, English-only root 404, and preservation of the user's nav change.
+
+**Steps → verify:**
+
+1. Add catalogue parse/completeness, exact English route pinning, 10-subject coverage, plural/number, fallback, and format-field tests.
+2. Add mocked authoring tests described in T2/T3, including byte-identical rollback and safe logs.
+3. Add full stable-key parity, route collision, English manifest, localized nested-route, canonical ordering/membership, and home-only unaffected-file tests.
+4. Add reciprocal canonical/`hreflang`/switcher tests for every page family and root 404 compatibility.
+5. Add motivation/profile/unit/name/date byte-preservation and exact English institution-name tests.
+6. Add browser JSON/escaping/injection, JS syntax, runtime locale, geo-IP/filter/join, success/error/accessibility, and rank-equivalence tests.
+7. Add localized `llms.txt`, shared sitemap/CSV/robots, locale share-path, English share-path, and build-time network prohibition tests.
+8. Verify `uv run python -m unittest tests/test_build_website.py` passes and `uv run ruff check tests/test_build_website.py` is clean.
+
+## T11 — Update repository guidance
+
+**ID:** T11 — Document the implemented authoring and build contract.
+
+**Depends-on:** T5.
+
+**Files:** `AGENTS.md:94-133` (repository root).
+
+**Assumptions:**
+
+1. English root and Spanish/French prefixes are fixed.
+3. Source prose exclusions are permanent product rules.
+4. Website builds are offline; authoring commands are explicit.
+5. English is the catalogue source and target catalogues are committed.
+12. Root 404 is English.
+
+**Steps → verify:**
+
+1. Document locale prefixes, localized semantic/category/country/subject routes, canonical proper-name routes, and `hreflang`/switcher behavior.
+2. Document catalogue locations, reviewed-key regeneration, label and translation commands, source-prose exclusions, and the no-network builder guarantee.
+3. Update `llms.txt`, share-image, sitemap/page-count, home-only, and 404 descriptions to match implementation.
+4. Verify every named file/command exists and guidance does not claim rollback-safe promotion or branch use.
+
+## T12 — Full regression and public-contract gate
+
+**ID:** T12 — Verify the complete implementation without modifying source files.
+
+**Depends-on:** T1-T11.
+
+**Files:** none.
+
+**Assumptions:** all 14 specification assumptions.
+
+**Steps → verify:**
+
+1. Capture the current English route/share-asset manifest, then run `uv run website/build.py --base-url https://example.org/awards/`.
+2. Verify the build reports 16 prizes, 7,345 pages per locale, 22,035 sitemap page URLs, exactly three siblings per stable key, and one sitemap at the current snapshot.
+3. Compare manifests: every prior English page and public English share path remains; no `/en/` route exists; CSV/robots paths remain shared.
+4. Check reciprocal canonical/`hreflang`/switcher links, localized semantic routes, root/Spanish/French `llms.txt`, locale share assets, and the English root 404.
+5. Prove motivations and excluded profile/unit/name/date content are byte-identical across siblings and ranks/membership match English.
+6. Run `uv run python -m unittest tests/test_build_website.py` and confirm all tests pass.
+7. Run `uv run ruff check website/build.py scripts/fetch_wikidata_labels.py scripts/translate_catalogue.py tests/test_build_website.py` and confirm it is clean.
+8. Run the home-only path against the completed build and verify only `website/dist/index.html` changes.
+9. Confirm the full and home-only build made no label-fetch or translation-provider request and `git status --short` contains no generated `website/dist/` state.
