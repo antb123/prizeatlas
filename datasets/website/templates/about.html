@@ -134,13 +134,9 @@
     laureate birthplaces and institutions.
   </p>
   <p>
-    Choosing which prizes belong here came down to four questions, all pointed at the sciences: has the prize stood
-    the test of time, with a history longer than twenty years? Does it carry serious funds, more than a million
-    dollars? Is it a science prize? And are its winners actually drawn from around the world, rather than mostly one
-    country? We're glad to add a prize that clears the bar — open an issue on GitHub or send us an email, and we'll
-    add it. The longer aim is a site where, a century from now, a good number of today's winners are still remembered
-    the way Einstein is. On most prizes only a handful will ever reach that, so the prize list itself is chosen with
-    a power-law bet in mind, not an expectation that every winner on it will last.
+    The longer aim is a site where, a century from now, a good number of today's winners are still remembered the way
+    Einstein is. On most prizes only a handful will ever reach that, so the prize list itself is chosen with a
+    power-law bet in mind, not an expectation that every winner on it will last.
   </p>
   <p>
     Everything is also searchable by high school subject — Biology, Chemistry, Physics, Math, and the rest — because
@@ -162,6 +158,13 @@
     bar is enough — the Breakthrough Prize qualifies on its purse alone at fourteen years old, the Shaw Prize the same
     way at twenty-two, and the Abel Prize on its international recipient list at twenty-three. Everything else on the
     list clears the age bar outright, several of them by a century or more.
+  </p>
+  {% set correction = correction_href() %}
+  <p>
+    If a prize clears one of those bars and is not here yet, add it: send a pull request or open an issue on
+    <a href="https://github.com/antb123/prizeatlas" target="_blank" rel="noopener noreferrer">GitHub</a>{% if correction %},
+    or <a href="{{ correction }}">contact us</a>{% else %}, or get in touch{% endif %}. The data is one row per
+    recipient, so a new prize is a contribution anyone can make.
   </p>
 </section>
 {% endblock %}
