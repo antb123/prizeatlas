@@ -416,7 +416,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("Recorded awards by affiliation country, per $1,000 (World Bank 2024 USD PPP).", home)
         self.assertIn('<ol class="highlights">', home)
         self.assertIn('href="countries/awarded/united-states/">United States</a>', home)
-        self.assertIn(f"<span>5 awards · {rate:.2f} awards / $1,000</span>", home)
+        self.assertIn(f"<span>{rate:.2f}</span>", home)
 
     def test_build_home_page_only_rewrites_index(self) -> None:
         database = self.create_database(

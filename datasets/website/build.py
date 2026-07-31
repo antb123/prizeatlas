@@ -2350,7 +2350,7 @@ def plan_home_page(
         women_pct=women_pct,
         top_countries=tuple(top_countries),
         affiliation_rates=tuple(affiliation_rates[:HOMEPAGE_ROWS]),
-        gdp_per_capita_ppp=tuple(gdp_per_capita_ppp),
+        gdp_per_capita_ppp=tuple(gdp_per_capita_ppp[:HOMEPAGE_ROWS]),
         top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
     )
 
