@@ -77,11 +77,13 @@ it with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 ## Build for nginx
 
 The production command only builds static files; nginx serves the resulting
-`datasets/website/dist/` directory:
+`datasets/website/dist/` directory. It reads `BASE_URL` from `datasets/.env`:
 
 ```sh
-./start.sh https://prizeatlas.org/
+./start.sh
 ```
+
+Pass a URL only to override that setting for another deployment.
 
 ### Download data only
 
