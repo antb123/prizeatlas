@@ -29,6 +29,14 @@ The site is generated as static HTML from a curated SQLite database. It needs no
 application server and remains useful if optional browser features, such as
 country detection, are unavailable.
 
+## Licensing
+
+The source code is licensed under the GNU General Public License, version 2.0
+or later; see [LICENSE](LICENSE). The curated data and original site content
+are dual-licensed under CC BY-SA 4.0 and the GNU Free Documentation License;
+see [CONTENT-LICENSE](CONTENT-LICENSE). Third-party material remains subject to
+its source's terms.
+
 ## Architecture
 
 The project is static by design:
