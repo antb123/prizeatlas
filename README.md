@@ -42,6 +42,8 @@ its source's terms.
 The project is static by design:
 
 - `datasets/awards.sqlite3` is the source of truth.
+- The 467 non-science award rows (History, Arts, Literature, and Economics) were moved out of that live database and preserved in
+  [`datasets/non_science.json`](datasets/non_science.json) for later restoration.
 - One build reads the database in read-only mode, validates the records, and
   renders the complete site with Python and Jinja.
 - Pages, styles, scripts, sitemaps, and explorer data are written to
