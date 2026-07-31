@@ -47,7 +47,7 @@
   <aside class="facts" aria-label="Facts">
     <h2>Facts</h2>
     <dl>
-      {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_share }}</dd></div>{% endif %}
+      {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_name }} {{ record.year }} {{ record.prize_share }}</dd></div>{% endif %}
       {% for label, value, route in facts %}
       <div><dt>{{ label }}</dt><dd>{% if route %}<a class="{{ 'birth-country' if label == 'Birth country' else '' }}" href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
       {% endfor %}

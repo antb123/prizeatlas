@@ -10,6 +10,8 @@
   {% endif %}
   <p class="winner-links">
     <a class="external-source" href="{{ wikipedia_url }}">Wikipedia <span aria-hidden="true">↗</span></a>
+    {% if person.qid %}<a class="external-source" href="https://www.wikidata.org/wiki/{{ person.qid }}">WDATA <span aria-hidden="true">↗</span></a>{% endif %}
+    {% if orc_id %}<a class="external-source" href="https://orcid.org/{{ orc_id }}">ORCID <span aria-hidden="true">↗</span></a>{% endif %}
     {% if author_openalex_id %}<a class="external-source" href="https://openalex.org/authors/{{ author_openalex_id }}">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
   </p>
 </header>

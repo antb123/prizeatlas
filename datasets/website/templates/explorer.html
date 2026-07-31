@@ -117,11 +117,7 @@
   <header class="hero">
     <p class="eyebrow">Data explorer</p>
     <h1>The most awarded people in science and beyond</h1>
-    <p class="lede">
-      Every laureate ranked by the number and weight of their awards.
-      Each prize family carries a prestige score out of 100; a win earns score&nbsp;&divide;&nbsp;100 points.
-      A Nobel Prize is worth 1.00, so two Nobels make 2.00 points.
-    </p>
+    <p class="lede">Every laureate ranked by the number of their recorded awards.</p>
     <ul class="stats" id="stats"></ul>
   </header>
 
@@ -134,7 +130,7 @@
 
   <section aria-labelledby="board-h">
     <h2 id="board-h">Leaderboard</h2>
-    <p class="section-note">The top 7 are shown — search to find anyone else. Click a row to see the full award record behind the score. Click a column heading to re-sort.</p>
+    <p class="section-note">The top 7 are shown — search to find anyone else. Click a row to see the full award record. Click a column heading to re-sort.</p>
     <div class="board-tools">
       <input id="q" type="search" placeholder="Filter by name…" aria-label="Filter by name">
       <span id="hits" role="status"></span>
@@ -144,8 +140,7 @@
         <tr>
           <th>#</th>
           <th aria-sort="none"><button type="button" data-sort="name">Name<span class="dir"></span></button></th>
-          <th style="text-align:right" aria-sort="none"><button type="button" data-sort="count">Awards<span class="dir"></span></button></th>
-          <th style="text-align:right" aria-sort="descending"><button type="button" data-sort="points">Points<span class="dir"> ↓</span></button></th>
+          <th style="text-align:right" aria-sort="descending"><button type="button" data-sort="count">Awards<span class="dir"> ↓</span></button></th>
         </tr>
       </thead>
       <tbody id="board"></tbody>
@@ -170,10 +165,24 @@
     <figure id="country-chart"></figure>
   </section>
 
+  <section aria-labelledby="gdp-h">
+    <h2 id="gdp-h">Awards per GDP per capita</h2>
+    <p class="section-note">
+      Top 15 countries by recorded awards per $1,000 of 2024 World Bank GDP per capita data, using recipients' affiliation country at the time of award.
+      PPP is shown first in current international dollars; each measure needs at least 5 recorded awards.
+    </p>
+    <select class="chart-select" id="gdp-select" aria-label="GDP per capita measure">
+      <option value="nominal">GDP per capita (current US$)</option>
+      <option value="ppp" selected>GDP per capita, PPP (current international $)</option>
+    </select>
+    <p class="section-note" id="gdp-chart-status" role="status"></p>
+    <figure id="gdp-chart"></figure>
+  </section>
+
   <section aria-labelledby="young-h">
     <h2 id="young-h">Career totals of early winners</h2>
     <p class="section-note">
-      Laureates who won at least one award before turning 40, ranked by their lifetime points — these are finished careers, not people who are young now.
+      Laureates who won at least one award before turning 40, ranked by their lifetime award count — these are finished careers, not people who are young now.
       Age comes from birth year, so it may be off by one.
     </p>
     <figure id="young-chart"></figure>
@@ -225,11 +234,11 @@ const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const SUBJECTS = DATA.subjects;           // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
+const GDP_PER_CAPITA_RANKINGS = DATA.gdp_per_capita_rankings;
 const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category, subjectIdx], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const gain = (familyIdx) => FAMILIES[familyIdx].score / 100;
 const YEARS = PEOPLE.flatMap((p) => p.a.map(([year]) => year));
 const FIRST_YEAR = Math.min(...YEARS), LAST_YEAR = Math.max(...YEARS);
 
@@ -248,22 +257,20 @@ const FIRST_YEAR = Math.min(...YEARS), LAST_YEAR = Math.max(...YEARS);
 /* ---------- leaderboard ---------- */
 const board = document.getElementById("board");
 const hits = document.getElementById("hits");
-const state = { q: "", key: "points", dir: -1 };
+const state = { q: "", key: "count", dir: -1 };
 const SORTS = {                                       // all ascending; state.dir flips them
-  points: (a, b) => a.p - b.p || a.c - b.c || b.id - a.id,
-  count: (a, b) => a.c - b.c || a.p - b.p || b.n.localeCompare(a.n),
+  count: (a, b) => a.c - b.c || b.n.localeCompare(a.n),
   name: (a, b) => a.n.localeCompare(b.n),
 };
-const DEFAULT_DIR = { points: -1, count: -1, name: 1 };
+const DEFAULT_DIR = { count: -1, name: 1 };
 const compare = (a, b) => state.dir * SORTS[state.key](a, b);
 
 function detailRows(person) {
   const items = person.a
     .map(([year, fi, category]) =>
-      `<li><span class="y">${year}</span>${esc(FAMILIES[fi].name)}${category ? " · " + esc(category) : ""}` +
-      `<span class="gain">+${gain(fi).toFixed(2)}</span></li>`)
+      `<li><span class="y">${year}</span>${esc(FAMILIES[fi].name)}${category ? " · " + esc(category) : ""}</li>`)
     .join("");
-  return `<tr class="detail"><td colspan="4"><ul>${items}</ul></td></tr>`;
+  return `<tr class="detail"><td colspan="3"><ul>${items}</ul></td></tr>`;
 }
 
 const TOP_N = 7;
@@ -282,8 +289,7 @@ function renderBoard() {
       `<tr class="person${p.open ? " open" : ""}" data-id="${p.id}" tabindex="0" aria-expanded="${p.open ? "true" : "false"}">` +
       `<td class="rank">${rankOf.get(p.id)}</td>` +
       `<td>${name}${p.o ? '<span class="badge">Organization</span>' : ""}</td>` +
-      `<td class="num">${p.c}</td>` +
-      `<td class="num pts">${p.p.toFixed(2)}</td></tr>`
+      `<td class="num">${p.c}</td></tr>`
     );
     if (p.open) html.push(detailRows(p));
   });
@@ -389,20 +395,23 @@ countryLookup
 
 /* ---------- top winners under 40 ---------- */
 {
-  const young = PEOPLE.filter((p) => p.by && p.a.some(([year]) => year - p.by < 40)).slice(0, TOP_N);
+  const young = PEOPLE
+    .filter((p) => p.by && p.a.some(([year]) => year - p.by < 40))
+    .sort((a, b) => b.c - a.c || a.n.localeCompare(b.n))
+    .slice(0, TOP_N);
   const rowH = 24, labelW = 215, valueW = 48, width = 860, height = young.length * rowH + 8;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Top winners under 40 by points" });
-  const max = young.length ? young[0].p : 1;
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Top winners under 40 by award count" });
+  const max = young.length ? young[0].c : 1;
   young.forEach((p, i) => {
     const firstAge = Math.min(...p.a.map(([year]) => year - p.by));
     const y = i * rowH + 4;
-    const barW = Math.max(2, (p.p / max) * (width - labelW - valueW - 12));
+    const barW = Math.max(2, (p.c / max) * (width - labelW - valueW - 12));
     const label = personChartLink(svg, p.r);
     text(label, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
     const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
     const tip = el("title", {}, rect);
-    tip.textContent = `${p.n} — first won at ${firstAge}, ${p.c} awards, ${p.p.toFixed(2)} points`;
-    text(svg, labelW + barW + 6, y + 14, p.p.toFixed(2), "bar-value");
+    tip.textContent = `${p.n} — first won at ${firstAge}, ${p.c} awards`;
+    text(svg, labelW + barW + 6, y + 14, String(p.c), "bar-value");
   });
   document.getElementById("young-chart").appendChild(svg);
 }
@@ -496,6 +505,55 @@ countryLookup
   }
   select.addEventListener("change", () => draw(select.value));
   draw("bc");
+}
+
+/* ---------- awards per GDP per capita ---------- */
+{
+  const select = document.getElementById("gdp-select");
+  const holder = document.getElementById("gdp-chart");
+  const status = document.getElementById("gdp-chart-status");
+  const measures = {
+    nominal: "GDP per capita (current US$)",
+    ppp: "GDP per capita, PPP (current international $)",
+  };
+  const number = (value) => value.toLocaleString("en", { maximumFractionDigits: 0 });
+
+  function draw(metric) {
+    const rows = GDP_PER_CAPITA_RANKINGS[metric];
+    holder.innerHTML = "";
+    if (!rows.length) {
+      status.textContent = "No countries meet the five-award and 2024-data requirements for this measure.";
+      return;
+    }
+    status.textContent = "";
+    const rowH = 24, labelW = 200, valueW = 54, width = 860, height = rows.length * rowH + 8;
+    const svg = el("svg", {
+      viewBox: `0 0 ${width} ${height}`,
+      role: "img",
+      "aria-labelledby": "gdp-chart-title gdp-chart-desc",
+    }, holder);
+    const title = el("title", { id: "gdp-chart-title" }, svg);
+    title.textContent = `Awards per $1,000 ${measures[metric]}`;
+    const description = el("desc", { id: "gdp-chart-desc" }, svg);
+    description.textContent = rows.map((row) => {
+      const name = COUNTRIES[row.country_idx];
+      return `${name}: ${row.award_count} awards, 2024 GDP per capita ${number(row.denominator)}, ${row.rate.toFixed(2)} awards per $1,000`;
+    }).join(". ");
+    const max = rows[0].rate;
+    rows.forEach((row, index) => {
+      const y = index * rowH + 4;
+      const name = COUNTRIES[row.country_idx];
+      const barW = Math.max(2, (row.rate / max) * (width - labelW - valueW - 12));
+      text(svg, labelW - 8, y + 14, name.length > 28 ? name.slice(0, 27) + "…" : name, "bar-label", "end");
+      const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
+      const tip = el("title", {}, rect);
+      tip.textContent = `${name} — ${row.award_count} awards; 2024 ${measures[metric]} ${number(row.denominator)}; ${row.rate.toFixed(2)} awards per $1,000 GDP per capita`;
+      text(svg, labelW + barW + 6, y + 14, row.rate.toFixed(2), "bar-value");
+    });
+    holder.appendChild(svg);
+  }
+  select.addEventListener("change", () => draw(select.value));
+  draw("ppp");
 }
 
 /* ---------- age at first win, by subject ---------- */

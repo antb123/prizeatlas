@@ -23,6 +23,7 @@
     {% if affiliation.openalex_id %}<a class="external-source" href="https://openalex.org/institutions/{{ affiliation.openalex_id }}">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
   </p>
   {% endif %}
+  {% if affiliation.ror %}<p class="ror-tag">ror: {{ affiliation.ror }}</p>{% endif %}
 </header>
 <section>
   <h2>Awards</h2>

@@ -102,5 +102,19 @@
   </ol>
 </section>
 {% endif %}
+{% if gdp_per_capita_ppp %}
+<section>
+  <h2>Awards per capita</h2>
+  <p>Recorded awards by affiliation country, per $1,000 (World Bank 2024 USD PPP).</p>
+  <ol class="highlights">
+    {% for country, award_count, rate in gdp_per_capita_ppp %}
+    <li>
+      <a href="{{ href(country.route) }}">{{ country.name }}</a>
+      <span>{{ award_count }} {{ "award" if award_count == 1 else "awards" }} · {{ "%.2f" | format(rate) }} awards / $1,000</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
 {% include "_awards.html" %}
 {% endblock %}

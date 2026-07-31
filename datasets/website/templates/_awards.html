@@ -1,11 +1,10 @@
-<section id="ranked-awards">
-  <h2>Ranked awards</h2>
-  <ol class="ranking">
+<section id="awards">
+  <h2>Awards</h2>
+  <ul class="ranking">
     {% for prize, route in prizes %}
     <li>
       <article>
         <div class="award-identity">
-          <div class="rank">{{ loop.index }}</div>
           {% if prize.logo %}<img class="award-logo" src="{{ asset_href(prize.logo) }}" alt="{{ prize.prize_name }} logo">{% endif %}
         </div>
         <div>
@@ -15,12 +14,8 @@
           </h3>
           <p>{{ prize.blurb }}</p>
         </div>
-        <p class="score" style="--score: {{ prize.score }}">
-          <span>Score</span> {{ prize.score }}
-          <span class="score-bar" aria-hidden="true"></span>
-        </p>
       </article>
     </li>
     {% endfor %}
-  </ol>
+  </ul>
 </section>

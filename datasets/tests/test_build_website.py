@@ -214,6 +214,10 @@ class WebsiteBuildTests(unittest.TestCase):
                         "Canada": 44,
                         "Switzerland": 55,
                         "Japan": 66,
+                    },
+                    "gdp_per_capita": {
+                        "nominal": {"Belgium": 10_000, "Germany": 20_000},
+                        "ppp": {"Belgium": 15_000, "Germany": 25_000},
                     }
                 }
             )
@@ -227,6 +231,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "countries": ["Belgium", "France", "United States", "Canada", "Switzerland", "Japan"],
                 "subjects": ["Physics"],
                 "population": [11, 22, 33, 44, 55, 66],
+                "gdp_per_capita_rankings": {"nominal": [], "ppp": []},
                 "people": [
                     {
                         "n": "Alice Example",
@@ -265,6 +270,174 @@ class WebsiteBuildTests(unittest.TestCase):
         plan = build.create_site_plan(rankings, records, "https://example.org/", "2026-07-26")
         explorer = next(job for job in plan.jobs if job.route == build.EXPLORER_ROUTE)
         self.assertEqual("explorer.html", explorer.template)
+        self.assertEqual("Data Explorer", explorer.title)
+
+    def test_gdp_per_capita_payload_counts_award_affiliations(self) -> None:
+        rankings = [build.Ranking("Q1", "First Prize", "first-prize", "https://example.org/first", 100, "Blurb.", "Reasoning.")]
+        records = [
+            award(
+                award_record_id=f"first-{index}",
+                year="2000",
+                prize_name="First Prize",
+                award_wikidata_qid="Q1",
+                full_name=f"Example {index}",
+                birth_country="Birthland",
+                affiliation_country="Affiliated A",
+                extras=({"affiliation_country": "Affiliated A"}, {"affiliation_country": "Affiliated B"}),
+            )
+            for index in range(5)
+        ]
+        snapshot_file = self.directory / "population.json"
+        snapshot_file.write_text(
+            json.dumps(
+                {
+                    "population": {},
+                    "gdp_per_capita": {
+                        "nominal": {"Affiliated A": 1_000, "Affiliated B": 2_000},
+                        "ppp": {"Affiliated A": 5_000, "Affiliated B": 1_000},
+                    },
+                }
+            )
+        )
+
+        payload = build.explorer_payload(rankings, records, {}, snapshot_file)
+
+        self.assertEqual(["Birthland", "Affiliated A", "Affiliated B"], payload["countries"])
+        self.assertEqual(
+            [
+                {"country_idx": 1, "award_count": 5, "denominator": 1_000.0, "rate": 5.0},
+                {"country_idx": 2, "award_count": 5, "denominator": 2_000.0, "rate": 2.5},
+            ],
+            payload["gdp_per_capita_rankings"]["nominal"],
+        )
+        self.assertEqual(2, payload["gdp_per_capita_rankings"]["ppp"][0]["country_idx"])
+        self.assertNotIn(0, [row["country_idx"] for row in payload["gdp_per_capita_rankings"]["nominal"]])
+
+    def test_gdp_per_capita_rankings_filter_sort_and_limit(self) -> None:
+        countries = ["Tie A", "Tie B", *(f"Country {index:02d}" for index in range(1, 17)), "Missing", "Zero", "Negative", "Below"]
+        award_counts = {name: 5 for name in countries}
+        award_counts["Below"] = 4
+        nominal = {name: 1_000 + index for index, name in enumerate(countries[:18])}
+        nominal["Tie A"] = nominal["Tie B"] = 1_000
+        nominal["Zero"] = 0
+        nominal["Negative"] = -1
+        ppp = dict(nominal)
+        ppp["Country 16"] = 1
+
+        nominal_rows = build.plan_gdp_per_capita_rankings(countries, award_counts, nominal)
+        ppp_rows = build.plan_gdp_per_capita_rankings(countries, award_counts, ppp)
+        nominal_names = [countries[int(row["country_idx"])] for row in nominal_rows]
+        ppp_names = [countries[int(row["country_idx"])] for row in ppp_rows]
+
+        self.assertEqual(15, len(nominal_rows))
+        self.assertEqual(["Tie A", "Tie B", *(f"Country {index:02d}" for index in range(1, 14))], nominal_names)
+        self.assertEqual("Country 16", ppp_names[0])
+        self.assertNotIn("Missing", nominal_names)
+        self.assertNotIn("Zero", nominal_names)
+        self.assertNotIn("Negative", nominal_names)
+        self.assertNotIn("Below", nominal_names)
+        self.assertAlmostEqual(5.0, nominal_rows[0]["rate"])
+        self.assertEqual(5, nominal_rows[0]["award_count"])
+        self.assertEqual(1_000, nominal_rows[0]["denominator"])
+
+    def test_gdp_per_capita_snapshot_uses_dataset_country_names(self) -> None:
+        snapshot = json.loads((Path(build.__file__).parent / "population.json").read_text())
+        metrics = snapshot["gdp_per_capita"]
+
+        self.assertIn("NY.GDP.PCAP.CD", snapshot["gdp_per_capita_source"]["nominal"])
+        self.assertIn("NY.GDP.PCAP.PP.CD", snapshot["gdp_per_capita_source"]["ppp"])
+        for metric in metrics.values():
+            self.assertIn("Czech Republic", metric)
+            self.assertIn("South Korea", metric)
+            self.assertIn("Turkey", metric)
+            self.assertNotIn("Czechia", metric)
+            self.assertNotIn("Korea, Rep.", metric)
+            self.assertNotIn("Turkiye", metric)
+            self.assertNotIn("Taiwan", metric)
+
+    def test_per_capita_places_match_explorer_affiliation_rules(self) -> None:
+        def people(count: int) -> tuple[build.Laureate, ...]:
+            return tuple(build.Laureate(f"Q{index}", f"Person {index}", f"/people/{index}/", ()) for index in range(count))
+
+        places = [
+            build.Place("First", "first", "/countries/awarded/first/", people(7)),
+            build.Place("Second", "second", "/countries/awarded/second/", people(10)),
+            build.Place("Missing population", "missing-population", "/countries/awarded/missing-population/", people(12)),
+            build.Place("Below threshold", "below-threshold", "/countries/awarded/below-threshold/", people(4)),
+        ]
+        population_file = self.directory / "population.json"
+        population_file.write_text(json.dumps({"population": {"First": 1_000_000, "Second": 2_000_000}}))
+
+        rates = build.plan_per_capita_places(places, population_file)
+
+        self.assertEqual([("First", 7.0), ("Second", 5.0)], [(place.name, rate) for place, rate in rates])
+
+    def test_homepage_ppp_rows_preserve_explorer_order_and_routes(self) -> None:
+        country_names = [f"Country {index}" for index in range(16)]
+        rankings = [
+            {"country_idx": index, "award_count": index + 5, "denominator": 1_000.0, "rate": index + 0.125}
+            for index in range(16)
+        ]
+        places = [
+            build.Place(name, build.slugify(name), f"/countries/awarded/{build.slugify(name)}/", ())
+            for index, name in enumerate(country_names)
+            if index != 1
+        ]
+
+        rows = build.plan_gdp_per_capita_home_rows(country_names, rankings, places)
+
+        self.assertEqual(14, len(rows))
+        self.assertEqual(["Country 0", *(f"Country {index}" for index in range(2, 15))], [country.name for country, _, _ in rows])
+        self.assertNotIn("Country 15", [country.name for country, _, _ in rows])
+        self.assertEqual((5, 0.125), (rows[0][1], rows[0][2]))
+
+    def test_homepage_renders_ppp_gdp_per_capita_ranking(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
+            [
+                {
+                    "award_record_id": f"test-{index}",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": f"Test Winner {index}",
+                    "laureate_wikidata_qid": f"Q{index + 10}",
+                    "affiliation_country": "United States",
+                }
+                for index in range(5)
+            ],
+        )
+
+        build.build_site(database, "https://example.org/", self.website)
+
+        rate = 5 / build.load_gdp_per_capita()["ppp"]["United States"] * 1_000
+        home = (self.website / "dist/index.html").read_text()
+        self.assertIn("<h2>Awards per capita</h2>", home)
+        self.assertIn("Recorded awards by affiliation country, per $1,000 (World Bank 2024 USD PPP).", home)
+        self.assertIn('<ol class="highlights">', home)
+        self.assertIn('href="countries/awarded/united-states/">United States</a>', home)
+        self.assertIn(f"<span>5 awards · {rate:.2f} awards / $1,000</span>", home)
+
+    def test_build_home_page_only_rewrites_index(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
+            [
+                {
+                    "award_record_id": "test-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Test Winner",
+                }
+            ],
+        )
+        build.build_site(database, "https://example.org/", self.website)
+        template = self.website / "templates/index.html"
+        template.write_text(template.read_text().replace("</header>", "</header>\n<p>Homepage preview</p>", 1))
+
+        build.build_home_page(database, "https://example.org/", self.website)
+
+        self.assertIn("Homepage preview", (self.website / "dist/index.html").read_text())
 
     def test_explorer_section_order_and_chart_limits(self) -> None:
         explorer_html = (Path(build.__file__).parent / "templates/explorer.html").read_text()
@@ -272,6 +445,7 @@ class WebsiteBuildTests(unittest.TestCase):
             'id="local-winners"',
             'id="board-h"',
             'id="country-h"',
+            'id="gdp-h"',
             'id="young-h"',
             'id="age-h"',
             'id="flow-h"',
@@ -281,7 +455,19 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertEqual(sorted(section_positions), section_positions)
         self.assertIn("PEOPLE.filter((p) => p.bc === countryIdx).slice(0, TOP_N)", explorer_html)
-        self.assertIn("PEOPLE.filter((p) => p.by && p.a.some(([year]) => year - p.by < 40)).slice(0, TOP_N)", explorer_html)
+        self.assertIn(".filter((p) => p.by && p.a.some(([year]) => year - p.by < 40))", explorer_html)
+        self.assertIn('id="gdp-select"', explorer_html)
+        self.assertIn('<option value="nominal">GDP per capita (current US$)</option>', explorer_html)
+        self.assertIn('<option value="ppp" selected>GDP per capita, PPP (current international $)</option>', explorer_html)
+        self.assertIn('draw("ppp")', explorer_html)
+        self.assertIn("2024 World Bank GDP per capita data", explorer_html)
+        self.assertIn("affiliation country at the time of award", explorer_html)
+        self.assertIn("const GDP_PER_CAPITA_RANKINGS = DATA.gdp_per_capita_rankings;", explorer_html)
+        self.assertIn("GDP_PER_CAPITA_RANKINGS[metric]", explorer_html)
+        self.assertIn('id="gdp-chart-status"', explorer_html)
+        self.assertIn("gdp-chart-title", explorer_html)
+        self.assertIn("gdp-chart-desc", explorer_html)
+        self.assertIn("No countries meet the five-award and 2024-data requirements for this measure.", explorer_html)
 
     def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
         rankings = [
@@ -316,7 +502,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(1, cards["Zoë Alpha"].rank)
         self.assertEqual(2, cards["Élodie Beta"].rank)
         explorer_template = (Path(build.__file__).parent / "templates/explorer.html").read_text()
-        self.assertIn("points: (a, b) => a.p - b.p || a.c - b.c || b.id - a.id", explorer_template)
+        self.assertIn("count: (a, b) => a.c - b.c || b.n.localeCompare(a.n)", explorer_template)
 
     def test_map_coordinates_aggregation_serialization_and_routes(self) -> None:
         self.assertEqual(((-180.0, -90.0), (180.0, 90.0)), build.parse_map_points("-180,-90;180,90", "r1", "affiliation_coordinates", True))
@@ -412,6 +598,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(len(map_jobs), len({job.description for job in map_jobs}))
         biology = next(job for job in map_jobs if job.route == "/map/biology/")
         self.assertEqual("map.html", biology.template)
+        self.assertEqual("Biology Map: Birthplaces and Institutions", biology.title)
         self.assertEqual("Biology", biology.context["initial_subject"])
 
     def test_nearby_payload_groups_places_and_people(self) -> None:
@@ -460,7 +647,7 @@ class WebsiteBuildTests(unittest.TestCase):
             ),
         ]
         routes = {"Q1": "/people/alice/", "Q2": "/people/bob/", "Q3": "/people/zed/"}
-        affiliations = [build.Affiliation("Common Institute", "common-institute", "/affiliations/common-institute/", 2, (), (), (), None)]
+        affiliations = [build.Affiliation("Common Institute", "common-institute", "/affiliations/common-institute/", 2, (), (), (), None, "", "")]
 
         payload = build.nearby_payload(records, routes, affiliations)
         self.assertEqual(
@@ -558,7 +745,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="2001/"', japan_html)
 
         physics_html = physics.read_text()
-        self.assertIn("<title>Ernest Orlando Lawrence — Nobel Prize for Physics, 1939</title>", physics_html)
+        self.assertIn("<title>Ernest Orlando Lawrence — Nobel Prize for Physics, 1939 | PrizeAtlas</title>", physics_html)
         self.assertIn('href="../../../../favicon.svg"', physics_html)
         self.assertIn('href="../../../../static/style.css"', physics_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
@@ -569,41 +756,48 @@ class WebsiteBuildTests(unittest.TestCase):
             'href="https://en.wikipedia.org/w/index.php?search=Ernest+Orlando+Lawrence"',
             physics_html,
         )
-        self.assertIn('name="q" value="Explain to me in clear language: &#34;Ernest Orlando Lawrence — &lt;em&gt;unsafe&lt;/em&gt;&#34;"', physics_html)
-        self.assertIn('formaction="https://chatgpt.com/"', physics_html)
-        self.assertIn('formaction="https://www.perplexity.ai/search"', physics_html)
-        self.assertIn('formaction="https://search.brave.com/ask"', physics_html)
-        self.assertEqual(3, physics_html.count('title="Explain to me in clear language:'))
-        self.assertIn('name="q" value="Explain to me in clear language: &#34;Organization Example&#34;"', turing.read_text())
+        self.assertIn('href="https://chatgpt.com/?q=', physics_html)
+        self.assertIn('href="https://www.perplexity.ai/search?q=', physics_html)
+        self.assertIn('href="https://search.brave.com/ask?q=', physics_html)
+        self.assertIn('Ernest%20Orlando%20Lawrence%20awarded%20Nobel%20Prize%20in%20Physics%201939%20%3Cem%3Eunsafe%3C/em%3E', physics_html)
+        self.assertIn('<p class="ask-ai" aria-label="Read more about this award">', physics_html)
+        self.assertIn('Organization%20Example%20awarded%20Turing%20Award%20in%20Computer%20science%201989', turing.read_text())
         physics_category_html = physics_category.read_text()
         self.assertIn('href="1939/ernest-orlando-lawrence/">Ernest Orlando Lawrence</a>', physics_category_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_category_html)
         home_html = (self.website / "dist/index.html").read_text()
-        self.assertIn("<h1>Prestigious Awards and Winners</h1>", home_html)
-        self.assertIn("<h2>Ranked awards</h2>", home_html)
-        self.assertIn("<span>Score</span>", home_html)
+        self.assertIn("<title>PrizeAtlas: Nobel Prize, Fields Medal &amp; 1 More Awards</title>", home_html)
+        self.assertIn('<meta property="og:site_name" content="PrizeAtlas">', home_html)
+        self.assertIn('<a class="site-name" href="./">PrizeAtlas</a>', home_html)
+        self.assertIn("<h1>Nobel Prize, Fields Medal &amp; 1 More Awards</h1>", home_html)
+        self.assertIn("<h2>Awards</h2>", home_html)
+        self.assertNotIn("<span>Score</span>", home_html)
         self.assertIn(
             'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
             home_html,
         )
         self.assertIn('src="static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
         self.assertIn('href="awards/">Awards</a>', home_html)
+        self.assertIn('<dt><a href="awards/">3</a></dt>', home_html)
+        self.assertIn('<dd><a href="awards/">prizes</a></dd>', home_html)
         self.assertTrue((self.website / "dist/static/logos/nobel-prize.png").is_file())
         awards_html = (self.website / "dist/awards/index.html").read_text()
-        self.assertIn("<title>Awards</title>", awards_html)
+        self.assertIn("<title>Science Awards including Nobel Prize, Fields Medal, and Others | PrizeAtlas</title>", awards_html)
         self.assertIn('<link rel="canonical" href="https://example.org/awards/awards/">', awards_html)
-        home_awards = re.search(r'<section id="ranked-awards">.*?</section>', home_html, re.DOTALL)
-        awards_page_awards = re.search(r'<section id="ranked-awards">.*?</section>', awards_html, re.DOTALL)
+        home_awards = re.search(r'<section id="awards">.*?</section>', home_html, re.DOTALL)
+        awards_page_awards = re.search(r'<section id="awards">.*?</section>', awards_html, re.DOTALL)
         self.assertIsNotNone(home_awards)
         self.assertIsNotNone(awards_page_awards)
         self.assertEqual(home_awards.group(0), awards_page_awards.group(0).replace('="../', '="'))
+        self.assertLess(home_awards.group(0).index(">Nobel Prize</a>"), home_awards.group(0).index(">Turing Award</a>"))
+        self.assertLess(home_awards.group(0).index(">Turing Award</a>"), home_awards.group(0).index(">Japan Prize</a>"))
         self.assertEqual(len(rankings), awards_html.count("<article>"))
         self.assertIn('src="../static/logos/nobel-prize.png" alt="Nobel Prize logo"', awards_html)
         self.assertIn("<p>Blurb.</p>", awards_html)
-        self.assertIn("<span>Score</span> 100", awards_html)
+        self.assertNotIn('<span>Score</span>', awards_html)
         self.assertIn('href="./">Awards</a>', awards_html)
         for excluded in (
-            "Prestigious Awards and Winners",
+            "<h1>Nobel Prize, Fields Medal &amp; 1 More Awards</h1>",
             "An editorial ranking",
             "Most decorated",
             "Recently awarded",
@@ -611,7 +805,7 @@ class WebsiteBuildTests(unittest.TestCase):
         ):
             self.assertNotIn(excluded, awards_html)
         turing_html = turing.read_text()
-        self.assertIn("<title>Organization Example — Turing Award for Computer science, 1989</title>", turing_html)
+        self.assertIn("<title>Organization Example — Turing Award for Computer science, 1989 | PrizeAtlas</title>", turing_html)
         self.assertIn("<dt>Type</dt><dd>Organization</dd>", turing_html)
         self.assertNotIn("/computer-science/", turing_html)
 
@@ -698,7 +892,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         year_html = (self.website / "dist/japan-prize/2000/index.html").read_text()
         # Two topics share one year, so neither may claim the heading; each recipient group names its own.
-        self.assertIn("<title>Japan Prize 2000: Winners</title>", year_html)
+        self.assertIn("<title>Japan Prize 2000: Winners | PrizeAtlas</title>", year_html)
         self.assertIn('<p class="group-category">Life Sciences</p>', year_html)
         self.assertIn('<p class="group-category">Materials and Production</p>', year_html)
 
@@ -730,7 +924,6 @@ class WebsiteBuildTests(unittest.TestCase):
         winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
         self.assertIn("mailto:fixme%40example.org?subject=Correction%3A%20nobel-1", winner)
         self.assertIn("Page%3A%20https%3A//example.org/nobel-prize/physics/2024/geoffrey-hinton/%0ARecord%3A%20nobel-1", winner)
-        self.assertIn('<span class="record-id">nobel-1</span>', winner)
         # The footer reports the page it sits on and names no record.
         home = (self.website / "dist/index.html").read_text()
         self.assertIn("mailto:fixme%40example.org?subject=Correction%3A%20https%3A//example.org/", home)
@@ -801,7 +994,7 @@ class WebsiteBuildTests(unittest.TestCase):
         plan = build.build_site(database, "https://example.org/", self.website)
 
         winner = (self.website / "dist/nobel-prize/physics/2024/geoffrey-hinton/index.html").read_text()
-        self.assertIn('<meta property="og:title" content="Geoffrey Hinton — Nobel Prize for Physics, 2024">', winner)
+        self.assertIn('<meta property="og:title" content="Geoffrey Hinton — Nobel Prize for Physics, 2024 | PrizeAtlas">', winner)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', winner)
         self.assertIn('<meta property="og:url" content="https://example.org/nobel-prize/physics/2024/geoffrey-hinton/">', winner)
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', winner)
@@ -862,16 +1055,16 @@ class WebsiteBuildTests(unittest.TestCase):
         prize = (self.website / "dist/nobel-prize/index.html").read_text()
         institution = (self.website / "dist/affiliations/university-of-toronto/index.html").read_text()
         self.assertIn(
-            '<meta property="og:description" content="Laureate rank #1. 1 recorded award. Subjects: Physics.">',
+            '<meta property="og:description" content="Nobel Prize in Physics 2024 — Geoffrey Hinton">',
             person,
         )
         self.assertIn(
-            '<meta property="og:description" content="Prize rank #1. 2 recorded awards. Subjects: Chemistry, Physics.">',
-            prize,
+            '<meta property="og:description" content="Nobel Prize laureates recorded at University of Toronto.">',
+            institution,
         )
         self.assertIn(
-            '<meta property="og:description" content="Institution rank #1. 1 recorded award. Subjects: Physics.">',
-            institution,
+            '<meta property="og:description" content="All 2 Nobel Prize laureates, 2024. Blurb.">',
+            prize,
         )
 
         fallback = self.website / "dist/static/share/default.png"
@@ -885,7 +1078,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', homepage)
         self.assertIn('<meta property="og:image" content="https://example.org/static/share/default.png">', error_page)
         self.assertNotIn("Laureates recognized by the widest range of these prizes.", homepage)
-        self.assertIn("<p class=\"eyebrow\">Top Institutions</p>", homepage)
+        self.assertNotIn("Top Institutions", homepage)
         self.assertIn("<h2>Affiliated Institutions</h2>", homepage)
         self.assertNotIn("not by institutional quality", homepage)
         self.assertIn('href="affiliations/university-of-toronto/">University of Toronto</a>', homepage)
@@ -1037,11 +1230,11 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="../../nobel-prize/medicine/2012/shinya-yamanaka/"', person_html)
 
         linked = (self.website / "dist/nobel-prize/medicine/2012/shinya-yamanaka/index.html").read_text()
-        self.assertIn(">All awards</a>", linked)
-        self.assertIn("Check Wikipedia", linked)
+        self.assertIn('href="../../../../people/shinya-yamanaka/">Shinya Yamanaka</a>', linked)
+        self.assertIn(">Wikipedia <span", linked)
         # A record without a laureate QID cannot be merged, so it gets no person page and no link.
         unlinked = (self.website / "dist/nobel-prize/physics/2012/unlinked-laureate/index.html").read_text()
-        self.assertNotIn(">All awards</a>", unlinked)
+        self.assertNotIn('href="../../../../people/unlinked-laureate/"', unlinked)
         self.assertFalse((self.website / "dist/people/unlinked-laureate").exists())
 
         index_html = (self.website / "dist/people/index.html").read_text()
@@ -1705,7 +1898,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("Sitemap: https://example.org/awards/sitemap.xml", robots)
 
         error_html = (self.website / "dist/404.html").read_text()
-        self.assertIn("<title>Page not found</title>", error_html)
+        self.assertIn("<title>Page not found | PrizeAtlas</title>", error_html)
         self.assertIn('<meta name="robots" content="noindex">', error_html)
         self.assertIn('href="/awards/static/style.css"', error_html)
         self.assertIn('href="/awards/favicon.svg"', error_html)
@@ -1931,7 +2124,7 @@ class WebsiteBuildTests(unittest.TestCase):
         build.build_site(database, "https://example.org/awards/", self.website)
 
         llms = (self.website / "dist/llms.txt").read_text()
-        self.assertTrue(llms.startswith("# Awards\n"))
+        self.assertTrue(llms.startswith("# PrizeAtlas\n"))
         self.assertIn("1950-2000", llms)
         self.assertIn("https://example.org/awards/sitemap.xml", llms)
         # Highest score first, each prize named by its complete winner list and linked out to the awarding body.
