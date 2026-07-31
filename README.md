@@ -71,8 +71,8 @@ it with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 ### Download data only
 
-If you only need the data, download the current public snapshot without
-cloning the code or building the site:
+When the public data snapshots are deployed, download them without cloning the
+code or building the site:
 
 ```sh
 wget -O awards.sqlite3 https://prizeatlas.org/awards.sqlite3
