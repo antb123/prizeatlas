@@ -141,6 +141,13 @@ footer {
   text-decoration: none;
 }
 
+.built {
+  margin-top: 0.75rem;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
 .footer-badge:hover {
   color: var(--accent);
 }
@@ -863,6 +870,8 @@ dd {
     list-style: none;
     cursor: pointer;
     color: var(--accent);
+    font-size: 1.25rem;
+    line-height: 1;
     padding: 0.4rem 0.6rem;
     margin: -0.4rem -0.6rem;
   }
@@ -871,13 +880,8 @@ dd {
     display: none;
   }
 
-  .site-nav-toggle summary::before {
-    content: "☰ ";
-    font-weight: bold;
-  }
-
   .site-nav {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 0;
     margin-left: 0;
@@ -887,6 +891,10 @@ dd {
     padding-top: 0.5rem;
   }
 
+  .site-nav-toggle[open] + .site-nav {
+    display: flex;
+  }
+
   .site-nav a {
     padding-block: 0.5rem;
     display: block;
@@ -894,17 +902,47 @@ dd {
   }
 }
 
-@media (min-width: 52rem) {
-  .site-nav-toggle {
-    display: contents;
+/* Two columns leave a laureate about 18 characters, so names shatter over three lines and their badges strand. */
+@media (max-width: 40rem) {
+  .people-index {
+    columns: 1;
   }
 
-  .site-nav-toggle summary {
+  /* Laureates, awards, and prizes fill one row on a phone. Years and countries would start a second row for two
+     figures the page repeats further down, so they wait for the width to carry them. */
+  .totals {
+    gap: 1rem 1.5rem;
+  }
+
+  .totals div:nth-child(n + 4) {
     display: none;
   }
 
-  .site-nav-toggle[open] .site-nav {
-    display: flex;
+  .page-intro > p:not(.eyebrow) {
+    font-size: 0.9375rem;
+  }
+
+  /* Desktop can spend 40px above the heading; a phone gives up a fifth of the first screen for it. */
+  .breadcrumbs {
+    padding-block: 0.75rem;
+  }
+
+  main {
+    padding-block: 1.5rem 3rem;
+  }
+
+  .page-intro {
+    margin-bottom: 2rem;
+  }
+
+  .view-tabs {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 52rem) {
+  .site-nav-toggle {
+    display: none;
   }
 }
 

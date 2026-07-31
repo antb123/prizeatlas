@@ -26,18 +26,16 @@
   <header class="site-header">
     <a class="site-name" href="{{ home_href }}">PrizeAtlas</a>
     <p>Recognition for work with lasting impact</p>
-    <details class="site-nav-toggle" open>
-      <summary>Menu</summary>
-      <nav class="site-nav" aria-label="Sections">
-        <a href="{{ href(awards_route) }}">Awards</a>
-        <a href="{{ href(subjects_route) }}">Subjects</a>
-        <a href="{{ href(countries_route) }}">Countries</a>
-        <a href="{{ href(affiliations_route) }}">Institutions</a>
-        <a href="{{ href(map_route) }}">Map</a>
-        <a href="{{ href(nearby_route) }}">Nearby</a>
-        <a href="{{ href(explorer_route) }}">Explorer</a>
-      </nav>
-    </details>
+    <details class="site-nav-toggle"><summary aria-label="Menu">☰</summary></details>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="{{ href(awards_route) }}">Awards</a>
+      <a href="{{ href(subjects_route) }}">Subjects</a>
+      <a href="{{ href(countries_route) }}">Countries</a>
+      <a href="{{ href(affiliations_route) }}">Institutions</a>
+      <a href="{{ href(map_route) }}">Map</a>
+      <a href="{{ href(nearby_route) }}">Nearby</a>
+      <a href="{{ href(explorer_route) }}">Explorer</a>
+    </nav>
   </header>
   {% if breadcrumbs %}
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -66,6 +64,7 @@
     </p>
     {% set correction = correction_href(record.award_record_id if record is defined else '') %}
     <p><a href="{{ href(about_route) }}">About</a> · <a href="{{ href(people_route) }}">People</a> · <a href="{{ csv_href }}" download>Download as CSV</a>{% if correction %} · <a href="{{ correction }}">Report correction</a>{% endif %}</p>
+    <p class="built">updated: {{ built }}</p>
   </footer>
 </body>
 </html>

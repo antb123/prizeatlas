@@ -2444,13 +2444,15 @@ def plan_home_page(
     top_countries = country_places["Awarded"][:7]
     affiliation_rates = plan_per_capita_places(country_places["Awarded"])
     # Nobel Prize and Fields Medal are the two prizes people actually search for by name; the rest of the
-    # roster is named only by count, so that count must track `rankings` instead of drifting into a stale "dozen".
+    # roster is named only by count, so both counts must track `rankings` instead of drifting into a stale "dozen".
     other_prize_count = len(rankings) - 2
-    hero_heading = f"Nobel Prize, Fields Medal & {other_prize_count} More Awards"
+    # The heading has to hold one line on a 320px phone, so it names one prize and counts the rest. The page title
+    # is not width-bound and keeps the fuller phrasing, where "Fields Medal" and "Awards" still earn their search traffic.
+    hero_heading = f"Nobel Prize & {len(rankings) - 1} More"
     return _page(
         "index.html",
         "/",
-        f"PrizeAtlas: {hero_heading}",
+        f"PrizeAtlas: Nobel Prize, Fields Medal & {other_prize_count} More Awards",
         _clamp(
             f"The Nobel Prize, Fields Medal, and {other_prize_count} more: {len(people):,} laureates and "
             f"{len(records):,} awards across {len(rankings)} international prizes, {min(year_prefixes)}-{latest_year}. "
@@ -2487,6 +2489,8 @@ def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> P
         "Science Awards including Nobel Prize, Fields Medal, and Others",
         f"Browse {len(rankings)} international awards and their recipients.",
         (Breadcrumb("Home", "/"), Breadcrumb("Awards", None)),
+        # The title carries the search terms; the heading only has to hold one line on a phone.
+        heading="Science Awards",
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
         item_list=tuple((ranking.prize_name, prize_routes[ranking.qid]) for ranking in rankings),
     )
@@ -3052,6 +3056,7 @@ def _environment(website_dir: Path) -> Environment:
         undefined=StrictUndefined,
     )
     environment.filters["slugify"] = slugify
+    environment.globals["built"] = datetime.date.today().isoformat()
     for name in TEMPLATES:
         environment.get_template(name)
     return environment
