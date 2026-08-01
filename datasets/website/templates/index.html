@@ -110,7 +110,7 @@
     {% for country, rate in income_adjusted_awards %}
     <li>
       <a href="{{ href(country.route) }}">{{ country.name }}</a>
-      <span>{{ "%.2f" | format(rate) }} / $1bn</span>
+      <span>{{ "%.4f" | format(rate) }} / $1bn</span>
     </li>
     {% endfor %}
   </ol>

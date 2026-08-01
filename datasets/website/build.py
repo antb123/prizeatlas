@@ -112,7 +112,6 @@ SUBJECTS = (
 )
 POPULATION_FILE = SCRIPT_DIR / "population.json"
 GDP_PER_CAPITA_MIN_AWARDS = 5
-GDP_PER_CAPITA_ROWS = 15
 HOMEPAGE_AWARD_YEAR_FROM = 2015
 HOMEPAGE_AWARD_YEAR_TO = 2025
 AFFILIATION_ROWS = 40
@@ -569,7 +568,6 @@ def explorer_payload(
     people: dict[str, dict[str, Any]] = {}
     countries: dict[str, int] = {}
     subjects: dict[str, int] = {}
-    affiliation_award_counts = award_affiliation_country_counts(records)
 
     def country_index(name: str) -> int:
         if name not in countries:
@@ -639,20 +637,13 @@ def explorer_payload(
         )
     ranked.sort(key=lambda person: (-person["p"], -person["c"], person["n"]))
 
-    for country_name in sorted(affiliation_award_counts):
-        country_index(country_name)
     country_names = list(countries)
     populations = load_population(country_names, population_file)
-    gdp_per_capita = load_gdp_per_capita(population_file)
     return {
         "families": [{"name": ranking.prize_name, "score": ranking.score} for ranking in rankings],
         "countries": country_names,
         "subjects": list(subjects),
         "population": populations,
-        "awards_gdp_comparison": {
-            metric: plan_awards_gdp_comparison(country_names, affiliation_award_counts, populations, gdp_per_capita[metric])
-            for metric in ("nominal", "ppp")
-        },
         "people": ranked,
     }
 
@@ -1271,20 +1262,34 @@ def plan_per_capita_places(places: Iterable[Place], population_file: Path = POPU
     return sorted(rates, key=lambda entry: (-entry[1], entry[0].name))
 
 
-def plan_income_adjusted_award_rows(
+def plan_income_adjusted_award_rankings(
     country_names: list[str],
     comparison: list[dict[str, int | float]],
+) -> list[dict[str, int | float]]:
+    """Rank award records per $1 billion of 2024 GDP PPP."""
+    rows = [
+        {
+            **row,
+            "rate": float(row["awards_per_million"]) / float(row["gdp_per_capita"]) * 1_000,
+        }
+        for row in comparison
+    ]
+    return sorted(rows, key=lambda row: (-float(row["rate"]), country_names[int(row["country_idx"])]))
+
+
+def plan_income_adjusted_award_rows(
+    country_names: list[str],
+    rankings: list[dict[str, int | float]],
     places: Iterable[Place],
 ) -> list[tuple[Place, float]]:
     """Rank homepage countries by award records per $1 billion of 2024 GDP PPP."""
     by_name = {place.name: place for place in places}
     rows: list[tuple[Place, float]] = []
-    for row in comparison:
+    for row in rankings:
         country = by_name.get(country_names[int(row["country_idx"])])
         if country is not None:
-            rate = float(row["awards_per_million"]) / float(row["gdp_per_capita"]) * 1_000
-            rows.append((country, rate))
-    return sorted(rows, key=lambda entry: (-entry[1], entry[0].name))
+            rows.append((country, float(row["rate"])))
+    return rows
 
 
 def plan_affiliations(
@@ -2683,7 +2688,11 @@ def create_site_plan(
         explorer["population"],
         load_gdp_per_capita()["ppp"],
     )
-    income_adjusted_awards = plan_income_adjusted_award_rows(explorer["countries"], homepage_comparison, country_places["Awarded"])
+    income_adjusted_rankings = plan_income_adjusted_award_rankings(explorer["countries"], homepage_comparison)
+    explorer["income_adjusted_awards"] = income_adjusted_rankings
+    income_adjusted_awards = plan_income_adjusted_award_rows(
+        explorer["countries"], income_adjusted_rankings, country_places["Awarded"]
+    )
 
     jobs.extend(plan_person_pages(people, base_url, explorer["people"]))
     for layout in layouts:
