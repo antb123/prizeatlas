@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_view_tabs.html" import country_tabs with context %}
+{% block content %}
+{{ country_tabs("Cities / 1m") }}
+<header class="page-intro">
+  <p class="eyebrow">Awarded in</p>
+  <h1>Cities by awards per million residents</h1>
+  <p>Award-recipient records at award-time institutions, divided by reviewed GeoNames city population.</p>
+</header>
+<ol class="rank-list rank-list-plain">
+  {% for row in cities %}
+  <li>
+    <span class="rank-position">{{ loop.index }}</span>
+    {% if row.route %}<a href="{{ href(row.route) }}">{{ row.city }}, {{ row.country }}</a>{% else %}<span>{{ row.city }}, {{ row.country }}</span>{% endif %}
+    <span class="rank-count">{{ "%.1f" | format(row.awards_per_million) }}</span>
+    <small>{{ row.award_count }} award{% if row.award_count != 1 %}s{% endif %} · population {{ "{:,}".format(row.population) }} · GeoNames {{ row.geoname_id }}</small>
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}

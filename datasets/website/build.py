@@ -60,6 +60,7 @@ TEMPLATES = (
     "_view_tabs.html",
     "countries.html",
     "country.html",
+    "city_per_capita.html",
     "affiliation_countries.html",
     "affiliation_country.html",
     "affiliations.html",
@@ -85,6 +86,7 @@ ITEM_LIST_CAP = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 CITIES_ROUTE = "/countries/cities/"
+CITIES_PER_CAPITA_ROUTE = "/countries/cities-per-capita/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
 COUNTRY_AFFILIATIONS_SEGMENT = "affiliations"
 COUNTRY_VIEWS = (
@@ -92,7 +94,7 @@ COUNTRY_VIEWS = (
     ("Awarded", "/countries/awarded/"),
     ("Died", "/countries/died/"),
 )
-RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "cities", "died"})
+RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "cities", "cities-per-capita", "died"})
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 UNIVERSITIES_ROUTE = "/universities/"
@@ -2399,6 +2401,20 @@ def plan_city_pages(cities: list[Place]) -> list[PageJob]:
     return jobs
 
 
+def plan_city_per_capita_page(rows: list[dict[str, int | float | str]], cities: list[Place]) -> PageJob:
+    """Plan the award-recipient city rate table alongside the city ranking."""
+    routes = {city.name: city.route for city in cities}
+    table_rows = [{**row, "route": routes.get(f"{row['city']}, {row['country']}", "")} for row in rows]
+    return _page(
+        "city_per_capita.html",
+        CITIES_PER_CAPITA_ROUTE,
+        "Cities by awards per million residents",
+        "Award-recipient records at award-time institutions per million residents, using reviewed GeoNames city populations.",
+        (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb("Cities / 1m", None)),
+        cities=tuple(table_rows),
+    )
+
+
 def plan_affiliation_country_pages(
     affiliation_countries: list[AffiliationCountry],
     records: list[AwardRecord],
@@ -2822,7 +2838,8 @@ def create_site_plan(
     affiliation_countries = plan_affiliation_countries(affiliations)
     subjects = plan_subjects(people, subject_counts, affiliations)
     explorer = explorer_payload(rankings, records, routes_by_laureate)
-    explorer["city_awards_per_capita"] = plan_city_awards_per_capita(records)
+    city_awards_per_capita = plan_city_awards_per_capita(records)
+    explorer["city_awards_per_capita"] = city_awards_per_capita
     homepage_award_counts = award_affiliation_country_counts(records, HOMEPAGE_AWARD_YEAR_FROM, HOMEPAGE_AWARD_YEAR_TO)
     homepage_comparison = plan_awards_gdp_comparison(
         explorer["countries"],
@@ -2843,6 +2860,7 @@ def create_site_plan(
     jobs.extend(plan_subject_pages(subjects, records, record_routes))
     jobs.extend(plan_country_pages(country_places))
     jobs.extend(plan_city_pages(cities))
+    jobs.append(plan_city_per_capita_page(city_awards_per_capita, cities))
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
     jobs.extend(plan_affiliation_pages(affiliations, records))
     jobs.extend(plan_university_pages(affiliations))
@@ -3256,6 +3274,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         cities_route=CITIES_ROUTE,
+        cities_per_capita_route=CITIES_PER_CAPITA_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
@@ -3299,6 +3318,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
         cities_route=CITIES_ROUTE,
+        cities_per_capita_route=CITIES_PER_CAPITA_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
