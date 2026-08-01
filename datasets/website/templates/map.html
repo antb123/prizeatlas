@@ -205,6 +205,17 @@
     .place-card .award-count { margin: 0; font-weight: 700; }
     .place-card .also { margin: .35rem 0 0; color: var(--muted); font-size: .75rem; }
     @media (max-width: 52rem) {
+      .stats {
+        display: flex;
+        gap: .9rem;
+        margin-bottom: .55rem;
+        padding-top: .4rem;
+        border-block: none;
+        border-top: 1px solid var(--rule);
+      }
+      .stat { display: flex; gap: .3rem; align-items: baseline; padding: 0; }
+      .stat + .stat { padding-left: 0; border-left: none; }
+      .stat strong { display: inline; font-size: .8rem; }
       .map-controls summary {
         display: flex;
         align-items: center;
@@ -249,7 +260,7 @@
         <div class="stat"><strong id="location-total">—</strong><span>visible locations</span></div>
         <div class="stat"><strong id="award-total">—</strong><span>mapped points</span></div>
       </div>
-      <details class="map-controls">
+      <details class="map-controls" open>
         <summary>Map controls</summary>
         <div class="controls" aria-label="Map layers">
           <label class="map-filter" for="subject-filter">
@@ -281,6 +292,13 @@
     (() => {
       "use strict";
       const fallback = document.getElementById("fallback");
+
+      // The controls disclosure only has a visible summary below 52rem; keep it open on desktop.
+      const narrow = window.matchMedia("(max-width: 52rem)");
+      const controls = document.querySelector(".map-controls");
+      controls.open = !narrow.matches;
+      narrow.addEventListener("change", (event) => { controls.open = !event.matches; });
+
       if (!window.L) {
         fallback.style.display = "block";
         return;

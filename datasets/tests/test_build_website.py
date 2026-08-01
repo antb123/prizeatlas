@@ -663,10 +663,10 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("Biology Map: Birthplaces and Institutions", biology.title)
         self.assertEqual("Biology", biology.context["initial_subject"])
         map_template = (Path(build.__file__).parent / "templates/map.html").read_text()
-        self.assertIn('<details class="map-controls">', map_template)
+        self.assertIn('<details class="map-controls" open>', map_template)
         self.assertIn("<summary>Map controls</summary>", map_template)
-        self.assertNotIn('<details class="map-controls" open>', map_template)
         self.assertIn('.map-controls:not([open]) > .controls { display: none; }', map_template)
+        self.assertIn("controls.open = !narrow.matches;", map_template)
 
     def test_nearby_payload_groups_places_and_people(self) -> None:
         records = [
