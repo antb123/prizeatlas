@@ -12,7 +12,7 @@
   <li>
     <span class="rank-position">{{ loop.index }}</span>
     <span>{% if row.route %}<a href="{{ href(row.route) }}">{{ row.city }}, {{ row.country }}</a>{% else %}{{ row.city }}, {{ row.country }}{% endif %} · {{ row.award_count }} award{% if row.award_count != 1 %}s{% endif %}</span>
-    <span class="rank-count">{{ "%.2f" | format(row.awards_per_million / 10000) }}%</span>
+    <span class="rank-count">{{ "%.3f" | format(row.awards_per_million / 10000) }}%</span>
   </li>
   {% endfor %}
 </ol>
