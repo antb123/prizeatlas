@@ -370,6 +370,60 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(1_000_000, nominal_rows[0]["population"])
         self.assertEqual(1_000, nominal_rows[0]["gdp_per_capita"])
 
+    def test_city_awards_per_capita_counts_each_award_once_per_city(self) -> None:
+        population_file = self.directory / "city_populations.csv"
+        population_file.write_text(
+            "city,country,population,geoname_id\nCambridge,United States,100,1\nCambridge,United Kingdom,200,2\n",
+            encoding="utf-8",
+        )
+        records = [
+            award(
+                award_record_id="cambridge-one",
+                affiliation_city="Cambridge",
+                affiliation_country="United States",
+                extras=({"affiliation_city": "Cambridge", "affiliation_country": "United States"},),
+            ),
+            award(
+                award_record_id="cambridge-two",
+                affiliation_city="Cambridge",
+                affiliation_country="United States",
+            ),
+            award(
+                award_record_id="cambridge-uk",
+                affiliation_city="Cambridge",
+                affiliation_country="United Kingdom",
+            ),
+            award(
+                award_record_id="missing-population",
+                affiliation_city="Missing",
+                affiliation_country="United States",
+            ),
+        ]
+
+        rows = build.plan_city_awards_per_capita(records, population_file)
+
+        self.assertEqual(
+            [
+                {
+                    "city": "Cambridge",
+                    "country": "United States",
+                    "population": 100,
+                    "geoname_id": 1,
+                    "award_count": 2,
+                    "awards_per_million": 20_000.0,
+                },
+                {
+                    "city": "Cambridge",
+                    "country": "United Kingdom",
+                    "population": 200,
+                    "geoname_id": 2,
+                    "award_count": 1,
+                    "awards_per_million": 5_000.0,
+                },
+            ],
+            rows,
+        )
+
     def test_award_affiliation_country_counts_filters_years(self) -> None:
         records = [
             award(
@@ -530,6 +584,9 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("gdp-chart-title", explorer_html)
         self.assertIn("gdp-chart-desc", explorer_html)
         self.assertNotIn("awards per $1,000", explorer_html)
+        self.assertIn('<option value="pc">Cities / 1m</option>', explorer_html)
+        self.assertIn("const CITY_AWARDS_PER_CAPITA = DATA.city_awards_per_capita;", explorer_html)
+        self.assertIn("Award records per million residents by city", explorer_html)
 
     def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
         rankings = [

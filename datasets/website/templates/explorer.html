@@ -154,7 +154,7 @@
     <p class="section-note">
       Distinct laureates per modern country, top 25 shown. Every view counts a person once, however many awards they hold.
       Affiliation and citizenship count a laureate once under each listed country.
-      The two rate views measure laureates against World Bank population, by birth country and by affiliation country; each needs at least 5 laureates and skips countries with no published figure.
+      The two country rate views measure laureates against World Bank population. Cities / 1m measures award records at award-time affiliations against GeoNames city population.
     </p>
     <select class="chart-select" id="country-select" aria-label="Country field">
       <option value="bc">Birth country</option>
@@ -163,6 +163,7 @@
       <option value="cc">Citizenship</option>
       <option value="pb">Births / 1m</option>
       <option value="pa">Affiliations / 1m</option>
+      <option value="pc">Cities / 1m</option>
     </select>
     <figure id="country-chart"></figure>
   </section>
@@ -230,6 +231,7 @@ const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const SUBJECTS = DATA.subjects;           // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
+const CITY_AWARDS_PER_CAPITA = DATA.city_awards_per_capita;
 const INCOME_ADJUSTED_AWARDS = DATA.income_adjusted_awards;
 const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category, subjectIdx], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
@@ -465,34 +467,42 @@ countryLookup
   const PER_CAPITA = { pb: "bc", pa: "ac" };          // rate views: which country field to count before dividing
 
   function draw(field) {
+    const cityRows = field === "pc" ? CITY_AWARDS_PER_CAPITA : null;
     const base = PER_CAPITA[field];
     const perCapita = Boolean(base);
-    const counts = new Map();
-    for (const p of PEOPLE) {
-      const value = p[base || field];
-      const indices = Array.isArray(value) ? value : value === null ? [] : [value];
-      for (const i of indices) counts.set(i, (counts.get(i) || 0) + 1);
+    let entries;
+    if (cityRows) {
+      entries = cityRows.map((row) => [row, row.awards_per_million, row.award_count]);
+    } else {
+      const counts = new Map();
+      for (const p of PEOPLE) {
+        const value = p[base || field];
+        const indices = Array.isArray(value) ? value : value === null ? [] : [value];
+        for (const i of indices) counts.set(i, (counts.get(i) || 0) + 1);
+      }
+      entries = [...counts.entries()].map(([i, count]) => [i, count, count]);
     }
-    let entries = [...counts.entries()].map(([i, count]) => [i, count, count]);
     if (perCapita)
       entries = entries
         .filter(([i, count]) => POPULATION[i] && count >= MIN_PER_CAPITA)
         .map(([i, count]) => [i, (count / POPULATION[i]) * 1e6, count]);
-    const ranked = entries.sort((a, b) => b[1] - a[1] || COUNTRIES[a[0]].localeCompare(COUNTRIES[b[0]]));
+    const ranked = entries.sort((a, b) => b[1] - a[1] || (cityRows ? `${a[0].city}, ${a[0].country}` : COUNTRIES[a[0]]).localeCompare(cityRows ? `${b[0].city}, ${b[0].country}` : COUNTRIES[b[0]]));
     const shown = ranked.slice(0, TOP);
     holder.innerHTML = "";
     if (!shown.length) return;
     const max = shown[0][1];
     const rowH = 24, labelW = 200, valueW = 44, width = 860, height = shown.length * rowH + 8;
-    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Laureates by country" });
-    shown.forEach(([countryIdx, value, count], i) => {
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": cityRows ? "Award records per million residents by city" : "Laureates by country" });
+    shown.forEach(([place, value, count], i) => {
       const y = i * rowH + 4;
-      const name = COUNTRIES[countryIdx];
+      const name = cityRows ? `${place.city}, ${place.country}` : COUNTRIES[place];
       const barW = Math.max(2, (value / max) * (width - labelW - valueW - 12));
       text(svg, labelW - 8, y + 14, name.length > 28 ? name.slice(0, 27) + "…" : name, "bar-label", "end");
       const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
       const tip = el("title", {}, rect);
-      tip.textContent = perCapita
+      tip.textContent = cityRows
+        ? `${name} — ${count} award-recipient rows, ${value.toFixed(1)} per million (GeoNames ${place.geoname_id})`
+        : perCapita
         ? `${name} — ${value.toFixed(1)} per million by ${base === "ac" ? "affiliation" : "birth"} (${count} laureate${count === 1 ? "" : "s"})`
         : `${name} — ${count} laureate${count === 1 ? "" : "s"}`;
       text(svg, labelW + barW + 6, y + 14, perCapita ? value.toFixed(1) : String(count), "bar-value");

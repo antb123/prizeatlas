@@ -112,6 +112,7 @@ SUBJECTS = (
     "History", "Lit", "Arts", "Economics", "Earth Science",
 )
 POPULATION_FILE = SCRIPT_DIR / "population.json"
+CITY_POPULATION_FILE = SCRIPT_DIR / "city_populations.csv"
 GDP_PER_CAPITA_MIN_AWARDS = 5
 HOMEPAGE_AWARD_YEAR_FROM = 2015
 HOMEPAGE_AWARD_YEAR_TO = 2025
@@ -508,6 +509,22 @@ def load_population(country_names: list[str], population_file: Path = POPULATION
     return [figures.get(name) for name in country_names]
 
 
+def load_city_populations(population_file: Path = CITY_POPULATION_FILE) -> dict[tuple[str, str], tuple[int, int]]:
+    """Load reviewed GeoNames city populations as {(city, country): (population, geoname_id)}."""
+    populations: dict[tuple[str, str], tuple[int, int]] = {}
+    with population_file.open(newline="", encoding="utf-8") as source:
+        for row in csv.DictReader(source):
+            city, country = row["city"].strip(), row["country"].strip()
+            try:
+                population, geoname_id = int(row["population"]), int(row["geoname_id"])
+            except (KeyError, TypeError, ValueError) as error:
+                raise BuildFailure(f"invalid city population city={city!r} country={country!r}") from error
+            if not city or not country or population <= 0 or geoname_id <= 0 or (city, country) in populations:
+                raise BuildFailure(f"invalid city population city={city!r} country={country!r}")
+            populations[city, country] = population, geoname_id
+    return populations
+
+
 def load_gdp_per_capita(population_file: Path = POPULATION_FILE) -> dict[str, dict[str, float]]:
     """Load the two fixed 2024 World Bank GDP-per-capita snapshots."""
     snapshot = json.loads(population_file.read_text(encoding="utf-8"))
@@ -557,6 +574,35 @@ def award_affiliation_country_counts(
         for country in {affiliation.country.strip() for affiliation in record.affiliations if _nonblank(affiliation.country)}:
             counts[country] = counts.get(country, 0) + 1
     return counts
+
+
+def plan_city_awards_per_capita(
+    records: Iterable[AwardRecord], population_file: Path = CITY_POPULATION_FILE
+) -> list[dict[str, int | float | str]]:
+    """Rank award-recipient records by award-time city population."""
+    counts: dict[tuple[str, str], int] = {}
+    for record in records:
+        places = {(affiliation.city.strip(), affiliation.country.strip()) for affiliation in record.affiliations}
+        for city, country in places:
+            if city and country:
+                counts[city, country] = counts.get((city, country), 0) + 1
+
+    populations = load_city_populations(population_file)
+    rows = [
+        {
+            "city": city,
+            "country": country,
+            "population": population,
+            "geoname_id": geoname_id,
+            "award_count": count,
+            "awards_per_million": count / population * 1_000_000,
+        }
+        for (city, country), count in counts.items()
+        if (population_entry := populations.get((city, country))) is not None
+        for population, geoname_id in (population_entry,)
+    ]
+    rows.sort(key=lambda row: (-float(row["awards_per_million"]), str(row["city"]), str(row["country"])))
+    return rows
 
 
 def explorer_payload(
@@ -2776,6 +2822,7 @@ def create_site_plan(
     affiliation_countries = plan_affiliation_countries(affiliations)
     subjects = plan_subjects(people, subject_counts, affiliations)
     explorer = explorer_payload(rankings, records, routes_by_laureate)
+    explorer["city_awards_per_capita"] = plan_city_awards_per_capita(records)
     homepage_award_counts = award_affiliation_country_counts(records, HOMEPAGE_AWARD_YEAR_FROM, HOMEPAGE_AWARD_YEAR_TO)
     homepage_comparison = plan_awards_gdp_comparison(
         explorer["countries"],

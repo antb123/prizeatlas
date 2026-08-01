@@ -1,0 +1,104 @@
+city,country,country_code,laureates,affiliation_latitude,affiliation_longitude,population,matched_city,matched_state,matched_country,latitude,longitude,geoname_id,distance_to_affiliations_km,match_status,candidate_count
+Cambridge,United States,US,132,42.367514,-71.104333,110402,Cambridge,Massachusetts,United States,42.3751,-71.10561,4931972,0.9,matched,10
+New York,United States,US,126,40.777406,-73.975337,8804190,New York,New York,United States,40.71427,-74.00597,5128581,7.5,matched,10
+Princeton,United States,US,74,40.341107,-74.660188,29603,Princeton,New Jersey,United States,40.34872,-74.65905,5102922,0.9,matched,10
+Stanford,United States,US,61,37.427380,-122.170392,13809,Stanford,California,United States,37.42411,-122.16608,5398563,0.5,matched,10
+London,United Kingdom,GB,57,51.522952,-0.234495,8961989,London,England,United Kingdom,51.50853,-0.12574,2643743,7.7,matched,10
+Cambridge,United Kingdom,GB,56,52.193130,0.126070,145674,Cambridge,England,United Kingdom,52.2,0.11667,2653941,1.0,matched,7
+Paris,France,FR,53,48.841455,2.330610,2138551,Paris,Île-de-France,France,48.85341,2.3488,2988507,1.9,matched,10
+Berkeley,United States,US,49,37.872079,-122.258227,120972,Berkeley,California,United States,37.87159,-122.27275,5327684,1.3,matched,10
+Oxford,United Kingdom,GB,41,51.754940,-1.255054,162100,Oxford,England,United Kingdom,51.75222,-1.25596,2640729,0.3,matched,4
+Bethesda,United States,US,40,38.993570,-77.107219,60858,Bethesda,Maryland,United States,38.98067,-77.10026,4348599,1.6,matched,10
+Pasadena,United States,US,40,34.139247,-118.125580,142250,Pasadena,California,United States,34.14778,-118.14452,5381396,2.0,matched,10
+Boston,United States,US,38,42.343683,-71.093140,653833,Boston,Massachusetts,United States,42.35843,-71.05977,4930956,3.2,matched,10
+Toronto,Canada,CA,34,43.661750,-79.393417,2794356,Toronto,Ontario,Canada,43.70643,-79.39864,6167865,5.0,matched,9
+La Jolla,United States,US,32,32.884874,-117.243438,42808,La Jolla,California,United States,32.84727,-117.2742,5363943,5.1,matched,10
+Washington,United States,US,30,38.890336,-77.028090,689545,Washington,District of Columbia,United States,38.89511,-77.03637,4140963,0.9,matched,10
+Chicago,United States,US,28,41.795418,-87.602869,2664452,Chicago,Illinois,United States,41.85003,-87.65005,4887398,7.2,matched,10
+Philadelphia,United States,US,28,39.970688,-75.177381,1573916,Philadelphia,Pennsylvania,United States,39.95238,-75.16362,4560349,2.3,matched,10
+Baltimore,United States,US,27,39.318505,-76.612755,585708,Baltimore,Maryland,United States,39.29038,-76.61219,4347778,3.1,matched,10
+Seattle,United States,US,24,47.645270,-122.314922,780995,Seattle,Washington,United States,47.60621,-122.33207,5809844,4.5,matched,8
+Zurich,Switzerland,CH,23,47.375959,8.548004,415367,Zurich,Zurich,Switzerland,47.36667,8.55,2657896,1.0,matched,10
+Los Angeles,United States,US,22,34.059923,-118.397546,3820914,Los Angeles,California,United States,34.05223,-118.24368,5368361,14.2,matched,10
+Chevy Chase,United States,US,21,38.998500,-77.079600,9545,Chevy Chase,Maryland,United States,39.00287,-77.07115,4351335,0.9,matched,10
+New Haven,United States,US,20,41.310807,-72.926967,130322,New Haven,Connecticut,United States,41.30815,-72.92816,4839366,0.3,matched,10
+Meyrin,Switzerland,CH,19,46.234500,6.049100,19772,Meyrin,Geneva,Switzerland,46.23424,6.08025,2659667,2.4,matched,1
+Munich,Germany,DE,19,48.152953,11.579937,1260391,Munich,Bavaria,Germany,48.13743,11.57549,2867714,1.8,matched,1
+Berlin,Germany,DE,18,52.506222,13.364693,3426354,Berlin,State of Berlin,Germany,52.52437,13.41053,2950159,3.7,matched,10
+Ithaca,United States,US,18,42.449200,-76.483900,30788,Ithaca,New York,United States,42.44063,-76.49661,5122432,1.4,matched,9
+Stockholm,Sweden,SE,17,59.350917,18.041904,1515017,Stockholm,Stockholm,Sweden,59.32938,18.06871,2673730,2.8,matched,3
+Tokyo,Japan,JP,17,35.669284,139.743590,9733276,Tokyo,Tokyo,Japan,35.6895,139.69171,1850147,5.2,matched,4
+San Francisco,United States,US,16,37.764539,-122.453529,827526,San Francisco,California,United States,37.77493,-122.41942,5391959,3.2,matched,10
+Göttingen,Germany,DE,15,51.544463,9.949713,122149,Göttingen,Lower Saxony,Germany,51.53443,9.93228,2918632,1.6,matched,4
+Basel,Switzerland,CH,14,47.560578,7.594907,177595,Basel,Basel-City,Switzerland,47.55839,7.57327,2661604,1.6,matched,7
+Kyoto,Japan,JP,14,35.026180,135.778185,1463723,Kyoto,Kyoto,Japan,35.02107,135.75385,1857910,2.3,matched,1
+Madison,United States,US,14,42.939165,-88.523188,280305,Madison,Wisconsin,United States,43.07305,-89.40123,5261457,72.9,matched,10
+Moscow,Russia,RU,14,55.683427,37.562803,10381222,Moscow,Moscow,Russia,55.75204,37.61781,524901,8.4,matched,1
+Rehovot,Israel,IL,14,31.905928,34.809200,149392,Rehovot,Central District,Israel,31.89421,34.81199,293725,1.3,matched,1
+Copenhagen,Denmark,DK,13,55.680385,12.571294,1153615,Copenhagen,Capital Region,Denmark,55.67594,12.56553,2618425,0.6,matched,2
+Montreal,Canada,CA,13,45.501000,-73.586956,1762949,Montreal,Quebec,Canada,45.50884,-73.58781,6077243,0.9,matched,8
+Pittsburgh,United States,US,13,40.442915,-79.947608,304391,Pittsburgh,Pennsylvania,United States,40.44062,-79.99589,5206379,4.1,matched,10
+Dallas,United States,US,12,32.805586,-96.832319,1326087,Dallas,Texas,United States,32.78306,-96.80667,4684888,3.5,matched,10
+Heidelberg,Germany,DE,12,49.409720,8.695867,143345,Heidelberg,Baden-Wurttemberg,Germany,49.40768,8.69079,2907911,0.4,matched,7
+Jerusalem,Israel,IL,12,31.775800,35.200000,971800,Jerusalem,Jerusalem,Israel,31.76904,35.21633,281184,1.7,matched,2
+Urbana,United States,US,11,40.110500,-88.228400,42311,Urbana,Illinois,United States,40.11059,-88.20727,4914570,1.8,matched,10
+Bures-sur-Yvette,France,FR,10,48.695100,2.168647,10411,Bures-sur-Yvette,Île-de-France,France,48.69981,2.17064,3029522,0.5,matched,1
+Austin,United States,US,9,30.286100,-97.739400,974447,Austin,Texas,United States,30.26715,-97.74306,4671654,2.1,matched,10
+Edinburgh,United Kingdom,GB,9,55.947400,-3.187200,514990,Edinburgh,Scotland,United Kingdom,55.95206,-3.19648,2650225,0.8,matched,1
+Geneva,Switzerland,CH,9,46.204732,6.143239,201741,Geneva,Geneva,Switzerland,46.20222,6.14569,2660646,0.3,matched,2
+St. Louis,United States,US,9,38.642838,-90.277656,279695,St Louis,Missouri,United States,38.62727,-90.19789,4407066,7.1,matched,10
+Stony Brook,United States,US,9,40.917300,-73.124600,13740,Stony Brook,New York,United States,40.92565,-73.14094,5139865,1.7,matched,5
+Yorktown Heights,United States,US,9,41.215655,-73.800491,1781,Yorktown Heights,New York,United States,41.27093,-73.77763,5145253,6.4,matched,2
+Houston,United States,US,8,29.721843,-95.392171,2314157,Houston,Texas,United States,29.76328,-95.36327,4699066,5.4,matched,10
+Minneapolis,United States,US,8,44.975230,-93.238320,410939,Minneapolis,Minnesota,United States,44.97997,-93.26384,5037649,2.1,matched,6
+New Brunswick,United States,US,8,40.501700,-74.448100,57035,New Brunswick,New Jersey,United States,40.48622,-74.45182,5101717,1.7,matched,10
+Santa Barbara,United States,US,8,34.415882,-119.845400,91842,Santa Barbara,California,United States,34.42083,-119.69819,5392952,13.5,matched,9
+Vancouver,Canada,CA,8,49.264700,-123.252800,662248,Vancouver,British Columbia,Canada,49.24966,-123.11934,6173331,9.8,matched,5
+Atlanta,United States,US,7,33.782959,-84.347070,510823,Atlanta,Georgia,United States,33.749,-84.38798,4180439,5.3,matched,10
+Boulder,United States,US,7,40.009616,-105.270426,106803,Boulder,Colorado,United States,40.01499,-105.27055,5574991,0.6,matched,10
+Lund,Sweden,SE,7,55.705750,13.193988,87244,Lund,Skåne,Sweden,55.70584,13.19321,2693678,0.0,matched,10
+Manchester,United Kingdom,GB,7,53.466700,-2.232157,568996,Manchester,England,United Kingdom,53.48095,-2.23743,2643123,1.6,matched,6
+Orsay,France,FR,7,48.700411,2.171056,17817,Orsay,Île-de-France,France,48.69572,2.18727,2989204,1.3,matched,3
+Rochester,United States,US,7,43.534755,-84.372982,12993,Rochester,Michigan,United States,42.68059,-83.13382,5007400,138.3,matched,10
+Uppsala,Sweden,SE,7,59.857500,17.628900,177074,Uppsala,Uppsala,Sweden,59.85882,17.63889,2666199,0.6,matched,4
+Bonn,Germany,DE,6,50.734386,7.100014,330579,Bonn,North Rhine-Westphalia,Germany,50.73438,7.09549,2946447,0.3,matched,9
+Durham,United States,US,6,35.999829,-78.928302,257636,Durham,North Carolina,United States,35.99403,-78.89862,4464368,2.7,matched,10
+Garching,Germany,DE,6,48.260542,11.669617,15303,Garching,Bavaria,Germany,48.24896,11.65101,2922582,1.9,matched,2
+Mainz,Germany,DE,6,49.989878,8.252256,217123,Mainz,Rheinland-Pfalz,Germany,49.98185,8.28008,2874225,2.2,matched,10
+Melbourne,Australia,AU,6,-37.799360,144.957810,5350705,Melbourne,Victoria,Australia,-37.814,144.96332,2158177,1.7,matched,8
+Strasbourg,France,FR,6,48.579963,7.761163,274845,Strasbourg,Grand Est,France,48.58392,7.74553,2973783,1.2,matched,1
+Tübingen,Germany,DE,6,48.531700,9.054389,83416,Tübingen,Baden-Wurttemberg,Germany,48.52266,9.05222,2820860,1.0,matched,1
+Ann Arbor,United States,US,5,42.276900,-83.738100,117070,Ann Arbor,Michigan,United States,42.27756,-83.74088,4984247,0.2,matched,2
+Beijing,China,CN,5,40.026429,116.378171,18960744,Beijing,Beijing,China,39.9075,116.39723,1816670,13.3,matched,10
+Brussels,Belgium,BE,5,50.824150,4.388567,1019022,Brussels,Brussels Capital,Belgium,50.85045,4.34878,2800866,4.0,matched,1
+Canberra,Australia,AU,5,-35.277800,149.120500,367752,Canberra,Australian Capital Territory,Australia,-35.28346,149.12807,2172517,0.9,matched,2
+Cleveland,United States,US,5,41.501700,-81.641843,365379,Cleveland,Ohio,United States,41.4995,-81.69541,5150529,4.5,matched,10
+Cold Spring Harbor,United States,US,5,40.861900,-73.467200,5070,Cold Spring Harbor,New York,United States,40.87149,-73.45679,5113223,1.4,matched,1
+Grenoble,France,FR,5,45.193550,5.750450,158552,Grenoble,Rhône-Alpes,France,45.17869,5.71479,3014728,3.2,matched,4
+Hamburg,Germany,DE,5,53.562994,9.986183,1845229,Hamburg,Hamburg,Germany,53.55073,9.99302,2911298,1.4,matched,10
+Leiden,Netherlands,NL,5,52.156900,4.485300,119713,Leiden,South Holland,The Netherlands,52.15833,4.49306,2751773,0.6,matched,1
+Liverpool,United Kingdom,GB,5,53.403883,-2.958600,496770,Liverpool,England,United Kingdom,53.41058,-2.97794,2644210,1.5,matched,1
+Mountain View,United States,US,5,37.402473,-122.083686,80435,Mountain View,California,United States,37.38605,-122.08385,5375480,1.8,matched,10
+Nagoya,Japan,JP,5,35.145429,136.971771,2332176,Nagoya,Aichi,Japan,35.18147,136.90641,1856057,7.2,matched,5
+Rome,Italy,IT,5,41.905650,12.498275,2318895,Rome,Lazio,Italy,41.89193,12.51133,3169070,1.9,matched,2
+Tel Aviv,Israel,IL,5,32.112500,34.805000,432892,Tel Aviv,Tel Aviv,Israel,32.08088,34.78057,293397,4.2,matched,10
+Vienna,Austria,AT,5,48.213100,16.359700,1691468,Vienna,Vienna,Austria,48.20849,16.37208,2761369,1.1,matched,1
+Brighton,United Kingdom,GB,4,50.865300,-0.085600,277103,Brighton,England,United Kingdom,50.82838,-0.13947,2654710,5.6,matched,10
+Chapel Hill,United States,US,4,35.908600,-79.049200,59568,Chapel Hill,North Carolina,United States,35.9132,-79.05584,4460162,0.8,matched,10
+College Station,United States,US,4,30.610400,-96.344100,107889,College Station,Texas,United States,30.62798,-96.33441,4682464,2.2,matched,9
+Cologne,Germany,DE,4,50.943250,6.894000,963395,Cologne,North Rhine-Westphalia,Germany,50.93333,6.95,2886242,4.1,matched,2
+Davis,United States,US,4,38.540000,-121.750000,67666,Davis,California,United States,38.54491,-121.74052,5341704,1.0,matched,10
+Denver,United States,US,4,39.740225,-104.968000,729019,Denver,Colorado,United States,39.73915,-104.9847,5419384,1.4,matched,10
+Dublin,Ireland,IE,4,53.334425,-6.246700,1024027,Dublin,Leinster,Ireland,53.33306,-6.24889,2964574,0.2,matched,4
+Freiburg im Breisgau,Germany,DE,4,48.009650,7.849450,215966,Freiburg im Breisgau,Baden-Wurttemberg,Germany,47.9959,7.85222,2925177,1.5,matched,5
+Haifa,Israel,IL,4,32.777500,35.021700,285316,Haifa,Haifa,Israel,32.81303,34.99928,294801,4.5,matched,1
+Irvine,United States,US,4,33.645400,-117.842600,256927,Irvine,California,United States,33.66946,-117.82311,5359777,3.2,matched,10
+Kashiwa,Japan,JP,4,35.902000,139.936200,433436,Kashiwa,Chiba,Japan,35.86224,139.97732,1859924,5.8,matched,10
+Leipzig,Germany,DE,4,51.330829,12.385371,504971,Leipzig,Saxony,Germany,51.33962,12.37129,2879139,1.4,matched,10
+Ottawa,Canada,CA,4,45.407444,-75.697503,1017449,Ottawa,Ontario,Canada,45.41117,-75.69812,6094817,0.4,matched,5
+Rüschlikon,Switzerland,CH,4,47.309700,8.544400,4653,Rüschlikon,Zurich,Switzerland,47.30688,8.55135,2658919,0.6,matched,10
+Salt Lake City,United States,US,4,40.764200,-111.846400,215548,Salt Lake City,Utah,United States,40.76078,-111.89105,5780993,3.8,matched,10
+San Diego,United States,US,4,32.824267,-117.211567,1404452,San Diego,California,United States,32.71571,-117.16472,5391811,12.8,matched,10
+Suita,Japan,JP,4,34.810671,135.525286,385567,Suita,Osaka,Japan,34.76143,135.51567,1851483,5.5,matched,1
+Tsukuba,Japan,JP,4,36.121050,140.083300,241656,Tsukuba,Ibaraki,Japan,36.08333,140.11667,2110681,5.2,matched,2
+Winnipeg,Canada,CA,4,49.809400,-97.132800,749607,Winnipeg,Manitoba,Canada,49.8844,-97.14704,6183235,8.4,matched,2
