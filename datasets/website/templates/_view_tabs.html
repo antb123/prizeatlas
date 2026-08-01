@@ -14,7 +14,7 @@
   <a href="{{ href(route) }}"{% if current == label %} aria-current="page"{% endif %}>{{ label }}</a>
   {% endfor %}
   <a href="{{ href(cities_route) }}"{% if current == "Cities" %} aria-current="page"{% endif %}>Cities</a>
-  <a href="{{ href(cities_per_capita_route) }}"{% if current == "Cities / 1m" %} aria-current="page"{% endif %}>Cities / 1m</a>
+  <a href="{{ href(cities_per_capita_route) }}"{% if current == "Cities %" %} aria-current="page"{% endif %}>Cities %</a>
   <a class="tab-alt" href="{{ href(country_affiliations_route) }}"{% if current == "Institutions" %} aria-current="page"{% endif %}>Institutions</a>
 </nav>
 {% endmacro %}

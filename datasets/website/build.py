@@ -2408,9 +2408,9 @@ def plan_city_per_capita_page(rows: list[dict[str, int | float | str]], cities: 
     return _page(
         "city_per_capita.html",
         CITIES_PER_CAPITA_ROUTE,
-        "Cities by awards per million residents",
-        "Award-recipient records at award-time institutions per million residents, using reviewed GeoNames city populations.",
-        (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb("Cities / 1m", None)),
+        "Cities by award records as a share of population",
+        "Award-recipient records at award-time institutions as a percentage of reviewed GeoNames city population.",
+        (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb("Cities %", None)),
         cities=tuple(table_rows),
     )
 
