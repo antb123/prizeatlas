@@ -87,6 +87,10 @@
   .explorer .bar-value { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
   .explorer .dot-born { fill: #b45309; }
   .explorer .dot-affiliated { fill: var(--accent); }
+  .explorer .scatter-dot { fill: var(--accent); fill-opacity: .78; stroke: #fff; stroke-width: 1.5; }
+  .explorer .scatter-label { font-size: 10px; fill: var(--ink); }
+  .explorer #gdp-chart { overflow-x: auto; }
+  .explorer #gdp-chart svg { min-width: 720px; }
   .explorer .link-line { stroke: var(--line); stroke-width: 3; }
   .explorer .gap-value { font-size: 12px; font-variant-numeric: tabular-nums; fill: var(--muted); }
   .explorer .gap-value.gain { fill: var(--accent); font-weight: 600; }
@@ -166,10 +170,10 @@
   </section>
 
   <section aria-labelledby="gdp-h">
-    <h2 id="gdp-h">Awards per GDP per capita</h2>
+    <h2 id="gdp-h">Award records and GDP per capita</h2>
     <p class="section-note">
-      Top 15 countries by recorded awards per $1,000 of 2024 World Bank GDP per capita data, using recipients' affiliation country at the time of award.
-      PPP is shown first in current international dollars; each measure needs at least 5 recorded awards.
+      Top 15 countries by recorded award-recipient rows per million residents, using affiliation country at the time of award, plotted against 2024 World Bank GDP per capita.
+      PPP is shown first in current international dollars; countries need at least 5 recorded award rows and published population and GDP figures.
     </p>
     <select class="chart-select" id="gdp-select" aria-label="GDP per capita measure">
       <option value="nominal">GDP per capita (current US$)</option>
@@ -234,7 +238,7 @@ const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const SUBJECTS = DATA.subjects;           // [name, ...]
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
-const GDP_PER_CAPITA_RANKINGS = DATA.gdp_per_capita_rankings;
+const AWARDS_GDP_COMPARISON = DATA.awards_gdp_comparison;
 const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category, subjectIdx], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
 
@@ -507,7 +511,7 @@ countryLookup
   draw("bc");
 }
 
-/* ---------- awards per GDP per capita ---------- */
+/* ---------- award records per person versus GDP per person ---------- */
 {
   const select = document.getElementById("gdp-select");
   const holder = document.getElementById("gdp-chart");
@@ -519,36 +523,53 @@ countryLookup
   const number = (value) => value.toLocaleString("en", { maximumFractionDigits: 0 });
 
   function draw(metric) {
-    const rows = GDP_PER_CAPITA_RANKINGS[metric];
+    const rows = AWARDS_GDP_COMPARISON[metric].slice(0, 15);
     holder.innerHTML = "";
     if (!rows.length) {
-      status.textContent = "No countries meet the five-award and 2024-data requirements for this measure.";
+      status.textContent = "No countries meet the five-award, population, and 2024 GDP-data requirements for this measure.";
       return;
     }
     status.textContent = "";
-    const rowH = 24, labelW = 200, valueW = 54, width = 860, height = rows.length * rowH + 8;
+    const width = 860, height = 400, padL = 66, padR = 18, padT = 22, padB = 52;
+    const plotW = width - padL - padR, plotH = height - padT - padB;
+    const minGDP = Math.min(...rows.map((row) => row.gdp_per_capita));
+    const maxGDP = Math.max(...rows.map((row) => row.gdp_per_capita));
+    const gdpSpan = Math.max(1, maxGDP - minGDP);
+    const maxAwards = Math.max(...rows.map((row) => row.awards_per_million));
     const svg = el("svg", {
       viewBox: `0 0 ${width} ${height}`,
       role: "img",
       "aria-labelledby": "gdp-chart-title gdp-chart-desc",
     }, holder);
     const title = el("title", { id: "gdp-chart-title" }, svg);
-    title.textContent = `Awards per $1,000 ${measures[metric]}`;
+    title.textContent = `Award-recipient records per million residents versus ${measures[metric]}`;
     const description = el("desc", { id: "gdp-chart-desc" }, svg);
     description.textContent = rows.map((row) => {
       const name = COUNTRIES[row.country_idx];
-      return `${name}: ${row.award_count} awards, 2024 GDP per capita ${number(row.denominator)}, ${row.rate.toFixed(2)} awards per $1,000`;
+      return `${name}: ${row.award_count} award-recipient rows, ${row.awards_per_million.toFixed(2)} per million residents, 2024 GDP per capita ${number(row.gdp_per_capita)}`;
     }).join(". ");
-    const max = rows[0].rate;
-    rows.forEach((row, index) => {
-      const y = index * rowH + 4;
+
+    for (let step = 0; step <= 4; step++) {
+      const x = padL + plotW * step / 4;
+      const y = padT + plotH - plotH * step / 4;
+      el("line", { x1: x, y1: padT, x2: x, y2: padT + plotH, class: "grid" }, svg);
+      el("line", { x1: padL, y1: y, x2: padL + plotW, y2: y, class: "grid" }, svg);
+      text(svg, x, height - padB + 18, number(minGDP + gdpSpan * step / 4), "axis", "middle");
+      text(svg, padL - 7, y + 4, (maxAwards * step / 4).toFixed(1), "axis", "end");
+    }
+    text(svg, padL + plotW / 2, height - 7, `2024 ${measures[metric]}`, "axis", "middle");
+    const yLabel = text(svg, 14, padT + plotH / 2, "Award-recipient rows per million residents", "axis", "middle");
+    yLabel.setAttribute("transform", `rotate(-90 14 ${padT + plotH / 2})`);
+
+    rows.forEach((row) => {
       const name = COUNTRIES[row.country_idx];
-      const barW = Math.max(2, (row.rate / max) * (width - labelW - valueW - 12));
-      text(svg, labelW - 8, y + 14, name.length > 28 ? name.slice(0, 27) + "…" : name, "bar-label", "end");
-      const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
-      const tip = el("title", {}, rect);
-      tip.textContent = `${name} — ${row.award_count} awards; 2024 ${measures[metric]} ${number(row.denominator)}; ${row.rate.toFixed(2)} awards per $1,000 GDP per capita`;
-      text(svg, labelW + barW + 6, y + 14, row.rate.toFixed(2), "bar-value");
+      const x = padL + (row.gdp_per_capita - minGDP) / gdpSpan * plotW;
+      const y = padT + plotH - row.awards_per_million / maxAwards * plotH;
+      const point = el("circle", { cx: x, cy: y, r: 5, class: "scatter-dot" }, svg);
+      const tip = el("title", {}, point);
+      tip.textContent = `${name} — ${row.award_count} award-recipient rows; population ${number(row.population)}; ${row.awards_per_million.toFixed(2)} rows per million residents; 2024 ${measures[metric]} ${number(row.gdp_per_capita)}`;
+      const rightAligned = x > width - 125;
+      text(svg, x + (rightAligned ? -7 : 7), y - 7, name, "scatter-label", rightAligned ? "end" : "start");
     });
     holder.appendChild(svg);
   }

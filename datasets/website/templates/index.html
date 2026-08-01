@@ -102,15 +102,15 @@
   </ol>
 </section>
 {% endif %}
-{% if gdp_per_capita_ppp %}
+{% if income_adjusted_awards %}
 <section>
-  <h2>Awards per capita</h2>
-  <p>Recorded awards by affiliation country, per $1,000 (World Bank 2024 USD PPP).</p>
+  <h2>Award records relative to GDP</h2>
+  <p>2015–2025 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.</p>
   <ol class="highlights">
-    {% for country, award_count, rate in gdp_per_capita_ppp %}
+    {% for country, rate in income_adjusted_awards %}
     <li>
       <a href="{{ href(country.route) }}">{{ country.name }}</a>
-      <span>{{ "%.2f" | format(rate) }}</span>
+      <span>{{ "%.2f" | format(rate) }} / $1bn</span>
     </li>
     {% endfor %}
   </ol>

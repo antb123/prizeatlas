@@ -232,7 +232,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "countries": ["Belgium", "France", "United States", "Canada", "Switzerland", "Japan"],
                 "subjects": ["Physics"],
                 "population": [11, 22, 33, 44, 55, 66],
-                "gdp_per_capita_rankings": {"nominal": [], "ppp": []},
+                "awards_gdp_comparison": {"nominal": [], "ppp": []},
                 "people": [
                     {
                         "n": "Alice Example",
@@ -273,7 +273,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("explorer.html", explorer.template)
         self.assertEqual("Data Explorer", explorer.title)
 
-    def test_gdp_per_capita_payload_counts_award_affiliations(self) -> None:
+    def test_awards_gdp_payload_counts_award_affiliations_per_million(self) -> None:
         rankings = [build.Ranking("Q1", "First Prize", "first-prize", "https://example.org/first", 100, "Blurb.", "Reasoning.")]
         records = [
             award(
@@ -292,7 +292,7 @@ class WebsiteBuildTests(unittest.TestCase):
         snapshot_file.write_text(
             json.dumps(
                 {
-                    "population": {},
+                    "population": {"Affiliated A": 1_000_000, "Affiliated B": 2_000_000},
                     "gdp_per_capita": {
                         "nominal": {"Affiliated A": 1_000, "Affiliated B": 2_000},
                         "ppp": {"Affiliated A": 5_000, "Affiliated B": 1_000},
@@ -306,40 +306,81 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(["Birthland", "Affiliated A", "Affiliated B"], payload["countries"])
         self.assertEqual(
             [
-                {"country_idx": 1, "award_count": 5, "denominator": 1_000.0, "rate": 5.0},
-                {"country_idx": 2, "award_count": 5, "denominator": 2_000.0, "rate": 2.5},
+                {
+                    "country_idx": 1,
+                    "award_count": 5,
+                    "population": 1_000_000,
+                    "awards_per_million": 5.0,
+                    "gdp_per_capita": 1_000.0,
+                },
+                {
+                    "country_idx": 2,
+                    "award_count": 5,
+                    "population": 2_000_000,
+                    "awards_per_million": 2.5,
+                    "gdp_per_capita": 2_000.0,
+                },
             ],
-            payload["gdp_per_capita_rankings"]["nominal"],
+            payload["awards_gdp_comparison"]["nominal"],
         )
-        self.assertEqual(2, payload["gdp_per_capita_rankings"]["ppp"][0]["country_idx"])
-        self.assertNotIn(0, [row["country_idx"] for row in payload["gdp_per_capita_rankings"]["nominal"]])
+        self.assertEqual(5_000, payload["awards_gdp_comparison"]["ppp"][0]["gdp_per_capita"])
+        self.assertNotIn(0, [row["country_idx"] for row in payload["awards_gdp_comparison"]["nominal"]])
 
-    def test_gdp_per_capita_rankings_filter_sort_and_limit(self) -> None:
-        countries = ["Tie A", "Tie B", *(f"Country {index:02d}" for index in range(1, 17)), "Missing", "Zero", "Negative", "Below"]
+    def test_awards_gdp_comparison_filters_and_sorts(self) -> None:
+        countries = [
+            "Tie A",
+            "Tie B",
+            *(f"Country {index:02d}" for index in range(1, 17)),
+            "Missing GDP",
+            "Zero GDP",
+            "Missing population",
+            "Zero population",
+            "Below",
+        ]
         award_counts = {name: 5 for name in countries}
         award_counts["Below"] = 4
+        populations = [1_000_000, 1_000_000, *(1_000_000 + index * 1_000 for index in range(1, 17)), 1_000_000, 1_000_000, None, 0, 1_000_000]
         nominal = {name: 1_000 + index for index, name in enumerate(countries[:18])}
         nominal["Tie A"] = nominal["Tie B"] = 1_000
-        nominal["Zero"] = 0
-        nominal["Negative"] = -1
+        nominal["Zero GDP"] = 0
+        nominal["Missing population"] = 1_000
+        nominal["Zero population"] = 1_000
+        nominal["Below"] = 1_000
         ppp = dict(nominal)
         ppp["Country 16"] = 1
 
-        nominal_rows = build.plan_gdp_per_capita_rankings(countries, award_counts, nominal)
-        ppp_rows = build.plan_gdp_per_capita_rankings(countries, award_counts, ppp)
+        nominal_rows = build.plan_awards_gdp_comparison(countries, award_counts, populations, nominal)
+        ppp_rows = build.plan_awards_gdp_comparison(countries, award_counts, populations, ppp)
         nominal_names = [countries[int(row["country_idx"])] for row in nominal_rows]
         ppp_names = [countries[int(row["country_idx"])] for row in ppp_rows]
 
-        self.assertEqual(15, len(nominal_rows))
-        self.assertEqual(["Tie A", "Tie B", *(f"Country {index:02d}" for index in range(1, 14))], nominal_names)
-        self.assertEqual("Country 16", ppp_names[0])
-        self.assertNotIn("Missing", nominal_names)
-        self.assertNotIn("Zero", nominal_names)
-        self.assertNotIn("Negative", nominal_names)
+        self.assertEqual(18, len(nominal_rows))
+        self.assertEqual(["Tie A", "Tie B", *(f"Country {index:02d}" for index in range(1, 17))], nominal_names)
+        self.assertEqual(nominal_names, ppp_names)
+        self.assertNotIn("Missing GDP", nominal_names)
+        self.assertNotIn("Zero GDP", nominal_names)
+        self.assertNotIn("Missing population", nominal_names)
+        self.assertNotIn("Zero population", nominal_names)
         self.assertNotIn("Below", nominal_names)
-        self.assertAlmostEqual(5.0, nominal_rows[0]["rate"])
+        self.assertAlmostEqual(5.0, nominal_rows[0]["awards_per_million"])
         self.assertEqual(5, nominal_rows[0]["award_count"])
-        self.assertEqual(1_000, nominal_rows[0]["denominator"])
+        self.assertEqual(1_000_000, nominal_rows[0]["population"])
+        self.assertEqual(1_000, nominal_rows[0]["gdp_per_capita"])
+
+    def test_award_affiliation_country_counts_filters_years(self) -> None:
+        records = [
+            award(
+                award_record_id=f"test-{year}",
+                year=str(year),
+                affiliation_country="Included",
+                extras=({"affiliation_country": "Included"}, {"affiliation_country": "Second"}),
+            )
+            for year in (2014, 2015, 2025, 2026)
+        ]
+
+        counts = build.award_affiliation_country_counts(records, 2015, 2025)
+
+        self.assertEqual({"Included": 2, "Second": 2}, counts)
 
     def test_gdp_per_capita_snapshot_uses_dataset_country_names(self) -> None:
         snapshot = json.loads((Path(build.__file__).parent / "population.json").read_text())
@@ -373,10 +414,16 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertEqual([("First", 7.0), ("Second", 5.0)], [(place.name, rate) for place, rate in rates])
 
-    def test_homepage_ppp_rows_preserve_explorer_order_and_routes(self) -> None:
+    def test_homepage_income_adjusted_rows_sort_and_preserve_routes(self) -> None:
         country_names = [f"Country {index}" for index in range(16)]
-        rankings = [
-            {"country_idx": index, "award_count": index + 5, "denominator": 1_000.0, "rate": index + 0.125}
+        comparison = [
+            {
+                "country_idx": index,
+                "award_count": index + 5,
+                "population": 1_000_000,
+                "awards_per_million": index + 0.125,
+                "gdp_per_capita": 1_000.0,
+            }
             for index in range(16)
         ]
         places = [
@@ -385,14 +432,14 @@ class WebsiteBuildTests(unittest.TestCase):
             if index != 1
         ]
 
-        rows = build.plan_gdp_per_capita_home_rows(country_names, rankings, places)
+        rows = build.plan_income_adjusted_award_rows(country_names, comparison, places)
 
-        self.assertEqual(14, len(rows))
-        self.assertEqual(["Country 0", *(f"Country {index}" for index in range(2, 15))], [country.name for country, _, _ in rows])
-        self.assertNotIn("Country 15", [country.name for country, _, _ in rows])
-        self.assertEqual((5, 0.125), (rows[0][1], rows[0][2]))
+        self.assertEqual(15, len(rows))
+        self.assertEqual([*(f"Country {index}" for index in range(15, 1, -1)), "Country 0"], [country.name for country, _ in rows])
+        self.assertNotIn("Country 1", [country.name for country, _ in rows])
+        self.assertEqual(15.125, rows[0][1])
 
-    def test_homepage_renders_ppp_gdp_per_capita_ranking(self) -> None:
+    def test_homepage_renders_income_adjusted_award_ranking(self) -> None:
         database = self.create_database(
             [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
             [
@@ -400,7 +447,7 @@ class WebsiteBuildTests(unittest.TestCase):
                     "award_record_id": f"test-{index}",
                     "award_wikidata_qid": "Q1",
                     "prize_name": "Test Prize",
-                    "year": "2000",
+                    "year": "2020",
                     "full_name": f"Test Winner {index}",
                     "laureate_wikidata_qid": f"Q{index + 10}",
                     "affiliation_country": "United States",
@@ -411,13 +458,17 @@ class WebsiteBuildTests(unittest.TestCase):
 
         build.build_site(database, "https://example.org/", self.website)
 
-        rate = 5 / build.load_gdp_per_capita()["ppp"]["United States"] * 1_000
+        population = build.load_population(["United States"])[0]
+        self.assertIsNotNone(population)
+        awards_per_million = 5 / population * 1_000_000
+        rate = awards_per_million / build.load_gdp_per_capita()["ppp"]["United States"] * 1_000
         home = (self.website / "dist/index.html").read_text()
-        self.assertIn("<h2>Awards per capita</h2>", home)
-        self.assertIn("Recorded awards by affiliation country, per $1,000 (World Bank 2024 USD PPP).", home)
+        self.assertIn("<h2>Award records relative to GDP</h2>", home)
+        self.assertIn("2015–2025 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.", home)
         self.assertIn('<ol class="highlights">', home)
         self.assertIn('href="countries/awarded/united-states/">United States</a>', home)
-        self.assertIn(f"<span>{rate:.2f}</span>", home)
+        self.assertIn(f"<span>{rate:.2f} / $1bn</span>", home)
+        self.assertNotIn("awards / $1,000", home)
 
     def test_build_home_page_only_rewrites_index(self) -> None:
         database = self.create_database(
@@ -461,14 +512,21 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('<option value="nominal">GDP per capita (current US$)</option>', explorer_html)
         self.assertIn('<option value="ppp" selected>GDP per capita, PPP (current international $)</option>', explorer_html)
         self.assertIn('draw("ppp")', explorer_html)
-        self.assertIn("2024 World Bank GDP per capita data", explorer_html)
+        self.assertIn("plotted against 2024 World Bank GDP per capita", explorer_html)
+        self.assertIn("recorded award-recipient rows per million residents", explorer_html)
         self.assertIn("affiliation country at the time of award", explorer_html)
-        self.assertIn("const GDP_PER_CAPITA_RANKINGS = DATA.gdp_per_capita_rankings;", explorer_html)
-        self.assertIn("GDP_PER_CAPITA_RANKINGS[metric]", explorer_html)
+        self.assertIn("const AWARDS_GDP_COMPARISON = DATA.awards_gdp_comparison;", explorer_html)
+        self.assertIn("AWARDS_GDP_COMPARISON[metric].slice(0, 15)", explorer_html)
+        self.assertIn("(row.gdp_per_capita - minGDP) / gdpSpan", explorer_html)
+        self.assertIn("row.awards_per_million / maxAwards", explorer_html)
+        self.assertIn('class: "scatter-dot"', explorer_html)
+        self.assertIn(".explorer #gdp-chart { overflow-x: auto; }", explorer_html)
+        self.assertIn(".explorer #gdp-chart svg { min-width: 720px; }", explorer_html)
         self.assertIn('id="gdp-chart-status"', explorer_html)
         self.assertIn("gdp-chart-title", explorer_html)
         self.assertIn("gdp-chart-desc", explorer_html)
-        self.assertIn("No countries meet the five-award and 2024-data requirements for this measure.", explorer_html)
+        self.assertIn("No countries meet the five-award, population, and 2024 GDP-data requirements for this measure.", explorer_html)
+        self.assertNotIn("awards per $1,000", explorer_html)
 
     def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
         rankings = [
