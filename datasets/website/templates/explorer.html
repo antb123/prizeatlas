@@ -505,7 +505,7 @@ countryLookup
         : perCapita
         ? `${name} — ${value.toFixed(1)} per million by ${base === "ac" ? "affiliation" : "birth"} (${count} laureate${count === 1 ? "" : "s"})`
         : `${name} — ${count} laureate${count === 1 ? "" : "s"}`;
-      text(svg, labelW + barW + 6, y + 14, perCapita ? value.toFixed(1) : String(count), "bar-value");
+      text(svg, labelW + barW + 6, y + 14, (cityRows || perCapita) ? value.toFixed(1) : String(count), "bar-value");
     });
     holder.appendChild(svg);
   }
