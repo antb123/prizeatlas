@@ -1530,6 +1530,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "University One",
                 "affiliation_city": "Boston",
                 "affiliation_country": "United States",
+                "affiliation_coordinates": "-71.0589,42.3601",
             },
         ]
         # The second country of a multi-country award is a second affiliation row, not a ";" inside one.
@@ -1549,6 +1550,10 @@ class WebsiteBuildTests(unittest.TestCase):
         canada = (self.website / "dist/countries/affiliations/canada/index.html").read_text()
         switzerland = (self.website / "dist/countries/affiliations/switzerland/index.html").read_text()
         united_states = (self.website / "dist/countries/affiliations/united-states/index.html").read_text()
+        cities = (self.website / "dist/countries/cities/index.html").read_text()
+        boston = (self.website / "dist/countries/cities/boston-united-states/index.html").read_text()
+        sitemap = (self.website / "dist/sitemap.xml").read_text()
+        llms = (self.website / "dist/llms.txt").read_text()
 
         self.assertIn('href="affiliations/">Institutions</a>', people)
         self.assertLess(born_belgium.index("Alice Alpha"), born_belgium.index("Bob Beta"))
@@ -1569,6 +1574,91 @@ class WebsiteBuildTests(unittest.TestCase):
         # The city recorded for the institution in this country rides on the row.
         self.assertIn("Boston", united_states)
         self.assertRegex(united_states, r"(?s)1 institution ·\s*2 laureates ·\s*1 city")
+        self.assertIn('href="./" aria-current="page">Cities</a>', cities)
+        self.assertIn('href="../">All cities</a>', boston)
+        self.assertIn('href="../../../people/dave-delta/"', boston)
+        self.assertIn("https://example.org/countries/cities/boston-united-states/", sitemap)
+        self.assertIn("[Cities](https://example.org/countries/cities/)", llms)
+
+    def test_city_places_group_qid_linked_affiliations_by_city_and_country(self) -> None:
+        records = [
+            award(
+                award_record_id="alice-one",
+                year="2000",
+                full_name="Alice Alpha",
+                laureate_wikidata_qid="Q1",
+                affiliation_city="Boston",
+                affiliation_country="United States",
+                affiliation_coordinates="-71.0589,42.3601",
+            ),
+            award(
+                award_record_id="alice-two",
+                year="2001",
+                full_name="Alice Alpha",
+                laureate_wikidata_qid="Q1",
+                affiliation_city="Boston",
+                affiliation_country="United States",
+                affiliation_coordinates="-71.0600,42.3600",
+                extras=(
+                    {
+                        "affiliation_city": "Cambridge",
+                        "affiliation_country": "United States",
+                        "affiliation_coordinates": "-71.1097,42.3736",
+                    },
+                ),
+            ),
+            award(
+                award_record_id="bob",
+                year="2002",
+                full_name="Bob Beta",
+                laureate_wikidata_qid="Q2",
+                affiliation_city="Cambridge",
+                affiliation_country="United Kingdom",
+                affiliation_coordinates="0.1218,52.2053",
+            ),
+            award(
+                award_record_id="carol",
+                year="2003",
+                full_name="Carol Gamma",
+                laureate_wikidata_qid="Q3",
+                affiliation_city="Cambridge",
+                affiliation_country="United States",
+                affiliation_coordinates="-71.1100,42.3740",
+                extras=(
+                    {
+                        "affiliation_city": "Boston",
+                        "affiliation_country": "United States",
+                        "affiliation_coordinates": "-71.0590,42.3600",
+                    },
+                ),
+            ),
+        ]
+        routes = build.person_routes(records)
+        people = build.plan_people(records, routes, {record.award_record_id: "/award/" for record in records}, {"Physics": 0})
+
+        cities = build.plan_city_places(records, people)
+
+        self.assertEqual(
+            ["Boston, United States", "Cambridge, United States", "Cambridge, United Kingdom"],
+            [city.name for city in cities],
+        )
+        self.assertEqual([2, 2, 1], [len(city.people) for city in cities])
+        self.assertEqual(
+            ["/countries/cities/boston-united-states/", "/countries/cities/cambridge-united-states/", "/countries/cities/cambridge-united-kingdom/"],
+            [city.route for city in cities],
+        )
+        self.assertEqual(["Alice Alpha", "Carol Gamma"], [person.name for person in cities[0].people])
+
+        missing_point = award(
+            award_record_id="missing-point",
+            year="2004",
+            full_name="Missing Point",
+            laureate_wikidata_qid="Q4",
+            affiliation_city="Paris",
+            affiliation_country="France",
+        )
+        with self.assertRaisesRegex(build.BuildFailure, "record_id=missing-point field=affiliation_coordinates"):
+            build.plan_city_places([missing_point], build.plan_people([missing_point], build.person_routes([missing_point]), {"missing-point": "/"}, {"Physics": 0}))
 
     def test_second_affiliation_places_one_award_under_both_institutions(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]
@@ -1583,9 +1673,19 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "Paris Institute",
                 "affiliation_city": "Paris",
                 "affiliation_country": "France",
+                "affiliation_coordinates": "2.3522,48.8566",
             }
         ]
-        extras = {"shared-one": [{"affiliation_name": "Boston Institute", "affiliation_city": "Boston", "affiliation_country": "United States"}]}
+        extras = {
+            "shared-one": [
+                {
+                    "affiliation_name": "Boston Institute",
+                    "affiliation_city": "Boston",
+                    "affiliation_country": "United States",
+                    "affiliation_coordinates": "-71.0589,42.3601",
+                }
+            ]
+        }
         database = self.create_database(rankings, records, extras)
 
         build.build_site(database, "https://example.org/", self.website)
@@ -1783,6 +1883,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "University One",
                 "affiliation_city": "Boston",
                 "affiliation_country": "United States",
+                "affiliation_coordinates": "-71.0589,42.3601",
             },
             {
                 "award_record_id": "bio-two",
@@ -1795,6 +1896,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "University One",
                 "affiliation_city": "Boston",
                 "affiliation_country": "United States",
+                "affiliation_coordinates": "-71.0600,42.3600",
             },
             {
                 "award_record_id": "physics-one",
@@ -1807,6 +1909,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "University One",
                 "affiliation_city": "Boston",
                 "affiliation_country": "United States",
+                "affiliation_coordinates": "-71.0570,42.3610",
             },
             {
                 "award_record_id": "bio-three",
@@ -1819,6 +1922,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "affiliation_name": "Second Institute",
                 "affiliation_city": "Oslo",
                 "affiliation_country": "Norway",
+                "affiliation_coordinates": "10.7522,59.9139",
             },
         ]
         database = self.create_database(rankings, records)

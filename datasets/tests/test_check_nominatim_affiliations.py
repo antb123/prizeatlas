@@ -54,10 +54,13 @@ class ParseCoordinatesTests(unittest.TestCase):
     def test_invalid_returns_none(self) -> None:
         self.assertIsNone(chk.parse_stored_coordinates("bad"))
         self.assertIsNone(chk.parse_stored_coordinates("1,2,3"))
+        self.assertIsNone(chk.parse_stored_coordinates("nan,2"))
+        self.assertIsNone(chk.parse_stored_coordinates("181,2"))
+        self.assertIsNone(chk.parse_stored_coordinates("2,91"))
 
 
 class CheckAllTests(unittest.TestCase):
-    def _make_db(self, rows: list[tuple[str, str, str, str]]) -> str:
+    def _make_db(self, rows: list[tuple[str, str, str, str, str]], extras: list[tuple[str, int, str, str, str, str]] = []) -> str:
         tmp = tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False)
         tmp.close()
         con = sqlite3.connect(tmp.name)
@@ -66,47 +69,95 @@ class CheckAllTests(unittest.TestCase):
             "award_record_id TEXT, affiliation_name TEXT, affiliation_city TEXT, "
             "affiliation_country TEXT, affiliation_coordinates TEXT)"
         )
+        con.execute(
+            "CREATE TABLE award_extra_affiliations ("
+            "award_record_id TEXT, position INTEGER, affiliation_name TEXT, affiliation_city TEXT, "
+            "affiliation_country TEXT, affiliation_coordinates TEXT)"
+        )
         for record_id, name, city, country, coords in rows:
             con.execute(
                 "INSERT INTO awards VALUES (?, ?, ?, ?, ?)",
                 (record_id, name, city, country, coords),
             )
+        for record_id, position, name, city, country, coords in extras:
+            con.execute(
+                "INSERT INTO award_extra_affiliations VALUES (?, ?, ?, ?, ?, ?)",
+                (record_id, position, name, city, country, coords),
+            )
         con.commit()
         con.close()
         return tmp.name
 
-    def test_match_and_not_found(self) -> None:
+    def test_groups_both_stores_and_accepts_distinct_city_points(self) -> None:
         db = self._make_db([
             ("r1", "Collège de France", "Paris", "France", "2.3456,48.8492"),
-            ("r2", "Unknown Place", "Nowhere", "Narnia", "10.0,20.0"),
+        ], [
+            ("r1", 2, "Institut Pasteur", "Paris", "France", "2.3320,48.8560"),
+            ("r2", 2, "MIT", "Cambridge", "United States", "-71.0919,42.3597"),
         ])
 
         cache_path = Path(tempfile.mktemp(suffix=".json"))
         output_path = Path(tempfile.mktemp(suffix=".json"))
 
-        def fake_search(query, cache, cache_path, rate_limit=1.0):
-            if "Collège" in query:
-                return [{"lon": "2.35", "lat": "48.85"}]
-            return []
-
         def fake_city(city, country, cache, cache_path, rate_limit=1.0):
-            if country == "Narnia":
-                return []
-            return []
+            if city == "Paris":
+                return [{"lon": "2.35", "lat": "48.85"}]
+            return [{"lon": "-71.09", "lat": "42.36"}]
 
-        with (
-            patch.object(chk, "nominatim_search", side_effect=fake_search),
-            patch.object(chk, "nominatim_city_search", side_effect=fake_city),
-        ):
+        with patch.object(chk, "nominatim_city_search", side_effect=fake_city):
             summary = chk.check_all(db, cache_path, output_path)
 
         self.assertEqual(2, summary["total"])
-        self.assertEqual(1, summary["MATCH"])
-        self.assertEqual(1, summary["NOT_FOUND"])
+        self.assertEqual(2, summary["verified"])
+        self.assertEqual(2, summary["MATCH"])
 
         report = json.loads(output_path.read_text())
         self.assertEqual("MATCH", report["results"][0]["status"])
-        self.assertEqual("NOT_FOUND", report["results"][1]["status"])
+        self.assertEqual(2, len(report["results"][1]["stored_points"]))
+
+        Path(db).unlink()
+        cache_path.unlink(missing_ok=True)
+        output_path.unlink(missing_ok=True)
+
+    def test_reports_missing_invalid_inverted_discrepancy_and_lookup_failure(self) -> None:
+        db = self._make_db([
+            ("r1", "Missing", "Blank", "France", ""),
+            ("r2", "Invalid", "Bad", "France", "1,91"),
+            ("r3", "Inverted", "Paris", "France", "48.85,2.35"),
+            ("r4", "Wrong", "Lyon", "France", "2.35,48.85"),
+            ("r5", "Unknown", "Nowhere", "Narnia", "10.0,20.0"),
+        ])
+        cache_path = Path(tempfile.mktemp(suffix=".json"))
+        output_path = Path(tempfile.mktemp(suffix=".json"))
+
+        def fake_city(city, country, cache, cache_path, rate_limit=1.0):
+            if city == "Nowhere":
+                return []
+            if city == "Lyon":
+                return [{"lon": "4.8357", "lat": "45.7640"}]
+            return [{"lon": "2.35", "lat": "48.85"}]
+
+        with patch.object(chk, "nominatim_city_search", side_effect=fake_city):
+            summary = chk.check_all(db, cache_path, output_path)
+
+        self.assertEqual(5, summary["total"])
+        self.assertEqual(0, summary["verified"])
+        self.assertEqual(1, summary["MISSING_COORDINATES"])
+        self.assertEqual(1, summary["INVALID_COORDINATES"])
+        self.assertEqual(1, summary["INVERTED"])
+        self.assertEqual(1, summary["DISCREPANCY"])
+        self.assertEqual(1, summary["LOOKUP_FAILED"])
+
+        Path(db).unlink()
+        cache_path.unlink(missing_ok=True)
+        output_path.unlink(missing_ok=True)
+
+    def test_main_returns_nonzero_when_not_every_pair_is_verified(self) -> None:
+        db = self._make_db([("r1", "Missing", "Blank", "France", "")])
+        cache_path = Path(tempfile.mktemp(suffix=".json"))
+        output_path = Path(tempfile.mktemp(suffix=".json"))
+
+        self.assertEqual(1, chk.main(["--db", db, "--cache", str(cache_path), "--output", str(output_path)]))
 
         Path(db).unlink()
         cache_path.unlink(missing_ok=True)

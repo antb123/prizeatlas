@@ -18,5 +18,5 @@
   </li>
   {% endfor %}
 </ul>
-<p><a href="{{ href(view_route) }}">All countries</a></p>
+<p><a href="{{ href(view_route) }}">{{ return_label | default("All countries") }}</a></p>
 {% endblock %}

@@ -84,6 +84,7 @@ PEOPLE_PER_PAGE = 200
 ITEM_LIST_CAP = 200
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
+CITIES_ROUTE = "/countries/cities/"
 COUNTRY_AFFILIATIONS_ROUTE = "/countries/affiliations/"
 COUNTRY_AFFILIATIONS_SEGMENT = "affiliations"
 COUNTRY_VIEWS = (
@@ -91,7 +92,7 @@ COUNTRY_VIEWS = (
     ("Awarded", "/countries/awarded/"),
     ("Died", "/countries/died/"),
 )
-RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "died"})
+RESERVED_COUNTRY_SEGMENTS = frozenset({COUNTRY_AFFILIATIONS_SEGMENT, "awarded", "cities", "died"})
 AFFILIATIONS_ROUTE = "/affiliations/"
 AFFILIATION_SLUG_MAX = 80
 UNIVERSITIES_ROUTE = "/universities/"
@@ -1250,6 +1251,51 @@ def plan_country_places(
     return countries
 
 
+def plan_city_places(records: Iterable[AwardRecord], people: Iterable[Laureate]) -> list[Place]:
+    """Rank affiliation cities by distinct, QID-linked laureates.
+
+    A city is its present-day city/country pair.  Coordinates are evidence for every
+    included affiliation, but do not split a city when institutions have different
+    points within it.
+    """
+    people_by_qid = {person.qid: person for person in people}
+    members_by_place: dict[tuple[str, str], set[str]] = {}
+    for record in records:
+        qid = record.laureate_wikidata_qid.strip()
+        if not qid:
+            continue
+        for affiliation in record.affiliations:
+            city, country = affiliation.city.strip(), affiliation.country.strip()
+            if not city or not country:
+                continue
+            parse_map_points(affiliation.coordinates, record.award_record_id, "affiliation_coordinates", multiple=False)
+            members_by_place.setdefault((city, country), set()).add(qid)
+
+    slugs: dict[str, str] = {}
+    cities: list[Place] = []
+    for (city, country), members in members_by_place.items():
+        name = f"{city}, {country}"
+        slug = slugify(f"{city}-{country}")
+        if slug in slugs:
+            raise BuildFailure(f"duplicate city slug slug={slug} name={name!r} other={slugs[slug]!r}")
+        slugs[slug] = name
+        cities.append(
+            Place(
+                name,
+                slug,
+                f"{CITIES_ROUTE}{slug}/",
+                tuple(
+                    sorted(
+                        (people_by_qid[qid] for qid in members),
+                        key=lambda person: (-len(person.awards), _surname_key(person.name)),
+                    )
+                ),
+            )
+        )
+    cities.sort(key=lambda place: (-len(place.people), place.name))
+    return cities
+
+
 def plan_per_capita_places(places: Iterable[Place], population_file: Path = POPULATION_FILE) -> list[tuple[Place, float]]:
     """Rank country places by distinct laureates per million people, matching the Explorer rate views."""
     places = list(places)
@@ -2254,8 +2300,56 @@ def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
                     eyebrow=f"{label} in",
                     blurb=detail_blurb.format(count=count, laureates=laureates),
                     view_route=route,
+                    return_label="All countries",
                 )
             )
+    return jobs
+
+
+def plan_city_pages(cities: list[Place]) -> list[PageJob]:
+    """Plan the award-time affiliation city index and its city detail pages."""
+    covered = len({person.qid for city in cities for person in city.people})
+    jobs = [
+        _page(
+            "countries.html",
+            CITIES_ROUTE,
+            "Cities where laureates were awarded",
+            _clamp(
+                f"The award-time institution cities of {covered:,} laureates across {len(cities)} cities, ranked. "
+                "Laureates may appear under more than one city."
+            ),
+            (Breadcrumb("Home", "/"), Breadcrumb("Cities", None)),
+            countries=tuple(cities),
+            item_list=tuple((city.name, city.route) for city in cities[:ITEM_LIST_CAP]),
+            leader=len(cities[0].people) if cities else 0,
+            tab="Cities",
+            eyebrow="Awarded in",
+            blurb=f"{covered:,} laureates recorded at award-time institutions across {len(cities)} cities.",
+            caveat=(
+                "A laureate is counted once in every city where an institution was recorded for them. "
+                "Different institution points in the same city remain one city."
+            ),
+            plain_counts=False,
+        )
+    ]
+    for city in cities:
+        count = len(city.people)
+        laureates = "laureate" if count == 1 else "laureates"
+        jobs.append(
+            _page(
+                "country.html",
+                city.route,
+                f"Laureates awarded in {city.name}",
+                _clamp(f"{count} award-winning {laureates} recorded at institutions in {city.name}, with every prize each won."),
+                (Breadcrumb("Home", "/"), Breadcrumb("Cities", CITIES_ROUTE), Breadcrumb(city.name, None)),
+                place=city,
+                tab="Cities",
+                eyebrow="Awarded in",
+                blurb=f"{count} {laureates} on record were affiliated with institutions here when their awards were made.",
+                view_route=CITIES_ROUTE,
+                return_label="All cities",
+            )
+        )
     return jobs
 
 
@@ -2674,6 +2768,7 @@ def create_site_plan(
         jobs.append(plan_winners_page(layout))
 
     people = plan_people(records, routes_by_laureate, record_routes, subject_order)
+    cities = plan_city_places(records, people)
     affiliations = plan_affiliations(records, record_routes, profiles_by_qid)
     country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
     countries = country_places["Born"]
@@ -2700,6 +2795,7 @@ def create_site_plan(
         jobs.extend(plan_prize_year_pages(layout))
     jobs.extend(plan_subject_pages(subjects, records, record_routes))
     jobs.extend(plan_country_pages(country_places))
+    jobs.extend(plan_city_pages(cities))
     jobs.extend(plan_affiliation_country_pages(affiliation_countries, records))
     jobs.extend(plan_affiliation_pages(affiliations, records))
     jobs.extend(plan_university_pages(affiliations))
@@ -2855,6 +2951,7 @@ points that rank individuals by it, are editorial judgements rather than measure
 - [People]({public_url(base_url, PEOPLE_ROUTE)}): every recipient by surname; a person's page gathers all of their awards
 - Every winner of one prize in a single list: see the {plan.prize_count} `/{{prize}}/{WINNERS_SEGMENT}/` pages named under "Winner lists" below
 - [Countries]({public_url(base_url, COUNTRIES_ROUTE)}): {plan.country_count} countries of birth, with companion views by award-time institution and by death
+- [Cities]({public_url(base_url, CITIES_ROUTE)}): award-time institution cities, each paired with its country so places with the same name stay separate
 - [Institutions]({public_url(base_url, AFFILIATIONS_ROUTE)}): the universities, laboratories, and organizations where the recognized work was done
 - [Universities]({public_url(base_url, UNIVERSITIES_ROUTE)}): universities and colleges alone, ranked by laureate, and
   [by country]({public_url(base_url, UNIVERSITY_COUNTRIES_ROUTE)})
@@ -2873,6 +2970,7 @@ Every slug is lowercase ASCII with hyphens for everything else: "Ngô Bao Châu"
 - `/countries/{{country}}/`, `/countries/awarded/{{country}}/`, `/countries/died/{{country}}/` — laureates by birth, by institution at the
   time of the award, and by death
 - `/countries/affiliations/{{country}}/` — the institutions in one country
+- `/countries/cities/{{city}}-{{country}}/` — laureates recorded at award-time institutions in one present-day city and country
 - `/affiliations/{{institution}}/` — one institution and its laureates
 - `/subjects/{{subject}}/` — one school subject
 - `/subjects/{{subject}}/recent/` — that subject's prize recipients from its latest recorded year and the two preceding calendar years
@@ -3110,6 +3208,7 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         awards_route=AWARDS_ROUTE,
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
+        cities_route=CITIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
@@ -3152,6 +3251,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         awards_route=AWARDS_ROUTE,
         people_route=PEOPLE_ROUTE,
         countries_route=COUNTRIES_ROUTE,
+        cities_route=CITIES_ROUTE,
         country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
         country_views=COUNTRY_VIEWS,
         affiliations_route=AFFILIATIONS_ROUTE,
