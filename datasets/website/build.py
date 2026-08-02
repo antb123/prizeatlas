@@ -156,6 +156,19 @@ FACT_FIELDS = (
 )
 LANGUAGE_CODES = ("en", "es", "fr")
 LANGUAGE_NAMES = {"en": "en", "fr": "fr", "es": "es"}
+FIXED_STABLE_KEYS = {
+    "index.html": "home",
+    "awards.html": "awards",
+    "city_per_capita.html": "cities-per-capita",
+    "affiliation_countries.html": "affiliation-countries",
+    "affiliations.html": "affiliations",
+    "universities.html": "universities",
+    "university_countries.html": "universities:countries",
+    "subjects.html": "subjects",
+    "explorer.html": "explorer",
+    "nearby.html": "nearby",
+    "about.html": "about",
+}
 NUMBER_SEPARATORS = {"en": (",", "."), "es": (".", ","), "fr": ("\u202f", ",")}
 SEGMENT_DEFAULTS = {
     "awards": "awards",
@@ -786,7 +799,7 @@ def _required_ui_keys(template_dir: Path) -> set[str]:
     return keys
 
 
-def _validate_languages(  # noqa: C901 - catalogue preflight is intentionally one explicit validation path.
+def _validate_languages(
     languages: tuple[Language, ...], rankings: Iterable[Ranking], records: Iterable[AwardRecord], template_dir: Path
 ) -> None:
     by_code = {language.code: language for language in languages}
@@ -3526,13 +3539,11 @@ def create_site_plan(
     )
 
 
-def _stable_key(job: PageJob) -> str:  # noqa: C901 - one explicit table of page-family identities.
+def _stable_key(job: PageJob) -> str:
     """Return the language-independent identity for one canonical planner job."""
     context = job.context
-    if job.template == "index.html":
-        return "home"
-    if job.template == "awards.html":
-        return "awards"
+    if key := FIXED_STABLE_KEYS.get(job.template):
+        return key
     if job.template == "people.html":
         return f"people:{context['page_number']}"
     if job.template == "prize.html":
@@ -3557,22 +3568,10 @@ def _stable_key(job: PageJob) -> str:  # noqa: C901 - one explicit table of page
         if context["tab"] == "Cities":
             return f"city:{context['place'].slug}"
         return f"country:{context['tab'].lower()}:{context['place'].slug}"
-    if job.template == "city_per_capita.html":
-        return "cities-per-capita"
-    if job.template == "affiliation_countries.html":
-        return "affiliation-countries"
     if job.template == "affiliation_country.html":
         return f"affiliation-country:{context['place'].slug}"
-    if job.template == "affiliations.html":
-        return "affiliations"
     if job.template == "affiliation.html":
         return f"affiliation:{context['affiliation'].slug}"
-    if job.template == "universities.html":
-        return "universities"
-    if job.template == "university_countries.html":
-        return "universities:countries"
-    if job.template == "subjects.html":
-        return "subjects"
     if job.template in {"subject.html", "subject_affiliations.html", "subject_recent.html"}:
         view = {
             "subject.html": "people",
@@ -3582,19 +3581,10 @@ def _stable_key(job: PageJob) -> str:  # noqa: C901 - one explicit table of page
         return f"subject:{slugify(context['subject'].name)}:{view}"
     if job.template == "map.html":
         return "map" if not context["initial_subject"] else f"map:{slugify(context['initial_subject'])}"
-    if job.template in {"explorer.html", "nearby.html", "about.html"}:
-        return job.template.removesuffix(".html")
     raise BuildFailure(f"cannot assign stable key template={job.template} route={job.route}")
 
 
-def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa: C901 - one explicit route table.
-    """Rebuild a canonical route from language-owned segments and source identity."""
-    context = job.context
-    parts = job.route.strip("/").split("/") if job.route != "/" else []
-    if key == "home":
-        return language.route()
-    if key == "awards":
-        return language.route(language.segment("awards"))
+def _localized_award_route(language: Language, context: dict[str, Any], key: str, parts: list[str]) -> str:
     if key.startswith("people:"):
         number = int(key.rsplit(":", 1)[1])
         if number == 1:
@@ -3617,6 +3607,10 @@ def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa
         return language.route(*parts)
     if key.startswith("person:"):
         return language.route(language.segment("people"), parts[-1])
+    raise BuildFailure(f"cannot localize award route language={language.code} key={key}")
+
+
+def _localized_place_route(language: Language, context: dict[str, Any], key: str) -> str:
     if key == "countries:born":
         return language.route(language.segment("countries"))
     if key == "countries:awarded":
@@ -3635,6 +3629,10 @@ def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa
         return language.route(language.segment("countries"), language.segment("cities"), context["place"].slug)
     if key == "cities-per-capita":
         return language.route(language.segment("countries"), language.segment("cities-per-capita"))
+    raise BuildFailure(f"cannot localize place route language={language.code} key={key}")
+
+
+def _localized_directory_route(language: Language, context: dict[str, Any], key: str) -> str:
     if key == "affiliation-countries":
         return language.route(language.segment("countries"), language.segment("country_affiliations"))
     if key.startswith("affiliation-country:"):
@@ -3669,6 +3667,20 @@ def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa
     if key in {"explorer", "nearby", "about"}:
         return language.route(language.segment(key))
     raise BuildFailure(f"cannot localize route language={language.code} key={key}")
+
+
+def _localized_route(language: Language, job: PageJob, key: str) -> str:
+    """Rebuild a canonical route from language-owned segments and source identity."""
+    if key == "home":
+        return language.route()
+    if key == "awards":
+        return language.route(language.segment("awards"))
+    parts = job.route.strip("/").split("/") if job.route != "/" else []
+    if key.startswith(("people:", "prize:", "prize-winners:", "category:", "category-year:", "prize-year:", "winner:", "person:")):
+        return _localized_award_route(language, job.context, key, parts)
+    if key in {"countries:born", "countries:awarded", "countries:died", "cities", "cities-per-capita"} or key.startswith(("country:", "city:")):
+        return _localized_place_route(language, job.context, key)
+    return _localized_directory_route(language, job.context, key)
 
 
 def _validate_localized_jobs(jobs: Iterable[PageJob], language_codes: tuple[str, ...]) -> None:
@@ -3732,7 +3744,83 @@ def _country_index_people(places: Iterable[Place]) -> int:
     return len({person.qid for place in places for person in place.people})
 
 
-def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tuple[str, str]:  # noqa: C901 - page metadata follows the explicit page-family map.
+def _localized_subject_place_metadata(language: Language, context: dict[str, Any], key: str) -> tuple[dict[str, Any], str] | None:
+    num = lambda value: format_number(value, language)
+    if key == "subjects":
+        return {}, "subjects"
+    if key.startswith("subject:"):
+        subject: Subject = context["subject"]
+        fields = {"subject": language.term("subject", subject.name), "award_count": num(subject.award_count), "person_count": num(len(subject.people))}
+        name = {"people": "subject", "affiliations": "subject-affiliations", "recent": "subject-recent"}[key.rsplit(":", 1)[1]]
+        if name == "subject-affiliations":
+            fields["institution_count"] = num(len(subject.affiliations))
+        elif name == "subject-recent":
+            fields.update(
+                recipient_count=num(context["recent_recipient_count"]),
+                prize_count=num(context["recent_prize_count"]),
+                year_from=context["recent_start_year"],
+                year_to=context["recent_end_year"],
+            )
+        return fields, name
+    if key.startswith("countries:"):
+        view = key.split(":", 1)[1]
+        places = context["countries"]
+        return {"person_count": num(_country_index_people(places)), "country_count": num(len(places))}, f"countries-{view}"
+    if key.startswith("country:"):
+        _country, view, _slug = key.split(":", 2)
+        place: Place = context["place"]
+        return {"country": language.term("country", place.name), "person_count": num(len(place.people))}, f"country-{view}"
+    if key == "cities":
+        places = context["countries"]
+        return {"person_count": num(_country_index_people(places)), "city_count": num(len(places))}, "cities"
+    if key.startswith("city:"):
+        place = context["place"]
+        return {"city": _localized_place_label(language, place), "person_count": num(len(place.people))}, "city"
+    if key == "cities-per-capita":
+        return {}, "cities-per-capita"
+    return None
+
+
+def _localized_directory_metadata(
+    language: Language, context: dict[str, Any], key: str, plan: SitePlan
+) -> tuple[dict[str, Any], str] | None:
+    num = lambda value: format_number(value, language)
+    if key == "affiliation-countries":
+        return {
+            "country_count": num(len(context["countries"])),
+            "recorded_count": num(context["recorded"]),
+            "award_count": num(context["total"]),
+        }, "affiliation-countries"
+    if key.startswith("affiliation-country:"):
+        place: AffiliationCountry = context["place"]
+        return {"country": language.term("country", place.name), "institution_count": num(len(place.members))}, "affiliation-country"
+    if key == "affiliations":
+        return {"recorded_count": num(context["recorded"]), "award_count": num(context["total"])}, "affiliations"
+    if key.startswith("affiliation:"):
+        affiliation: Affiliation = context["affiliation"]
+        return {
+            "institution": _localized_affiliation_name(language, affiliation),
+            "prizes": ", ".join(language.term("prize", prize) for prize in dict.fromkeys(link.record.prize_name for link in affiliation.awards)),
+            "year_span": _year_span([link.record.year for link in affiliation.awards]),
+            "award_count": num(context["award_count"]),
+            "person_count": num(affiliation.count),
+        }, "affiliation"
+    if key == "universities":
+        return {"university_count": num(context["total"])}, "universities"
+    if key == "universities:countries":
+        return {"university_count": num(context["total"]), "country_count": num(len(context["countries"]))}, "universities-countries"
+    if key == "map":
+        return {}, "map"
+    if key.startswith("map:"):
+        return {"subject": language.term("subject", context["initial_subject"])}, "map-subject"
+    if key in {"explorer", "nearby"}:
+        return {}, key
+    if key == "about":
+        return {"prize_count": num(plan.prize_count), "person_count": num(plan.person_count)}, "about"
+    return None
+
+
+def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tuple[str, str]:
     """Produce translated metadata from canonical data without changing planner membership."""
     context = job.context
     key = _stable_key(job)
@@ -3824,75 +3912,11 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
             "award_count": num(len(person.awards)),
         }
         name = "person"
-    elif key == "subjects":
-        fields, name = {}, "subjects"
-    elif key.startswith("subject:"):
-        subject: Subject = context["subject"]
-        fields = {"subject": language.term("subject", subject.name), "award_count": num(subject.award_count), "person_count": num(len(subject.people))}
-        name = {"people": "subject", "affiliations": "subject-affiliations", "recent": "subject-recent"}[key.rsplit(":", 1)[1]]
-        if name == "subject-affiliations":
-            fields["institution_count"] = num(len(subject.affiliations))
-        elif name == "subject-recent":
-            fields.update(
-                recipient_count=num(context["recent_recipient_count"]),
-                prize_count=num(context["recent_prize_count"]),
-                year_from=context["recent_start_year"],
-                year_to=context["recent_end_year"],
-            )
-    elif key.startswith("countries:"):
-        view = key.split(":", 1)[1]
-        places = context["countries"]
-        fields = {"person_count": num(_country_index_people(places)), "country_count": num(len(places))}
-        name = f"countries-{view}"
-    elif key.startswith("country:"):
-        _country, view, _slug = key.split(":", 2)
-        place: Place = context["place"]
-        fields = {"country": language.term("country", place.name), "person_count": num(len(place.people))}
-        name = f"country-{view}"
-    elif key == "cities":
-        places = context["countries"]
-        fields, name = {"person_count": num(_country_index_people(places)), "city_count": num(len(places))}, "cities"
-    elif key.startswith("city:"):
-        place = context["place"]
-        fields, name = {"city": _localized_place_label(language, place), "person_count": num(len(place.people))}, "city"
-    elif key == "cities-per-capita":
-        fields, name = {}, "cities-per-capita"
-    elif key == "affiliation-countries":
-        fields = {
-            "country_count": num(len(context["countries"])),
-            "recorded_count": num(context["recorded"]),
-            "award_count": num(context["total"]),
-        }
-        name = "affiliation-countries"
-    elif key.startswith("affiliation-country:"):
-        place: AffiliationCountry = context["place"]
-        fields, name = {"country": language.term("country", place.name), "institution_count": num(len(place.members))}, "affiliation-country"
-    elif key == "affiliations":
-        fields, name = {"recorded_count": num(context["recorded"]), "award_count": num(context["total"])}, "affiliations"
-    elif key.startswith("affiliation:"):
-        affiliation: Affiliation = context["affiliation"]
-        fields = {
-            "institution": _localized_affiliation_name(language, affiliation),
-            "prizes": ", ".join(language.term("prize", prize) for prize in dict.fromkeys(link.record.prize_name for link in affiliation.awards)),
-            "year_span": _year_span([link.record.year for link in affiliation.awards]),
-            "award_count": num(context["award_count"]),
-            "person_count": num(affiliation.count),
-        }
-        name = "affiliation"
-    elif key == "universities":
-        fields, name = {"university_count": num(context["total"])}, "universities"
-    elif key == "universities:countries":
-        fields, name = {"university_count": num(context["total"]), "country_count": num(len(context["countries"]))}, "universities-countries"
-    elif key == "map":
-        fields, name = {}, "map"
-    elif key.startswith("map:"):
-        fields, name = {"subject": language.term("subject", context["initial_subject"])}, "map-subject"
-    elif key in {"explorer", "nearby"}:
-        fields, name = {}, key
-    elif key == "about":
-        fields, name = {"prize_count": num(plan.prize_count), "person_count": num(plan.person_count)}, "about"
     else:
-        raise BuildFailure(f"metadata missing key={key}")
+        result = _localized_subject_place_metadata(language, context, key) or _localized_directory_metadata(language, context, key, plan)
+        if result is None:
+            raise BuildFailure(f"metadata missing key={key}")
+        fields, name = result
     def metadata(field: str) -> str:
         catalogue_key = f"meta.{name}.{field}"
         try:
