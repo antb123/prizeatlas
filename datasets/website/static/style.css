@@ -918,7 +918,8 @@ dd {
   }
 
   .site-nav-toggle {
-    margin-left: auto;
+    order: 2;
+    margin-left: 0.75rem;
     padding: 0;
   }
 
@@ -937,6 +938,7 @@ dd {
   }
 
   .site-nav {
+    order: 3;
     display: none;
     flex-direction: column;
     gap: 0;
@@ -957,10 +959,10 @@ dd {
     border-bottom: 1px solid var(--rule);
   }
 
+  /* Language codes ride beside the hamburger rather than claiming a row of their own. */
   .language-switcher {
     order: 1;
-    width: 100%;
-    margin: 0.25rem 0 0;
+    margin-left: auto;
   }
 }
 
