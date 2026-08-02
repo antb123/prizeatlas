@@ -616,6 +616,15 @@ def relative_route(source_route: str, target_route: str) -> str:
     return "./" if relative == "." else relative + "/"
 
 
+def _localized_route_target(target: str, route_map: Mapping[str, str]) -> str:
+    if not route_map or not target.startswith("/"):
+        return target
+    try:
+        return route_map[target]
+    except KeyError as error:
+        raise BuildFailure(f"unmapped internal route target={target}") from error
+
+
 def relative_file(source_route: str, target: str) -> str:
     source = source_route.strip("/") or "."
     return posixpath.relpath(target, source)
@@ -1368,10 +1377,9 @@ def localized_explorer_payload(
         family["name"] = language.term("prize", name)
     localized_explorer_route = language.route(language.segment("explorer"))
     for person in localized["people"]:
-        person["r"] = relative_route(
-            localized_explorer_route,
-            route_map.get(_resolve_relative_route(EXPLORER_ROUTE, person["r"]), _resolve_relative_route(EXPLORER_ROUTE, person["r"])),
-        ) if person["r"] else ""
+        if person["r"]:
+            target = _resolve_relative_route(EXPLORER_ROUTE, person["r"])
+            person["r"] = relative_route(localized_explorer_route, _localized_route_target(target, route_map))
     for row in localized.get("city_awards_per_capita", ()):
         row["city_label"] = _localized_location_label(language, row["city"], row["country"])
     return localized
@@ -1421,7 +1429,7 @@ def localized_nearby_payload(
     for person in localized["people"]:
         if person[1]:
             target = _resolve_relative_route(NEARBY_ROUTE, person[1])
-            person[1] = relative_route(localized_route, route_map.get(target, target))
+            person[1] = relative_route(localized_route, _localized_route_target(target, route_map))
     for place in localized["places"]:
         place["name_key"] = place["n"]
         if place["k"] == "a":
@@ -1431,7 +1439,7 @@ def localized_nearby_payload(
         place["display_where"] = _localized_where(language, place["w"])
         if place["r"]:
             target = _resolve_relative_route(NEARBY_ROUTE, place["r"])
-            place["r"] = relative_route(localized_route, route_map.get(target, target))
+            place["r"] = relative_route(localized_route, _localized_route_target(target, route_map))
     return localized
 
 
@@ -1788,7 +1796,9 @@ def _localized_schema(job: PageJob, schema: dict[str, Any]) -> dict[str, Any]:
     else:
         person = job.context.get("person")
         awards = tuple(candidate for candidate, _route in person.awards) if isinstance(person, Laureate) else ()
-        record = awards[-1] if awards else None
+        record = job.context.get("schema_record")
+        if isinstance(person, Laureate) and not isinstance(record, AwardRecord):
+            raise BuildFailure(f"person schema record missing route={job.route}")
     if awards and "award" in localized:
         labels = [f"{_localized_award_label(language, candidate)}, {candidate.year}" for candidate in awards]
         localized["award"] = labels if isinstance(localized["award"], list) else labels[0]
@@ -1803,10 +1813,11 @@ def _localized_schema(job: PageJob, schema: dict[str, Any]) -> dict[str, Any]:
     if len(named) == 1 and isinstance(affiliation_schema, dict):
         localized["affiliation"] = _localized_schema_affiliation(language, affiliation_schema, named[0])
     elif named and isinstance(affiliation_schema, list):
+        if len(affiliation_schema) != len(named) or not all(isinstance(item, dict) for item in affiliation_schema):
+            raise BuildFailure(f"schema affiliations differ from source route={job.route}")
         localized["affiliation"] = [
             _localized_schema_affiliation(language, item, affiliation)
             for item, affiliation in zip(affiliation_schema, named, strict=True)
-            if isinstance(item, dict)
         ]
     return localized
 
@@ -1833,7 +1844,7 @@ def _localized_item_list(job: PageJob) -> tuple[tuple[str, str], ...]:
 
 def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] | None = None) -> str:
     route_map = route_map or {}
-    localized_route = lambda route: route_map.get(route, route)
+    localized_route = lambda route: _localized_route_target(route, route_map)
     graph: list[dict[str, Any]] = []
     if job.breadcrumbs:
         graph.append(
@@ -2795,6 +2806,7 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
                     **_laureate_schema(latest, public_url(base_url, person.route)),
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
                 },
+                schema_record=latest,
                 share_card=ShareCard(
                     "Laureate",
                     person.name,
@@ -3279,11 +3291,11 @@ def plan_home_page(
         hero_heading=hero_heading,
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
         totals=(
-            (f"{len(people):,}", "laureates"),
-            (f"{len(records):,}", "awards"),
-            (f"{len(rankings)}", "prizes"),
+            (len(people), "laureates"),
+            (len(records), "awards"),
+            (len(rankings), "prizes"),
             (f"{min(year_prefixes)}-{latest_year}", "years"),
-            (f"{len({record.birth_country for record in records if _nonblank(record.birth_country)})}", "countries"),
+            (len({record.birth_country for record in records if _nonblank(record.birth_country)}), "countries"),
         ),
         recent=tuple(
             (record, record_routes[record.award_record_id], ranking_by_qid[record.award_wikidata_qid])
@@ -3425,13 +3437,13 @@ def plan_about_page(
         ),
         (Breadcrumb("Home", "/"), Breadcrumb("About", None)),
         totals=(
-            (f"{len(people):,}", "laureates"),
-            (f"{len(records):,}", "awards"),
-            (f"{len(rankings)}", "prizes"),
+            (len(people), "laureates"),
+            (len(records), "awards"),
+            (len(rankings), "prizes"),
             (f"{min(year_prefixes)}-{latest_year}", "years"),
-            (f"{len(subjects)}", "subjects"),
-            (f"{len(countries)}", "countries"),
-            (f"{len(affiliations):,}", "institutions"),
+            (len(subjects), "subjects"),
+            (len(countries), "countries"),
+            (len(affiliations), "institutions"),
         ),
     )
 
@@ -4409,6 +4421,7 @@ def _route_maps(plan: SitePlan) -> dict[str, dict[str, str]]:
         if not isinstance(canonical, str):
             raise BuildFailure(f"page has no canonical route key={job.key}")
         routes[job.language.code][canonical] = job.route
+        routes[job.language.code][job.route] = job.route
     return routes
 
 
@@ -4442,15 +4455,15 @@ def _render_job(
             return target
         if target.startswith("."):
             return target
-        return relative_route(job.route, route_map.get(target, target))
+        return relative_route(job.route, _localized_route_target(target, route_map))
 
     def absolute_href(target: str) -> str:
-        return public_url(base_url, route_map.get(target, target))
+        return public_url(base_url, _localized_route_target(target, route_map))
 
     context = dict(job.context)
     if totals := context.get("totals"):
         context["totals"] = tuple(
-            (format_number(int(value.replace(",", "")), language) if value.replace(",", "").isdigit() else value, label)
+            (format_number(value, language) if isinstance(value, int) else value, label)
             for value, label in totals
         )
     if facts := context.get("facts"):

@@ -205,6 +205,14 @@ class WebsiteBuildTests(unittest.TestCase):
             "/breakthrough-prize/2013-special/",
             build._localized_route(language, special, "prize-year:Q1:2013-special"),
         )
+        route_map = {
+            "/subjects/physics/": "/es/temas/fisica/",
+            "/es/temas/fisica/": "/es/temas/fisica/",
+        }
+        self.assertEqual("/es/temas/fisica/", build._localized_route_target("/subjects/physics/", route_map))
+        self.assertEqual("/es/temas/fisica/", build._localized_route_target("/es/temas/fisica/", route_map))
+        with self.assertRaisesRegex(build.BuildFailure, "unmapped internal route"):
+            build._localized_route_target("/subjects/missing/", route_map)
         self.assertEqual("ngo-bao-chau", build.slugify("Ngô Bao Châu"))
         self.assertEqual("sren", build.slugify("Søren"))
         self.assertEqual("frank-h-shu", build.slugify("Frank H. Shu (徐遐生)"))
@@ -1153,6 +1161,10 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertTrue(all(set(group) == set(build.LANGUAGE_CODES) for group in siblings.values()))
         self.assertEqual(3 * len(siblings), len(plan.jobs))
         self.assertFalse(any(job.route.startswith("/en/") for job in plan.jobs))
+        home_totals = {label: value for value, label in siblings["home"]["en"].context["totals"]}
+        self.assertIsInstance(home_totals["laureates"], int)
+        self.assertIsInstance(home_totals["awards"], int)
+        self.assertEqual("1939-2001", home_totals["years"])
         deep_siblings = siblings["winner:nobel-1"]
         for code, job in deep_siblings.items():
             html = (self.website / "dist" / job.route.strip("/") / "index.html").read_text()
@@ -1460,6 +1472,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("At the time: University of Toronto.", winner)
 
         jobs = {job.route: job for job in plan.jobs}
+        self.assertEqual("nobel-1", jobs["/people/geoffrey-hinton/"].context["schema_record"].award_record_id)
         cards = {
             route: job.context["share_card"]
             for route, job in jobs.items()
@@ -1565,6 +1578,18 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertNotIn("<script>", rendered)
         self.assertIn("\\u003c/script>", rendered)
         self.assertEqual("</script><script>alert(1)</script>", json.loads(rendered)["@graph"][0]["affiliation"]["name"])
+
+        source = award(
+            ({"affiliation_name": "Second University"},),
+            full_name="Test",
+            affiliation_name="First University",
+        )
+        schema = build._laureate_schema(source, "https://example.org/x/")
+        schema["affiliation"].pop()
+        language = build.Language("en", "", {}, {}, {}, {}, {}, ",", ".")
+        job = build.PageJob("winner.html", "/x/", "t", "d", (), {"record": source}, language)
+        with self.assertRaisesRegex(build.BuildFailure, "schema affiliations differ from source"):
+            build._localized_schema(job, schema)
 
     def test_index_pages_carry_item_list_structured_data(self) -> None:
         def item_list(route: str) -> list[dict]:
