@@ -55,8 +55,10 @@
       {% for fact in facts %}
       <div><dt>{{ fact.label }}</dt><dd>{% if fact.route %}<a class="{{ 'birth-country' if fact.kind == 'birth_country' else '' }}" href="{{ href(fact.route) }}">{{ fact.value }}</a>{% else %}{{ fact.value }}{% endif %}</dd></div>
       {% endfor %}
+      {% set identifier_hints = {"ORCID": "identifier.orcid", "WDATA": "identifier.wikidata", "OpenAlex": "identifier.openalex", "ROR": "identifier.ror"} %}
       {% for label, value, url in identifiers %}
-      <div class="identifier"><dt>{{ label }}</dt><dd><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ value }}</a></dd></div>
+      {% set hint = t(identifier_hints[label]) %}
+      <div class="identifier" title="{{ hint }}"><dt><abbr title="{{ hint }}">{{ label }}</abbr></dt><dd><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ value }}</a></dd></div>
       {% endfor %}
     </dl>
   </aside>

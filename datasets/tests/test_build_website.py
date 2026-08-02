@@ -2878,7 +2878,10 @@ class WebsiteBuildTests(unittest.TestCase):
 
         winner = (self.website / "dist/test-prize/2001/named-winner/index.html").read_text()
         # The id has to be page text, not just an href, or nothing reading the page can match it.
-        self.assertIn("<dt>ORCID</dt><dd><a href=\"https://orcid.org/0009-0003-1393-0987\"", winner)
+        self.assertIn(">ORCID</abbr></dt><dd><a href=\"https://orcid.org/0009-0003-1393-0987\"", winner)
+        # Each registry abbreviation carries its explanation as hover text.
+        self.assertIn("<abbr title=\"ORCID — a persistent identifier for this researcher\">ORCID</abbr>", winner)
+        self.assertIn("<abbr title=\"ROR — Research Organization Registry ID for the institution\">ROR</abbr>", winner)
         self.assertIn(">0009-0003-1393-0987</a>", winner)
         self.assertIn(">Q80917</a>", winner)
         self.assertIn(">A5083138872</a>", winner)
@@ -2902,10 +2905,10 @@ class WebsiteBuildTests(unittest.TestCase):
         build.build_site(database, "https://example.org/awards/", self.website)
 
         winner = (self.website / "dist/test-prize/2001/bare-winner/index.html").read_text()
-        self.assertIn("<dt>WDATA</dt>", winner)
-        self.assertNotIn("<dt>ORCID</dt>", winner)
-        self.assertNotIn("<dt>OpenAlex</dt>", winner)
-        self.assertNotIn("<dt>ROR</dt>", winner)
+        self.assertIn(">WDATA</abbr></dt>", winner)
+        self.assertNotIn(">ORCID</abbr></dt>", winner)
+        self.assertNotIn(">OpenAlex</abbr></dt>", winner)
+        self.assertNotIn(">ROR</abbr></dt>", winner)
         self.assertNotIn("<dt>Affiliated with</dt>", winner)
 
     def test_winners_page_lists_every_recipient_oldest_first(self) -> None:

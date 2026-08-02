@@ -55,8 +55,6 @@
   <h2 id="near-h" tabindex="-1" hidden>{{ t("nearby.near_you") }}</h2>
   <ol id="near-list" class="near-list"></ol>
 
-  <p class="footnote">{{ t("nearby.footnote_start", places=format_number(places), laureates=format_number(laureates)) }} <a href="{{ href(map_route) }}">{{ t("chrome.map") }}</a>{{ t("nearby.footnote_middle") }} <a href="{{ href(countries_route) }}">{{ t("chrome.countries") }}</a>{{ t("nearby.footnote_end") }}</p>
-
   <script id="nearby-data" type="application/json">{{ payload|safe }}</script>
   <script id="nearby-ui" type="application/json">{{ {
     "locale": language.code,
