@@ -155,7 +155,7 @@ FACT_FIELDS = (
     ("Death country", "death_country"),
 )
 LANGUAGE_CODES = ("en", "es", "fr")
-LANGUAGE_NAMES = {"en": "English", "es": "Español", "fr": "Français"}
+LANGUAGE_NAMES = {"en": "en", "fr": "fr", "es": "es"}
 NUMBER_SEPARATORS = {"en": (",", "."), "es": (".", ","), "fr": ("\u202f", ",")}
 SEGMENT_DEFAULTS = {
     "awards": "awards",
@@ -790,8 +790,8 @@ def _validate_languages(  # noqa: C901 - catalogue preflight is intentionally on
     languages: tuple[Language, ...], rankings: Iterable[Ranking], records: Iterable[AwardRecord], template_dir: Path
 ) -> None:
     by_code = {language.code: language for language in languages}
-    if tuple(by_code) != LANGUAGE_CODES:
-        raise BuildFailure("language codes must be en, es, fr")
+    if tuple(by_code) not in (("en",), LANGUAGE_CODES):
+        raise BuildFailure("language codes must be en or en, es, fr")
     if len({language.prefix for language in languages}) != len(languages):
         raise BuildFailure("language prefixes must be unique")
     english = by_code["en"]
@@ -850,29 +850,35 @@ def _validate_languages(  # noqa: C901 - catalogue preflight is intentionally on
 
 
 def load_languages(
-    rankings: Iterable[Ranking], records: Iterable[AwardRecord], i18n_dir: Path = I18N_DIR
+    rankings: Iterable[Ranking],
+    records: Iterable[AwardRecord],
+    i18n_dir: Path = I18N_DIR,
+    language_codes: tuple[str, ...] = LANGUAGE_CODES,
 ) -> tuple[Language, ...]:
-    """Load all committed catalogues before planning or creating any output directory."""
-    labels_path = i18n_dir / "labels.toml"
-    try:
-        labels_document = tomllib.loads(labels_path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, tomllib.TOMLDecodeError) as error:
-        raise BuildFailure("labels catalogue is missing or invalid") from error
-    raw_labels = labels_document.get("labels")
-    if not isinstance(raw_labels, dict):
-        raise BuildFailure("labels catalogue is invalid")
-    labels_by_code = {code: {} for code in LANGUAGE_CODES}
-    for qid, labels in raw_labels.items():
-        if not WIKIDATA_QID.fullmatch(qid) or not isinstance(labels, dict):
-            raise BuildFailure(f"labels invalid={qid!r}")
-        for code in ("es", "fr"):
-            value = labels.get(code, "")
-            if not isinstance(value, str):
+    """Load the selected committed catalogues before planning or creating any output directory."""
+    if language_codes not in (("en",), LANGUAGE_CODES):
+        raise BuildFailure("language codes must be en or en, es, fr")
+    labels_by_code = {code: {} for code in language_codes}
+    if language_codes != ("en",):
+        labels_path = i18n_dir / "labels.toml"
+        try:
+            labels_document = tomllib.loads(labels_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, tomllib.TOMLDecodeError) as error:
+            raise BuildFailure("labels catalogue is missing or invalid") from error
+        raw_labels = labels_document.get("labels")
+        if not isinstance(raw_labels, dict):
+            raise BuildFailure("labels catalogue is invalid")
+        for qid, labels in raw_labels.items():
+            if not WIKIDATA_QID.fullmatch(qid) or not isinstance(labels, dict):
                 raise BuildFailure(f"labels invalid={qid!r}")
-            if value:
-                labels_by_code[code][qid] = value
+            for code in ("es", "fr"):
+                value = labels.get(code, "")
+                if not isinstance(value, str):
+                    raise BuildFailure(f"labels invalid={qid!r}")
+                if value:
+                    labels_by_code[code][qid] = value
     languages: list[Language] = []
-    for code in LANGUAGE_CODES:
+    for code in language_codes:
         source = i18n_dir / f"{code}.toml"
         try:
             document = tomllib.loads(source.read_text(encoding="utf-8"))
@@ -3665,7 +3671,7 @@ def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa
     raise BuildFailure(f"cannot localize route language={language.code} key={key}")
 
 
-def _validate_localized_jobs(jobs: Iterable[PageJob]) -> None:
+def _validate_localized_jobs(jobs: Iterable[PageJob], language_codes: tuple[str, ...]) -> None:
     by_key: dict[str, dict[str, PageJob]] = {}
     route_owners: dict[str, PageJob] = {}
     for job in jobs:
@@ -3682,7 +3688,7 @@ def _validate_localized_jobs(jobs: Iterable[PageJob]) -> None:
             )
         route_owners[job.route] = job
     for key, siblings in by_key.items():
-        if set(siblings) != set(LANGUAGE_CODES):
+        if set(siblings) != set(language_codes):
             raise BuildFailure(f"locale parity key={key} languages={','.join(sorted(siblings))}")
 
 
@@ -3921,7 +3927,7 @@ def create_multilingual_site_plan(
             localized.append(
                 PageJob(job.template, route, title, description, _localized_breadcrumbs(language, job.breadcrumbs), context, language, key)
             )
-    _validate_localized_jobs(localized)
+    _validate_localized_jobs(localized, tuple(language.code for language in languages))
     return SitePlan(
         tuple(localized),
         canonical.prize_count,
@@ -4568,16 +4574,17 @@ def _promote(staging: Path, dist: Path) -> None:
     staging.rename(dist)
 
 
-def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) -> SitePlan:
+def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR, en_only: bool = False) -> SitePlan:
     normalized_base_url = normalize_base_url(base_url)
     corrections_email = read_env(website_dir.parent / ".env").get("CORRECTIONS_EMAIL", "")
     print(f"website build config corrections_email={corrections_email or '(unset)'}")
     rankings, profiles, records = read_database(database)
     generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
-    languages = load_languages(rankings, records, website_dir / "i18n")
+    language_codes = ("en",) if en_only else LANGUAGE_CODES
+    languages = load_languages(rankings, records, website_dir / "i18n", language_codes)
     plan = create_multilingual_site_plan(rankings, records, normalized_base_url, generated, languages, profiles)
     route_maps = _route_maps(plan)
-    alternate_maps = _alternates(plan)
+    alternate_maps = {job.key: {} for job in plan.jobs} if en_only else _alternates(plan)
     environment = _environment(website_dir)
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
     staging.chmod(0o2775)
@@ -4628,6 +4635,7 @@ def build_home_page(database: Path, base_url: str, website_dir: Path = SCRIPT_DI
     route_maps = _route_maps(plan)
     alternate_maps = _alternates(plan)
     home = next(job for job in plan.jobs if job.key == "home" and job.language and job.language.code == "en")
+    home_alternates = alternate_maps["home"] if all((output / code).is_dir() for code in ("es", "fr")) else {}
     _render_job(
         _environment(website_dir),
         output,
@@ -4635,7 +4643,7 @@ def build_home_page(database: Path, base_url: str, website_dir: Path = SCRIPT_DI
         corrections_email,
         home,
         route_maps["en"],
-        alternate_maps["home"],
+        home_alternates,
     )
 
 
@@ -4643,29 +4651,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--database", type=Path, default=DATASET_DIR / "awards.sqlite3")
-    parser.add_argument("--home-only", action="store_true", help="update website/dist/index.html only")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--home-only", action="store_true", help="update website/dist/index.html only")
+    mode.add_argument("--en-only", action="store_true", help="build the complete English site only")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    print(f"website build started_at={datetime.datetime.now(tz=datetime.UTC).isoformat()}", flush=True)
     try:
         if args.home_only:
             build_home_page(args.database.resolve(), args.base_url)
             print("website home page complete")
             return 0
-        plan = build_site(args.database.resolve(), args.base_url)
+        plan = build_site(args.database.resolve(), args.base_url, en_only=args.en_only)
+        print(
+            "website build complete "
+            f"prizes={plan.prize_count} categories={plan.category_count} year_pages={plan.year_count} "
+            f"winner_pages={plan.winner_count} people={plan.person_count} countries={plan.country_count} subjects={plan.subject_count} "
+            f"recipients={plan.recipient_count} "
+            f"sitemap_urls={len(plan.jobs)} generated_pages={len(plan.jobs)}"
+        )
+        return 0
     except Exception as error:  # noqa: BLE001 - every worker failure must map to exit status 1.
         print(f"website build failed: {error}", file=sys.stderr)
         return 1
-    print(
-        "website build complete "
-        f"prizes={plan.prize_count} categories={plan.category_count} year_pages={plan.year_count} "
-        f"winner_pages={plan.winner_count} people={plan.person_count} countries={plan.country_count} subjects={plan.subject_count} "
-        f"recipients={plan.recipient_count} "
-        f"sitemap_urls={len(plan.jobs)} generated_pages={len(plan.jobs)}"
-    )
-    return 0
+    finally:
+        print(f"website build finished_at={datetime.datetime.now(tz=datetime.UTC).isoformat()}", flush=True)
 
 
 if __name__ == "__main__":

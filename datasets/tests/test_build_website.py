@@ -734,6 +734,83 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertIn("Homepage preview", (self.website / "dist/index.html").read_text())
 
+    def test_english_only_build_omits_localized_output_and_alternates(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
+            [
+                {
+                    "award_record_id": "test-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Test Winner",
+                }
+            ],
+        )
+        (self.website / "i18n/es.toml").write_text("invalid = [")
+        (self.website / "i18n/fr.toml").unlink()
+        (self.website / "i18n/labels.toml").unlink()
+
+        plan = build.build_site(database, "https://example.org/awards/", self.website, en_only=True)
+
+        self.assertTrue(plan.jobs)
+        self.assertEqual({"en"}, {job.language.code for job in plan.jobs if job.language})
+        output = self.website / "dist"
+        self.assertTrue((output / "index.html").is_file())
+        self.assertTrue((output / "llms.txt").is_file())
+        self.assertFalse((output / "es").exists())
+        self.assertFalse((output / "fr").exists())
+        winner = (output / "test-prize/2000/test-winner/index.html").read_text()
+        self.assertIn('<html lang="en">', winner)
+        self.assertNotIn('rel="alternate"', winner)
+        self.assertNotIn('class="language-switcher"', winner)
+        sitemap = (output / "sitemap.xml").read_text()
+        self.assertNotIn("https://example.org/awards/es/", sitemap)
+        self.assertNotIn("https://example.org/awards/fr/", sitemap)
+
+    def test_home_page_refresh_does_not_add_alternates_to_english_only_output(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
+            [
+                {
+                    "award_record_id": "test-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Test Winner",
+                }
+            ],
+        )
+        (self.website / "dist").mkdir()
+
+        with mock.patch.object(build, "_render_job") as render:
+            build.build_home_page(database, "https://example.org/", self.website)
+
+        self.assertEqual({}, render.call_args.args[-1])
+
+    def test_en_only_cli_reports_start_and_finish_times(self) -> None:
+        plan = build.SitePlan((), 1, 2, 3, 4, 5, 6, 7, 8, "2000–2001")
+        with mock.patch.object(build, "build_site", return_value=plan) as build_site, mock.patch("builtins.print") as output:
+            result = build.main(["--base-url", "https://example.org/", "--en-only"])
+
+        self.assertEqual(0, result)
+        self.assertTrue(build.parse_args(["--base-url", "https://example.org/", "--en-only"]).en_only)
+        self.assertTrue(build_site.call_args.kwargs["en_only"])
+        messages = [call.args[0] for call in output.call_args_list]
+        self.assertRegex(messages[0], r"^website build started_at=\d{4}-\d{2}-\d{2}T.*\+00:00$")
+        self.assertIn("generated_pages=0", messages[1])
+        self.assertRegex(messages[2], r"^website build finished_at=\d{4}-\d{2}-\d{2}T.*\+00:00$")
+
+    def test_cli_reports_finish_time_after_build_failure(self) -> None:
+        with mock.patch.object(build, "build_site", side_effect=RuntimeError("render failed")), mock.patch("builtins.print") as output:
+            result = build.main(["--base-url", "https://example.org/"])
+
+        self.assertEqual(1, result)
+        messages = [call.args[0] for call in output.call_args_list]
+        self.assertRegex(messages[0], r"^website build started_at=\d{4}-\d{2}-\d{2}T.*\+00:00$")
+        self.assertEqual("website build failed: render failed", messages[1])
+        self.assertRegex(messages[2], r"^website build finished_at=\d{4}-\d{2}-\d{2}T.*\+00:00$")
+
     def test_explorer_section_order_and_chart_limits(self) -> None:
         explorer_html = (Path(build.__file__).parent / "templates/explorer.html").read_text()
         section_markers = (
@@ -1086,10 +1163,17 @@ class WebsiteBuildTests(unittest.TestCase):
                     f'<link rel="alternate" hreflang="{alternate_code}" href="https://example.org/awards{alternate_job.route}">',
                     html,
                 )
+                self.assertRegex(
+                    html,
+                    rf'hreflang="{alternate_code}" lang="{alternate_code}"[^>]*>{alternate_code}</a>',
+                )
             self.assertIn(
                 f'<link rel="alternate" hreflang="x-default" href="https://example.org/awards{deep_siblings["en"].route}">',
                 html,
             )
+            switcher = html.split('<nav class="language-switcher"', 1)[1].split("</nav>", 1)[0]
+            self.assertLess(switcher.index(">en</a>"), switcher.index(">fr</a>"))
+            self.assertLess(switcher.index(">fr</a>"), switcher.index(">es</a>"))
             structured_match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(structured_match)
             graph = json.loads(structured_match.group(1))["@graph"]

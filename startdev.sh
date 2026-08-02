@@ -1,9 +1,28 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Build the awards website and serve it on localhost. Usage: ./startdev.sh [port]
+# Build the awards website and serve it on localhost. Usage: ./startdev.sh [port] [--en-only]
 set -euo pipefail
 
-port="${1:-8000}"
+port=8000
+port_set=0
+build_options=()
+for argument in "$@"; do
+	case "$argument" in
+		--en-only) build_options=(--en-only) ;;
+		*[!0-9]*|"")
+			echo "usage: ./startdev.sh [port] [--en-only]" >&2
+			exit 2
+			;;
+		*)
+			if (( port_set )); then
+				echo "usage: ./startdev.sh [port] [--en-only]" >&2
+				exit 2
+			fi
+			port="$argument"
+			port_set=1
+			;;
+	esac
+done
 base="http://localhost:${port}/"
 
 if ! python3 - "$port" <<'PY'
@@ -27,13 +46,19 @@ cd "$(dirname "${BASH_SOURCE[0]}")/datasets"
 # The previous build's page count is the denominator. First run has no dist, so progress counts up without a percentage.
 # `|| true` throughout: a failed command substitution takes the assignment down with it under `set -e`.
 expected=0
-[[ -d website/dist ]] && expected="$(find website/dist -name '*.html' | wc -l || true)"
+if [[ -d website/dist ]]; then
+	if (( ${#build_options[@]} )); then
+		expected="$(find website/dist -name '*.html' ! -path 'website/dist/es/*' ! -path 'website/dist/fr/*' | wc -l || true)"
+	else
+		expected="$(find website/dist -name '*.html' | wc -l || true)"
+	fi
+fi
 log="$(mktemp)"
 builder=""
 # Without this, a script that exits early leaves the build orphaned and still writing a staging directory.
 trap 'rm -f "$log"; [[ -n "$builder" ]] && kill "$builder" 2>/dev/null; true' EXIT
 
-uv run website/build.py --base-url "$base" >"$log" 2>&1 &
+uv run website/build.py --base-url "$base" "${build_options[@]}" >"$log" 2>&1 &
 builder=$!
 
 # build.py writes into website/.dist-staging-* and swaps it into place at the end, so the staging tree is the progress meter.
