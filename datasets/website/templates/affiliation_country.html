@@ -1,29 +1,26 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ country_tabs("Institutions") }}
+{{ country_tabs("affiliations") }}
 <header class="page-intro">
-  <p class="eyebrow">Institutions in</p>
-  <h1>{{ place.name }}</h1>
-  <p>{{ place.members | length }} {{ "institution" if place.members | length == 1 else "institutions" }} ·
-    {{ place.laureates }} {{ "laureate" if place.laureates == 1 else "laureates" }} ·
-    {{ place.cities }} {{ "city" if place.cities == 1 else "cities" }}.</p>
-  <p class="caveat">An institution is the one recorded at the time of the award, not a whole career, and each count
-  is the laureates recorded here rather than the institution's worldwide total.</p>
+  <p class="eyebrow">{{ t("affiliation_country.eyebrow") }}</p>
+  <h1>{{ place_label(place) }}</h1>
+  <p>{{ t("affiliation_country.summary", institutions=t("plural.institution", count=place.members | length), laureates=t("plural.laureate", count=place.laureates), cities=t("plural.city", count=place.cities)) }}</p>
+  <p class="caveat">{{ t("affiliation_country.caveat") }}</p>
 </header>
 <ol class="rank-list">
   {% for row in place.members %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <span><a href="{{ href(row.affiliation.route) }}">{{ row.affiliation.name }}</a>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <span><a href="{{ href(row.affiliation.route) }}">{{ language.entity_label(row.affiliation.qid, row.affiliation.name) }}</a>
       <span class="rank-meta">
         {% if row.place %}{{ row.place }}{% endif %}
-        {% for name, route in row.affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+        {% for name, route in row.affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
       </span>
     </span>
-    <span class="rank-count" style="--share: {{ row.count * 100 // leader }}">{{ row.count }}</span>
+    <span class="rank-count" style="--share: {{ row.count * 100 // leader }}">{{ format_number(row.count) }}</span>
   </li>
   {% endfor %}
 </ol>
-<p><a href="{{ href(country_affiliations_route) }}">All countries</a></p>
+<p><a href="{{ href(country_affiliations_route) }}">{{ t("common.all_countries") }}</a></p>
 {% endblock %}

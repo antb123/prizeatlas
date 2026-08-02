@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ country_tabs("Cities %") }}
+{{ country_tabs("cities_per_capita") }}
 <header class="page-intro">
-  <p class="eyebrow">Awarded in</p>
-  <h1>Cities by award records as a share of population</h1>
-  <p>Award-recipient records at award-time institutions as a percentage of reviewed GeoNames city population.</p>
+  <p class="eyebrow">{{ t("cities_per_capita.eyebrow") }}</p>
+  <h1>{{ t("cities_per_capita.heading") }}</h1>
+  <p>{{ t("cities_per_capita.description") }}</p>
 </header>
 <ol class="rank-list rank-list-plain">
   {% for row in cities %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <span>{% if row.route %}<a href="{{ href(row.route) }}">{{ row.city }}, {{ row.country }}</a>{% else %}{{ row.city }}, {{ row.country }}{% endif %} · {{ row.award_count }} award{% if row.award_count != 1 %}s{% endif %}</span>
-    <span class="rank-count">{{ "%.3f" | format(row.awards_per_million / 10000) }}%</span>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <span>{% if row.route %}<a href="{{ href(row.route) }}">{{ city_label(row.city, row.country) }}</a>{% else %}{{ city_label(row.city, row.country) }}{% endif %} · {{ t("plural.award", count=row.award_count) }}</span>
+    <span class="rank-count">{{ format_number(row.awards_per_million / 10000, 3) }}%</span>
   </li>
   {% endfor %}
 </ol>

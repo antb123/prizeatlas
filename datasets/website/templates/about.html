@@ -2,175 +2,60 @@
 {% block body_class %}about{% endblock %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">About</p>
-  <h1>About this site</h1>
-  <p>
-    A free, static reference to the international prizes that mark work with lasting impact, and to everyone who has
-    received one. Every prize, every award year, and every recipient has its own page, and the pages are linked to each
-    other by subject, country, and institution so that one name leads to the next.
-  </p>
+  <p class="eyebrow">{{ t("about.eyebrow") }}</p>
+  <h1>{{ t("about.heading") }}</h1>
+  <p>{{ t("about.intro") }}</p>
 </header>
 <dl class="totals">
   {% for value, label in totals %}
   <div>
     <dt>{{ value }}</dt>
-    <dd>{{ label }}</dd>
+    <dd>{% if label == "laureates" %}{{ t("home.total.laureates") }}{% elif label == "awards" %}{{ t("home.total.awards") }}{% elif label == "prizes" %}{{ t("home.total.prizes") }}{% elif label == "years" %}{{ t("home.total.years") }}{% elif label == "subjects" %}{{ t("home.total.subjects") }}{% elif label == "countries" %}{{ t("home.total.countries") }}{% elif label == "institutions" %}{{ t("home.total.institutions") }}{% endif %}</dd>
   </div>
   {% endfor %}
 </dl>
 <section>
-  <h2>Why it is useful to students</h2>
-  <p>
-    Award citations are the shortest honest summary of a discovery ever written. Each one states what was found, by
-    whom, and why it mattered, in a sentence that had to survive a committee. This site collects them and makes them
-    browsable in the terms a student already has.
-  </p>
+  <h2>{{ t("about.students_heading") }}</h2>
+  <p>{{ t("about.students_intro") }}</p>
   <ul>
-    <li>
-      <strong>Sorted by school subject.</strong> Every award is tagged with the class its work belongs to — Biology,
-      Physics, Chemistry, Math, CS, and Earth Science — so
-      <a href="{{ href(subjects_route) }}">the subject pages</a> turn "we are studying genetics this term" into the
-      people who did the defining work in it.
-    </li>
-    <li>
-      <strong>Usable as a source.</strong> Every page carries a canonical address and links out to the awarding body's
-      own record, so a citation in an essay or a bibliography is a copy and a paste rather than a search.
-    </li>
-    <li>
-      <strong>Fast and free everywhere.</strong> These are plain HTML pages. No account, no paywall, no cookie banner,
-      no autoplaying anything. They open on a school Chromebook and on a phone with one bar of signal.
-    </li>
-    <li>
-      <strong>Practice at reading data.</strong> <a href="{{ href(explorer_route) }}">The explorer</a> ranks laureates
-      and countries and then lets a reader test the ranking — dividing by population changes the leaderboard
-      completely, and noticing why is the lesson.
-    </li>
-    <li>
-      <strong>Geography and history in one view.</strong> <a href="{{ href(map_route) }}">The atlas</a> plots where
-      laureates were born against the institutions where they later worked. The distance between the two dots is a
-      century of migration, visible at a glance.
-    </li>
+    <li><strong>{{ t("about.students_subject_title") }}</strong> {{ t("about.students_subject_start") }} <a href="{{ href(subjects_route) }}">{{ t("about.subject_pages") }}</a> {{ t("about.students_subject_end") }}</li>
+    <li><strong>{{ t("about.students_source_title") }}</strong> {{ t("about.students_source") }}</li>
+    <li><strong>{{ t("about.students_fast_title") }}</strong> {{ t("about.students_fast") }}</li>
+    <li><strong>{{ t("about.students_data_title") }}</strong> <a href="{{ href(explorer_route) }}">{{ t("about.explorer") }}</a> {{ t("about.students_data") }}</li>
+    <li><strong>{{ t("about.students_geography_title") }}</strong> <a href="{{ href(map_route) }}">{{ t("about.atlas") }}</a> {{ t("about.students_geography") }}</li>
   </ul>
 </section>
 <section>
-  <h2>What you can do here</h2>
+  <h2>{{ t("about.actions_heading") }}</h2>
   <ul>
-    <li>
-      <a href="{{ home_href }}">Prizes</a> — the award families, each with a short description and an editorial
-      prestige score, opening onto that prize's categories, its award years, and a page for every recipient with the
-      full citation.
-    </li>
-    <li>
-      <a href="{{ href(people_route) }}">People</a> — every laureate on record, listed by surname. A person's page
-      gathers all of their awards in one place, which is where the repeat winners become obvious.
-    </li>
-    <li>
-      <a href="{{ href(subjects_route) }}">Subjects</a> — the same awards regrouped by high school class, with the
-      institutions that recur in each field.
-    </li>
-    <li>
-      <a href="{{ href(countries_route) }}">Countries</a> — laureates by country of birth, award-time institution,
-      or death, and
-      <a href="{{ href(affiliations_route) }}">Institutions</a> — the universities, laboratories, and organizations
-      where the recognized work was done.
-    </li>
-    <li>
-      <a href="{{ href(map_route) }}">Map</a> — birthplaces and institutions on one atlas, filterable by subject.
-    </li>
-    <li>
-      <a href="{{ href(explorer_route) }}">Explorer</a> — ranked leaderboards, laureates per million people, and a
-      chart of those who won before turning forty.
-    </li>
+    <li><a href="{{ home_href }}">{{ t("about.prizes") }}</a> {{ t("about.actions_prizes") }}</li>
+    <li><a href="{{ href(people_route) }}">{{ t("about.people") }}</a> {{ t("about.actions_people") }}</li>
+    <li><a href="{{ href(subjects_route) }}">{{ t("about.subjects") }}</a> {{ t("about.actions_subjects") }}</li>
+    <li><a href="{{ href(countries_route) }}">{{ t("about.countries") }}</a> {{ t("about.actions_countries_start") }} <a href="{{ href(affiliations_route) }}">{{ t("about.institutions") }}</a> {{ t("about.actions_countries_end") }}</li>
+    <li><a href="{{ href(map_route) }}">{{ t("about.map") }}</a> {{ t("about.actions_map") }}</li>
+    <li><a href="{{ href(explorer_route) }}">{{ t("about.explorer") }}</a> {{ t("about.actions_explorer") }}</li>
   </ul>
 </section>
 <section>
-  <h2>Where the data comes from</h2>
-  <p>
-    One row per recipient, compiled from each award's official record and cross-checked against Wikipedia and Wikidata.
-    Institutions are keyed off their Wikidata entry and matched against the Research Organization Registry (ROR) and
-    OpenAlex to resolve a name to a specific place and to link out to that organization's own record, and laureates
-    are linked to their ORCID identifier where one exists. Fields are verified individually rather than
-    imported wholesale, and the standing rule is to leave a cell blank rather than guess: a missing birthplace here
-    means nobody could confirm it, not that it was rounded to something plausible. Places use their present-day names,
-    so a laureate born in Königsberg in 1904 is listed under Kaliningrad, Russia.
-  </p>
-  <p>
-    The pages themselves are generated from that database by a build script and served as fixed files. Nothing is
-    assembled while you read it, and nothing about your visit is recorded. The one exception is the explorer, which may
-    ask a public service which country you are browsing from in order to show your country's laureates first; if that
-    request fails the rest of the page is unaffected.
-  </p>
+  <h2>{{ t("about.data_heading") }}</h2>
+  <p>{{ t("about.data_records") }}</p>
+  <p>{{ t("about.data_pages") }}</p>
 </section>
 <section>
-  <h2>Design philosophy</h2>
-  <p>
-    This site is built to work first on a phone with a slow connection, then on a desktop — not the other way around.
-    That means plain HTML, small pages, and no framework weighing down a Chromebook in a school with one bar of
-    signal or a browser in a market where bandwidth is expensive. The goal is the same on every device: free, fast,
-    and informative, with nothing standing between a reader and the answer.
-  </p>
-  <p>
-    The curated data and original site content are dual-licensed under
-    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> and the
-    <a href="https://www.gnu.org/licenses/fdl-1.3.html">GNU Free Documentation License</a> (unversioned), with no
-    invariant or cover sections. The source code is licensed under the GNU General Public License, version 2 or
-    later. References throughout point back to their sources — the awarding body's own record, Wikidata, Wikipedia,
-    the Research Organization Registry (ROR), and OpenAlex — so a fact here can always be traced to where it came
-    from.
-  </p>
-  <p>
-    A laureate's page is meant to be a beginning, not an ending. Alongside the citation, every one links out to
-    ChatGPT, Perplexity, Brave, and Wikipedia with the award already framed as a question, so a reader who wants more
-    than the summary can go get it in one click. Where a laureate's OpenAlex record exists, that page links there
-    too, which is where the trail goes from a plain-language explanation to the specific papers the person actually
-    wrote — the same site works whether the reader is meeting the subject for the first time or already reading the
-    literature. Institution pages do the same for a different question: where an affiliation publishes how to apply,
-    that link is here too, for anyone weighing where they might study next.
-  </p>
-  <p>
-    The map and the nearby page turn the same data into geography. The map plots birthplaces against the institutions
-    where laureates later worked, filterable by subject, so a reader can drill into one region or one field at a
-    time. Nearby does the same from wherever the reader actually is, using their location to surface the closest
-    laureate birthplaces and institutions.
-  </p>
-  <p>
-    The longer aim is a site where, a century from now, a good number of today's winners are still remembered the way
-    Einstein is. On most prizes only a handful will ever reach that, so the prize list itself is chosen with a
-    power-law bet in mind, not an expectation that every winner on it will last.
-  </p>
-  <p>
-    Everything is also searchable by high school subject — Biology, Chemistry, Physics, Math, and the rest — because
-    the site is built primarily for science and math students. We like literature and the arts as much as anyone, but
-    early on we chose to keep this collection focused rather than trying to cover every field at once.
-  </p>
-  <p>
-    We think many of these people are adding to the knowledge of humanity and promoting humanity's quality of life
-    going forward. These people should be treasured not only as national heroes but as global citizens who have
-    promoted humanity. We only removed the Nobel Prize in Literature and other arts prizes to simplify the process,
-    not that these other awards are less in any way.
-  </p>
+  <h2>{{ t("about.design_heading") }}</h2>
+  <p>{{ t("about.design_mobile") }}</p>
+  <p>{{ t("about.design_license_start") }} <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> {{ t("about.design_license_middle") }} <a href="https://www.gnu.org/licenses/fdl-1.3.html">GNU Free Documentation License</a>{{ t("about.design_license_end") }}</p>
+  <p>{{ t("about.design_laureate") }}</p>
+  <p>{{ t("about.design_geography") }}</p>
+  <p>{{ t("about.design_aim") }}</p>
+  <p>{{ t("about.design_subjects") }}</p>
+  <p>{{ t("about.design_humanity") }}</p>
 </section>
 <section>
-  <h2>Which prizes make the list</h2>
-  <p>
-    A prize is included if it clears at least one of three bars: recipients clearly drawn from around the world
-    rather than one country, a history longer than 25 years, or a purse over one million dollars. Meeting any single
-    bar is enough — the Breakthrough Prize qualifies on its purse alone at fourteen years old, the Shaw Prize the same
-    way at twenty-two, and the Abel Prize on its international recipient list at twenty-three. Everything else on the
-    list clears the age bar outright, several of them by a century or more.
-  </p>
-  <p>
-    One list we found useful while assembling ours is the European Research Council's roundup of
-    <a href="https://erc.europa.eu/projects-statistics/scientific-prizes" target="_blank" rel="noopener noreferrer">scientific prizes</a>.
-    Not everything on it is here: EMBO's awards go only to Europe, and the Holberg and Balzan prizes are not
-    specifically science prizes.
-  </p>
+  <h2>{{ t("about.prizes_heading") }}</h2>
+  <p>{{ t("about.prizes_criteria") }}</p>
+  <p>{{ t("about.prizes_list_start") }} <a href="https://erc.europa.eu/projects-statistics/scientific-prizes" target="_blank" rel="noopener noreferrer">{{ t("about.scientific_prizes") }}</a>{{ t("about.prizes_list_end") }}</p>
   {% set correction = correction_href() %}
-  <p>
-    If a prize clears one of those bars and is not here yet, add it: send a pull request or open an issue on
-    <a href="https://github.com/antb123/prizeatlas" target="_blank" rel="noopener noreferrer">GitHub</a>{% if correction %},
-    or <a href="{{ correction }}">contact us</a>{% else %}, or get in touch{% endif %}. The data is one row per
-    recipient, so a new prize is a contribution anyone can make.
-  </p>
+  <p>{{ t("about.prizes_contact_start") }} <a href="https://github.com/antb123/prizeatlas" target="_blank" rel="noopener noreferrer">GitHub</a>{% if correction %}, {{ t("about.prizes_contact_or") }} <a href="{{ correction }}">{{ t("about.contact_us") }}</a>{% else %}, {{ t("about.get_in_touch") }}{% endif %}. {{ t("about.prizes_contact_end") }}</p>
 </section>
 {% endblock %}

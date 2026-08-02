@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">Subjects</p>
-  <h1>Awards by subject</h1>
-  <p>Browse these awards by the high school class their work belongs to.</p>
+  <p class="eyebrow">{{ t("subjects.eyebrow") }}</p>
+  <h1>{{ t("subjects.heading") }}</h1>
+  <p>{{ t("subjects.description") }}</p>
 </header>
 {% if subjects %}
 <ol class="rank-list">
   {% for subject in subjects %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <a href="{{ href(subject.route) }}">{{ subject.name }}</a>
-    <span class="rank-count" style="--share: {{ subject.award_count * 100 // leader }}">{{ subject.award_count }} {{ "award" if subject.award_count == 1 else "awards" }}</span>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <a href="{{ href(subject.route) }}">{{ term("subject", subject.name) }}</a>
+    <span class="rank-count" style="--share: {{ subject.award_count * 100 // leader }}">{{ t("plural.award", count=subject.award_count) }}</span>
   </li>
   {% endfor %}
 </ol>
 {% else %}
-<p>No awards have been assigned a subject yet.</p>
+<p>{{ t("subjects.empty") }}</p>
 {% endif %}
 {% endblock %}

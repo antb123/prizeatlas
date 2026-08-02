@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">Institution</p>
+  <p class="eyebrow">{{ t("affiliation.eyebrow") }}</p>
   {% if affiliation.profile and affiliation.profile.logo_url %}
-  <img class="award-logo award-logo-large" src="{{ affiliation.profile.logo_url }}" alt="{{ affiliation.name }} logo">
+  <img class="award-logo award-logo-large" src="{{ affiliation.profile.logo_url }}" alt="{{ t("common.logo_alt", name=language.entity_label(affiliation.qid, affiliation.name)) }}">
   {% endif %}
-  <h1>{{ affiliation.name }}</h1>
+  <h1>{{ language.entity_label(affiliation.qid, affiliation.name) }}</h1>
   <p class="subject-badges">
-    {% for name, route in affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
+    {% for name, route in affiliation.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
   </p>
   {% if affiliation.profile and affiliation.profile.description %}
   <p>{{ affiliation.profile.description }}</p>
   {% endif %}
   <p>
-    {% if affiliation.count %}{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }} · {% endif %}
-    {{ award_count }} recorded {{ "award" if award_count == 1 else "awards" }}.
+    {% if affiliation.count %}{{ t("plural.laureate", count=affiliation.count) }} · {% endif %}
+    {{ t("affiliation.summary", count=award_count) }}
   </p>
   {% if affiliation.profile %}
   <p class="winner-links">
-    {% if affiliation.profile.application_url %}<a class="external-source" href="{{ affiliation.profile.application_url }}">How to Apply <span aria-hidden="true">↗</span></a>{% endif %}
+    {% if affiliation.profile.application_url %}<a class="external-source" href="{{ affiliation.profile.application_url }}">{{ t("common.how_to_apply") }} <span aria-hidden="true">↗</span></a>{% endif %}
     <a class="external-source" href="{{ wikipedia_url }}">Wikipedia <span aria-hidden="true">↗</span></a>
     {% if affiliation.openalex_id %}<a class="external-source" href="https://openalex.org/institutions/{{ affiliation.openalex_id }}">OpenAlex <span aria-hidden="true">↗</span></a>{% endif %}
   </p>
@@ -26,18 +26,18 @@
   {% if affiliation.ror %}<p class="ror-tag">ror: {{ affiliation.ror }}</p>{% endif %}
 </header>
 <section>
-  <h2>Awards</h2>
+  <h2>{{ t("common.awards") }}</h2>
   <ol class="person-awards">
     {% for link in affiliation.awards %}
     <li>
       <p class="person-award-year">{{ link.record.year }}</p>
       <div>
         <h3><a href="{{ href(link.route) }}">{{ link.record.full_name }}</a></h3>
-        <p>{{ link.record.prize_name }}{% if link.record.category %} — {{ link.record.category }}{% endif %}{% if link.affiliation.sub_name %} · {{ link.affiliation.sub_name }}{% endif %}</p>
+        <p>{{ term("prize", link.record.prize_name) }}{% if link.record.category %} — {{ term("category", link.record.category) }}{% endif %}{% if link.affiliation.sub_name %} · {{ link.affiliation.sub_name }}{% endif %}</p>
       </div>
     </li>
     {% endfor %}
   </ol>
 </section>
-<p><a href="{{ href(affiliations_route) }}">All institutions</a></p>
+<p><a href="{{ href(affiliations_route) }}">{{ t("common.all_institutions") }}</a></p>
 {% endblock %}

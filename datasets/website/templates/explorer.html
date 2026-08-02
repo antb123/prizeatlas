@@ -117,32 +117,32 @@
 {% block content %}
 <div class="explorer">
   <header class="hero">
-    <p class="eyebrow">Data explorer</p>
-    <h1>The most awarded people in science and beyond</h1>
-    <p class="lede">Every laureate ranked by the number of their recorded awards.</p>
+    <p class="eyebrow">{{ t("explorer.eyebrow") }}</p>
+    <h1>{{ t("explorer.heading") }}</h1>
+    <p class="lede">{{ t("explorer.lede") }}</p>
     <ul class="stats" id="stats"></ul>
   </header>
 
   <section id="local-winners" aria-labelledby="local-winners-h">
-    <h2 id="local-winners-h">Top winners in your country</h2>
-    <p class="section-note" id="local-winners-note">Detecting your country…</p>
+    <h2 id="local-winners-h">{{ t("explorer.local_heading") }}</h2>
+    <p class="section-note" id="local-winners-note">{{ t("explorer.detecting_country") }}</p>
     <figure id="local-winners-chart"></figure>
-    <p class="section-note"><a href="{{ href(nearby_route) }}">Find the winners nearest you</a></p>
+    <p class="section-note"><a href="{{ href(nearby_route) }}">{{ t("explorer.nearby_link") }}</a></p>
   </section>
 
   <section aria-labelledby="board-h">
-    <h2 id="board-h">Leaderboard</h2>
-    <p class="section-note">The top 7 are shown — search to find anyone else. Click a row to see the full award record. Click a column heading to re-sort.</p>
+    <h2 id="board-h">{{ t("explorer.leaderboard") }}</h2>
+    <p class="section-note">{{ t("explorer.leaderboard_note") }}</p>
     <div class="board-tools">
-      <input id="q" type="search" placeholder="Filter by name…" aria-label="Filter by name">
+      <input id="q" type="search" placeholder="{{ t("explorer.filter_placeholder") }}" aria-label="{{ t("explorer.filter_aria") }}">
       <span id="hits" role="status"></span>
     </div>
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th aria-sort="none"><button type="button" data-sort="name">Name<span class="dir"></span></button></th>
-          <th style="text-align:right" aria-sort="descending"><button type="button" data-sort="count">Awards<span class="dir"> ↓</span></button></th>
+          <th>{{ t("explorer.rank") }}</th>
+          <th aria-sort="none"><button type="button" data-sort="name">{{ t("explorer.name") }}<span class="dir"></span></button></th>
+          <th style="text-align:right" aria-sort="descending"><button type="button" data-sort="count">{{ t("common.awards") }}<span class="dir"> ↓</span></button></th>
         </tr>
       </thead>
       <tbody id="board"></tbody>
@@ -150,93 +150,128 @@
   </section>
 
   <section aria-labelledby="country-h">
-    <h2 id="country-h">Laureates by country</h2>
-    <p class="section-note">
-      Distinct laureates per modern country, top 25 shown. Every view counts a person once, however many awards they hold.
-      Affiliation and citizenship count a laureate once under each listed country.
-      The two country rate views measure laureates against World Bank population. Cities / 1m measures award records at award-time affiliations against GeoNames city population.
-    </p>
-    <select class="chart-select" id="country-select" aria-label="Country field">
-      <option value="bc">Birth country</option>
-      <option value="dc">Death country</option>
-      <option value="ac">Affiliation country</option>
-      <option value="cc">Citizenship</option>
-      <option value="pb">Births / 1m</option>
-      <option value="pa">Affiliations / 1m</option>
-      <option value="pc">Cities / 1m</option>
+    <h2 id="country-h">{{ t("explorer.country_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.country_note") }}</p>
+    <select class="chart-select" id="country-select" aria-label="{{ t("explorer.country_select_aria") }}">
+      <option value="bc">{{ t("explorer.country_birth") }}</option>
+      <option value="dc">{{ t("explorer.country_death") }}</option>
+      <option value="ac">{{ t("explorer.country_affiliation") }}</option>
+      <option value="cc">{{ t("explorer.country_citizenship") }}</option>
+      <option value="pb">{{ t("explorer.country_births_per_million") }}</option>
+      <option value="pa">{{ t("explorer.country_affiliations_per_million") }}</option>
+      <option value="pc">{{ t("explorer.country_cities_per_million") }}</option>
     </select>
     <figure id="country-chart"></figure>
   </section>
 
   <section aria-labelledby="gdp-h">
-    <h2 id="gdp-h">Recent award records relative to GDP</h2>
-    <p class="section-note">
-      Every country with at least 5 recorded award-recipient rows from 2015–2025, using affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.
-    </p>
+    <h2 id="gdp-h">{{ t("explorer.gdp_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.gdp_note") }}</p>
     <figure id="gdp-chart"></figure>
   </section>
 
   <section aria-labelledby="young-h">
-    <h2 id="young-h">Career totals of early winners</h2>
-    <p class="section-note">
-      Laureates who won at least one award before turning 40, ranked by their lifetime award count — these are finished careers, not people who are young now.
-      Age comes from birth year, so it may be off by one.
-    </p>
+    <h2 id="young-h">{{ t("explorer.young_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.young_note") }}</p>
     <figure id="young-chart"></figure>
   </section>
 
   <section aria-labelledby="age-h">
-    <h2 id="age-h">Age at first win, by subject</h2>
-    <p class="section-note">
-      How old laureates were when they won their first recorded award, grouped by subject.
-      The bar spans the middle half of each subject — a quarter won younger, a quarter older — and the notch is the median.
-      Mathematics stands apart because the Fields Medal is only awarded under 40. Organizations and laureates with no birth year are excluded.
-    </p>
+    <h2 id="age-h">{{ t("explorer.age_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.age_note") }}</p>
     <figure id="age-chart"></figure>
   </section>
 
   <section aria-labelledby="flow-h">
-    <h2 id="flow-h">Where laureates go to win</h2>
-    <p class="section-note">
-      Each country's laureates per million people, counted twice: by where they were born, and by where they were working when the award came.
-      A bar running right means the country hosts more laureates than it raises; running left means its laureates won elsewhere.
-      Needs a published population figure and at least 5 laureates on one of the two measures.
-    </p>
+    <h2 id="flow-h">{{ t("explorer.flow_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.flow_note") }}</p>
     <p class="legend">
-      <span><i class="swatch-born"></i>Born there</span>
-      <span><i class="swatch-affiliated"></i>Affiliated there</span>
+      <span><i class="swatch-born"></i>{{ t("explorer.born_there") }}</span>
+      <span><i class="swatch-affiliated"></i>{{ t("explorer.affiliated_there") }}</span>
     </p>
     <figure id="flow-chart"></figure>
   </section>
 
   <section aria-labelledby="time-h">
-    <h2 id="time-h">Awards by decade</h2>
-    <p class="section-note">How many awards each prize family has handed out over time. The final decade is marked&nbsp;* because it is still running.</p>
-    <select class="chart-select" id="family-select" aria-label="Prize family"></select>
+    <h2 id="time-h">{{ t("explorer.decade_heading") }}</h2>
+    <p class="section-note">{{ t("explorer.decade_note") }}</p>
+    <select class="chart-select" id="family-select" aria-label="{{ t("explorer.family_select_aria") }}"></select>
     <figure id="time-chart"></figure>
   </section>
 
   <p class="explorer-note">
-      Scoring: points = &Sigma; (prize prestige score &divide; 100) over a laureate's recorded awards; prize shares are not discounted.
-      Identity follows the Wikidata QID in the source data, so the same person is merged across prize families.
-      Built from <code>awards.sqlite3</code> as of {{ generated }}.
+      {{ t("explorer.note", generated=generated) }}
   </p>
 </div>
 
 <script id="explorer-data" type="application/json">{{ payload|safe }}</script>
+<script id="explorer-ui" type="application/json">{{ {
+  "locale": language.code,
+  "statsLaureates": t("explorer.stats_laureates"),
+  "statsAwards": t("explorer.stats_awards"),
+  "statsFamilies": t("explorer.stats_families"),
+  "statsYears": t("explorer.stats_years"),
+  "filteredResults": browser_t("explorer.filtered_results"),
+  "topResults": browser_t("explorer.top_results"),
+  "organization": t("explorer.organization"),
+  "localChartAria": browser_t("explorer.local_chart_aria"),
+  "localTooltip": browser_t("explorer.local_tooltip"),
+  "localHeading": browser_t("explorer.local_heading_named"),
+  "localNote": t("explorer.local_note"),
+  "detectionUnavailable": t("explorer.detection_unavailable"),
+  "youngChartAria": t("explorer.young_chart_aria"),
+  "youngTooltip": browser_t("explorer.young_tooltip"),
+  "allFamilies": t("explorer.all_families"),
+  "decadeChartAria": t("explorer.decade_chart_aria"),
+  "decadeTooltip": browser_t("explorer.decade_tooltip"),
+  "decadePartial": browser_t("explorer.decade_partial"),
+  "decadeLabel": browser_t("explorer.decade_label"),
+  "countryChartAria": t("explorer.country_chart_aria"),
+  "cityChartAria": t("explorer.city_chart_aria"),
+  "cityTooltip": browser_t("explorer.city_tooltip"),
+  "countryRateTooltip": browser_t("explorer.country_rate_tooltip"),
+  "countryCountTooltip": browser_t("explorer.country_count_tooltip"),
+  "countryBirth": t("explorer.country_birth"),
+  "countryAffiliation": t("explorer.country_affiliation"),
+  "gdpChartTitle": t("explorer.gdp_chart_title"),
+  "gdpDescription": browser_t("explorer.gdp_description"),
+  "gdpTooltip": browser_t("explorer.gdp_tooltip"),
+  "ageChartAria": t("explorer.age_chart_aria"),
+  "ageTooltip": browser_t("explorer.age_tooltip"),
+  "flowChartAria": t("explorer.flow_chart_aria"),
+  "flowTooltip": browser_t("explorer.flow_tooltip"),
+  "awards": {"one": browser_t("plural.award.one"), "other": browser_t("plural.award.other")},
+  "laureates": {"one": browser_t("plural.laureate.one"), "other": browser_t("plural.laureate.other")}
+}|tojson }}</script>
 <script>
 "use strict";
 const DATA = JSON.parse(document.getElementById("explorer-data").textContent);
+const UI = JSON.parse(document.getElementById("explorer-ui").textContent);
 const FAMILIES = DATA.families;           // [{name, score}]
 const COUNTRIES = DATA.countries;         // [name, ...]
 const SUBJECTS = DATA.subjects;           // [name, ...]
+const COUNTRY_KEYS = DATA.country_keys;   // canonical country values aligned with COUNTRIES
+const SUBJECT_KEYS = DATA.subject_keys;   // canonical subject values aligned with SUBJECTS
+const CATEGORY_LABELS = DATA.category_labels;
 const POPULATION = DATA.population;       // [people | null, ...] aligned with COUNTRIES
 const CITY_AWARDS_PER_CAPITA = DATA.city_awards_per_capita;
 const INCOME_ADJUSTED_AWARDS = DATA.income_adjusted_awards;
 const PEOPLE = DATA.people;               // [{n, o, r, c, p, a:[[year, familyIdx, category, subjectIdx], ...], bc, dc, ac:[countryIdx], cc:[countryIdx], by}]
 PEOPLE.forEach((person, index) => { person.id = index; });
 
-const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const number = new Intl.NumberFormat(UI.locale);
+const decimal = new Intl.NumberFormat(UI.locale, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+const rate = new Intl.NumberFormat(UI.locale, {minimumFractionDigits: 4, maximumFractionDigits: 4});
+const points = new Intl.NumberFormat(UI.locale, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const plural = new Intl.PluralRules(UI.locale);
+const format = (template, fields) => template.replace(/\{([a-z_]+)\}/g, (match, name) => Object.hasOwn(fields, name) ? String(fields[name]) : match);
+const pluralText = (forms, count, fields = {}) => format(forms[plural.select(count)], {...fields, count});
+const html = (name, className, content) => {
+  const node = document.createElement(name);
+  if (className) node.className = className;
+  if (content !== undefined) node.textContent = content;
+  return node;
+};
 const YEARS = PEOPLE.flatMap((p) => p.a.map(([year]) => year));
 const FIRST_YEAR = Math.min(...YEARS), LAST_YEAR = Math.max(...YEARS);
 
@@ -244,12 +279,18 @@ const FIRST_YEAR = Math.min(...YEARS), LAST_YEAR = Math.max(...YEARS);
 {
   const awards = PEOPLE.reduce((sum, p) => sum + p.c, 0);
   const span = FIRST_YEAR + "–" + LAST_YEAR;
-  document.getElementById("stats").innerHTML = [
-    [PEOPLE.length.toLocaleString("en"), "laureates ranked"],
-    [awards.toLocaleString("en"), "recorded awards"],
-    [FAMILIES.length, "prize families"],
-    [span, "years covered"],
-  ].map(([value, label]) => `<li><b>${value}</b><span>${label}</span></li>`).join("");
+  const stats = document.getElementById("stats");
+  const entries = [
+    [number.format(PEOPLE.length), UI.statsLaureates],
+    [number.format(awards), UI.statsAwards],
+    [number.format(FAMILIES.length), UI.statsFamilies],
+    [span, UI.statsYears],
+  ];
+  stats.replaceChildren(...entries.map(([value, label]) => {
+    const item = document.createElement("li");
+    item.append(html("b", "", value), html("span", "", label));
+    return item;
+  }));
 }
 
 /* ---------- leaderboard ---------- */
@@ -263,12 +304,39 @@ const SORTS = {                                       // all ascending; state.di
 const DEFAULT_DIR = { count: -1, name: 1 };
 const compare = (a, b) => state.dir * SORTS[state.key](a, b);
 
-function detailRows(person) {
-  const items = person.a
-    .map(([year, fi, category]) =>
-      `<li><span class="y">${year}</span>${esc(FAMILIES[fi].name)}${category ? " · " + esc(category) : ""}</li>`)
-    .join("");
-  return `<tr class="detail"><td colspan="3"><ul>${items}</ul></td></tr>`;
+function detailRow(person) {
+  const row = html("tr", "detail");
+  const cell = document.createElement("td");
+  cell.colSpan = 3;
+  const list = document.createElement("ul");
+  person.a.forEach(([year, fi, category]) => {
+    const item = document.createElement("li");
+    item.append(html("span", "y", year), document.createTextNode(FAMILIES[fi].name));
+    if (category) item.append(document.createTextNode(` · ${CATEGORY_LABELS[category] || category}`));
+    list.append(item);
+  });
+  cell.append(list);
+  row.append(cell);
+  return row;
+}
+
+function personRow(person, rank) {
+  const row = html("tr", `person${person.open ? " open" : ""}`);
+  row.dataset.id = person.id;
+  row.tabIndex = 0;
+  row.setAttribute("aria-expanded", String(Boolean(person.open)));
+  row.append(html("td", "rank", number.format(rank)));
+  const nameCell = document.createElement("td");
+  if (person.r) {
+    const profile = html("a", "person-profile", person.n);
+    profile.href = person.r;
+    nameCell.append(profile);
+  } else {
+    nameCell.append(document.createTextNode(person.n));
+  }
+  if (person.o) nameCell.append(html("span", "badge", UI.organization));
+  row.append(nameCell, html("td", "num", number.format(person.c)));
+  return row;
 }
 
 const TOP_N = 7;
@@ -278,20 +346,14 @@ function renderBoard() {
   const rankOf = new Map(sorted.map((p, i) => [p.id, i + 1]));
   const rows = query ? sorted.filter((p) => p.n.toLowerCase().includes(query)) : sorted.slice(0, TOP_N);
   hits.textContent = query
-    ? `${rows.length} of ${PEOPLE.length} shown`
-    : `top ${TOP_N} of ${PEOPLE.length.toLocaleString("en")} — search to see all`;
-  const html = [];
+    ? format(UI.filteredResults, {shown: number.format(rows.length), total: number.format(PEOPLE.length)})
+    : format(UI.topResults, {count: number.format(TOP_N), total: number.format(PEOPLE.length)});
+  const nodes = [];
   rows.forEach((p) => {
-    const name = p.r ? `<a class="person-profile" href="${esc(p.r)}">${esc(p.n)}</a>` : esc(p.n);
-    html.push(
-      `<tr class="person${p.open ? " open" : ""}" data-id="${p.id}" tabindex="0" aria-expanded="${p.open ? "true" : "false"}">` +
-      `<td class="rank">${rankOf.get(p.id)}</td>` +
-      `<td>${name}${p.o ? '<span class="badge">Organization</span>' : ""}</td>` +
-      `<td class="num">${p.c}</td></tr>`
-    );
-    if (p.open) html.push(detailRows(p));
+    nodes.push(personRow(p, rankOf.get(p.id)));
+    if (p.open) nodes.push(detailRow(p));
   });
-  board.innerHTML = html.join("");
+  board.replaceChildren(...nodes);
 }
 
 document.getElementById("q").addEventListener("input", (e) => { state.q = e.target.value; renderBoard(); });
@@ -362,14 +424,15 @@ countryLookup
       TW: "Taiwan",
       TZ: "Tanzania",
     };
-    const countryName = aliases[country] || new Intl.DisplayNames(["en"], { type: "region" }).of(country);
-    const countryIdx = COUNTRIES.indexOf(countryName);
+    const countryKey = aliases[country] || new Intl.DisplayNames(["en"], { type: "region" }).of(country);
+    const countryIdx = COUNTRY_KEYS.indexOf(countryKey);
     if (countryIdx < 0) throw new Error("country is not represented");
     const local = PEOPLE.filter((p) => p.bc === countryIdx).slice(0, TOP_N);
     if (!local.length) throw new Error("country has no birth records");
+    const countryName = COUNTRIES[countryIdx];
 
     const rowH = 24, labelW = 215, valueW = 48, width = 860, height = local.length * rowH + 8;
-    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `Top winners born in ${countryName}` });
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": format(UI.localChartAria, {country: countryName}) });
     const max = local[0].p;
     local.forEach((p, i) => {
       const y = i * rowH + 4;
@@ -378,16 +441,15 @@ countryLookup
       text(label, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
       const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
       const tip = el("title", {}, rect);
-      tip.textContent = `${p.n} — ${p.c} awards, ${p.p.toFixed(2)} points`;
-      text(svg, labelW + barW + 6, y + 14, p.p.toFixed(2), "bar-value");
+      tip.textContent = format(UI.localTooltip, {name: p.n, awards: pluralText(UI.awards, p.c, {count: number.format(p.c)}), points: points.format(p.p)});
+      text(svg, labelW + barW + 6, y + 14, points.format(p.p), "bar-value");
     });
-    document.getElementById("local-winners-h").textContent = `Top winners in ${countryName}`;
-    document.getElementById("local-winners-note").textContent =
-      "Ranked by total points across all prize families, using birth country.";
+    document.getElementById("local-winners-h").textContent = format(UI.localHeading, {country: countryName});
+    document.getElementById("local-winners-note").textContent = UI.localNote;
     document.getElementById("local-winners-chart").appendChild(svg);
   })
   .catch(() => {
-    document.getElementById("local-winners-note").textContent = "Country detection is unavailable.";
+    document.getElementById("local-winners-note").textContent = UI.detectionUnavailable;
     console.warn("explorer country lookup failed");
   });
 
@@ -398,7 +460,7 @@ countryLookup
     .sort((a, b) => b.c - a.c || a.n.localeCompare(b.n))
     .slice(0, TOP_N);
   const rowH = 24, labelW = 215, valueW = 48, width = 860, height = young.length * rowH + 8;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Top winners under 40 by award count" });
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": UI.youngChartAria });
   const max = young.length ? young[0].c : 1;
   young.forEach((p, i) => {
     const firstAge = Math.min(...p.a.map(([year]) => year - p.by));
@@ -408,8 +470,8 @@ countryLookup
     text(label, labelW - 8, y + 14, p.n.length > 30 ? p.n.slice(0, 29) + "…" : p.n, "bar-label", "end");
     const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
     const tip = el("title", {}, rect);
-    tip.textContent = `${p.n} — first won at ${firstAge}, ${p.c} awards`;
-    text(svg, labelW + barW + 6, y + 14, String(p.c), "bar-value");
+    tip.textContent = format(UI.youngTooltip, {name: p.n, age: number.format(firstAge), awards: pluralText(UI.awards, p.c, {count: number.format(p.c)})});
+    text(svg, labelW + barW + 6, y + 14, number.format(p.c), "bar-value");
   });
   document.getElementById("young-chart").appendChild(svg);
 }
@@ -418,8 +480,16 @@ countryLookup
 {
   const DECADE = 10;
   const select = document.getElementById("family-select");
-  select.innerHTML = `<option value="-1">All prize families</option>` +
-    FAMILIES.map((f, i) => `<option value="${i}">${esc(f.name)}</option>`).join("");
+  const allFamilies = document.createElement("option");
+  allFamilies.value = "-1";
+  allFamilies.textContent = UI.allFamilies;
+  select.append(allFamilies);
+  FAMILIES.forEach((family, index) => {
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = family.name;
+    select.append(option);
+  });
   const holder = document.getElementById("time-chart");
 
   function draw(familyIdx) {
@@ -435,13 +505,13 @@ countryLookup
     const width = 860, height = 240, padL = 40, padB = 26, padT = 18;
     const plotW = width - padL - 8, plotH = height - padT - padB;
     const barW = plotW / decades.length;
-    holder.innerHTML = "";
-    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Awards per decade" });
+    holder.replaceChildren();
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": UI.decadeChartAria });
     for (let step = 0; step <= 4; step++) {
       const value = Math.round((max / 4) * step);
       const y = padT + plotH - (value / max) * plotH;
       el("line", { x1: padL, y1: y, x2: width - 8, y2: y, class: "grid" }, svg);
-      text(svg, padL - 6, y + 4, String(value), "axis", "end");
+      text(svg, padL - 6, y + 4, number.format(value), "axis", "end");
     }
     decades.forEach((decade, i) => {
       const count = counts.get(decade);
@@ -449,8 +519,8 @@ countryLookup
       const h = (count / max) * plotH;
       const rect = el("rect", { x: padL + i * barW + 3, y: padT + plotH - h, width: barW - 6, height: Math.max(1, h), class: "bar" }, svg);
       const tip = el("title", {}, rect);
-      tip.textContent = `${decade}s — ${count} awards` + (partial ? ` (partial decade, through ${LAST_YEAR})` : "");
-      text(svg, padL + i * barW + barW / 2, height - 8, decade + "s" + (partial ? "*" : ""), "axis", "middle");
+      tip.textContent = format(UI.decadeTooltip, {decade, awards: pluralText(UI.awards, count, {count: number.format(count)})}) + (partial ? ` ${format(UI.decadePartial, {year: LAST_YEAR})}` : "");
+      text(svg, padL + i * barW + barW / 2, height - 8, format(UI.decadeLabel, {decade}) + (partial ? "*" : ""), "axis", "middle");
     });
     holder.appendChild(svg);
   }
@@ -486,26 +556,27 @@ countryLookup
       entries = entries
         .filter(([i, count]) => POPULATION[i] && count >= MIN_PER_CAPITA)
         .map(([i, count]) => [i, (count / POPULATION[i]) * 1e6, count]);
-    const ranked = entries.sort((a, b) => b[1] - a[1] || (cityRows ? `${a[0].city}, ${a[0].country}` : COUNTRIES[a[0]]).localeCompare(cityRows ? `${b[0].city}, ${b[0].country}` : COUNTRIES[b[0]]));
+    const displayName = (place) => cityRows ? place.city_label : COUNTRIES[place];
+    const ranked = entries.sort((a, b) => b[1] - a[1] || displayName(a[0]).localeCompare(displayName(b[0]), UI.locale));
     const shown = ranked.slice(0, TOP);
-    holder.innerHTML = "";
+    holder.replaceChildren();
     if (!shown.length) return;
     const max = shown[0][1];
     const rowH = 24, labelW = 200, valueW = 44, width = 860, height = shown.length * rowH + 8;
-    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": cityRows ? "Award records per million residents by city" : "Laureates by country" });
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": cityRows ? UI.cityChartAria : UI.countryChartAria });
     shown.forEach(([place, value, count], i) => {
       const y = i * rowH + 4;
-      const name = cityRows ? `${place.city}, ${place.country}` : COUNTRIES[place];
+      const name = displayName(place);
       const barW = Math.max(2, (value / max) * (width - labelW - valueW - 12));
       text(svg, labelW - 8, y + 14, name.length > 28 ? name.slice(0, 27) + "…" : name, "bar-label", "end");
       const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
       const tip = el("title", {}, rect);
       tip.textContent = cityRows
-        ? `${name} — ${count} award-recipient rows, ${value.toFixed(1)} per million (GeoNames ${place.geoname_id})`
+        ? format(UI.cityTooltip, {name, awards: number.format(count), rate: decimal.format(value), geoname: place.geoname_id})
         : perCapita
-        ? `${name} — ${value.toFixed(1)} per million by ${base === "ac" ? "affiliation" : "birth"} (${count} laureate${count === 1 ? "" : "s"})`
-        : `${name} — ${count} laureate${count === 1 ? "" : "s"}`;
-      text(svg, labelW + barW + 6, y + 14, (cityRows || perCapita) ? value.toFixed(1) : String(count), "bar-value");
+        ? format(UI.countryRateTooltip, {name, rate: decimal.format(value), field: base === "ac" ? UI.countryAffiliation : UI.countryBirth, laureates: pluralText(UI.laureates, count, {count: number.format(count)})})
+        : format(UI.countryCountTooltip, {name, laureates: pluralText(UI.laureates, count, {count: number.format(count)})});
+      text(svg, labelW + barW + 6, y + 14, (cityRows || perCapita) ? decimal.format(value) : number.format(count), "bar-value");
     });
     holder.appendChild(svg);
   }
@@ -525,11 +596,11 @@ countryLookup
       "aria-labelledby": "gdp-chart-title gdp-chart-desc",
     }, holder);
     const title = el("title", { id: "gdp-chart-title" }, svg);
-    title.textContent = "2015–2025 award-recipient rows per $1 billion of 2024 GDP at PPP";
+    title.textContent = UI.gdpChartTitle;
     const description = el("desc", { id: "gdp-chart-desc" }, svg);
     description.textContent = rows.map((row) => {
       const name = COUNTRIES[row.country_idx];
-      return `${name}: ${row.award_count} award-recipient rows, ${row.rate.toFixed(4)} per $1 billion of GDP`;
+      return format(UI.gdpDescription, {name, awards: number.format(row.award_count), rate: rate.format(row.rate)});
     }).join(". ");
     const max = rows[0].rate;
     rows.forEach((row, index) => {
@@ -539,8 +610,8 @@ countryLookup
       text(svg, labelW - 8, y + 14, name, "bar-label", "end");
       const rect = el("rect", { x: labelW, y, width: barW, height: rowH - 8, rx: 2, class: "bar" }, svg);
       const tip = el("title", {}, rect);
-      tip.textContent = `${name} — ${row.award_count} award-recipient rows from 2015–2025; ${row.rate.toFixed(4)} per $1 billion of 2024 GDP at PPP`;
-      text(svg, labelW + barW + 6, y + 14, row.rate.toFixed(4), "bar-value");
+      tip.textContent = format(UI.gdpTooltip, {name, awards: number.format(row.award_count), rate: rate.format(row.rate)});
+      text(svg, labelW + barW + 6, y + 14, rate.format(row.rate), "bar-value");
     });
     holder.appendChild(svg);
   }
@@ -570,7 +641,7 @@ countryLookup
     values.sort((a, b) => a - b);
     rows.push({ name: SUBJECTS[subjectIdx], n: values.length, q1: quantile(values, .25), median: quantile(values, .5), q3: quantile(values, .75) });
   }
-  rows.sort((a, b) => a.median - b.median || a.name.localeCompare(b.name));
+  rows.sort((a, b) => a.median - b.median || a.name.localeCompare(b.name, UI.locale));
 
   const rowH = 30, labelW = 130, padR = 16, width = 860, padT = 26;
   const plotL = labelW, plotR = width - padR;
@@ -578,10 +649,10 @@ countryLookup
   const hi = Math.ceil(Math.max(...rows.map((r) => r.q3)) / 10) * 10;
   const x = (age) => plotL + ((age - lo) / (hi - lo)) * (plotR - plotL);
   const height = padT + rows.length * rowH + 10;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Age at first win by subject" });
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": UI.ageChartAria });
   for (let age = lo; age <= hi; age += 5) {
     el("line", { x1: x(age), y1: padT - 8, x2: x(age), y2: height - 10, class: "grid" }, svg);
-    text(svg, x(age), padT - 14, String(age), "axis", "middle");
+    text(svg, x(age), padT - 14, number.format(age), "axis", "middle");
   }
   rows.forEach((r, i) => {
     const y = padT + i * rowH + rowH / 2;
@@ -590,7 +661,7 @@ countryLookup
     el("line", { x1: x(r.median), y1: y - 10, x2: x(r.median), y2: y + 10, class: "median-tick" }, svg);
     const hit = el("rect", { x: 0, y: padT + i * rowH, width, height: rowH, fill: "transparent" }, svg);
     const tip = el("title", {}, hit);
-    tip.textContent = `${r.name} — median ${r.median.toFixed(0)}, middle half ${r.q1.toFixed(0)}–${r.q3.toFixed(0)} (${r.n} laureates)`;
+    tip.textContent = format(UI.ageTooltip, {name: r.name, median: number.format(r.median), lower: number.format(r.q1), upper: number.format(r.q3), laureates: pluralText(UI.laureates, r.n, {count: number.format(r.n)})});
   });
   document.getElementById("age-chart").appendChild(svg);
 }
@@ -624,10 +695,10 @@ countryLookup
   const max = Math.ceil(Math.max(...rows.map((r) => Math.max(r.bornRate, r.hereRate))));
   const x = (rate) => plotL + (rate / max) * (plotR - plotL);
   const height = padT + rows.length * rowH + 10;
-  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Laureates per million by birth country and affiliation country" });
+  const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": UI.flowChartAria });
   for (let tick = 0; tick <= max; tick++) {
     el("line", { x1: x(tick), y1: padT - 8, x2: x(tick), y2: height - 10, class: "grid" }, svg);
-    text(svg, x(tick), padT - 14, String(tick), "axis", "middle");
+    text(svg, x(tick), padT - 14, number.format(tick), "axis", "middle");
   }
   rows.forEach((r, i) => {
     const y = padT + i * rowH + rowH / 2;
@@ -635,10 +706,10 @@ countryLookup
     el("line", { x1: x(r.bornRate), y1: y, x2: x(r.hereRate), y2: y, class: "link-line" }, svg);
     el("circle", { cx: x(r.bornRate), cy: y, r: 4.5, class: "dot-born" }, svg);
     el("circle", { cx: x(r.hereRate), cy: y, r: 4.5, class: "dot-affiliated" }, svg);
-    text(svg, width - 8, y + 4, (r.gap >= 0 ? "+" : "−") + Math.abs(r.gap).toFixed(2), "gap-value" + (r.gap >= 0 ? " gain" : ""), "end");
+    text(svg, width - 8, y + 4, (r.gap >= 0 ? "+" : "−") + decimal.format(Math.abs(r.gap)), "gap-value" + (r.gap >= 0 ? " gain" : ""), "end");
     const hit = el("rect", { x: 0, y: padT + i * rowH, width, height: rowH, fill: "transparent" }, svg);
     const tip = el("title", {}, hit);
-    tip.textContent = `${r.name} — ${r.b} born (${r.bornRate.toFixed(2)} per million), ${r.a} affiliated (${r.hereRate.toFixed(2)} per million)`;
+    tip.textContent = format(UI.flowTooltip, {name: r.name, born: number.format(r.b), born_rate: decimal.format(r.bornRate), affiliated: number.format(r.a), affiliated_rate: decimal.format(r.hereRate)});
   });
   document.getElementById("flow-chart").appendChild(svg);
 }

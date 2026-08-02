@@ -1,21 +1,19 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import country_tabs with context %}
 {% block content %}
-{{ country_tabs("Institutions") }}
+{{ country_tabs("affiliations") }}
 <header class="page-intro">
-  <p class="eyebrow">Institutions in</p>
+  <p class="eyebrow">{{ t("affiliation_countries.eyebrow") }}</p>
   <h1>{{ title }}</h1>
-  <p>Countries ranked by the number of distinct institutions recorded there.</p>
-  <p class="caveat">An institution country is recorded for {{ "{:,}".format(recorded) }} of
-  {{ "{:,}".format(total) }} awards. Compound country entries count the recorded institution once in each listed
-  country.</p>
+  <p>{{ t("affiliation_countries.description") }}</p>
+  <p class="caveat">{{ t("affiliation_countries.caveat", recorded=format_number(recorded), total=format_number(total)) }}</p>
 </header>
 <ol class="rank-list">
   {% for place in countries %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <a href="{{ href(place.route) }}">{{ place.name }}</a>
-    <span class="rank-count" style="--share: {{ (place.members | length) * 100 // leader }}">{{ place.members | length }}</span>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <a href="{{ href(place.route) }}">{{ place_label(place) }}</a>
+    <span class="rank-count" style="--share: {{ (place.members | length) * 100 // leader }}">{{ format_number(place.members | length) }}</span>
   </li>
   {% endfor %}
 </ol>

@@ -8,7 +8,7 @@
       {% for record, route in winners %}
       <li>
         <a href="{{ href(route) }}">{{ record.full_name }}</a>
-        {% if routed_categories %}<span>{{ record.category }}</span>{% endif %}
+        {% if routed_categories %}<span>{{ term("category", record.category) }}</span>{% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -19,29 +19,26 @@
 {% block content %}
 <header class="page-intro">
   <h1>{{ title }}</h1>
-  <p>{{ prize.blurb }}</p>
-  <p><a class="external-source" href="{{ prize.url }}">Official website <span aria-hidden="true">↗</span></a></p>
+  <p>{{ ranking_blurb(prize.qid) }}</p>
+  <p><a class="external-source" href="{{ prize.url }}">{{ t("common.official_website") }} <span aria-hidden="true">↗</span></a></p>
 </header>
 {% if routed_categories %}
 <section>
-  <h2>Categories</h2>
+  <h2>{{ t("common.categories") }}</h2>
   <ul class="route-list">
-    {% for category, route in category_links %}<li><a href="{{ href(route) }}">{{ category }}</a></li>{% endfor %}
+    {% for category, route in category_links %}<li><a href="{{ href(route) }}">{{ term("category", category) }}</a></li>{% endfor %}
   </ul>
 </section>
 {% endif %}
 <section>
-  <h2>Award years</h2>
+  <h2>{{ t("common.award_years") }}</h2>
   <ul class="route-list route-list-years">
     {% for year, route, prefix in year_links %}<li><a href="{{ href(route) }}">{{ year }}</a></li>{% endfor %}
   </ul>
 </section>
 <section>
-  <h2>Recent winners</h2>
-  <p>
-    The last {{ recent_years }} award years. See <a href="{{ href(winners_route) }}">every {{ prize.prize_name }} winner</a> in one
-    list, or use the {% if routed_categories %}categories{% else %}years{% endif %} above.
-  </p>
+  <h2>{{ t("prize.recent_winners") }}</h2>
+  <p>{{ t("prize.recent_summary_start", years=recent_years) }} <a href="{{ href(winners_route) }}">{{ t("prize.every_winner", prize=term("prize", prize.prize_name)) }}</a> {{ t("prize.recent_summary_end", browsing=t("common.categories" if routed_categories else "common.award_years")) }}</p>
   {{ winner_groups(recent_groups) }}
 </section>
 {% endblock %}

@@ -1,33 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<nav class="view-tabs" aria-label="University views">
-  <a class="tab-alt" href="{{ href(universities_route) }}">Overall</a>
-  <a href="{{ href(university_countries_route) }}" aria-current="page">By country</a>
+<nav class="view-tabs" aria-label="{{ t("tabs.university_views_aria") }}">
+  <a class="tab-alt" href="{{ href(universities_route) }}">{{ t("tabs.overall") }}</a>
+  <a href="{{ href(university_countries_route) }}" aria-current="page">{{ t("tabs.by_country") }}</a>
 </nav>
 <header class="page-intro">
-  <p class="eyebrow">Universities</p>
+  <p class="eyebrow">{{ t("universities.eyebrow") }}</p>
   <h1>{{ title }}</h1>
-  <p>{{ "{:,}".format(total) }} universities and colleges, grouped by the country each award was recorded in and
-  showing the top {{ rows }} of each.</p>
-  <p class="caveat">This counts award-time affiliations, not teaching quality, research output or overall university
-  quality. Each count is the laureates recorded in that country rather than the university's worldwide total.</p>
+  <p>{{ t("university_countries.description", total=format_number(total), rows=rows) }}</p>
+  <p class="caveat">{{ t("university_countries.caveat") }}</p>
 </header>
 {% for place in countries %}
 <section>
-  <h2>{{ place.name }}</h2>
+  <h2>{{ place_label(place) }}</h2>
   <ol class="rank-list">
     {% for row in place.members[:rows] %}
     <li>
-      <span class="rank-position">{{ loop.index }}</span>
-      <span><a href="{{ href(row.affiliation.route) }}">{{ row.affiliation.name }}</a>
+      <span class="rank-position">{{ format_number(loop.index) }}</span>
+      <span><a href="{{ href(row.affiliation.route) }}">{{ language.entity_label(row.affiliation.qid, row.affiliation.name) }}</a>
         {% if row.place %}<span class="rank-meta">{{ row.place }}</span>{% endif %}
       </span>
-      <span class="rank-count" style="--share: {{ row.count * 100 // place.members[0].count }}">{{ row.count }}</span>
+      <span class="rank-count" style="--share: {{ row.count * 100 // place.members[0].count }}">{{ format_number(row.count) }}</span>
     </li>
     {% endfor %}
   </ol>
   {% if place.members | length > rows %}
-  <p><a href="{{ href(place.route) }}">All {{ place.members | length }} institutions in {{ place.name }}</a></p>
+  <p><a href="{{ href(place.route) }}">{{ t("university_countries.all_in_country", count=place.members | length, country=place_label(place)) }}</a></p>
   {% endif %}
 </section>
 {% endfor %}

@@ -20,23 +20,28 @@ import posixpath
 import re
 import shutil
 import sqlite3
+import string
 import sys
 import tempfile
 import unicodedata
 from collections import Counter
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 from urllib.parse import quote, quote_plus, urlsplit, urlunsplit
 from xml.sax.saxutils import escape as xml_escape
 
+import tomllib
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 from PIL import Image, ImageDraw, ImageFont
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DATASET_DIR = SCRIPT_DIR.parent
+I18N_DIR = SCRIPT_DIR / "i18n"
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 YEAR_PREFIX = re.compile(r"([0-9]{4})")
 # A biographical note that is only a birth or lifespan restates the Facts panel: "(b. 1946)", "(born 1961)",
@@ -149,6 +154,29 @@ FACT_FIELDS = (
     ("Death city", "death_city"),
     ("Death country", "death_country"),
 )
+LANGUAGE_CODES = ("en", "es", "fr")
+LANGUAGE_NAMES = {"en": "English", "es": "Español", "fr": "Français"}
+NUMBER_SEPARATORS = {"en": (",", "."), "es": (".", ","), "fr": ("\u202f", ",")}
+SEGMENT_DEFAULTS = {
+    "awards": "awards",
+    "people": "people",
+    "countries": "countries",
+    "awarded": "awarded",
+    "died": "died",
+    "cities": "cities",
+    "cities-per-capita": "cities-per-capita",
+    "country_affiliations": "affiliations",
+    "affiliations": "affiliations",
+    "universities": "universities",
+    "subjects": "subjects",
+    "explorer": "explorer",
+    "nearby": "nearby",
+    "map": "map",
+    "about": "about",
+    "winners": "winners",
+    "recent": "recent",
+    "page": "page",
+}
 IDENTIFIER_FIELDS = (
     ("ORCID", "orc_id", "https://orcid.org/"),
     ("WDATA", "laureate_wikidata_qid", "https://www.wikidata.org/wiki/"),
@@ -194,6 +222,90 @@ AWARD_COLUMNS = (
 
 class BuildFailure(Exception):
     """The website cannot be built without violating its contract."""
+
+
+@dataclass(frozen=True, slots=True)
+class Language:
+    """One immutable, offline catalogue and its locale-owned route vocabulary."""
+    code: str
+    prefix: str
+    segments: Mapping[str, str]
+    ui: Mapping[str, str]
+    terms: Mapping[str, Mapping[str, str]]
+    ranking: Mapping[str, str]
+    labels: Mapping[str, str]
+    group: str
+    decimal: str
+    reviewed: frozenset[str] = frozenset()
+
+    def route(self, *components: str) -> str:
+        parts = [self.prefix.strip("/")] if self.prefix else []
+        parts.extend(component.strip("/") for component in components if component.strip("/"))
+        return "/" + "/".join(parts) + "/" if parts else "/"
+
+    def segment(self, key: str) -> str:
+        try:
+            return self.segments[key]
+        except KeyError as error:
+            raise BuildFailure(f"language={self.code} segments missing={key}") from error
+
+    def text(self, key: str, /, count: float | None = None, **fields: object) -> str:
+        selected_key = key
+        if count is not None and key not in self.ui:
+            selected_key = f"{key}.{self.plural_form(count)}"
+        try:
+            value = self.ui[selected_key]
+        except KeyError as error:
+            raise BuildFailure(f"language={self.code} ui missing={selected_key}") from error
+        if count is not None:
+            fields["count"] = format_number(count, self)
+        if count is None and not fields and selected_key.endswith((".one", ".other")):
+            return value
+        required = set(_format_fields(value, self.code, selected_key))
+        if set(fields) != required:
+            raise BuildFailure(f"language={self.code} ui format={selected_key}")
+        try:
+            return value.format(**fields)
+        except (IndexError, KeyError, TypeError, ValueError) as error:
+            raise BuildFailure(f"language={self.code} ui format={selected_key}") from error
+
+    def pattern(self, key: str) -> str:
+        """Return a validated UI format pattern for inert browser JSON only."""
+        try:
+            return self.ui[key]
+        except KeyError as error:
+            raise BuildFailure(f"language={self.code} ui missing={key}") from error
+
+    def plural_form(self, count: float) -> str:
+        return "one" if (self.code == "fr" and count in (0, 1)) or (self.code != "fr" and count == 1) else "other"
+
+    def term(self, section: str, value: str) -> str:
+        try:
+            return self.terms[section][value]
+        except KeyError as error:
+            raise BuildFailure(f"language={self.code} terms.{section} missing={value!r}") from error
+
+    def ranking_blurb(self, qid: str) -> str:
+        try:
+            return self.ranking[qid]
+        except KeyError as error:
+            raise BuildFailure(f"language={self.code} ranking missing={qid}") from error
+
+    def entity_label(self, qid: str, recorded: str) -> str:
+        if self.code == "en" or not qid:
+            return recorded
+        return self.labels.get(qid, recorded) or recorded
+
+    def city_label(self, city: str, country: str) -> str:
+        return self.text("city.label", city=city, country=self.term("country", country))
+
+
+@dataclass(frozen=True, slots=True)
+class Fact:
+    kind: str
+    label: str
+    value: str
+    route: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -293,6 +405,7 @@ class Affiliation:
     profile: AffiliationProfile | None
     openalex_id: str
     ror: str
+    qid: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -309,6 +422,8 @@ class PageJob:
     description: str
     breadcrumbs: tuple[Breadcrumb, ...]
     context: dict[str, Any]
+    language: Language | None = None
+    key: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -336,6 +451,8 @@ class Place:
     slug: str
     route: str
     people: tuple[Laureate, ...]
+    city: str = ""
+    country: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -345,6 +462,8 @@ class RankedAffiliation:
     affiliation: Affiliation
     count: int
     place: str
+    city: str = ""
+    country: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -495,6 +614,300 @@ def _text(value: object) -> str:
 
 def _nonblank(value: str) -> bool:
     return bool(value.strip())
+
+
+def _catalogue_mapping(value: object, code: str, section: str) -> dict[str, str]:
+    if not isinstance(value, dict):
+        raise BuildFailure(f"language={code} {section} must be a table")
+    result: dict[str, str] = {}
+    for key, item in value.items():
+        if not isinstance(key, str) or not isinstance(item, str) or not item:
+            raise BuildFailure(f"language={code} {section} invalid={key!r}")
+        result[key] = item
+    return result
+
+
+def _format_fields(value: str, code: str, key: str) -> tuple[str, ...]:
+    fields: list[str] = []
+    try:
+        parsed = string.Formatter().parse(value)
+    except ValueError as error:
+        raise BuildFailure(f"language={code} ui invalid-placeholder={key}") from error
+    for _literal, field, _format, _conversion in parsed:
+        if field is None:
+            continue
+        if not field or any(token in field for token in ".["):
+            raise BuildFailure(f"language={code} ui invalid-placeholder={key}")
+        fields.append(field)
+    if len(fields) != len(set(fields)):
+        raise BuildFailure(f"language={code} ui duplicate-placeholder={key}")
+    return tuple(sorted(fields))
+
+
+def _language_from_catalogue(code: str, catalogue: Mapping[str, object], labels: Mapping[str, str]) -> Language:
+    prefix = catalogue.get("prefix")
+    group = catalogue.get("group")
+    decimal = catalogue.get("decimal")
+    if catalogue.get("code") != code:
+        raise BuildFailure(f"language={code} code is invalid")
+    if not isinstance(prefix, str) or (prefix and (not prefix.startswith("/") or not prefix.endswith("/"))):
+        raise BuildFailure(f"language={code} prefix is invalid")
+    if not isinstance(group, str) or not isinstance(decimal, str) or (group, decimal) != NUMBER_SEPARATORS[code]:
+        raise BuildFailure(f"language={code} number separators are invalid")
+    segments = _catalogue_mapping(catalogue.get("segments"), code, "segments")
+    if set(segments) != set(SEGMENT_DEFAULTS):
+        missing = sorted(set(SEGMENT_DEFAULTS) - set(segments))
+        extra = sorted(set(segments) - set(SEGMENT_DEFAULTS))
+        raise BuildFailure(f"language={code} segments keys missing={missing!r} extra={extra!r}")
+    for key, value in segments.items():
+        if not SLUG.fullmatch(value):
+            raise BuildFailure(f"language={code} segments invalid={key}")
+    ui = _catalogue_mapping(catalogue.get("ui"), code, "ui")
+    for key, value in ui.items():
+        _format_fields(value, code, key)
+    raw_terms = catalogue.get("terms")
+    if not isinstance(raw_terms, dict):
+        raise BuildFailure(f"language={code} terms must be a table")
+    required_term_sections = {"prize", "category", "country", "subject", "laureate_type"}
+    if not required_term_sections.issubset(raw_terms):
+        missing = sorted(required_term_sections - set(raw_terms))
+        raise BuildFailure(f"language={code} terms missing={missing!r}")
+    terms = {section: _catalogue_mapping(raw_terms[section], code, f"terms.{section}") for section in required_term_sections}
+    raw_ranking = catalogue.get("ranking")
+    if not isinstance(raw_ranking, dict):
+        raise BuildFailure(f"language={code} ranking must be a table")
+    ranking: dict[str, str] = {}
+    for qid, item in raw_ranking.items():
+        if not WIKIDATA_QID.fullmatch(qid) or not isinstance(item, dict) or not isinstance(item.get("blurb"), str) or not item["blurb"]:
+            raise BuildFailure(f"language={code} ranking invalid={qid!r}")
+        ranking[qid] = item["blurb"]
+    reviewed = catalogue.get("reviewed")
+    if not isinstance(reviewed, list) or not all(isinstance(key, str) for key in reviewed) or len(reviewed) != len(set(reviewed)):
+        raise BuildFailure(f"language={code} reviewed is invalid")
+    available = {
+        *(f"segments.{key}" for key in segments),
+        *(f"ui.{key}" for key in ui),
+        *(f"terms.{section}.{key}" for section, values in terms.items() for key in values),
+        *(f"ranking.{qid}.blurb" for qid in ranking),
+    }
+    unknown_reviewed = sorted(set(reviewed) - available)
+    if unknown_reviewed:
+        raise BuildFailure(f"language={code} reviewed missing={unknown_reviewed[0]}")
+    return Language(
+        code,
+        prefix,
+        MappingProxyType(segments),
+        MappingProxyType(ui),
+        MappingProxyType({section: MappingProxyType(values) for section, values in terms.items()}),
+        MappingProxyType(ranking),
+        MappingProxyType(dict(labels)),
+        group,
+        decimal,
+        frozenset(reviewed),
+    )
+
+
+def _live_catalogue_values(
+    rankings: Iterable[Ranking], records: Iterable[AwardRecord]
+) -> dict[str, set[str]]:
+    rankings = list(rankings)
+    records = list(records)
+    countries = {
+        value.strip()
+        for record in records
+        for value in (
+            record.birth_country,
+            record.death_country,
+            *(record.citizenship_countries.split(";")),
+            *(affiliation.country for affiliation in record.affiliations),
+        )
+        if value.strip()
+    }
+    return {
+        "prize": {ranking.prize_name for ranking in rankings} | {record.prize_name for record in records},
+        "category": {record.category for record in records if _nonblank(record.category)},
+        "country": countries,
+        "subject": set(SUBJECTS) | {record.high_school_subject for record in records if _nonblank(record.high_school_subject)},
+        "laureate_type": {"Individual", "Organization"},
+    }
+
+
+def _required_ui_keys(template_dir: Path) -> set[str]:
+    keys = {
+        match.group(1)
+        for template in TEMPLATES
+        for match in re.finditer(r"\b(?:t|browser_t)\(\s*[\"']([^\"']+)[\"']", (template_dir / template).read_text(encoding="utf-8"))
+        if not match.group(1).endswith(".")
+    }
+    keys.update(f"home.total.{key}" for key in ("laureates", "awards", "prizes", "years", "countries", "subjects", "institutions"))
+    keys.update(f"fact.{attribute}" for _label, attribute in FACT_FIELDS)
+    keys.update(
+        {
+            "city.label", "home.hero_heading", "awards.heading", "common.all_cities", "meta.award-with-category",
+            "meta.error.title", "meta.error.description",
+        }
+    )
+    keys.update(f"view.{view}" for view in ("born", "awarded", "died"))
+    keys.update(
+        f"crumb.{crumb}"
+        for crumb in (
+            "home", "awards", "people", "countries", "cities", "institutions", "universities", "by-country", "subjects", "recent",
+            "every-winner", "page",
+        )
+    )
+    for view in ("born", "awarded", "died", "cities"):
+        keys.update((f"countries.{view}.eyebrow", f"countries.{view}.blurb", f"countries.{view}.caveat", f"country.{view}.eyebrow", f"country.{view}.blurb"))
+    metadata = (
+        "home", "awards", "people", "prize", "prize-winners", "category", "prize-year", "category-year", "winner", "person",
+        "subjects", "subject", "subject-affiliations", "subject-recent", "countries-born", "countries-awarded", "countries-died",
+        "cities", "country-born", "country-awarded", "country-died", "city", "cities-per-capita", "affiliation-countries",
+        "affiliation-country", "affiliations", "affiliation", "universities", "universities-countries", "map", "map-subject",
+        "explorer", "nearby", "about",
+    )
+    keys.update(f"meta.{name}.{field}" for name in metadata for field in ("title", "description"))
+    keys.update(
+        {
+            "share.laureate-description", "share.institution-description", "share.card.prize-kind", "share.card.rank-label",
+            "share.card.award-count-label", "share.card.subjects-label",
+        }
+    )
+    for generic in ("default", "laureates", "institutions", "universities", "map", "nearby"):
+        keys.update((f"share.generic.{generic}.title", f"share.generic.{generic}.subtitle"))
+    keys.update(
+        {
+            "llms.title", "llms.intro", "llms.pages", "llms.provenance", "llms.start_heading", "llms.start_prizes",
+            "llms.start_people", "llms.start_countries", "llms.start_cities", "llms.start_affiliations", "llms.start_universities",
+            "llms.start_subjects", "llms.start_about", "llms.patterns_heading", "llms.patterns", "llms.winner_heading",
+            "llms.winner_intro", "llms.subject_heading", "llms.subject_intro", "llms.bulk_heading", "llms.bulk_intro",
+            "llms.bulk_explorer", "llms.bulk_map", "llms.bulk_nearby", "llms.prize-winner", "llms.prize-year",
+            "llms.prize_year.categories", "llms.prize_year.years", "llms.category", "llms.subject",
+        }
+    )
+    return keys
+
+
+def _validate_languages(  # noqa: C901 - catalogue preflight is intentionally one explicit validation path.
+    languages: tuple[Language, ...], rankings: Iterable[Ranking], records: Iterable[AwardRecord], template_dir: Path
+) -> None:
+    by_code = {language.code: language for language in languages}
+    if tuple(by_code) != LANGUAGE_CODES:
+        raise BuildFailure("language codes must be en, es, fr")
+    if len({language.prefix for language in languages}) != len(languages):
+        raise BuildFailure("language prefixes must be unique")
+    english = by_code["en"]
+    if english.prefix or dict(english.segments) != SEGMENT_DEFAULTS:
+        raise BuildFailure("language=en route segments differ from public English routes")
+    values = _live_catalogue_values(rankings, records)
+    ranking_qids = {ranking.qid for ranking in rankings}
+    english_ui = english.ui
+    required_ui = _required_ui_keys(template_dir)
+    plural_bases = {key for key in required_ui if f"{key}.one" in english_ui and f"{key}.other" in english_ui}
+    required_ui.difference_update(plural_bases)
+    required_ui.update(f"{key}.{form}" for key in plural_bases for form in ("one", "other"))
+    for language in languages:
+        if language.code != "en" and language.prefix != f"/{language.code}/":
+            raise BuildFailure(f"language={language.code} prefix is invalid")
+        for section, required in values.items():
+            missing = sorted(required - set(language.terms[section]))
+            if missing:
+                raise BuildFailure(f"language={language.code} terms.{section} missing={missing[0]!r}")
+        missing_rankings = sorted(ranking_qids - set(language.ranking))
+        if missing_rankings:
+            raise BuildFailure(f"language={language.code} ranking missing={missing_rankings[0]}")
+        if set(language.ui) != set(english_ui):
+            missing = sorted(set(english_ui) - set(language.ui))
+            extra = sorted(set(language.ui) - set(english_ui))
+            raise BuildFailure(f"language={language.code} ui keys missing={missing[:1]!r} extra={extra[:1]!r}")
+        missing_ui = sorted(required_ui - set(language.ui))
+        if missing_ui:
+            raise BuildFailure(f"language={language.code} ui missing={missing_ui[0]}")
+        for key, value in language.ui.items():
+            if _format_fields(value, language.code, key) != _format_fields(english_ui[key], "en", key):
+                raise BuildFailure(f"language={language.code} ui placeholders={key}")
+        route_values = (
+            *language.segments.values(),
+            *(slugify(language.term("category", value)) for value in values["category"]),
+            *(slugify(language.term("country", value)) for value in values["country"]),
+            *(slugify(language.term("subject", value)) for value in values["subject"]),
+        )
+        if any(not value for value in route_values):
+            raise BuildFailure(f"language={language.code} route value is blank")
+        reserved = {
+            language.segment("country_affiliations"),
+            language.segment("awarded"),
+            language.segment("cities"),
+            language.segment("cities-per-capita"),
+            language.segment("died"),
+        }
+        for country in values["country"]:
+            if slugify(language.term("country", country)) in reserved:
+                raise BuildFailure(f"language={language.code} country route collides={country!r}")
+        if language.code == "en":
+            for section in ("category", "country", "subject"):
+                for value in values[section]:
+                    if slugify(language.term(section, value)) != slugify(value):
+                        raise BuildFailure(f"language=en terms.{section} route changed={value!r}")
+
+
+def load_languages(
+    rankings: Iterable[Ranking], records: Iterable[AwardRecord], i18n_dir: Path = I18N_DIR
+) -> tuple[Language, ...]:
+    """Load all committed catalogues before planning or creating any output directory."""
+    labels_path = i18n_dir / "labels.toml"
+    try:
+        labels_document = tomllib.loads(labels_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, tomllib.TOMLDecodeError) as error:
+        raise BuildFailure("labels catalogue is missing or invalid") from error
+    raw_labels = labels_document.get("labels")
+    if not isinstance(raw_labels, dict):
+        raise BuildFailure("labels catalogue is invalid")
+    labels_by_code = {code: {} for code in LANGUAGE_CODES}
+    for qid, labels in raw_labels.items():
+        if not WIKIDATA_QID.fullmatch(qid) or not isinstance(labels, dict):
+            raise BuildFailure(f"labels invalid={qid!r}")
+        for code in ("es", "fr"):
+            value = labels.get(code, "")
+            if not isinstance(value, str):
+                raise BuildFailure(f"labels invalid={qid!r}")
+            if value:
+                labels_by_code[code][qid] = value
+    languages: list[Language] = []
+    for code in LANGUAGE_CODES:
+        source = i18n_dir / f"{code}.toml"
+        try:
+            document = tomllib.loads(source.read_text(encoding="utf-8"))
+        except (FileNotFoundError, tomllib.TOMLDecodeError) as error:
+            raise BuildFailure(f"language={code} catalogue is missing or invalid") from error
+        languages.append(_language_from_catalogue(code, document, labels_by_code[code]))
+    result = tuple(languages)
+    _validate_languages(result, rankings, records, i18n_dir.parent / "templates")
+    return result
+
+
+def format_number(value: float, language: Language | str, digits: int | None = None) -> str:
+    """Deterministic locale formatting without process-global locale state."""
+    if isinstance(language, str):
+        try:
+            group, decimal = NUMBER_SEPARATORS[language]
+        except KeyError as error:
+            raise BuildFailure(f"language={language} number is invalid") from error
+    else:
+        group, decimal = language.group, language.decimal
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
+        raise BuildFailure(f"language={language.code if isinstance(language, Language) else language} number is invalid")
+    if digits is not None and (not isinstance(digits, int) or digits < 0):
+        raise BuildFailure(f"language={language.code if isinstance(language, Language) else language} number digits are invalid")
+    if digits is None and isinstance(value, float):
+        if value.is_integer():
+            rendered = f"{int(value):,}"
+        else:
+            rounded = Decimal(str(value)).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+            rendered = f"{rounded:,f}".rstrip("0").rstrip(".")
+    else:
+        rendered = f"{value:,.{digits}f}" if digits is not None else f"{value:,}"
+    whole, separator, fraction = rendered.partition(".")
+    localized = whole.replace(",", group)
+    return localized if not separator else localized + decimal + fraction
 
 
 def _year_prefix(value: str, record_id: str) -> int:
@@ -730,7 +1143,7 @@ def _map_display_label(kind: str, label: tuple[str, ...]) -> str:
     if kind == "birth":
         city, country = label
         return city or country or "Unnamed birthplace"
-    name, city, country = label
+    name, city, country, _qid = label
     return name or city or country or "Unnamed institution"
 
 
@@ -773,7 +1186,12 @@ def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]
                 "affiliation_coordinates",
                 multiple=False,
             )[0]
-            label = (affiliation.name.strip(), affiliation.city.strip(), affiliation.country.strip())
+            label = (
+                affiliation.name.strip(),
+                affiliation.city.strip(),
+                affiliation.country.strip(),
+                affiliation.wikidata_qid.strip(),
+            )
             add("affiliation", point, label, subject, decade)
 
     result: dict[str, list[dict[str, object]]] = {"birth": [], "affiliation": []}
@@ -801,7 +1219,7 @@ def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]
             if kind == "birth":
                 marker["city"], marker["country"] = primary
             else:
-                marker["name"], marker["city"], marker["country"] = primary
+                marker["name"], marker["city"], marker["country"], marker["qid"] = primary
             result[kind].append(marker)
     return result
 
@@ -876,6 +1294,7 @@ def nearby_payload(
                 "g": [point[0], point[1]],
                 "n": headline,
                 "w": where,
+                "q": affiliation.qid if affiliation else "",
                 "x": len(place["names"]) - 1,
                 "p": [person_index[key] for key in sorted(place["people"], key=lambda key: (people[key], key))],
                 "r": relative_route(NEARBY_ROUTE, affiliation.route) if affiliation else "",
@@ -889,6 +1308,112 @@ def nearby_payload(
         ],
         "places": result_places,
     }
+
+
+def _resolve_relative_route(source_route: str, value: str) -> str:
+    if not value:
+        return ""
+    joined = posixpath.normpath(posixpath.join(source_route.strip("/") or ".", value.strip()))
+    return "/" if joined == "." else f"/{joined.strip('/')}/"
+
+
+def _localized_location_label(language: Language, city: str, country: str) -> str:
+    if city and country:
+        return language.city_label(city, country)
+    if city:
+        return city
+    return language.term("country", country) if country else ""
+
+
+def localized_explorer_payload(
+    payload: dict[str, Any], language: Language, route_map: Mapping[str, str]
+) -> dict[str, Any]:
+    """Add localized labels while retaining all source keys used for joins and ranking."""
+    localized = json.loads(json.dumps(payload))
+    country_keys = list(localized["countries"])
+    subject_keys = list(localized["subjects"])
+    family_keys = [family["name"] for family in localized["families"]]
+    localized["country_keys"] = country_keys
+    localized["subject_keys"] = subject_keys
+    localized["family_keys"] = family_keys
+    localized["category_labels"] = {
+        category: language.term("category", category)
+        for person in localized["people"]
+        for _year, _family, category, _subject in person["a"]
+        if category
+    }
+    localized["countries"] = [language.term("country", country) for country in country_keys]
+    localized["subjects"] = [language.term("subject", subject) for subject in subject_keys]
+    for family, name in zip(localized["families"], family_keys, strict=True):
+        family["key"] = name
+        family["name"] = language.term("prize", name)
+    localized_explorer_route = language.route(language.segment("explorer"))
+    for person in localized["people"]:
+        person["r"] = relative_route(
+            localized_explorer_route,
+            route_map.get(_resolve_relative_route(EXPLORER_ROUTE, person["r"]), _resolve_relative_route(EXPLORER_ROUTE, person["r"])),
+        ) if person["r"] else ""
+    for row in localized.get("city_awards_per_capita", ()):
+        row["city_label"] = _localized_location_label(language, row["city"], row["country"])
+    return localized
+
+
+def localized_map_payload(payload: dict[str, Any], language: Language) -> dict[str, Any]:
+    localized = json.loads(json.dumps(payload))
+    countries = {
+        marker["country"]
+        for markers in localized.values()
+        if isinstance(markers, list)
+        for marker in markers
+        if marker.get("country")
+    }
+    localized["labels"] = {
+        "subjects": {subject: language.term("subject", subject) for subject in SUBJECTS},
+        "countries": {country: language.term("country", country) for country in countries},
+    }
+    for marker in (*localized.get("birth", ()), *localized.get("affiliation", ())):
+        city = str(marker.get("city", ""))
+        country = str(marker.get("country", ""))
+        marker["title_key"] = marker["title"]
+        marker["display_city"] = _localized_location_label(language, city, country)
+        if marker.get("name"):
+            marker["display_title"] = language.entity_label(str(marker.get("qid", "")), str(marker["name"]))
+        else:
+            marker["display_title"] = city or (language.term("country", country) if country else marker["title"])
+        marker["title"] = marker["display_title"]
+    return localized
+
+
+def _localized_where(language: Language, value: str) -> str:
+    for country in sorted(language.terms["country"], key=len, reverse=True):
+        if value == country:
+            return language.term("country", country)
+        suffix = f", {country}"
+        if value.endswith(suffix):
+            return language.city_label(value[: -len(suffix)], country)
+    return value
+
+
+def localized_nearby_payload(
+    payload: dict[str, Any], language: Language, route_map: Mapping[str, str]
+) -> dict[str, Any]:
+    localized = json.loads(json.dumps(payload))
+    localized_route = language.route(language.segment("nearby"))
+    for person in localized["people"]:
+        if person[1]:
+            target = _resolve_relative_route(NEARBY_ROUTE, person[1])
+            person[1] = relative_route(localized_route, route_map.get(target, target))
+    for place in localized["places"]:
+        place["name_key"] = place["n"]
+        if place["k"] == "a":
+            place["n"] = language.entity_label(str(place.get("q", "")), str(place["n"]))
+        elif not place["w"] and place["n"] in language.terms["country"]:
+            place["n"] = language.term("country", place["n"])
+        place["display_where"] = _localized_where(language, place["w"])
+        if place["r"]:
+            target = _resolve_relative_route(NEARBY_ROUTE, place["r"])
+            place["r"] = relative_route(localized_route, route_map.get(target, target))
+    return localized
 
 
 def _descending_records(records: Iterable[AwardRecord]) -> list[AwardRecord]:
@@ -1024,29 +1549,49 @@ def _page(
 
 
 def share_image_target(job: PageJob) -> str:
-    if job.route.startswith(PEOPLE_ROUTE):
-        return SHARE_IMAGE_LAUREATES
-    if job.route.startswith(AFFILIATIONS_ROUTE):
-        return SHARE_IMAGE_INSTITUTIONS
-    if job.route.startswith(UNIVERSITIES_ROUTE):
-        return SHARE_IMAGE_UNIVERSITIES
-    if job.route == MAP_ROUTE:
-        return SHARE_IMAGE_MAP
-    if job.route == NEARBY_ROUTE:
-        return SHARE_IMAGE_NEARBY
-    card = job.context.get("share_card")
-    if card is None:
-        return SHARE_IMAGE_FALLBACK
-    if not isinstance(card, ShareCard):
-        raise BuildFailure(f"invalid share card route={job.route}")
-    if card.kind != "Prize" or not SLUG.fullmatch(card.slug):
-        raise BuildFailure(f"invalid share card route={job.route}")
-    return f"{SHARE_IMAGE_DIRECTORY}/prize-{card.slug}.png"
+    key = job.key
+    if key.startswith(("person:", "people:")):
+        target = SHARE_IMAGE_LAUREATES
+    elif key == "affiliations" or key.startswith("affiliation:"):
+        target = SHARE_IMAGE_INSTITUTIONS
+    elif key == "universities" or key == "universities:countries":
+        target = SHARE_IMAGE_UNIVERSITIES
+    elif key == "map":
+        target = SHARE_IMAGE_MAP
+    elif key == "nearby":
+        target = SHARE_IMAGE_NEARBY
+    else:
+        card = job.context.get("share_card")
+        if card is None:
+            target = SHARE_IMAGE_FALLBACK
+        else:
+            if not isinstance(card, ShareCard):
+                raise BuildFailure(f"invalid share card route={job.route}")
+            if card.kind != "Prize" or not SLUG.fullmatch(card.slug):
+                raise BuildFailure(f"invalid share card route={job.route}")
+            target = f"{SHARE_IMAGE_DIRECTORY}/prize-{card.slug}.png"
+    return _share_path_for_language(target, job.language)
 
 
-def _award_phrase(record: AwardRecord) -> str:
+def _share_path_for_language(target: str, language: Language | None) -> str:
+    if language is not None and language.code != "en":
+        filename = target.rsplit("/", 1)[-1]
+        return f"{SHARE_IMAGE_DIRECTORY}/{language.code}/{filename}"
+    return target
+
+
+def _award_phrase(record: AwardRecord, language: Language | None = None) -> str:
     """'{Prize} in {Category} {Year}', or just '{Prize} {Year}' when the prize has no standing categories."""
-    prize = f"{record.prize_name} in {record.category}" if _nonblank(record.category) else record.prize_name
+    if language is not None:
+        prize = language.term("prize", record.prize_name)
+        if record.category:
+            prize = language.text(
+                "share.award-with-category",
+                prize=prize,
+                category=language.term("category", record.category),
+            )
+    else:
+        prize = f"{record.prize_name} in {record.category}" if _nonblank(record.category) else record.prize_name
     return f"{prize} {record.year}"
 
 
@@ -1058,11 +1603,23 @@ def share_description(job: PageJob) -> str:
         raise BuildFailure(f"invalid share card route={job.route}")
     if card.kind == "Laureate":
         person: Laureate = job.context["person"]
-        return f"{_names([_award_phrase(record) for record, _ in person.awards])} — {person.name}"
+        if job.language is None:
+            return f"{_names([_award_phrase(record) for record, _ in person.awards])} — {person.name}"
+        return job.language.text(
+            "share.laureate-description",
+            awards=", ".join(_award_phrase(record, job.language) for record, _ in person.awards),
+            name=person.name,
+        )
     if card.kind == "Institution":
         affiliation: Affiliation = job.context["affiliation"]
         prizes = list(dict.fromkeys(link.record.prize_name for link in affiliation.awards))
-        return f"{_names(prizes)} laureates recorded at {affiliation.name}."
+        if job.language is None:
+            return f"{_names(prizes)} laureates recorded at {affiliation.name}."
+        return job.language.text(
+            "share.institution-description",
+            prizes=", ".join(job.language.term("prize", prize) for prize in prizes),
+            institution=_localized_affiliation_name(job.language, affiliation),
+        )
     return job.description
 
 
@@ -1097,8 +1654,8 @@ def _winner_description(record: AwardRecord, award_label: str) -> str:
     return _clamp(candidate)
 
 
-def _facts(record: AwardRecord, birth_countries: frozenset[str]) -> tuple[tuple[str, str, str], ...]:
-    """Facts panel rows as (label, value, route), minus anything the page already states.
+def _facts(record: AwardRecord, birth_countries: frozenset[str]) -> tuple[Fact, ...]:
+    """Facts panel rows with a stable field identity, minus anything the page already states.
 
     Type earns a row only for an organisation: 3047 of 3096 records are individuals, so on nearly every page the
     row reads "Individual" and tells the reader what the name above it already said. Birth year is dropped
@@ -1118,7 +1675,7 @@ def _facts(record: AwardRecord, birth_countries: frozenset[str]) -> tuple[tuple[
         else {}
     )
     return tuple(
-        (label, getattr(record, attribute), routes.get(attribute, ""))
+        Fact(attribute, label, getattr(record, attribute), routes.get(attribute, ""))
         for label, attribute in FACT_FIELDS
         if attribute not in skip and _nonblank(getattr(record, attribute))
     )
@@ -1194,7 +1751,70 @@ def _laureate_schema(record: AwardRecord, url: str) -> dict[str, Any]:
     return payload
 
 
-def _structured_data(base_url: str, job: PageJob) -> str:
+def _localized_schema_affiliation(language: Language, schema: dict[str, Any], affiliation: AwardAffiliation) -> dict[str, Any]:
+    localized = dict(schema)
+    localized["name"] = language.entity_label(affiliation.wikidata_qid, affiliation.name)
+    return localized
+
+
+def _localized_schema(job: PageJob, schema: dict[str, Any]) -> dict[str, Any]:
+    """Translate schema display fields while retaining names, dates, identifiers, and source prose."""
+    language = job.language
+    if language is None:
+        return schema
+    localized = dict(schema)
+    record = job.context.get("record")
+    if isinstance(record, AwardRecord):
+        awards = (record,)
+    else:
+        person = job.context.get("person")
+        awards = tuple(candidate for candidate, _route in person.awards) if isinstance(person, Laureate) else ()
+        record = awards[-1] if awards else None
+    if awards and "award" in localized:
+        labels = [f"{_localized_award_label(language, candidate)}, {candidate.year}" for candidate in awards]
+        localized["award"] = labels if isinstance(localized["award"], list) else labels[0]
+    if not isinstance(record, AwardRecord):
+        return localized
+    if _nonblank(record.birth_city) and _nonblank(record.birth_country):
+        localized["birthPlace"] = {"@type": "Place", "name": language.city_label(record.birth_city, record.birth_country)}
+    elif _nonblank(record.birth_country):
+        localized["birthPlace"] = {"@type": "Place", "name": language.term("country", record.birth_country)}
+    named = [affiliation for affiliation in record.affiliations if _nonblank(affiliation.name)]
+    affiliation_schema = localized.get("affiliation")
+    if len(named) == 1 and isinstance(affiliation_schema, dict):
+        localized["affiliation"] = _localized_schema_affiliation(language, affiliation_schema, named[0])
+    elif named and isinstance(affiliation_schema, list):
+        localized["affiliation"] = [
+            _localized_schema_affiliation(language, item, affiliation)
+            for item, affiliation in zip(affiliation_schema, named, strict=True)
+            if isinstance(item, dict)
+        ]
+    return localized
+
+
+def _localized_item_list(job: PageJob) -> tuple[tuple[str, str], ...]:
+    item_list = job.context.get("item_list")
+    if not isinstance(item_list, tuple) or job.language is None:
+        return item_list or ()
+    language = job.language
+    labels: dict[str, str] = {}
+    if job.template == "awards.html":
+        labels = {route: language.term("prize", ranking.prize_name) for ranking, route in job.context["prizes"]}
+    elif job.template == "subjects.html":
+        labels = {subject.route: language.term("subject", subject.name) for subject in job.context["subjects"]}
+    elif job.template == "countries.html":
+        labels = {
+            place.route: _localized_place_label(language, place) if job.key == "cities" else language.term("country", place.name)
+            for place in job.context["countries"]
+        }
+    elif job.template == "affiliations.html":
+        labels = {affiliation.route: _localized_affiliation_name(language, affiliation) for affiliation in job.context["affiliations"]}
+    return tuple((labels.get(route, name), route) for name, route in item_list)
+
+
+def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] | None = None) -> str:
+    route_map = route_map or {}
+    localized_route = lambda route: route_map.get(route, route)
     graph: list[dict[str, Any]] = []
     if job.breadcrumbs:
         graph.append(
@@ -1207,20 +1827,25 @@ def _structured_data(base_url: str, job: PageJob) -> str:
                         "name": crumb.label,
                         # The last crumb names the page the reader is on. Where it links onward — a winner page
                         # sends the name to the laureate — that link is for the reader, not a step in the trail.
-                        **({"item": public_url(base_url, crumb.route)} if crumb.route and position < len(job.breadcrumbs) else {}),
+                        **({"item": public_url(base_url, localized_route(crumb.route))} if crumb.route and position < len(job.breadcrumbs) else {}),
                     }
                     for position, crumb in enumerate(job.breadcrumbs, start=1)
                 ],
             }
         )
     if schema := job.context.get("schema"):
-        graph.append(schema)
-    if item_list := job.context.get("item_list"):
+        if not isinstance(schema, dict):
+            raise BuildFailure(f"invalid schema route={job.route}")
+        localized_schema = {**_localized_schema(job, schema), "url": public_url(base_url, job.route)}
+        if job.language is not None:
+            localized_schema["inLanguage"] = job.language.code
+        graph.append(localized_schema)
+    if item_list := _localized_item_list(job):
         graph.append(
             {
                 "@type": "ItemList",
                 "itemListElement": [
-                    {"@type": "ListItem", "position": position, "name": name, "url": public_url(base_url, route)}
+                    {"@type": "ListItem", "position": position, "name": name, "url": public_url(base_url, localized_route(route))}
                     for position, (name, route) in enumerate(item_list, start=1)
                 ],
             }
@@ -1338,6 +1963,8 @@ def plan_city_places(records: Iterable[AwardRecord], people: Iterable[Laureate])
                         key=lambda person: (-len(person.awards), _surname_key(person.name)),
                     )
                 ),
+                city,
+                country,
             )
         )
     cities.sort(key=lambda place: (-len(place.people), place.name))
@@ -1460,6 +2087,7 @@ def plan_affiliations(
                 matched_profiles[0] if matched_profiles else None,
                 next(iter(openalex_ids), ""),
                 next(iter(rors), ""),
+                next(iter(qids)) if len(qids) == 1 else "",
             )
         )
     affiliations.sort(key=lambda affiliation: (-affiliation.count, affiliation.name))
@@ -1517,23 +2145,20 @@ def plan_subject_affiliations(affiliations: list[Affiliation]) -> dict[str, tupl
     members: dict[str, list[RankedAffiliation]] = {}
     for affiliation in affiliations:
         laureates: dict[str, set[str]] = {}
-        cities: dict[str, list[str]] = {}
+        locations: dict[str, list[tuple[str, str]]] = {}
         for link in affiliation.awards:
             laureates.setdefault(link.record.high_school_subject, set()).add(link.record.laureate_wikidata_qid)
             if _nonblank(link.affiliation.city) or _nonblank(link.affiliation.country):
-                cities.setdefault(link.record.high_school_subject, []).append(_place_label(link.affiliation))
+                locations.setdefault(link.record.high_school_subject, []).append(
+                    (link.affiliation.city.strip(), link.affiliation.country.strip())
+                )
         for subject, qids in laureates.items():
-            members.setdefault(subject, []).append(RankedAffiliation(affiliation, len(qids), _commonest(cities.get(subject, ()))))
+            city, country = _commonest(locations.get(subject, ())) if locations.get(subject) else ("", "")
+            members.setdefault(subject, []).append(RankedAffiliation(affiliation, len(qids), ", ".join(part for part in (city, country) if part), city, country))
     return {
         subject: tuple(sorted(rows, key=lambda row: (-row.count, row.affiliation.name)))
         for subject, rows in members.items()
     }
-
-
-def _place_label(affiliation: AwardAffiliation) -> str:
-    """City and country as a reader sees them, dropping whichever half is missing."""
-    city, country = affiliation.city.strip(), affiliation.country.strip()
-    return ", ".join(part for part in (city, country) if part)
 
 
 def _commonest(values: Iterable[str]) -> str:
@@ -2895,6 +3520,422 @@ def create_site_plan(
     )
 
 
+def _stable_key(job: PageJob) -> str:  # noqa: C901 - one explicit table of page-family identities.
+    """Return the language-independent identity for one canonical planner job."""
+    context = job.context
+    if job.template == "index.html":
+        return "home"
+    if job.template == "awards.html":
+        return "awards"
+    if job.template == "people.html":
+        return f"people:{context['page_number']}"
+    if job.template == "prize.html":
+        return f"prize:{context['prize'].qid}"
+    if job.template == "winners.html":
+        return f"prize-winners:{context['prize'].qid}"
+    if job.template == "category.html":
+        return f"category:{context['prize'].qid}:{slugify(context['category'])}"
+    if job.template == "winner.html":
+        return f"winner:{context['record'].award_record_id}"
+    if job.template == "person.html":
+        return f"person:{context['person'].qid}"
+    if job.template == "year.html":
+        prize = context["prize"]
+        parts = job.route.strip("/").split("/")
+        if len(parts) == 2:
+            return f"prize-year:{prize.qid}:{context['year']}"
+        return f"category-year:{prize.qid}:{slugify(context['category'])}:{context['year']}"
+    if job.template == "countries.html":
+        return {"Born": "countries:born", "Awarded": "countries:awarded", "Died": "countries:died", "Cities": "cities"}[context["tab"]]
+    if job.template == "country.html":
+        if context["tab"] == "Cities":
+            return f"city:{context['place'].slug}"
+        return f"country:{context['tab'].lower()}:{context['place'].slug}"
+    if job.template == "city_per_capita.html":
+        return "cities-per-capita"
+    if job.template == "affiliation_countries.html":
+        return "affiliation-countries"
+    if job.template == "affiliation_country.html":
+        return f"affiliation-country:{context['place'].slug}"
+    if job.template == "affiliations.html":
+        return "affiliations"
+    if job.template == "affiliation.html":
+        return f"affiliation:{context['affiliation'].slug}"
+    if job.template == "universities.html":
+        return "universities"
+    if job.template == "university_countries.html":
+        return "universities:countries"
+    if job.template == "subjects.html":
+        return "subjects"
+    if job.template in {"subject.html", "subject_affiliations.html", "subject_recent.html"}:
+        view = {
+            "subject.html": "people",
+            "subject_affiliations.html": "affiliations",
+            "subject_recent.html": "recent",
+        }[job.template]
+        return f"subject:{slugify(context['subject'].name)}:{view}"
+    if job.template == "map.html":
+        return "map" if not context["initial_subject"] else f"map:{slugify(context['initial_subject'])}"
+    if job.template in {"explorer.html", "nearby.html", "about.html"}:
+        return job.template.removesuffix(".html")
+    raise BuildFailure(f"cannot assign stable key template={job.template} route={job.route}")
+
+
+def _localized_route(language: Language, job: PageJob, key: str) -> str:  # noqa: C901 - one explicit route table.
+    """Rebuild a canonical route from language-owned segments and source identity."""
+    context = job.context
+    parts = job.route.strip("/").split("/") if job.route != "/" else []
+    if key == "home":
+        return language.route()
+    if key == "awards":
+        return language.route(language.segment("awards"))
+    if key.startswith("people:"):
+        number = int(key.rsplit(":", 1)[1])
+        if number == 1:
+            return language.route(language.segment("people"))
+        return language.route(language.segment("people"), f"{language.segment('page')}-{number}")
+    if key.startswith("prize:"):
+        return language.route(parts[0])
+    if key.startswith("prize-winners:"):
+        return language.route(parts[0], language.segment("winners"))
+    if key.startswith("category:"):
+        return language.route(parts[0], slugify(language.term("category", context["category"])))
+    if key.startswith("category-year:"):
+        return language.route(parts[0], slugify(language.term("category", context["category"])), slugify(context["year"]))
+    if key.startswith("prize-year:"):
+        return language.route(parts[0], slugify(context["year"]))
+    if key.startswith("winner:"):
+        record: AwardRecord = context["record"]
+        if len(parts) == 4:
+            return language.route(parts[0], slugify(language.term("category", record.category)), parts[2], parts[3])
+        return language.route(*parts)
+    if key.startswith("person:"):
+        return language.route(language.segment("people"), parts[-1])
+    if key == "countries:born":
+        return language.route(language.segment("countries"))
+    if key == "countries:awarded":
+        return language.route(language.segment("countries"), language.segment("awarded"))
+    if key == "countries:died":
+        return language.route(language.segment("countries"), language.segment("died"))
+    if key.startswith("country:"):
+        _country, view, _slug = key.split(":", 2)
+        prefix = [language.segment("countries")]
+        if view != "born":
+            prefix.append(language.segment(view))
+        return language.route(*prefix, slugify(language.term("country", context["place"].name)))
+    if key == "cities":
+        return language.route(language.segment("countries"), language.segment("cities"))
+    if key.startswith("city:"):
+        return language.route(language.segment("countries"), language.segment("cities"), context["place"].slug)
+    if key == "cities-per-capita":
+        return language.route(language.segment("countries"), language.segment("cities-per-capita"))
+    if key == "affiliation-countries":
+        return language.route(language.segment("countries"), language.segment("country_affiliations"))
+    if key.startswith("affiliation-country:"):
+        return language.route(
+            language.segment("countries"),
+            language.segment("country_affiliations"),
+            slugify(language.term("country", context["place"].name)),
+        )
+    if key == "affiliations":
+        return language.route(language.segment("affiliations"))
+    if key.startswith("affiliation:"):
+        return language.route(language.segment("affiliations"), context["affiliation"].slug)
+    if key == "universities":
+        return language.route(language.segment("universities"))
+    if key == "universities:countries":
+        return language.route(language.segment("universities"), language.segment("countries"))
+    if key == "subjects":
+        return language.route(language.segment("subjects"))
+    if key.startswith("subject:"):
+        _subject, _slug, view = key.split(":", 2)
+        subject: Subject = context["subject"]
+        route = [language.segment("subjects"), slugify(language.term("subject", subject.name))]
+        if view == "affiliations":
+            route.append(language.segment("country_affiliations"))
+        elif view == "recent":
+            route.append(language.segment("recent"))
+        return language.route(*route)
+    if key == "map":
+        return language.route(language.segment("map"))
+    if key.startswith("map:"):
+        return language.route(language.segment("map"), slugify(language.term("subject", context["initial_subject"])))
+    if key in {"explorer", "nearby", "about"}:
+        return language.route(language.segment(key))
+    raise BuildFailure(f"cannot localize route language={language.code} key={key}")
+
+
+def _validate_localized_jobs(jobs: Iterable[PageJob]) -> None:
+    by_key: dict[str, dict[str, PageJob]] = {}
+    route_owners: dict[str, PageJob] = {}
+    for job in jobs:
+        if job.language is None:
+            raise BuildFailure(f"page has no language route={job.route}")
+        siblings = by_key.setdefault(job.key, {})
+        if job.language.code in siblings:
+            raise BuildFailure(f"duplicate locale page key={job.key} language={job.language.code}")
+        siblings[job.language.code] = job
+        if existing := route_owners.get(job.route):
+            raise BuildFailure(
+                f"duplicate public route route={job.route} keys={existing.key},{job.key} "
+                f"languages={existing.language.code},{job.language.code}"
+            )
+        route_owners[job.route] = job
+    for key, siblings in by_key.items():
+        if set(siblings) != set(LANGUAGE_CODES):
+            raise BuildFailure(f"locale parity key={key} languages={','.join(sorted(siblings))}")
+
+
+def _localized_affiliation_name(language: Language, affiliation: Affiliation) -> str:
+    return language.entity_label(affiliation.qid, affiliation.name)
+
+
+def _localized_award_label(language: Language, record: AwardRecord) -> str:
+    prize = language.term("prize", record.prize_name)
+    return language.text("meta.award-with-category", prize=prize, category=language.term("category", record.category)) if record.category else prize
+
+
+def _localized_breadcrumbs(language: Language, breadcrumbs: Iterable[Breadcrumb]) -> tuple[Breadcrumb, ...]:
+    fixed = {
+        "Home": "crumb.home",
+        "Awards": "crumb.awards",
+        "People": "crumb.people",
+        "Countries": "crumb.countries",
+        "Cities": "crumb.cities",
+        "Institutions": "crumb.institutions",
+        "Universities": "crumb.universities",
+        "By country": "crumb.by-country",
+        "Subjects": "crumb.subjects",
+        "Recent": "crumb.recent",
+        "Every winner": "crumb.every-winner",
+    }
+    result: list[Breadcrumb] = []
+    for crumb in breadcrumbs:
+        label = language.text(fixed[crumb.label]) if crumb.label in fixed else crumb.label
+        for section in ("prize", "category", "country", "subject"):
+            if crumb.label in language.terms[section]:
+                label = language.term(section, crumb.label)
+                break
+        if crumb.label.startswith("Page "):
+            label = language.text("crumb.page", page=crumb.label.removeprefix("Page "))
+        result.append(Breadcrumb(label, crumb.route))
+    return tuple(result)
+
+
+def _country_index_people(places: Iterable[Place]) -> int:
+    return len({person.qid for place in places for person in place.people})
+
+
+def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tuple[str, str]:  # noqa: C901 - page metadata follows the explicit page-family map.
+    """Produce translated metadata from canonical data without changing planner membership."""
+    context = job.context
+    key = _stable_key(job)
+    years = plan.year_span.split("-", 1)
+    year_from, year_to = (years[0], years[-1])
+    num = lambda value: format_number(value, language)
+    if key == "home":
+        fields = {
+            "other_prize_count": num(plan.prize_count - 2),
+            "people_count": num(plan.person_count),
+            "award_count": num(plan.recipient_count),
+            "prize_count": num(plan.prize_count),
+            "year_from": year_from,
+            "year_to": year_to,
+        }
+        name = "home"
+    elif key == "awards":
+        fields, name = {"prize_count": num(plan.prize_count)}, "awards"
+    elif key.startswith("people:"):
+        fields, name = {"page": context["page_number"], "page_count": context["page_count"]}, "people"
+    elif key.startswith("prize-winners:"):
+        prize = context["prize"]
+        fields = {"prize": language.term("prize", prize.prize_name), "recipient_count": num(len(context["winners"])), "year_span": context["span"]}
+        name = "prize-winners"
+    elif key.startswith("prize:"):
+        prize = context["prize"]
+        prize_records = [
+            candidate.context["record"]
+            for candidate in plan.jobs
+            if candidate.template == "winner.html" and candidate.context["record"].award_wikidata_qid == prize.qid
+        ]
+        fields = {
+            "prize": language.term("prize", prize.prize_name),
+            "recipient_count": num(len(prize_records)),
+            "year_span": _year_span([record.year for record in prize_records]),
+            "blurb": language.ranking_blurb(prize.qid),
+        }
+        name = "prize"
+    elif key.startswith("category:"):
+        prize = context["prize"]
+        recipients = sum(len(members) for _year, _route, _prefix, groups in context["years"] for _motivation, members in groups)
+        fields = {
+            "prize": language.term("prize", prize.prize_name),
+            "category": language.term("category", context["category"]),
+            "recipient_count": num(recipients),
+            "year_span": _year_span([year for year, *_rest in context["years"]]),
+        }
+        name = "category"
+    elif key.startswith("category-year:"):
+        fields = {
+            "prize": language.term("prize", context["prize"].prize_name),
+            "year": context["year"],
+            "names": ", ".join(record.full_name for _motivation, members in context["winners"] for record, _route in members),
+        }
+        name = "category-year"
+    elif key.startswith("prize-year:"):
+        prize = language.term("prize", context["prize"].prize_name)
+        award = (
+            language.text("meta.award-with-category", prize=prize, category=language.term("category", context["category"]))
+            if context["category"]
+            else prize
+        )
+        fields = {
+            "award": award,
+            "year": context["year"],
+            "names": ", ".join(record.full_name for _motivation, members in context["winners"] for record, _route in members),
+        }
+        name = "prize-year"
+    elif key.startswith("winner:"):
+        record: AwardRecord = context["record"]
+        first = next((item for item in record.affiliations if item.name), None)
+        fields = {
+            "name": record.full_name,
+            "award": _localized_award_label(language, record),
+            "year": record.year,
+            "motivation": record.motivation,
+            "affiliation": language.text(
+                "meta.winner.affiliation",
+                institution=language.entity_label(first.wikidata_qid, first.name),
+            ) if first else "",
+        }
+        name = "winner"
+    elif key.startswith("person:"):
+        person: Laureate = context["person"]
+        fields = {
+            "name": person.name,
+            "prizes": ", ".join(language.term("prize", prize) for prize in dict.fromkeys(record.prize_name for record, _route in person.awards)),
+            "year_span": _year_span([record.year for record, _route in person.awards]),
+            "award_count": num(len(person.awards)),
+        }
+        name = "person"
+    elif key == "subjects":
+        fields, name = {}, "subjects"
+    elif key.startswith("subject:"):
+        subject: Subject = context["subject"]
+        fields = {"subject": language.term("subject", subject.name), "award_count": num(subject.award_count), "person_count": num(len(subject.people))}
+        name = {"people": "subject", "affiliations": "subject-affiliations", "recent": "subject-recent"}[key.rsplit(":", 1)[1]]
+        if name == "subject-affiliations":
+            fields["institution_count"] = num(len(subject.affiliations))
+        elif name == "subject-recent":
+            fields.update(
+                recipient_count=num(context["recent_recipient_count"]),
+                prize_count=num(context["recent_prize_count"]),
+                year_from=context["recent_start_year"],
+                year_to=context["recent_end_year"],
+            )
+    elif key.startswith("countries:"):
+        view = key.split(":", 1)[1]
+        places = context["countries"]
+        fields = {"person_count": num(_country_index_people(places)), "country_count": num(len(places))}
+        name = f"countries-{view}"
+    elif key.startswith("country:"):
+        _country, view, _slug = key.split(":", 2)
+        place: Place = context["place"]
+        fields = {"country": language.term("country", place.name), "person_count": num(len(place.people))}
+        name = f"country-{view}"
+    elif key == "cities":
+        places = context["countries"]
+        fields, name = {"person_count": num(_country_index_people(places)), "city_count": num(len(places))}, "cities"
+    elif key.startswith("city:"):
+        place = context["place"]
+        fields, name = {"city": _localized_place_label(language, place), "person_count": num(len(place.people))}, "city"
+    elif key == "cities-per-capita":
+        fields, name = {}, "cities-per-capita"
+    elif key == "affiliation-countries":
+        fields = {
+            "country_count": num(len(context["countries"])),
+            "recorded_count": num(context["recorded"]),
+            "award_count": num(context["total"]),
+        }
+        name = "affiliation-countries"
+    elif key.startswith("affiliation-country:"):
+        place: AffiliationCountry = context["place"]
+        fields, name = {"country": language.term("country", place.name), "institution_count": num(len(place.members))}, "affiliation-country"
+    elif key == "affiliations":
+        fields, name = {"recorded_count": num(context["recorded"]), "award_count": num(context["total"])}, "affiliations"
+    elif key.startswith("affiliation:"):
+        affiliation: Affiliation = context["affiliation"]
+        fields = {
+            "institution": _localized_affiliation_name(language, affiliation),
+            "prizes": ", ".join(language.term("prize", prize) for prize in dict.fromkeys(link.record.prize_name for link in affiliation.awards)),
+            "year_span": _year_span([link.record.year for link in affiliation.awards]),
+            "award_count": num(context["award_count"]),
+            "person_count": num(affiliation.count),
+        }
+        name = "affiliation"
+    elif key == "universities":
+        fields, name = {"university_count": num(context["total"])}, "universities"
+    elif key == "universities:countries":
+        fields, name = {"university_count": num(context["total"]), "country_count": num(len(context["countries"]))}, "universities-countries"
+    elif key == "map":
+        fields, name = {}, "map"
+    elif key.startswith("map:"):
+        fields, name = {"subject": language.term("subject", context["initial_subject"])}, "map-subject"
+    elif key in {"explorer", "nearby"}:
+        fields, name = {}, key
+    elif key == "about":
+        fields, name = {"prize_count": num(plan.prize_count), "person_count": num(plan.person_count)}, "about"
+    else:
+        raise BuildFailure(f"metadata missing key={key}")
+    def metadata(field: str) -> str:
+        catalogue_key = f"meta.{name}.{field}"
+        try:
+            required = _format_fields(language.ui[catalogue_key], language.code, catalogue_key)
+            values = {key: fields[key] for key in required}
+        except KeyError as error:
+            raise BuildFailure(f"language={language.code} ui format={catalogue_key}") from error
+        return language.text(catalogue_key, **values)
+
+    return metadata("title"), _clamp(metadata("description"))
+
+
+def create_multilingual_site_plan(
+    rankings: list[Ranking],
+    records: list[AwardRecord],
+    base_url: str,
+    generated: str,
+    languages: tuple[Language, ...],
+    profiles: Iterable[AffiliationProfile] = (),
+) -> SitePlan:
+    """Plan every locale from one canonical data plan without changing membership or ordering."""
+    canonical = create_site_plan(rankings, records, base_url, generated, profiles)
+    localized: list[PageJob] = []
+    for language in languages:
+        for job in canonical.jobs:
+            key = _stable_key(job)
+            route = _localized_route(language, job, key)
+            context = {**job.context, "_canonical_route": job.route}
+            if tab := context.get("tab"):
+                context["tab"] = {"Born": "born", "Awarded": "awarded", "Died": "died", "Cities": "cities"}[tab]
+            title, description = _localized_metadata(language, job, canonical)
+            localized.append(
+                PageJob(job.template, route, title, description, _localized_breadcrumbs(language, job.breadcrumbs), context, language, key)
+            )
+    _validate_localized_jobs(localized)
+    return SitePlan(
+        tuple(localized),
+        canonical.prize_count,
+        canonical.category_count,
+        canonical.year_count,
+        canonical.winner_count,
+        canonical.recipient_count,
+        canonical.person_count,
+        canonical.country_count,
+        canonical.subject_count,
+        canonical.year_span,
+    )
+
+
 def _sitemap_document(root: str, entries: list[str]) -> bytes:
     body = "\n".join(entries)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<{root} xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}\n</{root}>\n'.encode()
@@ -2963,109 +4004,112 @@ def write_dataset_csv(output: Path, records: Iterable[AwardRecord]) -> None:
         )
 
 
-def write_llms_txt(output: Path, base_url: str, plan: SitePlan, rankings: Iterable[Ranking]) -> None:
-    """Write /llms.txt: what the site holds, how its URLs are shaped, and where a machine reader should start.
-
-    The pages are already plain HTML, so this file guides rather than restates them. An agent that can build a URL from
-    a name does not have to crawl, and one that reads the whole sitemap learns nothing about which page answers what.
-    """
+def write_llms_txt(output: Path, base_url: str, plan: SitePlan, rankings: Iterable[Ranking], language: Language) -> None:
+    """Write one localized machine-reader guide from the same plan as the pages."""
+    jobs = tuple(job for job in plan.jobs if job.language == language)
     categories: dict[str, list[PageJob]] = {}
-    for job in plan.jobs:
+    for job in jobs:
         if job.template == "category.html":
             categories.setdefault(job.context["prize"].qid, []).append(job)
-
     entries: list[str] = []
     for ranking in sorted(rankings, key=lambda ranking: ranking.score, reverse=True):
-        prize_route = f"/{ranking.slug}/"
+        prize = next(job for job in jobs if job.key == f"prize:{ranking.qid}")
+        winners = next(job for job in jobs if job.key == f"prize-winners:{ranking.qid}")
         entries.append(
-            f"- [Every {ranking.prize_name} winner]({public_url(base_url, prize_route + WINNERS_SEGMENT + '/')}): "
-            f"score {ranking.score}/100. {ranking.blurb} Awarding body: {ranking.url}"
+            language.text(
+                "llms.prize-winner",
+                name=language.term("prize", ranking.prize_name),
+                url=public_url(base_url, winners.route),
+                score=ranking.score,
+                blurb=language.ranking_blurb(ranking.qid),
+                official_url=ranking.url,
+            )
         )
         prize_categories = sorted(categories.get(ranking.qid, ()), key=lambda job: job.route)
-        indexes = "its categories and every award year" if prize_categories else "every award year"
-        entries.append(f"  - [{ranking.prize_name} by year]({public_url(base_url, prize_route)}): {indexes}")
-        for job in prize_categories:
-            entries.append(f"  - [{job.title}]({public_url(base_url, job.route)}): {job.description}")
-    prizes = "\n".join(entries)
-
+        indexes = language.text("llms.prize_year.categories") if prize_categories else language.text("llms.prize_year.years")
+        entries.append(language.text("llms.prize-year", name=language.term("prize", ranking.prize_name), url=public_url(base_url, prize.route), indexes=indexes))
+        entries.extend(language.text("llms.category", title=job.title, url=public_url(base_url, job.route), description=job.description) for job in prize_categories)
     subjects = "\n".join(
-        f"- [{job.title}]({public_url(base_url, job.route)}): {job.description} "
-        f"[Recent {job.context['subject'].name} prizes and recipients]"
-        f"({public_url(base_url, job.context['subject'].recent_route)}): latest three calendar years in the data."
-        for job in sorted((job for job in plan.jobs if job.template == "subject.html"), key=lambda job: job.route)
+        language.text(
+            "llms.subject",
+            title=job.title,
+            url=public_url(base_url, job.route),
+            description=job.description,
+            subject=language.term("subject", job.context["subject"].name),
+            recent_url=public_url(base_url, next(candidate for candidate in jobs if candidate.key == f"subject:{slugify(job.context['subject'].name)}:recent").route),
+        )
+        for job in sorted((job for job in jobs if job.template == "subject.html"), key=lambda job: job.route)
     )
-    institution_count = sum(1 for job in plan.jobs if job.template == "affiliation.html")
-    body = f"""# PrizeAtlas
-
-> A free, static reference to {plan.prize_count} international prize families and the {plan.person_count:,} people and organizations that have
-> received them, {plan.year_span}. Every prize, award year, recipient, person, country, institution, and school subject has its own page.
-
-Each of the {len(plan.jobs):,} pages is plain HTML that needs no JavaScript to read, and every route ends in a slash and is served from
-`index.html`. {public_url(base_url, "/sitemap.xml")} lists them all. Person and recipient pages embed schema.org JSON-LD — a `Person` or
-`Organization` carrying `birthDate`, `birthPlace`, `affiliation`, `award`, and a `sameAs` link to the laureate's Wikidata item — in a
-`<script type="application/ld+json">` block, which is the shortest path to one page's facts.
-
-The data is one row per recipient, compiled from each award's official record and cross-checked against Wikipedia and Wikidata. A blank
-field, or a key missing from that JSON-LD, means the value could not be confirmed, never that it was estimated. Places carry their
-present-day names, so a laureate born in Königsberg in 1904 is listed under Kaliningrad, Russia. The prestige score on each prize, and the
-points that rank individuals by it, are editorial judgements rather than measurements.
-
-## Where to start
-
-- [Prizes]({public_url(base_url, "/")}): the {plan.prize_count} award families, ranked by prestige score, each opening onto its categories, years, and recipients
-- [People]({public_url(base_url, PEOPLE_ROUTE)}): every recipient by surname; a person's page gathers all of their awards
-- Every winner of one prize in a single list: see the {plan.prize_count} `/{{prize}}/{WINNERS_SEGMENT}/` pages named under "Winner lists" below
-- [Countries]({public_url(base_url, COUNTRIES_ROUTE)}): {plan.country_count} countries of birth, with companion views by award-time institution and by death
-- [Cities]({public_url(base_url, CITIES_ROUTE)}): award-time institution cities, each paired with its country so places with the same name stay separate
-- [Institutions]({public_url(base_url, AFFILIATIONS_ROUTE)}): the universities, laboratories, and organizations where the recognized work was done
-- [Universities]({public_url(base_url, UNIVERSITIES_ROUTE)}): universities and colleges alone, ranked by laureate, and
-  [by country]({public_url(base_url, UNIVERSITY_COUNTRIES_ROUTE)})
-- [Subjects]({public_url(base_url, SUBJECTS_ROUTE)}): the same awards regrouped under {plan.subject_count} school subjects
-- [About]({public_url(base_url, ABOUT_ROUTE)}): scope, method, and the biases this collection inherits from the prizes themselves
-
-## URL patterns
-
-Every slug is lowercase ASCII with hyphens for everything else: "Ngô Bao Châu" is `ngo-bao-chau`, "Earth Science" is `earth-science`.
-
-- `/{{prize}}/{WINNERS_SEGMENT}/` — every recipient of one prize in one table: year, category, and a link to each award
-- `/{{prize}}/{{category}}/{{year}}/{{name}}/` — one recipient of one award, with the citation. Prizes with a single standing category, or
-  with a topic chosen afresh each year, drop the `{{category}}` segment.
-- `/{{prize}}/{{category}}/{{year}}/` and `/{{prize}}/{{category}}/` — one award year, and one category across its years
-- `/people/{{name}}/` — one person and every award they hold
-- `/countries/{{country}}/`, `/countries/awarded/{{country}}/`, `/countries/died/{{country}}/` — laureates by birth, by institution at the
-  time of the award, and by death
-- `/countries/affiliations/{{country}}/` — the institutions in one country
-- `/countries/cities/{{city}}-{{country}}/` — laureates recorded at award-time institutions in one present-day city and country
-- `/affiliations/{{institution}}/` — one institution and its laureates
-- `/subjects/{{subject}}/` — one school subject
-- `/subjects/{{subject}}/recent/` — that subject's prize recipients from its latest recorded year and the two preceding calendar years
-
-The individual country and institution lists — {institution_count:,} institutions alone — are too many to name here; take them from the two
-indexes above or build them from these patterns.
-
-## Winner lists
-
-One entry per prize, each with its complete list of recipients first, then the by-year view and any category lists beneath it. A category
-list is complete for that category; the by-year page names winners only for the most recent {PRIZE_PAGE_YEARS} award years.
-
-{prizes}
-
-## Subject lists
-
-The same awards regrouped under the school subject each belongs to, so one page gathers every laureate in a field across all {plan.prize_count} prizes.
-
-{subjects}
-
-## Bulk data
-
-These three pages carry their data as embedded JSON rather than prose, so read the script block and skip the markup.
-
-- [Explorer]({public_url(base_url, EXPLORER_ROUTE)}): `<script id="explorer-data" type="application/json">` holds every laureate with their awards,
-  countries, and birth year under abbreviated keys — the whole collection in one request.
-- [Map]({public_url(base_url, MAP_ROUTE)}): `<script id="map-data" type="application/json">` holds birthplace and institution coordinates by subject.
-- [Nearby]({public_url(base_url, NEARBY_ROUTE)}): `<script id="nearby-data" type="application/json">` holds `people` and coordinate-grouped `places` for browser-side proximity.
-"""
-    (output / "llms.txt").write_text(body, encoding="utf-8")
+    routes = _language_routes(language)
+    institution_count = sum(1 for job in jobs if job.template == "affiliation.html")
+    body = "\n\n".join(
+        (
+            language.text("llms.title"),
+            language.text(
+                "llms.intro",
+                prize_count=format_number(plan.prize_count, language),
+                person_count=format_number(plan.person_count, language),
+                year_span=plan.year_span,
+            ),
+            language.text("llms.pages", page_count=format_number(len(jobs), language), sitemap_url=public_url(base_url, "/sitemap.xml")),
+            language.text("llms.provenance"),
+            "\n".join(
+                (
+                    language.text("llms.start_heading"),
+                    language.text(
+                        "llms.start_prizes",
+                        url=public_url(base_url, language.route()),
+                        prize_count=format_number(plan.prize_count, language),
+                    ),
+                    language.text("llms.start_people", url=public_url(base_url, routes["people_route"])),
+                    language.text(
+                        "llms.start_countries",
+                        url=public_url(base_url, routes["countries_route"]),
+                        country_count=format_number(plan.country_count, language),
+                    ),
+                    language.text("llms.start_cities", url=public_url(base_url, routes["cities_route"])),
+                    language.text("llms.start_affiliations", url=public_url(base_url, routes["affiliations_route"])),
+                    language.text(
+                        "llms.start_universities",
+                        url=public_url(base_url, routes["universities_route"]),
+                        country_url=public_url(base_url, routes["university_countries_route"]),
+                    ),
+                    language.text("llms.start_subjects", url=public_url(base_url, routes["subjects_route"]), subject_count=plan.subject_count),
+                    language.text("llms.start_about", url=public_url(base_url, routes["about_route"])),
+                )
+            ),
+            "\n".join(
+                (
+                    language.text("llms.patterns_heading"),
+                    language.text(
+                        "llms.patterns",
+                        winners_segment=language.segment("winners"),
+                        institution_count=format_number(institution_count, language),
+                    ),
+                )
+            ),
+            "\n".join((language.text("llms.winner_heading"), language.text("llms.winner_intro", years=PRIZE_PAGE_YEARS), "\n".join(entries))),
+            "\n".join(
+                (
+                    language.text("llms.subject_heading"),
+                    language.text("llms.subject_intro", prize_count=format_number(plan.prize_count, language)),
+                    subjects,
+                )
+            ),
+            "\n".join(
+                (
+                    language.text("llms.bulk_heading"),
+                    language.text("llms.bulk_intro"),
+                    language.text("llms.bulk_explorer", url=public_url(base_url, routes["explorer_route"])),
+                    language.text("llms.bulk_map", url=public_url(base_url, routes["map_route"])),
+                    language.text("llms.bulk_nearby", url=public_url(base_url, routes["nearby_route"])),
+                )
+            ),
+        )
+    ) + "\n"
+    destination = output / language.prefix.strip("/") if language.prefix else output
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "llms.txt").write_text(body, encoding="utf-8")
 
 
 def _share_font(size: int, fonts: dict[int, ImageFont.FreeTypeFont]) -> ImageFont.FreeTypeFont:
@@ -3149,6 +4193,7 @@ def _write_share_image(
     fonts: dict[int, ImageFont.FreeTypeFont],
     page_url: str,
     card: ShareCard | None,
+    language: Language,
     generic: str | None = None,
 ) -> None:
     paper = (244, 240, 231)
@@ -3164,14 +4209,9 @@ def _write_share_image(
     draw.text((96, 78), "PRIZEATLAS", font=_share_font(28, fonts), fill=accent)
 
     if card is None:
-        title, subtitle = {
-            None: ("Recognition for work with lasting impact", "Ranked awards, laureates and institutions"),
-            "Laureates": ("Prize-winning laureates", "Explore recipients across major international awards"),
-            "Institutions": ("Award-linked institutions", "Affiliations recorded when prizes were awarded"),
-            "Universities": ("Universities with award-winning laureates", "Award-time affiliations, not institutional quality"),
-            "Map": ("The PrizeAtlas map", "Birthplaces and award-time affiliations around the world"),
-            "Nearby": ("Winners near you", "Explore laureates and institutions by distance"),
-        }[generic]
+        generic_key = {None: "default", "Laureates": "laureates", "Institutions": "institutions", "Universities": "universities", "Map": "map", "Nearby": "nearby"}[generic]
+        title = language.text(f"share.generic.{generic_key}.title")
+        subtitle = language.text(f"share.generic.{generic_key}.subtitle")
         name_font, name_lines = _share_fit(draw, title, fonts, 1008, 2, 66, 46)
         _draw_share_lines(draw, 96, 174, name_lines, name_font, ink, 12)
         draw.text(
@@ -3184,21 +4224,21 @@ def _write_share_image(
         if card.kind != "Prize" or card.rank < 1 or card.award_count < 1 or not card.subjects:
             raise BuildFailure(f"invalid share card slug={card.slug}")
         kind_font = _share_font(24, fonts)
-        kind = card.kind.upper()
+        kind = language.text("share.card.prize-kind").upper()
         draw.text((1104 - _share_text_width(draw, kind, kind_font), 82), kind, font=kind_font, fill=muted)
-        name_font, name_lines = _share_fit(draw, card.name, fonts, 1008, 2, 66, 42)
+        name_font, name_lines = _share_fit(draw, language.term("prize", card.name), fonts, 1008, 2, 66, 42)
         _draw_share_lines(draw, 96, 145, name_lines, name_font, ink, 10)
         draw.line((96, 326, 1104, 326), fill=rule, width=2)
         label_font = _share_font(20, fonts)
         value_font = _share_font(50, fonts)
-        draw.text((96, 360), f"{card.kind.upper()} RANK", font=label_font, fill=muted)
-        draw.text((96, 388), f"#{card.rank:,}", font=value_font, fill=ink)
-        draw.text((340, 360), "RECORDED AWARDS", font=label_font, fill=muted)
-        draw.text((340, 388), f"{card.award_count:,}", font=value_font, fill=ink)
-        draw.text((610, 360), "SUBJECTS", font=label_font, fill=muted)
+        draw.text((96, 360), language.text("share.card.rank-label").upper(), font=label_font, fill=muted)
+        draw.text((96, 388), f"#{format_number(card.rank, language)}", font=value_font, fill=ink)
+        draw.text((340, 360), language.text("share.card.award-count-label").upper(), font=label_font, fill=muted)
+        draw.text((340, 388), format_number(card.award_count, language), font=value_font, fill=ink)
+        draw.text((610, 360), language.text("share.card.subjects-label").upper(), font=label_font, fill=muted)
         subjects_font, subject_lines = _share_fit(
             draw,
-            " · ".join(card.subjects),
+            " · ".join(language.term("subject", subject) for subject in card.subjects),
             fonts,
             494,
             3,
@@ -3214,6 +4254,7 @@ def _write_share_image(
 
 
 def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> None:
+    jobs = tuple(jobs)
     fonts: dict[int, ImageFont.FreeTypeFont] = {}
     generic_images = (
         (SHARE_IMAGE_FALLBACK, None, "/"),
@@ -3223,8 +4264,26 @@ def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> 
         (SHARE_IMAGE_MAP, "Map", MAP_ROUTE),
         (SHARE_IMAGE_NEARBY, "Nearby", NEARBY_ROUTE),
     )
-    for target, generic, route in generic_images:
-        _write_share_image(output / target, fonts, public_url(base_url, route), None, generic)
+    languages = {job.language.code: job.language for job in jobs if job.language is not None}
+    for language in languages.values():
+        routes = _language_routes(language)
+        generic_routes = {
+            "/": language.route(),
+            PEOPLE_ROUTE: routes["people_route"],
+            AFFILIATIONS_ROUTE: routes["affiliations_route"],
+            UNIVERSITIES_ROUTE: routes["universities_route"],
+            MAP_ROUTE: routes["map_route"],
+            NEARBY_ROUTE: routes["nearby_route"],
+        }
+        for target, generic, route in generic_images:
+            _write_share_image(
+                output / _share_path_for_language(target, language),
+                fonts,
+                public_url(base_url, generic_routes[route]),
+                None,
+                language,
+                generic,
+            )
 
     owners: dict[str, str] = {}
     for job in jobs:
@@ -3235,7 +4294,9 @@ def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> 
         if target in owners:
             raise BuildFailure(f"duplicate share image target={target} routes={owners[target]},{job.route}")
         owners[target] = job.route
-        _write_share_image(output / target, fonts, public_url(base_url, job.route), card)
+        if job.language is None:
+            raise BuildFailure(f"share image has no language route={job.route}")
+        _write_share_image(output / target, fonts, public_url(base_url, job.route), card, job.language)
 
 
 def _environment(website_dir: Path) -> Environment:
@@ -3245,13 +4306,160 @@ def _environment(website_dir: Path) -> Environment:
         undefined=StrictUndefined,
     )
     environment.filters["slugify"] = slugify
-    environment.globals["built"] = datetime.date.today().isoformat()
+    environment.globals["built"] = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for name in TEMPLATES:
         environment.get_template(name)
     return environment
 
 
-def _render_job(environment: Environment, staging: Path, base_url: str, corrections_email: str, job: PageJob) -> str:
+def _language_routes(language: Language) -> dict[str, str]:
+    return {
+        "awards_route": language.route(language.segment("awards")),
+        "people_route": language.route(language.segment("people")),
+        "countries_route": language.route(language.segment("countries")),
+        "cities_route": language.route(language.segment("countries"), language.segment("cities")),
+        "cities_per_capita_route": language.route(language.segment("countries"), language.segment("cities-per-capita")),
+        "country_affiliations_route": language.route(language.segment("countries"), language.segment("country_affiliations")),
+        "affiliations_route": language.route(language.segment("affiliations")),
+        "universities_route": language.route(language.segment("universities")),
+        "university_countries_route": language.route(language.segment("universities"), language.segment("countries")),
+        "subjects_route": language.route(language.segment("subjects")),
+        "explorer_route": language.route(language.segment("explorer")),
+        "nearby_route": language.route(language.segment("nearby")),
+        "map_route": language.route(language.segment("map")),
+        "about_route": language.route(language.segment("about")),
+    }
+
+
+def _localized_place_label(language: Language, place: Place | AffiliationCountry) -> str:
+    if city := getattr(place, "city", ""):
+        return language.city_label(city, getattr(place, "country", ""))
+    return language.term("country", place.name)
+
+
+def _localized_subject(language: Language, subject: Subject) -> Subject:
+    return replace(
+        subject,
+        affiliations=tuple(
+            replace(row, place=_localized_location_label(language, row.city, row.country))
+            if row.city or row.country
+            else row
+            for row in subject.affiliations
+        ),
+    )
+
+
+def _localized_ranked_affiliation(language: Language, row: RankedAffiliation) -> RankedAffiliation:
+    if not row.city and not row.country:
+        return row
+    return replace(row, place=_localized_location_label(language, row.city, row.country))
+
+
+def _localized_affiliation_country(language: Language, place: AffiliationCountry) -> AffiliationCountry:
+    return replace(place, members=tuple(_localized_ranked_affiliation(language, row) for row in place.members))
+
+
+def _localized_fact(language: Language, fact: Fact) -> Fact:
+    value = fact.value
+    if fact.kind == "laureate_type":
+        value = language.term("laureate_type", value)
+    elif fact.kind in {"birth_country", "death_country"}:
+        value = language.term("country", value)
+    elif fact.kind == "citizenship_countries":
+        value = "; ".join(language.term("country", country.strip()) for country in value.split(";") if country.strip())
+    return Fact(fact.kind, language.text(f"fact.{fact.kind}"), value, fact.route)
+
+
+def _route_maps(plan: SitePlan) -> dict[str, dict[str, str]]:
+    routes = {code: {} for code in LANGUAGE_CODES}
+    for job in plan.jobs:
+        if job.language is None:
+            raise BuildFailure(f"page has no language route={job.route}")
+        canonical = job.context.get("_canonical_route")
+        if not isinstance(canonical, str):
+            raise BuildFailure(f"page has no canonical route key={job.key}")
+        routes[job.language.code][canonical] = job.route
+    return routes
+
+
+def _alternates(plan: SitePlan) -> dict[str, dict[str, str]]:
+    result: dict[str, dict[str, str]] = {}
+    for job in plan.jobs:
+        result.setdefault(job.key, {})[job.language.code if job.language else ""] = job.route
+    for key, entries in result.items():
+        if set(entries) != set(LANGUAGE_CODES):
+            raise BuildFailure(f"locale parity key={key} languages={','.join(sorted(entries))}")
+    return result
+
+
+def _render_job(
+    environment: Environment,
+    staging: Path,
+    base_url: str,
+    corrections_email: str,
+    job: PageJob,
+    route_map: Mapping[str, str] | None = None,
+    alternates: Mapping[str, str] | None = None,
+) -> str:
+    language = job.language
+    if language is None:
+        raise BuildFailure(f"page has no language route={job.route}")
+    route_map = route_map or {}
+    alternates = alternates or {}
+
+    def href(target: str) -> str:
+        if not target or urlsplit(target).scheme:
+            return target
+        if target.startswith("."):
+            return target
+        return relative_route(job.route, route_map.get(target, target))
+
+    def absolute_href(target: str) -> str:
+        return public_url(base_url, route_map.get(target, target))
+
+    context = dict(job.context)
+    if totals := context.get("totals"):
+        context["totals"] = tuple(
+            (format_number(int(value.replace(",", "")), language) if value.replace(",", "").isdigit() else value, label)
+            for value, label in totals
+        )
+    if facts := context.get("facts"):
+        context["facts"] = tuple(_localized_fact(language, fact) for fact in facts)
+    if job.template == "subject_affiliations.html":
+        context["subject"] = _localized_subject(language, context["subject"])
+    elif job.template == "affiliation_country.html":
+        context["place"] = _localized_affiliation_country(language, context["place"])
+    elif job.template == "university_countries.html":
+        context["countries"] = tuple(_localized_affiliation_country(language, place) for place in context["countries"])
+    if job.template == "explorer.html":
+        context["payload"] = explorer_json(localized_explorer_payload(json.loads(context["payload"]), language, route_map))
+    elif job.template == "map.html":
+        context["payload"] = map_json(localized_map_payload(json.loads(context["payload"]), language))
+    elif job.template == "nearby.html":
+        context["payload"] = map_json(localized_nearby_payload(json.loads(context["payload"]), language, route_map))
+    routes = _language_routes(language)
+    country_views = (
+        {"key": "born", "label": language.text("view.born"), "route": routes["countries_route"]},
+        {"key": "awarded", "label": language.text("view.awarded"), "route": language.route(language.segment("countries"), language.segment("awarded"))},
+        {"key": "died", "label": language.text("view.died"), "route": language.route(language.segment("countries"), language.segment("died"))},
+    )
+    if job.key == "home":
+        context["hero_heading"] = language.text("home.hero_heading", more_count=format_number(len(context["prizes"]) - 1, language))
+    elif job.key == "awards":
+        context["heading"] = language.text("awards.heading")
+    elif job.template == "countries.html":
+        view = context["tab"]
+        places = context["countries"]
+        fields = {"person_count": format_number(_country_index_people(places), language), "place_count": format_number(len(places), language)}
+        context["eyebrow"] = language.text(f"countries.{view}.eyebrow")
+        context["blurb"] = language.text(f"countries.{view}.blurb", **fields)
+        context["caveat"] = language.text(f"countries.{view}.caveat")
+    elif job.template == "country.html":
+        view = context["tab"]
+        fields = {"person_count": format_number(len(context["place"].people), language)}
+        context["eyebrow"] = language.text(f"country.{view}.eyebrow")
+        context["blurb"] = language.text(f"country.{view}.blurb", **fields)
+        context["return_label"] = language.text("common.all_cities" if view == "cities" else "common.all_countries")
     target_directory = staging / job.route.strip("/")
     target_directory.mkdir(parents=True, exist_ok=True)
     template = environment.get_template(job.template)
@@ -3265,46 +4473,54 @@ def _render_job(environment: Environment, staging: Path, base_url: str, correcti
         share_image_width=SHARE_IMAGE_WIDTH,
         share_image_height=SHARE_IMAGE_HEIGHT,
         breadcrumbs=job.breadcrumbs,
-        home_href=relative_route(job.route, "/"),
+        home_href=relative_route(job.route, language.route()),
         favicon_href=relative_file(job.route, "favicon.svg"),
         style_href=relative_file(job.route, "static/style.css"),
         csv_href=relative_file(job.route, "awards.csv"),
         asset_href=lambda target: relative_file(job.route, target) if target else "",
-        awards_route=AWARDS_ROUTE,
-        people_route=PEOPLE_ROUTE,
-        countries_route=COUNTRIES_ROUTE,
-        cities_route=CITIES_ROUTE,
-        cities_per_capita_route=CITIES_PER_CAPITA_ROUTE,
-        country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
-        country_views=COUNTRY_VIEWS,
-        affiliations_route=AFFILIATIONS_ROUTE,
-        universities_route=UNIVERSITIES_ROUTE,
-        university_countries_route=UNIVERSITY_COUNTRIES_ROUTE,
-        subjects_route=SUBJECTS_ROUTE,
-        explorer_route=EXPLORER_ROUTE,
-        nearby_route=NEARBY_ROUTE,
-        map_route=MAP_ROUTE,
-        about_route=ABOUT_ROUTE,
-        structured_data=_structured_data(base_url, job),
-        href=lambda target: relative_route(job.route, target),
+        country_views=country_views,
+        structured_data=_structured_data(base_url, job, route_map),
+        href=href,
+        absolute_href=absolute_href,
+        alternates=dict(alternates),
+        alternate_hrefs={code: relative_route(job.route, route) for code, route in alternates.items()},
+        alternate_urls={code: public_url(base_url, route) for code, route in alternates.items()},
+        language=language,
+        language_names=LANGUAGE_NAMES,
+        language_routes=routes,
+        route=job.route,
+        stable_key=job.key,
+        is_city=job.key.startswith("city:"),
+        t=lambda key, **fields: language.text(key, **fields),
+        pattern=language.pattern,
+        browser_t=language.pattern,
+        term=language.term,
+        ranking_blurb=language.ranking_blurb,
+        entity_label=language.entity_label,
+        city_label=language.city_label,
+        place_label=lambda place: _localized_place_label(language, place),
+        format_number=lambda value, digits=None: format_number(value, language, digits),
         correction_href=lambda record_id="": correction_mailto(corrections_email, page_url, record_id),
-        **job.context,
+        **routes,
+        **context,
     )
     (target_directory / "index.html").write_text(html, encoding="utf-8")
     return job.route
 
 
-def render_error_page(environment: Environment, output: Path, base_url: str) -> None:
+def render_error_page(environment: Environment, output: Path, base_url: str, language: Language) -> None:
     """Render /404.html.
 
     Every other page links relatively, which the server resolves against the file's own directory. The error page is
     served for arbitrary request URLs, so its links must be absolute from the deployment root instead.
     """
     root = urlsplit(base_url).path
+    routes = _language_routes(language)
+    description = language.text("meta.error.description")
     html = environment.get_template("404.html").render(
-        title="Page not found",
-        description="This page does not exist. Browse the ranked awards and their recipients instead.",
-        share_description="This page does not exist. Browse the ranked awards and their recipients instead.",
+        title=language.text("meta.error.title"),
+        description=description,
+        share_description=description,
         canonical="",
         share_image=public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}"),
         share_image_width=SHARE_IMAGE_WIDTH,
@@ -3314,22 +4530,29 @@ def render_error_page(environment: Environment, output: Path, base_url: str) -> 
         favicon_href=root + "favicon.svg",
         style_href=root + "static/style.css",
         csv_href=root + "awards.csv",
-        awards_route=AWARDS_ROUTE,
-        people_route=PEOPLE_ROUTE,
-        countries_route=COUNTRIES_ROUTE,
-        cities_route=CITIES_ROUTE,
-        cities_per_capita_route=CITIES_PER_CAPITA_ROUTE,
-        country_affiliations_route=COUNTRY_AFFILIATIONS_ROUTE,
-        country_views=COUNTRY_VIEWS,
-        affiliations_route=AFFILIATIONS_ROUTE,
-        subjects_route=SUBJECTS_ROUTE,
-        explorer_route=EXPLORER_ROUTE,
-        nearby_route=NEARBY_ROUTE,
-        map_route=MAP_ROUTE,
-        about_route=ABOUT_ROUTE,
+        country_views=(),
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
+        absolute_href=lambda target: public_url(base_url, target),
+        alternates={},
+        alternate_urls={},
+        language=language,
+        language_names=LANGUAGE_NAMES,
+        language_routes=routes,
+        route="/404.html",
+        stable_key="",
+        is_city=False,
+        t=lambda key, **fields: language.text(key, **fields),
+        pattern=language.pattern,
+        browser_t=language.pattern,
+        term=language.term,
+        ranking_blurb=language.ranking_blurb,
+        entity_label=language.entity_label,
+        city_label=language.city_label,
+        place_label=lambda place: _localized_place_label(language, place),
+        format_number=lambda value, digits=None: format_number(value, language, digits),
         correction_href=lambda record_id="": "",  # The served URL is unknown at build time, so there is nothing to report against.
+        **routes,
     )
     (output / "404.html").write_text(html, encoding="utf-8")
 
@@ -3351,7 +4574,10 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
     print(f"website build config corrections_email={corrections_email or '(unset)'}")
     rankings, profiles, records = read_database(database)
     generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
-    plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
+    languages = load_languages(rankings, records, website_dir / "i18n")
+    plan = create_multilingual_site_plan(rankings, records, normalized_base_url, generated, languages, profiles)
+    route_maps = _route_maps(plan)
+    alternate_maps = _alternates(plan)
     environment = _environment(website_dir)
     staging = Path(tempfile.mkdtemp(prefix=".dist-staging-", dir=website_dir))
     staging.chmod(0o2775)
@@ -3362,15 +4588,24 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR) ->
         write_share_images(staging, normalized_base_url, plan.jobs)
         with ThreadPoolExecutor(max_workers=8) as executor:
             rendered = executor.map(
-                lambda job: _render_job(environment, staging, normalized_base_url, corrections_email, job),
+                lambda job: _render_job(
+                    environment,
+                    staging,
+                    normalized_base_url,
+                    corrections_email,
+                    job,
+                    route_maps[job.language.code],
+                    alternate_maps[job.key],
+                ),
                 plan.jobs,
             )
             list(rendered)
         write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
         write_robots(staging, normalized_base_url)
         write_dataset_csv(staging, records)
-        write_llms_txt(staging, normalized_base_url, plan, rankings)
-        render_error_page(environment, staging, normalized_base_url)
+        for language in languages:
+            write_llms_txt(staging, normalized_base_url, plan, rankings, language)
+        render_error_page(environment, staging, normalized_base_url, languages[0])
         _make_world_readable(staging)
         _promote(staging, dist)
     finally:
@@ -3388,9 +4623,20 @@ def build_home_page(database: Path, base_url: str, website_dir: Path = SCRIPT_DI
     corrections_email = read_env(website_dir.parent / ".env").get("CORRECTIONS_EMAIL", "")
     rankings, profiles, records = read_database(database)
     generated = datetime.datetime.fromtimestamp(database.stat().st_mtime, tz=datetime.UTC).date().isoformat()
-    plan = create_site_plan(rankings, records, normalized_base_url, generated, profiles)
-    home = next(job for job in plan.jobs if job.route == "/")
-    _render_job(_environment(website_dir), output, normalized_base_url, corrections_email, home)
+    languages = load_languages(rankings, records, website_dir / "i18n")
+    plan = create_multilingual_site_plan(rankings, records, normalized_base_url, generated, languages, profiles)
+    route_maps = _route_maps(plan)
+    alternate_maps = _alternates(plan)
+    home = next(job for job in plan.jobs if job.key == "home" and job.language and job.language.code == "en")
+    _render_job(
+        _environment(website_dir),
+        output,
+        normalized_base_url,
+        corrections_email,
+        home,
+        route_maps["en"],
+        alternate_maps["home"],
+    )
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

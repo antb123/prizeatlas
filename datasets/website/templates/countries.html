@@ -6,14 +6,14 @@
   <p class="eyebrow">{{ eyebrow }}</p>
   <h1>{{ title }}</h1>
   <p>{{ blurb }}</p>
-  {% if caveat %}<p class="caveat">{{ caveat | safe }}</p>{% endif %}
+  {% if caveat %}<p class="caveat">{{ caveat }}</p>{% endif %}
 </header>
 <ol class="rank-list{% if plain_counts %} rank-list-plain{% endif %}">
   {% for place in countries %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <a href="{{ href(place.route) }}">{{ place.name }}</a>
-    <span class="rank-count" style="--share: {{ (place.people | length) * 100 // leader }}">{{ place.people | length }}</span>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <a href="{{ href(place.route) }}">{{ place_label(place) }}</a>
+    <span class="rank-count" style="--share: {{ (place.people | length) * 100 // leader }}">{{ format_number(place.people | length) }}</span>
   </li>
   {% endfor %}
 </ol>

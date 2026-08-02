@@ -93,6 +93,28 @@ footer p {
   margin-left: auto;
 }
 
+.language-switcher {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin-left: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.language-switcher a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.language-switcher a:hover,
+.language-switcher a[aria-current="page"] {
+  color: var(--accent);
+}
+
+.language-switcher a[aria-current="page"] {
+  font-weight: 700;
+}
+
 .breadcrumbs {
   padding-block: 1rem;
 }
@@ -916,6 +938,12 @@ dd {
     padding-block: 0.5rem;
     display: block;
     border-bottom: 1px solid var(--rule);
+  }
+
+  .language-switcher {
+    order: 1;
+    width: 100%;
+    margin: 0.25rem 0 0;
   }
 }
 

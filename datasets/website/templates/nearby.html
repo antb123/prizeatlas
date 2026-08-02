@@ -41,23 +41,45 @@
 {% endblock %}
 {% block content %}
   <header class="page-intro">
-    <p class="eyebrow">Nearby</p>
-    <h1>Award winners near you</h1>
-    <p>The recorded birthplaces and institutions closest to wherever you are.</p>
+    <p class="eyebrow">{{ t("nearby.eyebrow") }}</p>
+    <h1>{{ t("nearby.heading") }}</h1>
+    <p>{{ t("nearby.intro") }}</p>
   </header>
 
   <section class="locate">
-    <button id="locate" type="button">Use my location</button>
+    <button id="locate" type="button">{{ t("nearby.use_location") }}</button>
     <p id="status" role="status"></p>
-    <p class="privacy">Your position stays in this browser. The whole dataset already arrived with this page, so there is nothing to send.</p>
+    <p class="privacy">{{ t("nearby.privacy") }}</p>
   </section>
 
-  <h2 id="near-h" tabindex="-1" hidden>Near you</h2>
+  <h2 id="near-h" tabindex="-1" hidden>{{ t("nearby.near_you") }}</h2>
   <ol id="near-list" class="near-list"></ol>
 
-  <p class="footnote">{{ "{:,}".format(places) }} places and {{ "{:,}".format(laureates) }} laureates carry coordinates. Every place is on the <a href="{{ href(map_route) }}">Map</a>; every country is under <a href="{{ href(countries_route) }}">Countries</a>.</p>
+  <p class="footnote">{{ t("nearby.footnote_start", places=format_number(places), laureates=format_number(laureates)) }} <a href="{{ href(map_route) }}">{{ t("chrome.map") }}</a>{{ t("nearby.footnote_middle") }} <a href="{{ href(countries_route) }}">{{ t("chrome.countries") }}</a>{{ t("nearby.footnote_end") }}</p>
 
   <script id="nearby-data" type="application/json">{{ payload|safe }}</script>
+  <script id="nearby-ui" type="application/json">{{ {
+    "locale": language.code,
+    "map": t("chrome.map"),
+    "nearYou": t("nearby.near_you"),
+    "closestAnywhere": t("nearby.closest_anywhere"),
+    "bornHere": t("nearby.born_here"),
+    "workedHere": t("nearby.worked_here"),
+    "otherNames": {"one": browser_t("nearby.other_names.one"), "other": browser_t("nearby.other_names.other")},
+    "more": {"one": browser_t("nearby.more.one"), "other": browser_t("nearby.more.other")},
+    "nothingNearby": browser_t("nearby.nothing_nearby"),
+    "nearbyStatus": browser_t("nearby.nearby_status"),
+    "fragmentStatus": browser_t("nearby.fragment_status"),
+    "browserUnsupported": t("nearby.browser_unsupported"),
+    "waiting": t("nearby.waiting"),
+    "updateLocation": t("nearby.update_location"),
+    "permissionDenied": t("nearby.permission_denied"),
+    "positionUnavailable": t("nearby.position_unavailable"),
+    "timeout": t("nearby.timeout"),
+    "distanceUnderOne": t("nearby.distance_under_one"),
+    "distanceDecimal": browser_t("nearby.distance_decimal"),
+    "distanceRounded": browser_t("nearby.distance_rounded")
+  }|tojson }}</script>
   <script>
     (() => {
       "use strict";
@@ -65,13 +87,32 @@
       const status = document.getElementById("status");
       const heading = document.getElementById("near-h");
       const list = document.getElementById("near-list");
+      const payload = JSON.parse(document.getElementById("nearby-data").textContent);
+      const UI = JSON.parse(document.getElementById("nearby-ui").textContent);
+      const number = new Intl.NumberFormat(UI.locale);
+      const decimal = new Intl.NumberFormat(UI.locale, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+      const coordinate = new Intl.NumberFormat(UI.locale, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      const plural = new Intl.PluralRules(UI.locale);
       let located = false;
 
-      const esc = (value) => String(value).replace(/[&<>"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[character]);
+      const format = (template, fields) => template.replace(/\{([a-z_]+)\}/g, (match, name) => Object.hasOwn(fields, name) ? String(fields[name]) : match);
+      const pluralText = (forms, count, fields = {}) => format(forms[plural.select(count)], {...fields, count});
+      const element = (name, className, content) => {
+        const node = document.createElement(name);
+        if (className) node.className = className;
+        if (content !== undefined) node.textContent = content;
+        return node;
+      };
+      const link = (href, content) => {
+        const node = document.createElement("a");
+        node.href = href;
+        node.textContent = content;
+        return node;
+      };
       const formatDistance = (distance) => {
-        if (distance < 1) return "under 1 km";
-        if (distance < 10) return `${distance.toFixed(1)} km`;
-        return `${Math.round(distance).toLocaleString("en")} km`;
+        if (distance < 1) return UI.distanceUnderOne;
+        if (distance < 10) return format(UI.distanceDecimal, {distance: decimal.format(distance)});
+        return format(UI.distanceRounded, {distance: number.format(Math.round(distance))});
       };
       const distance = (latitude, longitude, point) => {
         const radians = Math.PI / 180;
@@ -84,65 +125,89 @@
         list.replaceChildren();
         heading.hidden = true;
       };
+      const placeItem = (place) => {
+        const item = document.createElement("li");
+        const meta = element("p", "near-meta");
+        meta.append(document.createTextNode(`${formatDistance(place.d)} · `));
+        const dot = element("span", `near-dot ${place.k === "b" ? "birth" : "institution"}`);
+        dot.setAttribute("aria-hidden", "true");
+        meta.append(dot, document.createTextNode(place.k === "b" ? UI.bornHere : UI.workedHere));
+
+        const name = element("p", "near-name");
+        const location = `${place.n} (${place.c})`;
+        name.append(place.r ? link(place.r, location) : document.createTextNode(place.n));
+        item.append(meta, name);
+
+        const whereLabel = place.display_where || place.w;
+        if (whereLabel || place.x) {
+          const where = element("p", "near-where");
+          if (whereLabel) where.append(document.createTextNode(whereLabel));
+          if (place.x) {
+            if (whereLabel) where.append(document.createTextNode(" · "));
+            where.append(document.createTextNode(pluralText(UI.otherNames, place.x)));
+          }
+          item.append(where);
+        }
+
+        const names = place.p.map((index) => payload.people[index]);
+        const visible = names.slice(0, 4);
+        const people = element("p", "rank-units");
+        visible.forEach(([name, route], index) => {
+          if (index) people.append(document.createTextNode(", "));
+          people.append(route ? link(route, name) : document.createTextNode(name));
+        });
+        item.append(people);
+        const extra = names.length - visible.length;
+        if (extra) item.append(element("p", "rank-units-more", pluralText(UI.more, extra)));
+        return item;
+      };
       const show = (latitude, longitude, fromFragment) => {
-        const payload = JSON.parse(document.getElementById("nearby-data").textContent);
         const nearest = payload.places.map((place) => ({...place, d: distance(latitude, longitude, place.g)})).sort((left, right) => left.d - right.d).slice(0, 25);
         if (!nearest.length) return;
         const closest = nearest[0];
-        heading.textContent = closest.d > 500 ? "Closest anywhere" : "Near you";
+        heading.textContent = closest.d > 500 ? UI.closestAnywhere : UI.nearYou;
         heading.hidden = false;
-        list.innerHTML = nearest.map((place) => {
-          const names = place.p.map((index) => payload.people[index]);
-          const visible = names.slice(0, 4).map(([name, route]) => route ? `<a href="${esc(route)}">${esc(name)}</a>` : esc(name));
-          const extra = names.length - visible.length;
-          const where = place.w ? `<p class="near-where">${esc(place.w)}${place.x ? ` · + ${place.x} other name${place.x === 1 ? "" : "s"} recorded here` : ""}</p>` : place.x ? `<p class="near-where">+ ${place.x} other name${place.x === 1 ? "" : "s"} recorded here</p>` : "";
-          const name = place.r ? `<a href="${esc(place.r)}">${esc(place.n)} (${place.c})</a>` : esc(place.n);
-          return `<li><p class="near-meta">${formatDistance(place.d)} · <span class="near-dot ${place.k === "b" ? "birth" : "institution"}"></span>${place.k === "b" ? "Born here" : "Worked here"}</p><p class="near-name">${name}</p>${where}<p class="rank-units">${visible.join(", ")}</p>${extra ? `<p class="rank-units-more">+ ${extra} more</p>` : ""}</li>`;
-        }).join("");
-        if (closest.d > 500) {
-          status.textContent = `Nothing recorded near you — the closest is ${formatDistance(closest.d)} away.`;
-        } else {
-          status.textContent = `${nearest.length} places within ${formatDistance(nearest.at(-1).d)}. Nearest: ${closest.n}.`;
-        }
-        if (fromFragment) status.textContent += ` Showing places near ${latitude.toFixed(2)}, ${longitude.toFixed(2)} — from the address bar, not your location.`;
-        heading.focus();
+        list.replaceChildren(...nearest.map(placeItem));
+        status.textContent = closest.d > 500
+          ? format(UI.nothingNearby, {distance: formatDistance(closest.d)})
+          : format(UI.nearbyStatus, {count: number.format(nearest.length), distance: formatDistance(nearest.at(-1).d), place: closest.n});
+        if (fromFragment) status.append(document.createTextNode(` ${format(UI.fragmentStatus, {latitude: coordinate.format(latitude), longitude: coordinate.format(longitude)})}`));
       };
-      const fragment = location.hash.match(/^#at=([^,]+),([^,]+)$/);
-      const latitude = fragment ? Number(fragment[1]) : NaN;
-      const longitude = fragment ? Number(fragment[2]) : NaN;
-      const hasFragment = Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
+      const parsedFragment = () => {
+        const match = /^#(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(location.hash);
+        return match ? [Number(match[1]), Number(match[2])] : null;
+      };
+
+      const fragment = parsedFragment();
+      if (fragment) show(fragment[0], fragment[1], true);
 
       if (!window.isSecureContext || !navigator.geolocation) {
-        button.remove();
-        status.innerHTML = `Your browser cannot share a location here. You can still explore the <a href="{{ href(map_route) }}">Map</a>.`;
+        const mapLink = link({{ href(map_route)|tojson }}, UI.map);
+        status.replaceChildren(document.createTextNode(`${UI.browserUnsupported} `), mapLink);
+        button.disabled = true;
       } else {
         button.addEventListener("click", () => {
           button.disabled = true;
           button.setAttribute("aria-busy", "true");
-          status.textContent = "Waiting for your browser to share a location…";
+          status.textContent = UI.waiting;
           navigator.geolocation.getCurrentPosition(
-            (position) => {
+            ({coords}) => {
+              located = true;
               button.disabled = false;
               button.removeAttribute("aria-busy");
-              if (!located) button.textContent = "Update my location";
-              located = true;
-              show(position.coords.latitude, position.coords.longitude, false);
+              button.textContent = UI.updateLocation;
+              clearResults();
+              show(coords.latitude, coords.longitude, false);
             },
             (error) => {
               button.disabled = false;
               button.removeAttribute("aria-busy");
-              clearResults();
-              status.textContent = error.code === 1
-                ? "Location not shared — nothing was sent anywhere. You can try again from the padlock in the address bar, or open the Map."
-                : error.code === 2
-                  ? "Your device could not work out where it is. Try again in a moment, or open the Map."
-                  : "That took too long. Try again — a second attempt is usually faster.";
+              status.textContent = error.code === 1 ? UI.permissionDenied : error.code === 2 ? UI.positionUnavailable : UI.timeout;
             },
-            {timeout: 10000, maximumAge: located ? 0 : 300000},
+            {enableHighAccuracy: false, timeout: 12000, maximumAge: located ? 0 : 300000}
           );
         });
       }
-      if (hasFragment) show(latitude, longitude, true);
     })();
   </script>
 {% endblock %}

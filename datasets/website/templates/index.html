@@ -2,26 +2,26 @@
 {% block content %}
 <header class="page-intro">
   <h1>{{ hero_heading }}</h1>
-  <p>Honoring the people behind the prizes — global citizens who've advanced humanity's knowledge and quality of life.</p>
+  <p>{{ t("home.intro") }}</p>
 </header>
 <dl class="totals">
   {% for value, label in totals %}
   <div>
     <dt>{% if label == "prizes" %}<a href="{{ href(awards_route) }}">{{ value }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dt>
-    <dd>{% if label == "prizes" %}<a href="{{ href(awards_route) }}">{{ label }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ label }}</a>{% else %}{{ label }}{% endif %}</dd>
+    <dd>{% if label == "prizes" %}<a href="{{ href(awards_route) }}">{{ t("home.total.prizes") }}</a>{% elif label == "countries" %}<a href="{{ href(countries_route) }}">{{ t("home.total.countries") }}</a>{% elif label == "laureates" %}{{ t("home.total.laureates") }}{% elif label == "awards" %}{{ t("home.total.awards") }}{% elif label == "years" %}{{ t("home.total.years") }}{% elif label == "subjects" %}{{ t("home.total.subjects") }}{% elif label == "institutions" %}{{ t("home.total.institutions") }}{% endif %}</dd>
   </div>
   {% endfor %}
 </dl>
 {% if decorated %}
 <section>
-  <h2>Most decorated</h2>
+  <h2>{{ t("home.most_decorated") }}</h2>
   <ol class="highlights">
     {% for person in decorated %}
     <li>
       <a href="{{ href(person.route) }}">{{ person.name }}</a>
       <span>
-        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
-        {{ person.awards | length }} awards
+        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
+        {{ t("plural.award", count=person.awards | length) }}
       </span>
     </li>
     {% endfor %}
@@ -30,28 +30,28 @@
 {% endif %}
 {% if top_institutions %}
 <section>
-  <h2>Affiliated Institutions</h2>
+  <h2>{{ t("home.affiliated_institutions") }}</h2>
   <ol class="highlights">
     {% for affiliation in top_institutions %}
     <li>
-      <a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
-      <span>{{ affiliation.count }} {{ "laureate" if affiliation.count == 1 else "laureates" }}</span>
+      <a href="{{ href(affiliation.route) }}">{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
+      <span>{{ t("plural.laureate", count=affiliation.count) }}</span>
     </li>
     {% endfor %}
   </ol>
-  <p><a href="{{ href(affiliations_route) }}">All institutions</a></p>
+  <p><a href="{{ href(affiliations_route) }}">{{ t("common.all_institutions") }}</a></p>
 </section>
 {% endif %}
 {% if recent %}
 <section>
-  <h2>Recently awarded</h2>
+  <h2>{{ t("home.recently_awarded") }}</h2>
   <ol class="highlights">
     {% for record, route, prize in recent %}
     <li>
       <a href="{{ href(route) }}">{{ record.full_name }}</a>
       <span>
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>{% endif %}
-        {{ prize.prize_name }}, {{ record.year }}
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", record.high_school_subject) | slugify) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
+        {{ term("prize", prize.prize_name) }}, {{ record.year }}
       </span>
     </li>
     {% endfor %}
@@ -60,29 +60,29 @@
 {% endif %}
 {% if top_women %}
 <section>
-  <h2>Top women</h2>
+  <h2>{{ t("home.top_women") }}</h2>
   <ol class="highlights">
     {% for person in top_women %}
     <li>
       <a href="{{ href(person.route) }}">{{ person.name }}</a>
       <span>
-        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
-        {{ person.awards | length }} {{ "award" if person.awards | length == 1 else "awards" }}
+        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
+        {{ t("plural.award", count=person.awards | length) }}
       </span>
     </li>
     {% endfor %}
   </ol>
-  <p>{{ women_pct }}% of winners are women.</p>
+  <p>{{ t("home.women_percentage", percentage=women_pct) }}</p>
 </section>
 {% endif %}
 {% if top_countries %}
 <section>
-  <h2>Top countries</h2>
+  <h2>{{ t("home.top_countries") }}</h2>
   <ol class="highlights">
     {% for country in top_countries %}
     <li>
-      <a href="{{ href(country.route) }}">{{ country.name }}</a>
-      <span>{{ country.people | length }} {{ "laureate" if country.people | length == 1 else "laureates" }}</span>
+      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
+      <span>{{ t("plural.laureate", count=country.people | length) }}</span>
     </li>
     {% endfor %}
   </ol>
@@ -90,13 +90,13 @@
 {% endif %}
 {% if affiliation_rates %}
 <section>
-  <h2>Laureates per capita</h2>
-  <p>Affiliations / 1m</p>
+  <h2>{{ t("home.laureates_per_capita") }}</h2>
+  <p>{{ t("home.affiliations_per_million") }}</p>
   <ol class="highlights">
     {% for country, rate in affiliation_rates %}
     <li>
-      <a href="{{ href(country.route) }}">{{ country.name }}</a>
-      <span>{{ "%.1f" | format(rate) }} / 1m</span>
+      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
+      <span>{{ t("home.rate_per_million", rate=format_number(rate, 1)) }}</span>
     </li>
     {% endfor %}
   </ol>
@@ -104,13 +104,13 @@
 {% endif %}
 {% if income_adjusted_awards %}
 <section>
-  <h2>Award records relative to GDP</h2>
-  <p>2015–2025 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.</p>
+  <h2>{{ t("home.gdp_award_records") }}</h2>
+  <p>{{ t("home.gdp_description") }}</p>
   <ol class="highlights">
     {% for country, rate in income_adjusted_awards %}
     <li>
-      <a href="{{ href(country.route) }}">{{ country.name }}</a>
-      <span>{{ "%.4f" | format(rate) }} / $1bn</span>
+      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
+      <span>{{ t("home.rate_per_billion", rate=format_number(rate, 4)) }}</span>
     </li>
     {% endfor %}
   </ol>

@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">{{ prize.prize_name }}{% if category %} · {{ category }}{% endif %}</p>
+  <p class="eyebrow">{{ term("prize", prize.prize_name) }}{% if category %} · {{ term("category", category) }}{% endif %}</p>
   <h1>{{ title }}</h1>
 </header>
 <section>
-  <h2>Recipients</h2>
+  <h2>{{ t("common.recipients") }}</h2>
   <ol class="recipient-list">
     {% for motivation, members in winners %}
     <li>
-      {% if show_group_categories and members[0][0].category %}<p class="group-category">{{ members[0][0].category }}</p>{% endif %}
+      {% if show_group_categories and members[0][0].category %}<p class="group-category">{{ term("category", members[0][0].category) }}</p>{% endif %}
       <h3>
         {% for record, route in members %}<a href="{{ href(route) }}">{{ record.full_name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
       </h3>
       {% set subject = members[0][0].high_school_subject %}
       {% if subject %}
-      <p class="subject-badges"><a class="subject-badge" href="{{ href(subjects_route ~ (subject | slugify) ~ '/') }}">{{ subject }}</a></p>
+      <p class="subject-badges"><a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", subject) | slugify) ~ '/') }}">{{ term("subject", subject) }}</a></p>
       {% endif %}
       {% if motivation %}<p>{{ motivation }}</p>{% endif %}
     </li>
@@ -23,7 +23,7 @@
   </ol>
 </section>
 {% if earlier_year or later_year %}
-<nav class="pagination" aria-label="Award years">
+<nav class="pagination" aria-label="{{ t("year.pagination_aria") }}">
   {% if earlier_year %}<a rel="prev" href="{{ href(earlier_year[1]) }}">← {{ earlier_year[0] }}</a>{% endif %}
   {% if later_year %}<a rel="next" href="{{ href(later_year[1]) }}">{{ later_year[0] }} →</a>{% endif %}
 </nav>

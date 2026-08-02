@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">{{ prize.prize_name }}</p>
+  <p class="eyebrow">{{ term("prize", prize.prize_name) }}</p>
   <h1>{{ title }}</h1>
-  <p>Browse every recorded award year in {{ category }}.</p>
+  <p>{{ t("category.browse_years", category=term("category", category)) }}</p>
 </header>
 <section>
-  <h2>Award years</h2>
+  <h2>{{ t("common.award_years") }}</h2>
   <ul class="category-years">
     {% for year, route, prefix, winners in years %}
     <li>

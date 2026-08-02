@@ -4,7 +4,7 @@
 {{ country_tabs(tab) }}
 <header class="page-intro">
   <p class="eyebrow">{{ eyebrow }}</p>
-  <h1>{{ place.name }}</h1>
+  <h1>{{ city_label(place.city, place.country) if is_city else term("country", place.name) }}</h1>
   <p>{{ blurb }}</p>
 </header>
 <ul class="people-index">
@@ -12,11 +12,11 @@
   <li>
     <a href="{{ href(person.route) }}">{{ person.name }}</a>
     <span class="person-index-meta">
-      {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
-      <span>{{ person.awards | length }}</span>
+      {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
+      <span>{{ format_number(person.awards | length) }}</span>
     </span>
   </li>
   {% endfor %}
 </ul>
-<p><a href="{{ href(view_route) }}">{{ return_label | default("All countries") }}</a></p>
+<p><a href="{{ href(view_route) }}">{{ return_label }}</a></p>
 {% endblock %}

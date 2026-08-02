@@ -15,10 +15,13 @@ from unittest import mock
 from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
+import tomllib
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from scripts import fetch_wikidata_labels as label_tool
+from scripts import translate_catalogue as translation_tool
 from website import build
 
 # Both affiliation stores spell the six columns the same way: the flat columns are position 1, the table is 2+.
@@ -52,6 +55,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.website = self.directory / "website"
         shutil.copytree(Path(build.__file__).parent / "templates", self.website / "templates")
         shutil.copytree(Path(build.__file__).parent / "static", self.website / "static")
+        shutil.copytree(Path(build.__file__).parent / "i18n", self.website / "i18n")
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -130,11 +134,77 @@ class WebsiteBuildTests(unittest.TestCase):
                 "INSERT INTO affiliations (affiliation_wikidata_qid, kind) VALUES (?, ?)",
                 profiles or (),
             )
+        self.extend_test_catalogues(rankings, records, extras or {})
         return database
+
+    def extend_test_catalogues(
+        self,
+        rankings: list[tuple[str, str, str, str, int]],
+        records: list[dict[str, str]],
+        extras: dict[str, list[dict[str, str]]],
+    ) -> None:
+        """Keep fixture-only vocabulary explicit while production catalogues stay closed."""
+        values = {
+            "prize": {ranking[1] for ranking in rankings} | {record.get("prize_name", "") for record in records},
+            "category": {record.get("category", "") for record in records},
+            "country": {
+                value.strip()
+                for record in records
+                for value in (
+                    record.get("birth_country", ""),
+                    record.get("death_country", ""),
+                    record.get("affiliation_country", ""),
+                    *record.get("citizenship_countries", "").split(";"),
+                )
+            }
+            | {row.get("affiliation_country", "").strip() for rows in extras.values() for row in rows},
+            "subject": set(build.SUBJECTS) | {record.get("high_school_subject", "Physics") for record in records},
+        }
+        for code in build.LANGUAGE_CODES:
+            path = self.website / "i18n" / f"{code}.toml"
+            content = path.read_text(encoding="utf-8")
+            catalogue = tomllib.loads(content)
+            for section, entries in values.items():
+                missing = sorted(value for value in entries if value and value not in catalogue["terms"][section])
+                if not missing:
+                    continue
+                header = f"[terms.{section}]\n"
+                additions = "".join(f"{json.dumps(value, ensure_ascii=False)} = {json.dumps(value, ensure_ascii=False)}\n" for value in missing)
+                content = content.replace(header, header + additions, 1)
+            missing_rankings = [ranking for ranking in rankings if ranking[0] not in catalogue["ranking"]]
+            for qid, _name, _slug, _url, _score in missing_rankings:
+                content += f"\n[ranking.{qid}]\nblurb = \"Blurb.\"\n"
+            path.write_text(content, encoding="utf-8")
 
     def test_slug_and_base_url_contract(self) -> None:
         self.assertEqual("physics", build.slugify("Physics"))
         self.assertEqual("1983-1984", build.slugify("1983/1984"))
+        language = build.Language("en", "", {}, {}, {"category": {"Agriculture": "Agriculture"}}, {}, {}, ",", ".")
+        ranking = build.Ranking("Q1", "Wolf Prize", "wolf-prize", "https://example.org/wolf", 100, "Blurb.", "Reasoning.")
+        job = build.PageJob(
+            "year.html",
+            "/wolf-prize/agriculture/1983-1984/",
+            "",
+            "",
+            (),
+            {"prize": ranking, "category": "Agriculture", "year": "1983/1984"},
+        )
+        self.assertEqual(
+            "/wolf-prize/agriculture/1983-1984/",
+            build._localized_route(language, job, "category-year:Q1:agriculture:1983-1984"),
+        )
+        special = build.PageJob(
+            "year.html",
+            "/breakthrough-prize/2013-special/",
+            "",
+            "",
+            (),
+            {"prize": ranking, "category": "", "year": "2013 (special)"},
+        )
+        self.assertEqual(
+            "/breakthrough-prize/2013-special/",
+            build._localized_route(language, special, "prize-year:Q1:2013-special"),
+        )
         self.assertEqual("ngo-bao-chau", build.slugify("Ngô Bao Châu"))
         self.assertEqual("sren", build.slugify("Søren"))
         self.assertEqual("frank-h-shu", build.slugify("Frank H. Shu (徐遐生)"))
@@ -153,6 +223,116 @@ class WebsiteBuildTests(unittest.TestCase):
         ):
             with self.subTest(value=value), self.assertRaises(build.BuildFailure):
                 build.normalize_base_url(value)
+
+    def test_server_number_and_plural_rules_match_browser_locales(self) -> None:
+        languages = {
+            code: build.Language(code, prefix, {}, {}, {}, {}, {}, group, decimal)
+            for code, prefix, group, decimal in (
+                ("en", "", ",", "."),
+                ("es", "/es/", ".", ","),
+                ("fr", "/fr/", "\u202f", ","),
+            )
+        }
+        expected = {"en": "1,986", "es": "1.986", "fr": "1\u202f986"}
+        for code, language in languages.items():
+            with self.subTest(code=code):
+                self.assertEqual(expected[code], build.format_number(1986.0, language))
+                self.assertEqual(expected[code] + language.decimal + "5", build.format_number(1986.5, language, 1))
+                self.assertEqual(expected[code] + language.decimal + "123", build.format_number(1986.12345, language))
+        self.assertEqual(("other", "one", "other"), tuple(languages["en"].plural_form(value) for value in (0, 1, 2)))
+        self.assertEqual(("other", "one", "other"), tuple(languages["es"].plural_form(value) for value in (0, 1, 2)))
+        self.assertEqual(("one", "one", "other"), tuple(languages["fr"].plural_form(value) for value in (0, 1, 2)))
+
+        french = self.website / "i18n/fr.toml"
+        french.write_text(french.read_text(encoding="utf-8").replace('group = "\u202f"', 'group = "\u00a0"', 1), encoding="utf-8")
+        with self.assertRaisesRegex(build.BuildFailure, "language=fr number separators are invalid"):
+            build.load_languages((), (), self.website / "i18n")
+
+    def test_label_authoring_uses_exact_affiliation_qid_union_and_rolls_back(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/test", 100)],
+            [
+                {
+                    "award_record_id": "test-1",
+                    "year": "2001",
+                    "prize_name": "Test Prize",
+                    "award_wikidata_qid": "Q1",
+                    "full_name": "Test Winner",
+                    "affiliation_name": "Primary University",
+                    "affiliation_wikidata_qid": "Q10",
+                }
+            ],
+            extras={"test-1": [{"affiliation_name": "Second University", "affiliation_wikidata_qid": "Q20"}]},
+        )
+        self.assertEqual(["Q10", "Q20"], label_tool.read_affiliation_qids(database))
+
+        destination = self.directory / "labels.toml"
+        labels = {"Q10": {"es": "Universidad Primaria", "fr": "Université primaire"}, "Q20": {}}
+        with mock.patch.object(label_tool, "fetch_batch", return_value=labels):
+            self.assertEqual((1, 1), label_tool.build_snapshot(database, destination))
+        self.assertEqual(labels["Q10"], tomllib.loads(destination.read_text(encoding="utf-8"))["labels"]["Q10"])
+
+        destination.write_bytes(b"unchanged\n")
+        with (
+            mock.patch.object(label_tool, "fetch_batch", side_effect=label_tool.LabelFetchFailure("request failed")),
+            self.assertRaises(label_tool.LabelFetchFailure),
+        ):
+            label_tool.build_snapshot(database, destination)
+        self.assertEqual(b"unchanged\n", destination.read_bytes())
+
+    def test_catalogue_translation_preserves_reviewed_dotted_keys_and_rejects_placeholder_changes(self) -> None:
+        source_document = {
+            "code": "en",
+            "prefix": "",
+            "group": ",",
+            "decimal": ".",
+            "reviewed": [],
+            "segments": {"awards": "awards"},
+            "ui": {"message.value": "Hello {name} in {place}", "reviewed.value": "English source"},
+            "terms": {"prize": {"Test Prize": "Test Prize"}},
+            "ranking": {"Q1": {"blurb": "English blurb"}},
+        }
+        target_document = {
+            **source_document,
+            "code": "es",
+            "prefix": "/es/",
+            "group": ".",
+            "decimal": ",",
+            "reviewed": ["ui.reviewed.value"],
+            "ui": {"message.value": "Borrador", "reviewed.value": "Corrección humana"},
+        }
+        source = self.directory / "en.toml"
+        target = self.directory / "es.toml"
+        source.write_text(translation_tool.render_catalogue(source_document), encoding="utf-8")
+        original_target = translation_tool.render_catalogue(target_document)
+        target.write_text(original_target, encoding="utf-8")
+
+        def translate(value: str, _code: str) -> str:
+            return "Hola zzxqf1zz, zzxqf0zz" if value == "Hello zzxqf0zz in zzxqf1zz" else value
+
+        translated, preserved = translation_tool.translate_catalogue(source, target, "es", translate)
+        result = tomllib.loads(target.read_text(encoding="utf-8"))
+        self.assertGreater(translated, 0)
+        self.assertEqual(1, preserved)
+        self.assertEqual("Hola {place}, {name}", result["ui"]["message.value"])
+        self.assertEqual("Corrección humana", result["ui"]["reviewed.value"])
+
+        corruptions = (
+            "Hola zzxqf0zz",
+            "Hola zzxqf0zz y zzxqf0zz",
+            "Hola zzxqf0zz, zzxqf1zz y zzxqf2zz",
+            "Hola zzxqfxzz y zzxqf1zz",
+        )
+        for corrupted in corruptions:
+            with self.subTest(corrupted=corrupted):
+                target.write_text(original_target, encoding="utf-8")
+
+                def corrupt(value: str, _code: str, replacement: str = corrupted) -> str:
+                    return replacement if value == "Hello zzxqf0zz in zzxqf1zz" else value
+
+                with self.assertRaises(translation_tool.CatalogueTranslationFailure):
+                    translation_tool.translate_catalogue(source, target, "es", corrupt)
+                self.assertEqual(original_target.encode(), target.read_bytes())
 
     def test_explorer_payload_serialization_and_route(self) -> None:
         rankings = [
@@ -531,7 +711,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("<h2 id=\"gdp-h\">Recent award records relative to GDP</h2>", explorer)
         self.assertIn("Every country with at least 5 recorded award-recipient rows from 2015–2025", explorer)
         self.assertIn("const INCOME_ADJUSTED_AWARDS = DATA.income_adjusted_awards;", explorer)
-        self.assertIn("row.rate.toFixed(4)", explorer)
+        self.assertIn("rate.format(row.rate)", explorer)
 
     def test_build_home_page_only_rewrites_index(self) -> None:
         database = self.create_database(
@@ -572,21 +752,20 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("PEOPLE.filter((p) => p.bc === countryIdx).slice(0, TOP_N)", explorer_html)
         self.assertIn(".filter((p) => p.by && p.a.some(([year]) => year - p.by < 40))", explorer_html)
         self.assertNotIn('id="gdp-select"', explorer_html)
-        self.assertIn("Every country with at least 5 recorded award-recipient rows from 2015–2025", explorer_html)
-        self.assertIn("affiliation country at the time of award", explorer_html)
+        self.assertIn('{{ t("explorer.gdp_note") }}', explorer_html)
         self.assertIn("const INCOME_ADJUSTED_AWARDS = DATA.income_adjusted_awards;", explorer_html)
         self.assertIn("const rows = INCOME_ADJUSTED_AWARDS;", explorer_html)
         self.assertIn('class: "bar"', explorer_html)
-        self.assertIn("row.rate.toFixed(4)", explorer_html)
+        self.assertIn("rate.format(row.rate)", explorer_html)
         self.assertNotIn('class: "scatter-dot"', explorer_html)
         self.assertIn(".explorer #gdp-chart { overflow-x: auto; }", explorer_html)
         self.assertIn(".explorer #gdp-chart svg { min-width: 720px; }", explorer_html)
         self.assertIn("gdp-chart-title", explorer_html)
         self.assertIn("gdp-chart-desc", explorer_html)
         self.assertNotIn("awards per $1,000", explorer_html)
-        self.assertIn('<option value="pc">Cities / 1m</option>', explorer_html)
+        self.assertIn('<option value="pc">{{ t("explorer.country_cities_per_million") }}</option>', explorer_html)
         self.assertIn("const CITY_AWARDS_PER_CAPITA = DATA.city_awards_per_capita;", explorer_html)
-        self.assertIn("Award records per million residents by city", explorer_html)
+        self.assertIn('"cityChartAria": t("explorer.city_chart_aria")', explorer_html)
 
     def test_laureate_share_rank_uses_explorer_server_order(self) -> None:
         rankings = [
@@ -721,7 +900,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("Biology", biology.context["initial_subject"])
         map_template = (Path(build.__file__).parent / "templates/map.html").read_text()
         self.assertIn('<details class="map-controls" open>', map_template)
-        self.assertIn("<summary>Map controls</summary>", map_template)
+        self.assertIn('<summary>{{ t("map.controls") }}</summary>', map_template)
         self.assertIn('.map-controls:not([open]) > .controls { display: none; }', map_template)
         self.assertIn("controls.open = !narrow.matches;", map_template)
 
@@ -729,39 +908,46 @@ class WebsiteBuildTests(unittest.TestCase):
         records = [
             award(
                 award_record_id="r3",
+                year="2000",
                 full_name="Zed < Example",
                 laureate_wikidata_qid="Q3",
                 birth_city="Shared",
                 birth_country="France",
                 birth_coordinates="2,48",
                 affiliation_name="Common Institute",
+                affiliation_wikidata_qid="Q10",
                 affiliation_city="Paris",
                 affiliation_country="France",
                 affiliation_coordinates="2,48",
             ),
             award(
                 award_record_id="r1",
+                year="2000",
                 full_name="Alice & Example",
                 laureate_wikidata_qid="Q1",
                 birth_city="Shared",
                 birth_country="France",
                 birth_coordinates="2,48",
                 affiliation_name="Common Institute",
+                affiliation_wikidata_qid="Q10",
                 affiliation_city="Paris",
                 affiliation_country="France",
                 affiliation_coordinates="2,48",
             ),
             award(
                 award_record_id="r2",
+                year="2000",
                 full_name="Alice & Example",
                 laureate_wikidata_qid="Q1",
                 affiliation_name="Common Institute",
+                affiliation_wikidata_qid="Q10",
                 affiliation_city="Paris",
                 affiliation_country="France",
                 affiliation_coordinates="2,48",
             ),
             award(
                 award_record_id="r4",
+                year="2000",
                 full_name="Bob Example",
                 laureate_wikidata_qid="Q2",
                 affiliation_name="Other Institute",
@@ -771,7 +957,9 @@ class WebsiteBuildTests(unittest.TestCase):
             ),
         ]
         routes = {"Q1": "/people/alice/", "Q2": "/people/bob/", "Q3": "/people/zed/"}
-        affiliations = [build.Affiliation("Common Institute", "common-institute", "/affiliations/common-institute/", 2, (), (), (), None, "", "")]
+        affiliations = [
+            build.Affiliation("Common Institute", "common-institute", "/affiliations/common-institute/", 2, (), (), (), None, "", "", "Q10")
+        ]
 
         payload = build.nearby_payload(records, routes, affiliations)
         self.assertEqual(
@@ -788,6 +976,30 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual([0, 2], birthplace["p"])
         self.assertEqual(build.map_json(payload), build.map_json(build.nearby_payload(list(reversed(records)), routes, affiliations)))
         self.assertNotIn("<", build.map_json(payload))
+
+        spanish = build.Language(
+            "es",
+            "/es/",
+            {"nearby": "cerca"},
+            {"city.label": "{city}, {country}"},
+            {"country": {"France": "Francia"}, "subject": {subject: subject for subject in build.SUBJECTS}},
+            {},
+            {"Q10": "Instituto Común"},
+            ".",
+            ",",
+        )
+        localized = build.localized_nearby_payload(payload, spanish, {})
+        localized_institution, localized_birthplace = localized["places"]
+        self.assertEqual(("Q10", "Instituto Común", "Paris, Francia"), (
+            localized_institution["q"], localized_institution["n"], localized_institution["display_where"]
+        ))
+        self.assertEqual("Francia", localized_birthplace["display_where"])
+        localized_map = build.localized_map_payload(build.map_payload(records), spanish)
+        common_marker = next(marker for marker in localized_map["affiliation"] if marker["qid"] == "Q10")
+        self.assertEqual(("Common Institute", "Instituto Común"), (common_marker["title_key"], common_marker["title"]))
+        ranked = build.RankedAffiliation(affiliations[0], 2, "Paris, France", "Paris", "France")
+        country = build.AffiliationCountry("France", "france", "/countries/affiliations/france/", (ranked,), 2, 1)
+        self.assertEqual("Paris, Francia", build._localized_affiliation_country(spanish, country).members[0].place)
 
     def test_complete_build_routes_metadata_escaping_and_relative_links(self) -> None:
         rankings = [
@@ -856,6 +1068,39 @@ class WebsiteBuildTests(unittest.TestCase):
 
         # Japan Prize routes by year, so only the Nobel Prize contributes category pages.
         self.assertEqual((3, 2, 5), (plan.prize_count, plan.category_count, plan.winner_count))
+        siblings: dict[str, dict[str, build.PageJob]] = {}
+        for job in plan.jobs:
+            self.assertIsNotNone(job.language)
+            siblings.setdefault(job.key, {})[job.language.code] = job
+        self.assertTrue(siblings)
+        self.assertTrue(all(set(group) == set(build.LANGUAGE_CODES) for group in siblings.values()))
+        self.assertEqual(3 * len(siblings), len(plan.jobs))
+        self.assertFalse(any(job.route.startswith("/en/") for job in plan.jobs))
+        deep_siblings = siblings["winner:nobel-1"]
+        for code, job in deep_siblings.items():
+            html = (self.website / "dist" / job.route.strip("/") / "index.html").read_text()
+            self.assertIn(f'<html lang="{code}">', html)
+            self.assertIn(f'<link rel="canonical" href="https://example.org/awards{job.route}">', html)
+            for alternate_code, alternate_job in deep_siblings.items():
+                self.assertIn(
+                    f'<link rel="alternate" hreflang="{alternate_code}" href="https://example.org/awards{alternate_job.route}">',
+                    html,
+                )
+            self.assertIn(
+                f'<link rel="alternate" hreflang="x-default" href="https://example.org/awards{deep_siblings["en"].route}">',
+                html,
+            )
+            structured_match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
+            self.assertIsNotNone(structured_match)
+            graph = json.loads(structured_match.group(1))["@graph"]
+            person_schema = next(item for item in graph if item.get("@type") == "Person")
+            expected_award = job.language.text(
+                "meta.award-with-category",
+                prize=job.language.term("prize", "Nobel Prize"),
+                category=job.language.term("category", "Physics"),
+            )
+            self.assertEqual(f"{expected_award}, 1939", person_schema["award"])
+            self.assertEqual(job.language.city_label("Canton", "United States"), person_schema["birthPlace"]["name"])
         physics = self.website / "dist/nobel-prize/physics/1939/ernest-orlando-lawrence/index.html"
         physics_category = self.website / "dist/nobel-prize/physics/index.html"
         turing = self.website / "dist/turing-award/1989/organization-example/index.html"
@@ -883,9 +1128,15 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="https://chatgpt.com/?q=', physics_html)
         self.assertIn('href="https://www.perplexity.ai/search?q=', physics_html)
         self.assertIn('href="https://search.brave.com/ask?q=', physics_html)
-        self.assertIn('Ernest%20Orlando%20Lawrence%20awarded%20Nobel%20Prize%20in%20Physics%201939%20%3Cem%3Eunsafe%3C/em%3E', physics_html)
+        self.assertIn(
+            'Explain%20to%20me%20in%20clear%20language%3A%20%22Ernest%20Orlando%20Lawrence%20awarded%20Nobel%20Prize%20in%20Physics%201939%20%3Cem%3Eunsafe%3C/em%3E%22',
+            physics_html,
+        )
         self.assertIn('<p class="ask-ai" aria-label="Read more about this award">', physics_html)
-        self.assertIn('Organization%20Example%20awarded%20Turing%20Award%20in%20Computer%20science%201989', turing.read_text())
+        self.assertIn(
+            'Explain%20to%20me%20in%20clear%20language%3A%20%22Organization%20Example%20awarded%20Turing%20Award%20in%20Computer%20science%201989%22',
+            turing.read_text(),
+        )
         physics_category_html = physics_category.read_text()
         self.assertIn('href="1939/ernest-orlando-lawrence/">Ernest Orlando Lawrence</a>', physics_category_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_category_html)
@@ -893,7 +1144,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("<title>PrizeAtlas: Nobel Prize, Fields Medal &amp; 1 More Awards</title>", home_html)
         self.assertIn('<meta property="og:site_name" content="PrizeAtlas">', home_html)
         self.assertIn('<a class="site-name" href="./">PrizeAtlas</a>', home_html)
-        self.assertIn("<h1>Nobel Prize, Fields Medal &amp; 1 More Awards</h1>", home_html)
+        self.assertIn("<h1>Nobel Prize &amp; 2 More</h1>", home_html)
         self.assertIn("<h2>Awards</h2>", home_html)
         self.assertNotIn("<span>Score</span>", home_html)
         self.assertIn(
@@ -1445,7 +1696,7 @@ class WebsiteBuildTests(unittest.TestCase):
         person = self.website / "dist/people/shinya-yamanaka/index.html"
         person_html = person.read_text()
         # Awards ascend by year, so a career reads in the order it happened.
-        self.assertIn("M</p>", person_html)
+        self.assertIn("Male</p>", person_html)
         self.assertLess(person_html.index("Wolf Prize"), person_html.index("Nobel Prize"))
         # Wolf Prize has a single category here, so it is not category-routed; Nobel has two and is.
         self.assertIn('href="../../wolf-prize/2011/shinya-yamanaka/"', person_html)
@@ -2479,7 +2730,6 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Q80917</a>", winner)
         self.assertIn(">A5083138872</a>", winner)
         self.assertIn(">01hhn8329</a>", winner)
-        self.assertIn("<dt>Affiliated with</dt>", winner)
         self.assertIn("<h2>Affiliated at time of winning</h2>", winner)
 
     def test_winner_facts_omit_registry_ids_the_record_lacks(self) -> None:

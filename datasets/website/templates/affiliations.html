@@ -1,43 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<nav class="view-tabs" aria-label="Institution views">
-  <a href="{{ href(affiliations_route) }}" aria-current="page">All institutions</a>
-  <a class="tab-alt" href="{{ href(country_affiliations_route) }}">By country</a>
-  <a class="tab-alt" href="{{ href(universities_route) }}">Universities</a>
+<nav class="view-tabs" aria-label="{{ t("tabs.institution_views_aria") }}">
+  <a href="{{ href(affiliations_route) }}" aria-current="page">{{ t("common.all_institutions") }}</a>
+  <a class="tab-alt" href="{{ href(country_affiliations_route) }}">{{ t("tabs.by_country") }}</a>
+  <a class="tab-alt" href="{{ href(universities_route) }}">{{ t("tabs.universities") }}</a>
 </nav>
 <header class="page-intro">
-  <p class="eyebrow">Institutions</p>
+  <p class="eyebrow">{{ t("affiliations.eyebrow") }}</p>
   <h1>{{ title }}</h1>
-  <p>Universities, institutes, and laboratories ranked by how many laureates are recorded against them.</p>
-  <p class="caveat">An affiliation is recorded for {{ "{:,}".format(recorded) }} of {{ "{:,}".format(total) }} awards.
-  This ranks what is recorded, which is not the same as the full picture, and affiliations are those held at the time
-  of the award rather than a whole career. A winner can have one primary and several additional affiliations recorded
-  for an award.</p>
+  <p>{{ t("affiliations.description") }}</p>
+  <p class="caveat">{{ t("affiliations.caveat", recorded=format_number(recorded), total=format_number(total)) }}</p>
 </header>
 <ol class="rank-list">
   {% for affiliation in affiliations %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <div><a href="{{ href(affiliation.route) }}">{{ affiliation.name }}</a>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <div><a href="{{ href(affiliation.route) }}">{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
       {% if affiliation.units %}
       <ul class="rank-units">
         {% for unit, unit_count in affiliation.units[:3] %}
-        <li>{{ unit }} <span class="rank-unit-count">{{ unit_count }}</span></li>
+        <li>{{ unit }} <span class="rank-unit-count">{{ format_number(unit_count) }}</span></li>
         {% endfor %}
       </ul>
       {% if affiliation.units | length > 3 %}
       <details class="rank-units-more">
-        <summary>+ {{ affiliation.units | length - 3 }} more</summary>
+        <summary>{{ t("affiliations.more", count=affiliation.units | length - 3) }}</summary>
         <ul class="rank-units">
           {% for unit, unit_count in affiliation.units[3:] %}
-          <li>{{ unit }} <span class="rank-unit-count">{{ unit_count }}</span></li>
+          <li>{{ unit }} <span class="rank-unit-count">{{ format_number(unit_count) }}</span></li>
           {% endfor %}
         </ul>
       </details>
       {% endif %}
       {% endif %}
     </div>
-    <span class="rank-count" style="--share: {{ affiliation.count * 100 // leader }}">{{ affiliation.count }}</span>
+    <span class="rank-count" style="--share: {{ affiliation.count * 100 // leader }}">{{ format_number(affiliation.count) }}</span>
   </li>
   {% endfor %}
 </ol>

@@ -1,33 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<nav class="view-tabs" aria-label="University views">
-  <a href="{{ href(universities_route) }}" aria-current="page">Overall</a>
-  <a class="tab-alt" href="{{ href(university_countries_route) }}">By country</a>
+<nav class="view-tabs" aria-label="{{ t("tabs.university_views_aria") }}">
+  <a href="{{ href(universities_route) }}" aria-current="page">{{ t("tabs.overall") }}</a>
+  <a class="tab-alt" href="{{ href(university_countries_route) }}">{{ t("tabs.by_country") }}</a>
 </nav>
 <header class="page-intro">
-  <p class="eyebrow">Universities</p>
+  <p class="eyebrow">{{ t("universities.eyebrow") }}</p>
   <h1>{{ title }}</h1>
-  <p>{{ "{:,}".format(total) }} universities and colleges, ranked by the {{ "{:,}".format(laureates) }} laureates
-  recorded at them. Institutes, laboratories, hospitals and companies are ranked separately under
-  <a href="{{ href(affiliations_route) }}">Institutions</a>.</p>
-  <p class="caveat">This counts award-time affiliations, not teaching quality, research output or overall university
-  quality. An affiliation is the one recorded when the award was made rather than a whole career, and a winner can
-  have several recorded for one award.</p>
+  <p>{{ t("universities.description_start", total=format_number(total), laureates=format_number(laureates)) }} <a href="{{ href(affiliations_route) }}">{{ t("tabs.institutions") }}</a>{{ t("universities.description_end") }}</p>
+  <p class="caveat">{{ t("universities.caveat") }}</p>
 </header>
 <ol class="rank-list">
   {% for university in universities %}
   <li>
-    <span class="rank-position">{{ loop.index }}</span>
-    <div><a href="{{ href(university.route) }}">{{ university.name }}</a>
+    <span class="rank-position">{{ format_number(loop.index) }}</span>
+    <div><a href="{{ href(university.route) }}">{{ language.entity_label(university.qid, university.name) }}</a>
       {% if university.units %}
       <ul class="rank-units">
         {% for unit, unit_count in university.units[:3] %}
-        <li>{{ unit }} <span class="rank-unit-count">{{ unit_count }}</span></li>
+        <li>{{ unit }} <span class="rank-unit-count">{{ format_number(unit_count) }}</span></li>
         {% endfor %}
       </ul>
       {% endif %}
     </div>
-    <span class="rank-count" style="--share: {{ university.count * 100 // leader }}">{{ university.count }}</span>
+    <span class="rank-count" style="--share: {{ university.count * 100 // leader }}">{{ format_number(university.count) }}</span>
   </li>
   {% endfor %}
 </ol>

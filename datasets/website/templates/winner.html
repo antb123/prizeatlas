@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-{% set ask_ai_topic = record.full_name ~ " awarded " ~ record.prize_name ~ ((" in " ~ record.category) if record.category else "") ~ " " ~ record.year %}
+{% set ask_ai_topic = t("winner.ask_ai_base", name=record.full_name, prize=term("prize", record.prize_name)) %}
+{% if record.category %}{% set ask_ai_topic = ask_ai_topic ~ " " ~ t("winner.ask_ai_category", category=term("category", record.category)) %}{% endif %}
+{% set ask_ai_topic = ask_ai_topic ~ " " ~ record.year %}
 {% if record.motivation %}{% set ask_ai_topic = ask_ai_topic ~ " " ~ record.motivation %}{% endif %}
-{% set ask_ai_query = ('Explain to me in clear language: "' ~ ask_ai_topic ~ '"') | urlencode %}
+{% set ask_ai_query = t("winner.ask_ai_query", topic=ask_ai_topic) | urlencode %}
 <article class="winner-article">
   <div class="winner-main">
     <header class="page-intro">
@@ -11,10 +13,10 @@
       {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
       {% if record.high_school_subject %}
       <p class="subject-badges">
-        <a class="subject-badge" href="{{ href(subjects_route ~ (record.high_school_subject | slugify) ~ '/') }}">{{ record.high_school_subject }}</a>
+        <a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", record.high_school_subject) | slugify) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>
       </p>
       {% endif %}
-      <p class="ask-ai" aria-label="Read more about this award">
+      <p class="ask-ai" aria-label="{{ t("winner.ask_ai_aria") }}">
         <a href="https://chatgpt.com/?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">ChatGPT <span aria-hidden="true">↗</span></a>
         <a href="https://www.perplexity.ai/search?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Perplexity <span aria-hidden="true">↗</span></a>
         <a href="https://search.brave.com/ask?q={{ ask_ai_query }}" target="_blank" rel="noopener noreferrer">Brave <span aria-hidden="true">↗</span></a>
@@ -24,19 +26,19 @@
     </header>
     {% if record.affiliations %}
     <section class="winner-affiliations">
-      <h2>Affiliated at time of winning</h2>{% for affiliation in record.affiliations %}{% set route = affiliation_routes[loop.index0] %}
+      <h2>{{ t("winner.affiliated_at_award") }}</h2>{% for affiliation in record.affiliations %}{% set route = affiliation_routes[loop.index0] %}
       <div>
       {% if affiliation.sub_name %}<p>{{ affiliation.sub_name }}</p>{% endif %}
-      {% if affiliation.name %}<p>{% if route %}<a href="{{ href(route) }}">{{ affiliation.name }}</a>{% else %}{{ affiliation.name }}{% endif %}</p>{% endif %}
+      {% if affiliation.name %}<p>{% if route %}<a href="{{ href(route) }}">{{ language.entity_label(affiliation.wikidata_qid, affiliation.name) }}</a>{% else %}{{ language.entity_label(affiliation.wikidata_qid, affiliation.name) }}{% endif %}</p>{% endif %}
       {% if affiliation.city or affiliation.country %}
-      <p class="place">{{ affiliation.city }}{% if affiliation.city and affiliation.country %}, {% endif %}{{ affiliation.country }}</p>
+      <p class="place">{{ affiliation.city }}{% if affiliation.city and affiliation.country %}, {% endif %}{{ term("country", affiliation.country) if affiliation.country else "" }}</p>
       {% endif %}
       </div>{% endfor %}
     </section>
     {% endif %}
     {% if co_laureates %}
     <section>
-      <h2>Shared with</h2>
+      <h2>{{ t("common.shared_with") }}</h2>
       <ul class="co-laureates">
         {% for other, other_route in co_laureates %}
         <li><a href="{{ href(other_route) }}">{{ other.full_name }}</a></li>
@@ -46,12 +48,12 @@
     {% endif %}
   </div>
   {% if facts or identifiers or record.prize_share %}
-  <aside class="facts" aria-label="Facts">
-    <h2>Facts</h2>
+  <aside class="facts" aria-label="{{ t("common.facts") }}">
+    <h2>{{ t("common.facts") }}</h2>
     <dl>
-      {% if record.prize_share %}<div><dt>Prize share</dt><dd>{{ record.prize_name }} {{ record.year }} {{ record.prize_share }}</dd></div>{% endif %}
-      {% for label, value, route in facts %}
-      <div><dt>{{ label }}</dt><dd>{% if route %}<a class="{{ 'birth-country' if label == 'Birth country' else '' }}" href="{{ href(route) }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</dd></div>
+      {% if record.prize_share %}<div><dt>{{ t("common.prize_share") }}</dt><dd>{{ term("prize", record.prize_name) }} {{ record.year }} {{ record.prize_share }}</dd></div>{% endif %}
+      {% for fact in facts %}
+      <div><dt>{{ fact.label }}</dt><dd>{% if fact.route %}<a class="{{ 'birth-country' if fact.kind == 'birth_country' else '' }}" href="{{ href(fact.route) }}">{{ fact.value }}</a>{% else %}{{ fact.value }}{% endif %}</dd></div>
       {% endfor %}
       {% for label, value, url in identifiers %}
       <div class="identifier"><dt>{{ label }}</dt><dd><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ value }}</a></dd></div>

@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">{{ prize.prize_name }}</p>
+  <p class="eyebrow">{{ term("prize", prize.prize_name) }}</p>
   <h1>{{ title }}</h1>
-  <p>Every recorded recipient in one list, oldest first. {{ prize.blurb }}</p>
-  <p><a href="{{ href(prize_route) }}">Browse {{ prize.prize_name }} by year</a></p>
+  <p>{{ t("winners.intro") }} {{ ranking_blurb(prize.qid) }}</p>
+  <p><a href="{{ href(prize_route) }}">{{ t("common.browse_by_year", prize=term("prize", prize.prize_name)) }}</a></p>
 </header>
 <section>
-  <h2>{{ winners|length }} recipients, {{ span }}</h2>
+  <h2>{{ t("winners.count", count=winners | length, span=span) }}</h2>
   <table class="winner-index">
     <thead>
       <tr>
-        <th scope="col">Year</th>
-        {% if routed_categories %}<th scope="col">Category</th>{% endif %}
-        <th scope="col">Winner</th>
+        <th scope="col">{{ t("common.year") }}</th>
+        {% if routed_categories %}<th scope="col">{{ t("common.category") }}</th>{% endif %}
+        <th scope="col">{{ t("common.winner") }}</th>
       </tr>
     </thead>
     <tbody>
       {% for record, route in winners %}
       <tr>
         <td>{{ record.year }}</td>
-        {% if routed_categories %}<td>{{ record.category }}</td>{% endif %}
+        {% if routed_categories %}<td>{{ term("category", record.category) }}</td>{% endif %}
         <td><a href="{{ href(route) }}">{{ record.full_name }}</a></td>
       </tr>
       {% endfor %}

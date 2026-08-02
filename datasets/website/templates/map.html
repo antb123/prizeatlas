@@ -247,45 +247,54 @@
 {% endblock %}
 {% block content %}
   <div class="map-shell">
-    <div id="map" role="region" aria-label="Interactive world map of award birthplaces and institutions"></div>
+    <div id="map" role="region" aria-label="{{ t("map.region_aria") }}"></div>
     <div class="shade" aria-hidden="true"></div>
     <section class="hero" aria-labelledby="map-title">
-      <p class="eyebrow">Explore the data</p>
-      <h1 id="map-title">PrizeAtlas Map</h1>
-      <p class="intro">
-        Where were Nobel Prize, Fields and other award winners born—and where did they do their work? Bigger circles
-        mean more recorded awards.
-      </p>
+      <p class="eyebrow">{{ t("map.eyebrow") }}</p>
+      <h1 id="map-title">{{ t("map.heading") }}</h1>
+      <p class="intro">{{ t("map.intro") }}</p>
       <div class="stats" aria-live="polite">
-        <div class="stat"><strong id="location-total">—</strong><span>visible locations</span></div>
-        <div class="stat"><strong id="award-total">—</strong><span>mapped points</span></div>
+        <div class="stat"><strong id="location-total">—</strong><span>{{ t("map.visible_locations") }}</span></div>
+        <div class="stat"><strong id="award-total">—</strong><span>{{ t("map.mapped_points") }}</span></div>
       </div>
       <details class="map-controls" open>
-        <summary>Map controls</summary>
-        <div class="controls" aria-label="Map layers">
+        <summary>{{ t("map.controls") }}</summary>
+        <div class="controls" aria-label="{{ t("map.layers_aria") }}">
           <label class="map-filter" for="subject-filter">
-            <span>High-school subject</span>
-            <select id="subject-filter"><option value="">All subjects</option></select>
+            <span>{{ t("map.subject_filter") }}</span>
+            <select id="subject-filter"><option value="">{{ t("map.all_subjects") }}</option></select>
           </label>
           <label class="map-filter" for="decade-filter">
-            <span>Award decade</span>
-            <select id="decade-filter"><option value="">All decades</option></select>
+            <span>{{ t("map.decade_filter") }}</span>
+            <select id="decade-filter"><option value="">{{ t("map.all_decades") }}</option></select>
           </label>
-          <button class="birth" id="birth-toggle" type="button" aria-pressed="true"><span class="dot"></span>Birthplaces</button>
-          <button class="institution" id="institution-toggle" type="button" aria-pressed="true"><span class="dot"></span>Institutions</button>
-          <button class="surprise" id="surprise" type="button">Surprise me ↗</button>
+          <button class="birth" id="birth-toggle" type="button" aria-pressed="true"><span class="dot"></span>{{ t("map.birthplaces") }}</button>
+          <button class="institution" id="institution-toggle" type="button" aria-pressed="true"><span class="dot"></span>{{ t("map.institutions") }}</button>
+          <button class="surprise" id="surprise" type="button">{{ t("map.surprise") }}</button>
         </div>
       </details>
     </section>
     <aside class="legend">
-      <strong>Circle area = recorded awards</strong>
-      <p><span class="dot" style="background:var(--birth)"></span> birthplace &nbsp; <span class="dot" style="background:var(--institution)"></span> institution</p>
+      <strong>{{ t("map.circle_area") }}</strong>
+      <p><span class="dot" style="background:var(--birth)"></span> {{ t("map.birthplace") }} &nbsp; <span class="dot" style="background:var(--institution)"></span> {{ t("map.institution") }}</p>
     </aside>
-    <p class="fallback" id="fallback">The interactive map could not load. Check your internet connection and reload.</p>
-    <noscript><p class="fallback" style="display:block">This interactive map requires JavaScript.</p></noscript>
+    <p class="fallback" id="fallback">{{ t("map.fallback") }}</p>
+    <noscript><p class="fallback" style="display:block">{{ t("map.no_javascript") }}</p></noscript>
   </div>
 
   <script id="map-data" type="application/json">{{ payload|safe }}</script>
+  <script id="map-ui" type="application/json">{{ {
+    "locale": language.code,
+    "birthplace": t("map.birthplace"),
+    "institution": t("map.institution"),
+    "countryNotRecorded": t("map.country_not_recorded"),
+    "locationDetailsNotRecorded": t("map.location_details_not_recorded"),
+    "contributors": t("map.contributors"),
+    "recordedAwards": {"one": browser_t("map.recorded_awards.one"), "other": browser_t("map.recorded_awards.other")},
+    "alsoRepresents": {"one": browser_t("map.also_represents.one"), "other": browser_t("map.also_represents.other")},
+    "mappedPoints": {"one": browser_t("map.mapped_points_aria.one"), "other": browser_t("map.mapped_points_aria.other")},
+    "markerAria": browser_t("map.marker_aria")
+  }|tojson }}</script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
@@ -305,24 +314,38 @@
       }
 
       const data = JSON.parse(document.getElementById("map-data").textContent);
+      const UI = JSON.parse(document.getElementById("map-ui").textContent);
+      const number = new Intl.NumberFormat(UI.locale);
+      const plural = new Intl.PluralRules(UI.locale);
+      const format = (template, fields) => template.replace(/\{([a-z_]+)\}/g, (match, name) => Object.hasOwn(fields, name) ? String(fields[name]) : match);
+      const pluralText = (forms, count, fields = {}) => format(forms[plural.select(count)], {...fields, count});
+      const subjectLabel = (subject) => data.labels.subjects[subject] || subject;
+      const countryLabel = (country) => data.labels.countries[country] || country;
       const compact = window.matchMedia("(max-width: 640px)").matches;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const map = L.map("map", {zoomControl: false, worldCopyJump: true, minZoom: 1}).setView([20, 5], compact ? 1 : 2);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: ""
       }).addTo(map);
       L.control.zoom({position: "bottomleft"}).addTo(map);
+      const attribution = document.querySelector(".leaflet-control-attribution");
+      if (attribution) {
+        const source = document.createElement("a");
+        source.href = "https://www.openstreetmap.org/copyright";
+        source.textContent = "OpenStreetMap";
+        attribution.replaceChildren(document.createTextNode("© "), source, document.createTextNode(` ${UI.contributors}`));
+      }
 
       const styles = getComputedStyle(document.querySelector(".map-shell"));
       const definitions = {
         birth: {
-          label: "Birthplace",
+          label: UI.birthplace,
           color: styles.getPropertyValue("--birth").trim(),
           fill: styles.getPropertyValue("--birth-fill").trim()
         },
         affiliation: {
-          label: "Institution",
+          label: UI.institution,
           color: styles.getPropertyValue("--institution").trim(),
           fill: styles.getPropertyValue("--institution-fill").trim()
         }
@@ -345,19 +368,19 @@
         const place = document.createElement("p");
         place.className = "where";
         if (kind === "birth") {
-          place.textContent = marker.city && marker.country ? marker.country : (marker.country || "Country not recorded");
+          place.textContent = marker.city && marker.country ? countryLabel(marker.country) : (marker.country ? countryLabel(marker.country) : UI.countryNotRecorded);
         } else {
-          place.textContent = [marker.city, marker.country].filter(Boolean).join(" · ") || "Location details not recorded";
+          place.textContent = [marker.city, marker.country ? countryLabel(marker.country) : ""].filter(Boolean).join(" · ") || UI.locationDetailsNotRecorded;
         }
         const count = document.createElement("p");
         count.className = "award-count";
-        const filterLabel = [selectedSubject, selectedDecade].filter(Boolean).join(" · ");
-        count.textContent = `${visibleCount.toLocaleString()} recorded ${visibleCount === 1 ? "award" : "awards"}${filterLabel ? ` · ${filterLabel}` : ""}`;
+        const filterLabel = [selectedSubject ? subjectLabel(selectedSubject) : "", selectedDecade].filter(Boolean).join(" · ");
+        count.textContent = pluralText(UI.recordedAwards, visibleCount, {count: number.format(visibleCount)}) + (filterLabel ? ` · ${filterLabel}` : "");
         card.append(type, title, place, count);
         if (marker.extra_labels) {
           const also = document.createElement("p");
           also.className = "also";
-          also.textContent = `Also represents ${marker.extra_labels} other recorded ${marker.extra_labels === 1 ? "label" : "labels"} at this point.`;
+          also.textContent = pluralText(UI.alsoRepresents, marker.extra_labels, {count: number.format(marker.extra_labels)});
           card.append(also);
         }
         return card;
@@ -366,12 +389,12 @@
       function syncMarkerAccessibility(item) {
         const element = item.circle.getElement();
         if (!element) return;
-        const filters = [selectedSubject, selectedDecade].filter(Boolean).join(", ");
+        const filters = [selectedSubject ? subjectLabel(selectedSubject) : "", selectedDecade].filter(Boolean).join(", ");
         element.setAttribute("tabindex", "0");
         element.setAttribute("role", "button");
         element.setAttribute(
           "aria-label",
-          `${definitions[item.kind].label}: ${item.marker.title}; ${item.visibleCount} mapped ${item.visibleCount === 1 ? "point" : "points"}${filters ? `; ${filters}` : ""}`
+          format(UI.markerAria, {kind: definitions[item.kind].label, title: item.marker.title, points: pluralText(UI.mappedPoints, item.visibleCount, {count: number.format(item.visibleCount)}), filters: filters ? `; ${filters}` : ""})
         );
         if (element.dataset.mapKeyboard === "true") return;
         element.dataset.mapKeyboard = "true";
@@ -406,9 +429,9 @@
 
       function updateTotals() {
         const visible = circles.filter(item => enabled[item.kind] && item.visibleCount > 0);
-        document.getElementById("location-total").textContent = visible.length.toLocaleString();
+        document.getElementById("location-total").textContent = number.format(visible.length);
         document.getElementById("award-total").textContent =
-          visible.reduce((total, item) => total + item.visibleCount, 0).toLocaleString();
+          number.format(visible.reduce((total, item) => total + item.visibleCount, 0));
       }
 
       function applyFilters() {
@@ -457,19 +480,11 @@
       for (const item of circles) {
         for (const subject of Object.keys(item.marker.subjects)) subjectNames.add(subject);
       }
-      const preferred = ["Biology", "Physics", "Chemistry", "Math", "CS", "History", "Lit", "Arts", "Economics", "Earth Science"];
-      const orderedSubjects = [...subjectNames].sort((a, b) => {
-        const ai = preferred.indexOf(a);
-        const bi = preferred.indexOf(b);
-        if (ai === -1 && bi === -1) return a.localeCompare(b);
-        if (ai === -1) return 1;
-        if (bi === -1) return -1;
-        return ai - bi;
-      });
+      const orderedSubjects = [...subjectNames].sort((a, b) => subjectLabel(a).localeCompare(subjectLabel(b), UI.locale));
       for (const subject of orderedSubjects) {
         const option = document.createElement("option");
         option.value = subject;
-        option.textContent = subject;
+        option.textContent = subjectLabel(subject);
         subjectSelect.append(option);
       }
       subjectSelect.addEventListener("change", () => {

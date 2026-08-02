@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 <header class="page-intro">
-  <p class="eyebrow">Index</p>
+  <p class="eyebrow">{{ t("people.eyebrow") }}</p>
   <h1>{{ title }}</h1>
-  <p>Every laureate on record, listed by surname. Page {{ page_number }} of {{ page_count }}.</p>
+  <p>{{ t("people.intro", page=page_number, pages=page_count) }}</p>
 </header>
 <ul class="people-index">
   {% for person in people %}
   <li>
     <a href="{{ href(person.route) }}">{{ person.name }}</a>
     <span class="person-index-meta">
-      {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ name }}</a>{% endfor %}
-      <span>{{ person.awards | length }}</span>
+      {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
+      <span>{{ format_number(person.awards | length) }}</span>
     </span>
   </li>
   {% endfor %}
 </ul>
 {% if page_count > 1 %}
-<nav class="pagination" aria-label="Laureate pages">
-  {% if previous_route %}<a rel="prev" href="{{ href(previous_route) }}">← Previous</a>{% endif %}
-  <span>Page {{ page_number }} of {{ page_count }}</span>
-  {% if next_route %}<a rel="next" href="{{ href(next_route) }}">Next →</a>{% endif %}
+<nav class="pagination" aria-label="{{ t("people.pagination_aria") }}">
+  {% if previous_route %}<a rel="prev" href="{{ href(previous_route) }}">← {{ t("common.previous") }}</a>{% endif %}
+  <span>{{ t("people.intro", page=page_number, pages=page_count) }}</span>
+  {% if next_route %}<a rel="next" href="{{ href(next_route) }}">{{ t("common.next") }} →</a>{% endif %}
 </nav>
 {% endif %}
 {% endblock %}
