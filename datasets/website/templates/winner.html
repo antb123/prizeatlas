@@ -13,7 +13,7 @@
       {% if biographical_note %}<p class="lead">{{ biographical_note }}</p>{% endif %}
       {% if record.high_school_subject %}
       <p class="subject-badges">
-        <a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", record.high_school_subject) | slugify) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>
+        <a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", record.high_school_subject) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>
       </p>
       {% endif %}
       <p class="ask-ai" aria-label="{{ t("winner.ask_ai_aria") }}">

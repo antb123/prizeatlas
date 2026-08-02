@@ -97,11 +97,11 @@ Run the website build from this `datasets/` directory:
 
 `uv run website/build.py --base-url https://example.org/awards/`
 
-- One offline build publishes English at `/`, Spanish at `/es/`, and French at `/fr/`. Semantic route segments and
-  category, country, and subject slugs are localized. Prize, person, institution, city, year, and award-recipient
-  slug components stay canonical, and every page carries reciprocal `hreflang` links plus an equivalent-page
-  language switcher.
-- Committed catalogues live in `website/i18n/`: `en.toml` is the English source, `es.toml` and `fr.toml` are the
+- One offline build publishes English at `/`, Spanish at `/es/`, French at `/fr/`, and Japanese at `/ja/`. Spanish and
+  French localize semantic route segments and category, country, and subject slugs; Japanese keeps those route
+  components canonical ASCII. Prize, person, institution, city, year, and award-recipient slug components stay
+  canonical, and every page carries reciprocal `hreflang` links plus an equivalent-page language switcher.
+- Committed catalogues live in `website/i18n/`: `en.toml` is the English source, and `es.toml`, `fr.toml`, and `ja.toml` are the
   translated catalogues with durable `reviewed` keys, and `labels.toml` holds optional exact-QID institution labels.
   Award motivations, biographical notes, institution descriptions, personal names, constituent-unit names, city
   names, dates, citations, and identifiers are never translated.
@@ -111,7 +111,7 @@ Run the website build from this `datasets/` directory:
   credential contract. The website builder itself never fetches labels or calls a translation provider.
 - Catalogue coverage is closed for route segments, UI copy, ranking blurbs, prizes, categories, countries, subjects,
   and laureate types. Enrichment that introduces a new country, category, or prize name makes both the full build and
-  `--home-only` fail until both target catalogues are regenerated, reviewed as needed, and committed.
+  `--home-only` fail until every translated catalogue is regenerated, reviewed as needed, and committed.
 - `awards.sqlite3` is read-only during website generation. Award records come from `awards`; stored prize routes and
   ranking copy come from `award_ranking`, whose complete seed is `award_ranking.toml`.
 - `--base-url` is required and may include a deployment subpath. It supplies absolute canonical and sitemap URLs.
@@ -120,12 +120,12 @@ Run the website build from this `datasets/` directory:
 - `/{prize}/winners/` lists every recipient of one prize, oldest first, from `winners.html`. The prize page itself
   stops at `PRIZE_PAGE_YEARS`, and only prizes with standing categories have complete lists beneath them, so this is
   the one page that holds the whole roll of an uncategorized prize. It exists for crawlers and AI readers.
-- Root `llms.txt`, `/es/llms.txt`, and `/fr/llms.txt` are the machine readers' localized guides: counts, URL patterns,
+- Root `llms.txt`, `/es/llms.txt`, `/fr/llms.txt`, and `/ja/llms.txt` are the machine readers' localized guides: counts, URL patterns,
   every winner list named explicitly (per prize, per category, per subject), and the pages that carry embedded JSON.
   They are generated from the same locale plans as the pages, stay out of the sitemap, and are never hand-edited.
-- The sitemap covers all three page plans while `awards.csv` and `robots.txt` remain shared at the root. Existing
+- The sitemap covers all four page plans while `awards.csv` and `robots.txt` remain shared at the root. Existing
   English share-image paths remain stable; Spanish and French share images live under `static/share/es/` and
-  `static/share/fr/`.
+  `static/share/fr/`, while Japanese pages reuse the English share images.
 - `--home-only` validates all catalogues but rewrites only the English root `dist/index.html`; it leaves localized
   pages and shared artifacts untouched. The single generated root `404.html` remains English because no locale-aware
   server error routing is part of the static build.

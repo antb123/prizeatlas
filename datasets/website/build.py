@@ -154,8 +154,8 @@ FACT_FIELDS = (
     ("Death city", "death_city"),
     ("Death country", "death_country"),
 )
-LANGUAGE_CODES = ("en", "es", "fr")
-LANGUAGE_NAMES = {"en": "en", "fr": "fr", "es": "es"}
+LANGUAGE_CODES = ("en", "es", "fr", "ja")
+LANGUAGE_NAMES = {"en": "en", "fr": "fr", "es": "es", "ja": "ja"}
 FIXED_STABLE_KEYS = {
     "index.html": "home",
     "awards.html": "awards",
@@ -169,7 +169,7 @@ FIXED_STABLE_KEYS = {
     "nearby.html": "nearby",
     "about.html": "about",
 }
-NUMBER_SEPARATORS = {"en": (",", "."), "es": (".", ","), "fr": ("\u202f", ",")}
+NUMBER_SEPARATORS = {"en": (",", "."), "es": (".", ","), "fr": ("\u202f", ","), "ja": (",", ".")}
 SEGMENT_DEFAULTS = {
     "awards": "awards",
     "people": "people",
@@ -290,6 +290,8 @@ class Language:
             raise BuildFailure(f"language={self.code} ui missing={key}") from error
 
     def plural_form(self, count: float) -> str:
+        if self.code == "ja":
+            return "other"
         return "one" if (self.code == "fr" and count in (0, 1)) or (self.code != "fr" and count == 1) else "other"
 
     def term(self, section: str, value: str) -> str:
@@ -544,6 +546,11 @@ def slugify(value: str) -> str:
     if not slug:
         raise BuildFailure("derived slug is empty")
     return slug
+
+
+def _term_route_slug(language: Language, section: str, value: str, canonical: str) -> str:
+    """Use canonical ASCII routes for Japanese, whose translated terms are not ASCII slugs."""
+    return canonical if language.code == "ja" else slugify(language.term(section, value))
 
 
 def affiliation_slug(name: str) -> str:
@@ -813,7 +820,7 @@ def _validate_languages(
 ) -> None:
     by_code = {language.code: language for language in languages}
     if tuple(by_code) not in (("en",), LANGUAGE_CODES):
-        raise BuildFailure("language codes must be en or en, es, fr")
+        raise BuildFailure(f"language codes must be en or {', '.join(LANGUAGE_CODES)}")
     if len({language.prefix for language in languages}) != len(languages):
         raise BuildFailure("language prefixes must be unique")
     english = by_code["en"]
@@ -848,9 +855,9 @@ def _validate_languages(
                 raise BuildFailure(f"language={language.code} ui placeholders={key}")
         route_values = (
             *language.segments.values(),
-            *(slugify(language.term("category", value)) for value in values["category"]),
-            *(slugify(language.term("country", value)) for value in values["country"]),
-            *(slugify(language.term("subject", value)) for value in values["subject"]),
+            *(_term_route_slug(language, "category", value, slugify(value)) for value in values["category"]),
+            *(_term_route_slug(language, "country", value, slugify(value)) for value in values["country"]),
+            *(_term_route_slug(language, "subject", value, slugify(value)) for value in values["subject"]),
         )
         if any(not value for value in route_values):
             raise BuildFailure(f"language={language.code} route value is blank")
@@ -862,7 +869,7 @@ def _validate_languages(
             language.segment("died"),
         }
         for country in values["country"]:
-            if slugify(language.term("country", country)) in reserved:
+            if _term_route_slug(language, "country", country, slugify(country)) in reserved:
                 raise BuildFailure(f"language={language.code} country route collides={country!r}")
         if language.code == "en":
             for section in ("category", "country", "subject"):
@@ -879,7 +886,7 @@ def load_languages(
 ) -> tuple[Language, ...]:
     """Load the selected committed catalogues before planning or creating any output directory."""
     if language_codes not in (("en",), LANGUAGE_CODES):
-        raise BuildFailure("language codes must be en or en, es, fr")
+        raise BuildFailure(f"language codes must be en or {', '.join(LANGUAGE_CODES)}")
     labels_by_code = {code: {} for code in language_codes}
     if language_codes != ("en",):
         labels_path = i18n_dir / "labels.toml"
@@ -893,7 +900,7 @@ def load_languages(
         for qid, labels in raw_labels.items():
             if not WIKIDATA_QID.fullmatch(qid) or not isinstance(labels, dict):
                 raise BuildFailure(f"labels invalid={qid!r}")
-            for code in ("es", "fr"):
+            for code in LANGUAGE_CODES[1:]:
                 value = labels.get(code, "")
                 if not isinstance(value, str):
                     raise BuildFailure(f"labels invalid={qid!r}")
@@ -1601,7 +1608,7 @@ def share_image_target(job: PageJob) -> str:
 
 
 def _share_path_for_language(target: str, language: Language | None) -> str:
-    if language is not None and language.code != "en":
+    if language is not None and language.code not in {"en", "ja"}:
         filename = target.rsplit("/", 1)[-1]
         return f"{SHARE_IMAGE_DIRECTORY}/{language.code}/{filename}"
     return target
@@ -3607,15 +3614,15 @@ def _localized_award_route(language: Language, context: dict[str, Any], key: str
     if key.startswith("prize-winners:"):
         return language.route(parts[0], language.segment("winners"))
     if key.startswith("category:"):
-        return language.route(parts[0], slugify(language.term("category", context["category"])))
+        return language.route(parts[0], _term_route_slug(language, "category", context["category"], parts[1]))
     if key.startswith("category-year:"):
-        return language.route(parts[0], slugify(language.term("category", context["category"])), slugify(context["year"]))
+        return language.route(parts[0], _term_route_slug(language, "category", context["category"], parts[1]), slugify(context["year"]))
     if key.startswith("prize-year:"):
         return language.route(parts[0], slugify(context["year"]))
     if key.startswith("winner:"):
         record: AwardRecord = context["record"]
         if len(parts) == 4:
-            return language.route(parts[0], slugify(language.term("category", record.category)), parts[2], parts[3])
+            return language.route(parts[0], _term_route_slug(language, "category", record.category, parts[1]), parts[2], parts[3])
         return language.route(*parts)
     if key.startswith("person:"):
         return language.route(language.segment("people"), parts[-1])
@@ -3634,7 +3641,7 @@ def _localized_place_route(language: Language, context: dict[str, Any], key: str
         prefix = [language.segment("countries")]
         if view != "born":
             prefix.append(language.segment(view))
-        return language.route(*prefix, slugify(language.term("country", context["place"].name)))
+        return language.route(*prefix, _term_route_slug(language, "country", context["place"].name, context["place"].slug))
     if key == "cities":
         return language.route(language.segment("countries"), language.segment("cities"))
     if key.startswith("city:"):
@@ -3651,7 +3658,7 @@ def _localized_directory_route(language: Language, context: dict[str, Any], key:
         return language.route(
             language.segment("countries"),
             language.segment("country_affiliations"),
-            slugify(language.term("country", context["place"].name)),
+            _term_route_slug(language, "country", context["place"].name, context["place"].slug),
         )
     if key == "affiliations":
         return language.route(language.segment("affiliations"))
@@ -3664,9 +3671,9 @@ def _localized_directory_route(language: Language, context: dict[str, Any], key:
     if key == "subjects":
         return language.route(language.segment("subjects"))
     if key.startswith("subject:"):
-        _subject, _slug, view = key.split(":", 2)
+        _subject, canonical_slug, view = key.split(":", 2)
         subject: Subject = context["subject"]
-        route = [language.segment("subjects"), slugify(language.term("subject", subject.name))]
+        route = [language.segment("subjects"), _term_route_slug(language, "subject", subject.name, canonical_slug)]
         if view == "affiliations":
             route.append(language.segment("country_affiliations"))
         elif view == "recent":
@@ -3675,7 +3682,8 @@ def _localized_directory_route(language: Language, context: dict[str, Any], key:
     if key == "map":
         return language.route(language.segment("map"))
     if key.startswith("map:"):
-        return language.route(language.segment("map"), slugify(language.term("subject", context["initial_subject"])))
+        canonical_slug = key.split(":", 1)[1]
+        return language.route(language.segment("map"), _term_route_slug(language, "subject", context["initial_subject"], canonical_slug))
     if key in {"explorer", "nearby", "about"}:
         return language.route(language.segment(key))
     raise BuildFailure(f"cannot localize route language={language.code} key={key}")
@@ -4308,6 +4316,8 @@ def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> 
     )
     languages = {job.language.code: job.language for job in jobs if job.language is not None}
     for language in languages.values():
+        if language.code == "ja":
+            continue
         routes = _language_routes(language)
         generic_routes = {
             "/": language.route(),
@@ -4329,6 +4339,8 @@ def write_share_images(output: Path, base_url: str, jobs: Iterable[PageJob]) -> 
 
     owners: dict[str, str] = {}
     for job in jobs:
+        if job.language is not None and job.language.code == "ja":
+            continue
         card = job.context.get("share_card")
         if not isinstance(card, ShareCard) or card.kind != "Prize":
             continue
@@ -4538,6 +4550,7 @@ def _render_job(
         pattern=language.pattern,
         browser_t=language.pattern,
         term=language.term,
+        term_slug=lambda section, value: _term_route_slug(language, section, value, slugify(value)),
         ranking_blurb=language.ranking_blurb,
         entity_label=language.entity_label,
         city_label=language.city_label,
@@ -4672,7 +4685,7 @@ def build_home_page(database: Path, base_url: str, website_dir: Path = SCRIPT_DI
     route_maps = _route_maps(plan)
     alternate_maps = _alternates(plan)
     home = next(job for job in plan.jobs if job.key == "home" and job.language and job.language.code == "en")
-    home_alternates = alternate_maps["home"] if all((output / code).is_dir() for code in ("es", "fr")) else {}
+    home_alternates = alternate_maps["home"] if all((output / code).is_dir() for code in LANGUAGE_CODES[1:]) else {}
     _render_job(
         _environment(website_dir),
         output,

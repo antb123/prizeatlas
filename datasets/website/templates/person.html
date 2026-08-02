@@ -5,7 +5,7 @@
   <h1>{{ person.name }}</h1>
   {% if lifespan or birth_year or birth_country or sex %}
   <p class="lifespan">{% if lifespan %}{{ lifespan }}{% elif birth_year %}{{ t("person.born", year=birth_year) }}{% endif %}{% if birth_country %}{% if lifespan or birth_year %} · {% endif %}
-    <a class="birth-country" href="{{ href(countries_route ~ (term("country", birth_country) | slugify) ~ '/') }}">{{ term("country", birth_country) }}</a>{% endif %}{% if sex %}{% if lifespan or birth_year or birth_country %} · {% endif %}
+    <a class="birth-country" href="{{ href(countries_route ~ term_slug("country", birth_country) ~ '/') }}">{{ term("country", birth_country) }}</a>{% endif %}{% if sex %}{% if lifespan or birth_year or birth_country %} · {% endif %}
     {{ t("person.sex_m" if sex == "M" else "person.sex_f") }}{% endif %}</p>
   {% endif %}
   <p class="winner-links">
@@ -23,7 +23,7 @@
       <p class="person-award-year">{{ record.year }}</p>
       <div>
         <h3><a href="{{ href(route) }}">{{ term("prize", record.prize_name) }}{% if record.category %} — {{ term("category", record.category) }}{% endif %}</a></h3>
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", record.high_school_subject) | slugify) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", record.high_school_subject) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
         {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
       </div>
     </li>

@@ -15,7 +15,7 @@
       </h3>
       {% set subject = members[0][0].high_school_subject %}
       {% if subject %}
-      <p class="subject-badges"><a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", subject) | slugify) ~ '/') }}">{{ term("subject", subject) }}</a></p>
+      <p class="subject-badges"><a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", subject) ~ '/') }}">{{ term("subject", subject) }}</a></p>
       {% endif %}
       {% if motivation %}<p>{{ motivation }}</p>{% endif %}
     </li>

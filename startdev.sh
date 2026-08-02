@@ -48,7 +48,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/datasets"
 expected=0
 if [[ -d website/dist ]]; then
 	if (( ${#build_options[@]} )); then
-		expected="$(find website/dist -name '*.html' ! -path 'website/dist/es/*' ! -path 'website/dist/fr/*' | wc -l || true)"
+		expected="$(find website/dist -name '*.html' ! -path 'website/dist/es/*' ! -path 'website/dist/fr/*' ! -path 'website/dist/ja/*' | wc -l || true)"
 	else
 		expected="$(find website/dist -name '*.html' | wc -l || true)"
 	fi

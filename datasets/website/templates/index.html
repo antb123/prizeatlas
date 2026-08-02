@@ -50,7 +50,7 @@
     <li>
       <a href="{{ href(route) }}">{{ record.full_name }}</a>
       <span>
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ (term("subject", record.high_school_subject) | slugify) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
+        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", record.high_school_subject) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
         {{ term("prize", prize.prize_name) }}, {{ record.year }}
       </span>
     </li>

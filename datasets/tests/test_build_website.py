@@ -239,9 +239,10 @@ class WebsiteBuildTests(unittest.TestCase):
                 ("en", "", ",", "."),
                 ("es", "/es/", ".", ","),
                 ("fr", "/fr/", "\u202f", ","),
+                ("ja", "/ja/", ",", "."),
             )
         }
-        expected = {"en": "1,986", "es": "1.986", "fr": "1\u202f986"}
+        expected = {"en": "1,986", "es": "1.986", "fr": "1\u202f986", "ja": "1,986"}
         for code, language in languages.items():
             with self.subTest(code=code):
                 self.assertEqual(expected[code], build.format_number(1986.0, language))
@@ -250,6 +251,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(("other", "one", "other"), tuple(languages["en"].plural_form(value) for value in (0, 1, 2)))
         self.assertEqual(("other", "one", "other"), tuple(languages["es"].plural_form(value) for value in (0, 1, 2)))
         self.assertEqual(("one", "one", "other"), tuple(languages["fr"].plural_form(value) for value in (0, 1, 2)))
+        self.assertEqual(("other", "other", "other"), tuple(languages["ja"].plural_form(value) for value in (0, 1, 2)))
 
         french = self.website / "i18n/fr.toml"
         french.write_text(french.read_text(encoding="utf-8").replace('group = "\u202f"', 'group = "\u00a0"', 1), encoding="utf-8")
@@ -757,6 +759,7 @@ class WebsiteBuildTests(unittest.TestCase):
         )
         (self.website / "i18n/es.toml").write_text("invalid = [")
         (self.website / "i18n/fr.toml").unlink()
+        (self.website / "i18n/ja.toml").write_text("invalid = [")
         (self.website / "i18n/labels.toml").unlink()
 
         plan = build.build_site(database, "https://example.org/awards/", self.website, en_only=True)
@@ -768,6 +771,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertTrue((output / "llms.txt").is_file())
         self.assertFalse((output / "es").exists())
         self.assertFalse((output / "fr").exists())
+        self.assertFalse((output / "ja").exists())
         winner = (output / "test-prize/2000/test-winner/index.html").read_text()
         self.assertIn('<html lang="en">', winner)
         self.assertNotIn('rel="alternate"', winner)
@@ -775,6 +779,7 @@ class WebsiteBuildTests(unittest.TestCase):
         sitemap = (output / "sitemap.xml").read_text()
         self.assertNotIn("https://example.org/awards/es/", sitemap)
         self.assertNotIn("https://example.org/awards/fr/", sitemap)
+        self.assertNotIn("https://example.org/awards/ja/", sitemap)
 
     def test_home_page_refresh_does_not_add_alternates_to_english_only_output(self) -> None:
         database = self.create_database(
@@ -795,6 +800,37 @@ class WebsiteBuildTests(unittest.TestCase):
             build.build_home_page(database, "https://example.org/", self.website)
 
         self.assertEqual({}, render.call_args.args[-1])
+
+    def test_home_page_refresh_requires_every_localized_output_directory(self) -> None:
+        database = self.create_database(
+            [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)],
+            [
+                {
+                    "award_record_id": "test-1",
+                    "award_wikidata_qid": "Q1",
+                    "prize_name": "Test Prize",
+                    "year": "2000",
+                    "full_name": "Test Winner",
+                }
+            ],
+        )
+        output = self.website / "dist"
+        (output / "es").mkdir(parents=True)
+        (output / "fr").mkdir()
+
+        with mock.patch.object(build, "_render_job") as render:
+            build.build_home_page(database, "https://example.org/", self.website)
+
+        self.assertEqual({}, render.call_args.args[-1])
+        (output / "ja").mkdir()
+
+        with mock.patch.object(build, "_render_job") as render:
+            build.build_home_page(database, "https://example.org/", self.website)
+
+        self.assertEqual(
+            {"en": "/", "es": "/es/", "fr": "/fr/", "ja": "/ja/"},
+            render.call_args.args[-1],
+        )
 
     def test_en_only_cli_reports_start_and_finish_times(self) -> None:
         plan = build.SitePlan((), 1, 2, 3, 4, 5, 6, 7, 8, "2000–2001")
@@ -1159,13 +1195,20 @@ class WebsiteBuildTests(unittest.TestCase):
             siblings.setdefault(job.key, {})[job.language.code] = job
         self.assertTrue(siblings)
         self.assertTrue(all(set(group) == set(build.LANGUAGE_CODES) for group in siblings.values()))
-        self.assertEqual(3 * len(siblings), len(plan.jobs))
+        self.assertEqual(len(build.LANGUAGE_CODES) * len(siblings), len(plan.jobs))
         self.assertFalse(any(job.route.startswith("/en/") for job in plan.jobs))
         home_totals = {label: value for value, label in siblings["home"]["en"].context["totals"]}
         self.assertIsInstance(home_totals["laureates"], int)
         self.assertIsInstance(home_totals["awards"], int)
         self.assertEqual("1939-2001", home_totals["years"])
         deep_siblings = siblings["winner:nobel-1"]
+        self.assertEqual("/ja/nobel-prize/physics/1939/ernest-orlando-lawrence/", deep_siblings["ja"].route)
+        self.assertEqual("/ja/nobel-prize/physics/", siblings["category:Q1:physics"]["ja"].route)
+        self.assertEqual("/ja/subjects/biology/", siblings["subject:biology:people"]["ja"].route)
+        self.assertEqual("static/share/prize-nobel-prize.png", build.share_image_target(siblings["prize:Q1"]["ja"]))
+        japanese_winner = (self.website / "dist/ja/nobel-prize/physics/1939/ernest-orlando-lawrence/index.html").read_text()
+        self.assertIn("ノーベル賞", japanese_winner)
+        self.assertIn("物理学", japanese_winner)
         for code, job in deep_siblings.items():
             html = (self.website / "dist" / job.route.strip("/") / "index.html").read_text()
             self.assertIn(f'<html lang="{code}">', html)
@@ -1186,6 +1229,7 @@ class WebsiteBuildTests(unittest.TestCase):
             switcher = html.split('<nav class="language-switcher"', 1)[1].split("</nav>", 1)[0]
             self.assertLess(switcher.index(">en</a>"), switcher.index(">fr</a>"))
             self.assertLess(switcher.index(">fr</a>"), switcher.index(">es</a>"))
+            self.assertLess(switcher.index(">es</a>"), switcher.index(">ja</a>"))
             structured_match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(structured_match)
             graph = json.loads(structured_match.group(1))["@graph"]

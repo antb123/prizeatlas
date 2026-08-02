@@ -12,6 +12,23 @@
   line-height: 1.6;
 }
 
+html:lang(ja) {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", Meiryo, "Noto Sans CJK JP", sans-serif;
+}
+
+html:lang(ja) h1,
+html:lang(ja) h2,
+html:lang(ja) h3,
+html:lang(ja) .eyebrow,
+html:lang(ja) .totals dd,
+html:lang(ja) .group-category,
+html:lang(ja) .score span,
+html:lang(ja) dt,
+html:lang(ja) .explorer thead th,
+html:lang(ja) .place-card .kind {
+  letter-spacing: normal;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #191a17;
