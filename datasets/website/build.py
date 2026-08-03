@@ -3331,7 +3331,7 @@ def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> P
         f"Browse {len(rankings)} international awards and their recipients.",
         (Breadcrumb("Home", "/"), Breadcrumb("Awards", None)),
         # The title carries the search terms; the heading only has to hold one line on a phone.
-        heading="Science Awards",
+        heading="Science and Math Awards",
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
         item_list=tuple((ranking.prize_name, prize_routes[ranking.qid]) for ranking in rankings),
     )
