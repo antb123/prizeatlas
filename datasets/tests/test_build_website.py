@@ -1609,7 +1609,23 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("1947-12-06", graph["Person"]["birthDate"])
         self.assertEqual("London, United Kingdom", graph["Person"]["birthPlace"]["name"])
         self.assertEqual("Nobel Prize for Physics, 2024", graph["Person"]["award"])
-        self.assertEqual(5, len(graph["BreadcrumbList"]["itemListElement"]))
+        breadcrumb_list = graph["BreadcrumbList"]["itemListElement"]
+        # Every all-routed crumb survives; only the final one omits `item`.
+        self.assertEqual(
+            ["Home", "Nobel Prize", "Physics", "2024", "Geoffrey Hinton"],
+            [entry["name"] for entry in breadcrumb_list],
+        )
+        self.assertEqual([1, 2, 3, 4, 5], [entry["position"] for entry in breadcrumb_list])
+        self.assertEqual(
+            [
+                "https://example.org/",
+                "https://example.org/nobel-prize/",
+                "https://example.org/nobel-prize/physics/",
+                "https://example.org/nobel-prize/physics/2024/",
+            ],
+            [entry["item"] for entry in breadcrumb_list[:-1]],
+        )
+        self.assertNotIn("item", breadcrumb_list[-1])
         # Citations never enter the schema, so the injected tag cannot reach the block at all.
         self.assertNotIn("alert(1)", block)
 
@@ -1634,6 +1650,34 @@ class WebsiteBuildTests(unittest.TestCase):
         job = build.PageJob("winner.html", "/x/", "t", "d", (), {"record": source}, language)
         with self.assertRaisesRegex(build.BuildFailure, "schema affiliations differ from source"):
             build._localized_schema(job, schema)
+
+    def test_structured_data_drops_non_routed_intermediate_breadcrumb(self) -> None:
+        crumbs = (
+            build.Breadcrumb("Home", "/"),
+            build.Breadcrumb("Japan Prize", "/japan-prize/"),
+            build.Breadcrumb("Earth Science", None),
+            build.Breadcrumb("1990", "/japan-prize/1990/"),
+            build.Breadcrumb("William Jason Morgan", None),
+        )
+        rendered = build._structured_data("https://example.org/", build.PageJob("winner.html", "/japan-prize/1990/morgan/", "t", "d", crumbs, {}))
+        graph = {entry["@type"]: entry for entry in json.loads(rendered)["@graph"]}
+        entries = graph["BreadcrumbList"]["itemListElement"]
+        # The non-routed category is dropped from the structured trail, positions stay contiguous.
+        self.assertEqual(
+            ["Home", "Japan Prize", "1990", "William Jason Morgan"],
+            [entry["name"] for entry in entries],
+        )
+        self.assertEqual([1, 2, 3, 4], [entry["position"] for entry in entries])
+        self.assertEqual(
+            [
+                "https://example.org/",
+                "https://example.org/japan-prize/",
+                "https://example.org/japan-prize/1990/",
+            ],
+            [entry["item"] for entry in entries[:-1]],
+        )
+        # The final entry names the current page and must not carry a person-page item.
+        self.assertNotIn("item", entries[-1])
 
     def test_index_pages_carry_item_list_structured_data(self) -> None:
         def item_list(route: str) -> list[dict]:

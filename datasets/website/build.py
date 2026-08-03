@@ -1854,6 +1854,11 @@ def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] |
     localized_route = lambda route: _localized_route_target(route, route_map)
     graph: list[dict[str, Any]] = []
     if job.breadcrumbs:
+        # Google requires `item` on every ListItem except the final one. A crumb with no route names a place
+        # the site does not page (a non-routed category), so drop every routeless intermediate crumb from the
+        # structured trail and renumber. The visible HTML breadcrumb keeps every crumb; only this JSON-LD trail
+        # is filtered. The final crumb always stays: it names the current page and may omit `item`.
+        trail = [crumb for crumb in job.breadcrumbs[:-1] if crumb.route] + [job.breadcrumbs[-1]]
         graph.append(
             {
                 "@type": "BreadcrumbList",
@@ -1862,11 +1867,11 @@ def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] |
                         "@type": "ListItem",
                         "position": position,
                         "name": crumb.label,
-                        # The last crumb names the page the reader is on. Where it links onward — a winner page
-                        # sends the name to the laureate — that link is for the reader, not a step in the trail.
-                        **({"item": public_url(base_url, localized_route(crumb.route))} if crumb.route and position < len(job.breadcrumbs) else {}),
+                        # Except the last crumb, which names the page the reader is on. Where it links onward — a
+                        # winner page sends the name to the laureate — that link is for the reader, not a step.
+                        **({"item": public_url(base_url, localized_route(crumb.route))} if position < len(trail) else {}),
                     }
-                    for position, crumb in enumerate(job.breadcrumbs, start=1)
+                    for position, crumb in enumerate(trail, start=1)
                 ],
             }
         )
