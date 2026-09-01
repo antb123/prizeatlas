@@ -6,9 +6,11 @@
 
 This is an authoring-time command.  It is deliberately independent of
 ``website/build.py`` so static builds remain offline and deterministic.
-``deepl`` is the supported network provider; set ``DEEPL_AUTH_KEY`` before
-using it.  Tests and local review tooling may inject a translator directly
-through :func:`translate_catalogue`.
+``openrouter`` is the supported network provider; set ``OPENROUTER_API_KEY``
+before using it.  ``google`` needs no credential and drafts from the public
+endpoint.  Either way the result is a draft: the ``reviewed`` manifest, not
+the provider, is the quality gate.  Tests and local review tooling may inject
+a translator directly through :func:`translate_catalogue`.
 """
 
 from __future__ import annotations
@@ -31,12 +33,15 @@ from typing import Any
 
 import tomllib
 
-TARGET_CODES = frozenset({"es", "fr"})
+TARGET_CODES = frozenset({"es", "fr", "ja"})
 TRANSLATABLE_SECTIONS = ("segments", "ui", "terms", "ranking")
-DEEPL_API_URL = "https://api-free.deepl.com/v2/translate"
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODEL = "anthropic/claude-opus-5"
 GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
 PLACEHOLDER = re.compile(r"zzxqg([0-9]+)zz")
 FORMAT_PLACEHOLDER = re.compile(r"zzxqf([0-9]+)zz")
+SEPARATORS = {"es": (".", ","), "fr": ("\u202f", ","), "ja": (",", ".")}
+LANGUAGES = {"es": "Spanish", "fr": "French", "ja": "Japanese"}
 GLOSSARIES = {
     "es": {
         "PrizeAtlas": "PrizeAtlas",
@@ -49,6 +54,12 @@ GLOSSARIES = {
         "Nobel Prize": "prix Nobel",
         "Fields Medal": "médaille Fields",
         "Turing Award": "prix Turing",
+    },
+    "ja": {
+        "PrizeAtlas": "PrizeAtlas",
+        "Nobel Prize": "ノーベル賞",
+        "Fields Medal": "フィールズ賞",
+        "Turing Award": "チューリング賞",
     },
 }
 
@@ -243,28 +254,39 @@ def restore_format_fields(value: str, fields: list[str], path: CataloguePath) ->
     return FORMAT_PLACEHOLDER.sub(lambda match: f"{{{fields[int(match.group(1))]}}}", value)
 
 
-def deepl_translator(auth_key: str, api_url: str = DEEPL_API_URL) -> Translator:
-    if not auth_key:
-        raise CatalogueTranslationFailure("DEEPL_AUTH_KEY is required for the deepl provider")
+INSTRUCTION = (
+    "Translate the user message from English into {language}. It is one short user-interface string "
+    "from a website about international science and mathematics prizes. Reply with the translation "
+    "alone: no quotes, no notes, no alternatives. Preserve leading and trailing whitespace, and copy "
+    "any zzxq token (such as zzxqf0zz) through unchanged and in place."
+)
+
+
+def openrouter_translator(api_key: str, model: str = OPENROUTER_MODEL, api_url: str = OPENROUTER_API_URL) -> Translator:
+    if not api_key:
+        raise CatalogueTranslationFailure("OPENROUTER_API_KEY is required for the openrouter provider")
 
     def translate(value: str, code: str) -> str:
-        body = json.dumps({"text": [value], "target_lang": code.upper(), "source_lang": "EN"}).encode()
+        messages = [
+            {"role": "system", "content": INSTRUCTION.format(language=LANGUAGES[code])},
+            {"role": "user", "content": value},
+        ]
+        body = json.dumps({"model": model, "messages": messages, "temperature": 0}).encode()
         request = urllib.request.Request(
             api_url,
             data=body,
-            headers={"Authorization": f"DeepL-Auth-Key {auth_key}", "Content-Type": "application/json", "Accept": "application/json"},
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "Accept": "application/json"},
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=120) as response:
                 payload = json.load(response)
         except urllib.error.HTTPError as error:
             raise CatalogueTranslationFailure(f"translation provider failed with HTTP {error.code}") from error
         except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError, UnicodeDecodeError) as error:
             raise CatalogueTranslationFailure("translation provider failed") from error
         try:
-            translated = payload["translations"]
-            result = translated[0]["text"]
+            result = payload["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as error:
             raise CatalogueTranslationFailure("translation provider returned an invalid response") from error
         if not isinstance(result, str) or not result:
@@ -345,13 +367,14 @@ def atomic_write(destination: Path, content: str) -> None:
 def bootstrap_catalogue(source_path: Path, target_path: Path, code: str) -> None:
     """Create the initial complete, explicitly unreviewed target catalogue."""
     if code not in TARGET_CODES:
-        raise CatalogueTranslationFailure("target must be es or fr")
+        raise CatalogueTranslationFailure("target must be es, fr, or ja")
     if target_path.exists():
         raise CatalogueTranslationFailure(f"target catalogue already exists: {target_path.name}")
     source_document = load_toml(source_path)
     translatable_values(source_document)
     target_document = copy.deepcopy(source_document)
-    target_document.update({"code": code, "prefix": f"/{code}/", "group": "." if code == "es" else "\u202f", "decimal": ",", "reviewed": []})
+    group, decimal = SEPARATORS[code]
+    target_document.update({"code": code, "prefix": f"/{code}/", "group": group, "decimal": decimal, "reviewed": []})
     atomic_write(target_path, render_catalogue(target_document))
 
 
@@ -374,7 +397,7 @@ def mark_reviewed(target_path: Path, sections: list[str], keys: list[str]) -> in
 def translate_catalogue(source_path: Path, target_path: Path, code: str, translator: Translator) -> tuple[int, int]:
     """Translate unreviewed values and atomically replace *target_path* after validation."""
     if code not in TARGET_CODES:
-        raise CatalogueTranslationFailure("target must be es or fr")
+        raise CatalogueTranslationFailure("target must be es, fr, or ja")
 
     source_document = load_toml(source_path)
     target_document = load_toml(target_path)
@@ -419,11 +442,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--review-key", action="append", default=[], help="mark one fully qualified key after human review")
     parser.add_argument(
         "--provider",
-        choices=("deepl", "google"),
-        default="deepl",
-        help="authoring translation provider; deepl requires DEEPL_AUTH_KEY, google creates a reviewable draft",
+        choices=("openrouter", "google"),
+        default="openrouter",
+        help="authoring translation provider; openrouter requires OPENROUTER_API_KEY, google needs no credential",
     )
-    parser.add_argument("--deepl-api-url", default=os.environ.get("DEEPL_API_URL", DEEPL_API_URL), help="DeepL endpoint; credentials remain in DEEPL_AUTH_KEY")
+    parser.add_argument("--model", default=os.environ.get("OPENROUTER_MODEL", OPENROUTER_MODEL), help="OpenRouter model; credentials remain in OPENROUTER_API_KEY")
     return parser.parse_args(argv)
 
 
@@ -442,8 +465,8 @@ def main(argv: list[str] | None = None) -> int:
             print("translated=0 preserved=0 failed=0")
             return 0
         translator = (
-            deepl_translator(os.environ.get("DEEPL_AUTH_KEY", ""), args.deepl_api_url)
-            if args.provider == "deepl"
+            openrouter_translator(os.environ.get("OPENROUTER_API_KEY", ""), args.model)
+            if args.provider == "openrouter"
             else google_translator()
         )
         translated, preserved = translate_catalogue(args.source.resolve(), destination.resolve(), args.target, translator)

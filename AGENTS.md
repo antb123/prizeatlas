@@ -106,9 +106,8 @@ Run the website build from this `datasets/` directory:
   Award motivations, biographical notes, institution descriptions, personal names, constituent-unit names, city
   names, dates, citations, and identifiers are never translated.
 - Refresh institution labels explicitly with `uv run scripts/fetch_wikidata_labels.py`. Regenerate an unreviewed
-  target catalogue explicitly with `uv run scripts/translate_catalogue.py es` or
-  `uv run scripts/translate_catalogue.py fr`; see each command's `--help` for its authoring-time network and
-  credential contract. The website builder itself never fetches labels or calls a translation provider.
+  target catalogue explicitly with `uv run scripts/translate_catalogue.py es`, `... fr`, or `... ja`; see each
+  command's `--help` for its authoring-time network and credential contract. The website builder itself never fetches labels or calls a translation provider.
 - Catalogue coverage is closed for route segments, UI copy, ranking blurbs, prizes, categories, countries, subjects,
   and laureate types. Enrichment that introduces a new country, category, or prize name makes both the full build and
   `--home-only` fail until every translated catalogue is regenerated, reviewed as needed, and committed.
