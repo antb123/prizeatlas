@@ -91,6 +91,11 @@ places - use todays name, country, location
   about whether the data is right — for that see `scripts/check_coordinates.sql` and
   `docs/birth-coordinates-validation-20260725.md`.
 
+## adding new laureates
+
+To add a new year's laureates for any prize family (search, validate, insert, QID, birth place, affiliation, coordinates, website rebuild), follow
+`docs/new_laureate_runbook_20261006.md`. It orders the rules in this file and in `docs/datasets-affiliation-records-20260728.md`; it does not replace them.
+
 ## static awards website
 
 Run the website build from this `datasets/` directory:
