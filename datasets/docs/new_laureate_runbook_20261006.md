@@ -12,7 +12,7 @@ A prize family not in the table is a different job: `docs/contributing-prizes.md
 
 | prefix (`<p>`) | `prize_name` | `award_wikidata_qid` | formal categories | `source_laureate_id` |
 |---|---|---|---|---|
-| `nobel` | Nobel Prize (Economics: see AGENTS.md, `Q47170`) | `Q7191` | yes | official API id |
+| `nobel` | Nobel Prize (Physics, Chemistry, Medicine only; Literature, Peace, Economics are out of scope) | `Q7191` | yes | official API id |
 | `wolf_prize` | Wolf Prize | `Q739936` | yes | blank |
 | `abel_prize` | Abel Prize | `Q188184` | none: blank `category`, blank `field_language` and `biographical_note` | blank |
 | `breakthrough` | Breakthrough Prize | `Q17278140` | yes (a `year` may read `2026 (special)`; copy the family's form) | blank |
@@ -21,7 +21,7 @@ A prize family not in the table is a different job: `docs/contributing-prizes.md
 | `gairdner_international_award` | Canada Gairdner International Award | `Q1031994` | none: blank `category` | official id |
 | `brain_prize` | The Brain Prize | `Q18357422` | none: blank `category` | blank |
 | `japan_prize` / `kyoto_prize` / `kavli_prize` | Japan Prize / Kyoto Prize / Kavli Prize | `Q908745` / `Q658444` / `Q1094530` | yes (Japan's field names change yearly; copy the source's) | blank |
-| `lasker_awards` | Lasker Award | `Q921415` | yes (the four award names) | blank |
+| `lasker_awards` | Lasker Award | `Q921415` | yes (Basic, Clinical, Special Achievement; the Public Service award is out of scope) | blank |
 | `shaw_prize` | Shaw Prize | `Q584250` | yes | official id on some rows, else blank |
 
 Two conventions need no table: copy the new row's `prize`, `category`, `year` form, and `prize_share` style from the family's latest rows, and take the next id from `max`, never from `count` (ids are not contiguous):
@@ -38,12 +38,15 @@ SELECT award_record_id, year, category, prize, prize_name, award_wikidata_qid, p
 What is missing? `SELECT category, count(*) FROM awards WHERE award_record_id LIKE '<p>-%' AND year = '2026' GROUP BY 1;` Check the official site for the announcement date; Nobel runs a category a day in early October, most others once a year.
 
 Only Nobel has an API. For every other family, read the year's roster on the official site in full (name, category, citation, institution as printed); not news articles or search snippets.
-Nobel (category codes `phy che med lit pea eco`; use `curl -L`, the `/2/` URLs redirect to `/2.1/`):
+Nobel (category codes `phy che med`; use `curl -L`, the `/2/` URLs redirect to `/2.1/`):
 
 ```
 curl -sL 'https://api.nobelprize.org/2.1/nobelPrizes?nobelPrizeYear=2026&nobelPrizeCategory=med' | jq -c '.nobelPrizes[].laureates[] | {id, name: (.knownName.en // .orgName.en), portion, motivation: .motivation.en}'
 curl -sL 'https://api.nobelprize.org/2.1/laureate/<id>' | jq -c '.[0] | {wd: .wikidata.id, born: .birth.date, city: .birth.place.city.en, country: .birth.place.country.en, sex: .gender, aff: [.nobelPrizes[].affiliations[]?.name.en]}'
 ```
+
+Wolf: each laureate has a page, `https://wolffund.org.il/<name-slug>/`, with "Affiliation at the time of the award" and "Award citation" (it states no prize share). Save the HTML to scratch with `curl -sL`, strip tags with `sed`, and read the block after "Wolf Prize Laureate in <field> <year>".
+The Foundation's own news pages may give no announcement date; take it from two press reports and say so in the run note.
 
 Result: one list of `year, category, name, motivation, share, source id, institution, URL`. Keep it in scratch until step 8.
 
@@ -66,7 +69,17 @@ VALUES ('nobel-001030', '2026', 'Physics', 'The Nobel Prize in Physics 2026', 'N
 COMMIT;
 ```
 
-Other families: fill `prize`, `category`, `source_laureate_id`, `prize_share` as the table and the latest-rows query above say (blank, where the family has none). Then `PRAGMA integrity_check;` must print `ok`, and the row count must equal old + inserted
+Other families: fill `prize`, `category`, `source_laureate_id`, `prize_share` as the table and the latest-rows query above say (blank, where the family has none).
+
+**Columns the `INSERT` does not list come out `NULL`, but older rows hold `''`.** A blank guard written as `affiliation_name = ''` then matches nothing, and the `UPDATE` silently changes zero rows (`SELECT changes();` shows it).
+Right after the insert, turn the new rows' `NULL`s into `''` (adjust the `WHERE`; this lists every text column except the id):
+
+```sql
+SELECT 'UPDATE awards SET ' || group_concat(name || ' = COALESCE(' || name || ', '''')', ', ') || ' WHERE year = ''2026'' AND prize_name = ''Wolf Prize'';'
+  FROM pragma_table_info('awards') WHERE name <> 'award_record_id' AND type = 'TEXT';      -- run the statement it prints, inside BEGIN IMMEDIATE … COMMIT
+```
+
+Then `PRAGMA integrity_check;` must print `ok`, and the row count must equal old + inserted
 (`ATTACH '<backup>' AS old; SELECT count(*) FROM (SELECT * FROM old.awards EXCEPT SELECT * FROM main.awards);` must be 0).
 
 ## 4. Laureate QID
@@ -75,6 +88,8 @@ Nobel: the API's `wikidata.id`. Every other family: find it, confirm it, write i
 `enrich.py` can resolve a QID itself, but without a `birth_year` on the row it abstains (tested on Wolf rows): its award anchor is the family QID, and people carry the category item, e.g. `Wolf Prize in Physics`.
 A roster rarely gives a birth year, so do it by hand:
 
+Wikidata and OpenAlex answer with an HTML error page, not JSON, when a request has no `User-Agent` or arrives too fast (`jq: parse error: Invalid numeric literal`). Send `-A 'prizeatlas-data-curation/1.0 (<contact>)'` and `sleep 1.5` between calls.
+
 ```
 W='https://www.wikidata.org/w/api.php'
 curl -s "$W?action=wbsearchentities&search=<name>&language=en&limit=5&format=json" | jq -c '.search[] | {id,label,description}'      # candidates
@@ -82,7 +97,8 @@ ids=$(curl -s "$W?action=wbgetentities&ids=Q…&props=claims&format=json" | jq -
 curl -s "$W?action=wbgetentities&ids=$ids&props=labels&languages=en&format=json" | jq -r '.entities[].labels.en.value'                 # awards held
 ```
 
-Confirm: the awards held include this prize (or its category item) and the field and birth year fit the roster. The label may differ from the roster spelling. Then write it, guarded:
+Confirm: the awards held include this prize (or its category item) and the field and birth year fit the roster. The label may differ from the roster spelling.
+A brand-new award is often not on Wikidata yet; then the birth year, birthplace and field matching the roster text is the evidence. Say so in the run note. Then write it, guarded:
 
 ```sql
 UPDATE awards SET laureate_wikidata_qid = 'Q…' WHERE award_record_id = '…' AND COALESCE(laureate_wikidata_qid,'') = '';
@@ -103,8 +119,20 @@ With a known QID it fills only blank type, birth date/year, birth city/country, 
 SELECT award_record_id, birth_city, birth_country FROM awards WHERE year = '2026' AND (birth_city = birth_country OR birth_city LIKE '%,%');   -- fix by hand or blank the city
 ```
 
-`birth_city` is the city alone, today's name; `birth_country` today's country. Anyone who has died needs `death_date`. Then ORCID/OpenAlex author ids: `uv run scripts/lookup_authors.py --db awards.sqlite3 --record-id <id>` previews;
-add `--apply` only after review (it repeats the live lookup, it does not replay the preview). `high_school_subject`: copy what existing rows of the same prize and category carry, by guarded `UPDATE`, or leave blank.
+`birth_city` is the city alone, today's name; `birth_country` today's country. Anyone who has died needs `death_date`.
+Wikidata states the birthplace's country as it was named when the place was in it, and `enrich.py` copies that. Also check, and fix by hand:
+
+```sql
+SELECT DISTINCT birth_country FROM awards WHERE year = '2026';       -- `Duchy of Moscow` → `Russia`; `People's Republic of China` → `China`; match the spelling older rows use
+SELECT award_record_id, birth_date FROM awards WHERE year = '2026' AND birth_date LIKE '%-01-01';   -- Wikidata gives some birth dates by year only (precision 9); `enrich.py` pads them to `YYYY-01-01`. Write `YYYY`
+```
+
+Confirm the precision with `wbgetentities … props=claims` (`.claims.P569[0].mainsnak.datavalue.value.precision`: 9 is a year, 11 a day). A person with no Wikidata birthplace keeps a blank city and country; do not copy one from another row unless a source states it.
+Then ORCID/OpenAlex author ids: `uv run scripts/lookup_authors.py --db awards.sqlite3 --record-id <id>` previews;
+add `--apply` only after review (it repeats the live lookup, it does not replay the preview).
+Check each `author_openalex_id` before applying: one ORCID can map to several OpenAlex profiles and the tool may pick a fragment (a 6-work profile for a 548-work researcher).
+`curl -s -A '<ua>' "https://api.openalex.org/authors?filter=orcid:<orcid>&select=id,display_name,works_count,cited_by_count"` lists them; store the one with the works, and note the choice.
+An id copied from the same person's older rows must be fetched once first (`/authors/<id>`); some return 404. `high_school_subject`: copy what existing rows of the same prize and category carry, by guarded `UPDATE`, or leave blank.
 Do not run `scripts/set_award_subjects.py` without `--dry-run`: it rewrites existing rows.
 
 ## 6. Affiliation and coordinates
@@ -112,6 +140,8 @@ Do not run `scripts/set_award_subjects.py` without `--dry-run`: it rewrites exis
 Nothing here is automated; each value is hand-written per `award_record_id` and blank-guarded. The institution is the one at the time of the award.
 
 1. **Name:** from the award source (the Nobel API `aff`, the Wolf roster). `affiliation_name` is the English Wikipedia title of the parent institution, not the unit (unit → `affiliation_sub_name`).
+   Position 1 follows the source's order; the rest go to the TSV (point 6). Before writing a name, `grep -n '<name>' scripts/normalize_affiliations.py`: where the normalizer holds a canonical spelling it wins over the Wikipedia title,
+   or the institution splits in rankings (`University of Colorado Boulder` is mapped to `University of Colorado, Boulder`, which `AGENTS.md` contradicts; see the todo list). A joint institute (JILA) is neither parent's unit: record the real employer from the source.
 2. **QID:** resolve to the parent institution and confirm it is the one on this row. If the name search fails, search Wikidata by label and rerun with the exact QID.
    `uv run scripts/lookup_coordinates.py "<institution>" --country "<country>"` (or `… Q… --country …`) prints `wikidata_id`, `description`, and `dataset_coordinates`.
    Reuse an existing spelling, QID, city, and coordinates when the DB already holds the institution: `SELECT affiliation_name, affiliation_wikidata_qid, affiliation_city, affiliation_coordinates, count(*) FROM awards WHERE affiliation_name LIKE '%<x>%' GROUP BY 1,2,3,4;`
@@ -122,6 +152,9 @@ Nothing here is automated; each value is hand-written per `award_record_id` and 
    uv run scripts/reverse_nominatim.py --coordinates "<longitude>,<latitude>"     # country_code must match the row's country (the name comes back in the local language)
    ```
    Sources disagree: leave the cell blank. The same trio gives `birth_coordinates` from the verified birth city (optional; blank is acceptable).
+   A negative longitude must be passed as `--coordinates="-105.2633,39.9942"`; with a space, argparse reads it as an option.
+   **A city and country without coordinates fail the build** (`invalid coordinate record_id=… field=affiliation_coordinates`): the city pages need a point for every place. Verify one, or blank the city and keep the country (HHMI is recorded that way).
+   An institution's own point is not always the parent's: a unit with its own Wikidata item (NIST Boulder, `Q40215915`) may supply the point, never the QID. Do not reuse a coordinate that equals the city's centre (`-105.2705,40.0150` is Boulder itself).
 5. **Write:**
    ```sql
    UPDATE awards SET affiliation_name = 'Stanford University', affiliation_city = 'Stanford', affiliation_country = 'United States',
@@ -130,6 +163,8 @@ Nothing here is automated; each value is hand-written per `award_record_id` and 
       AND affiliation_coordinates = '' AND COALESCE(affiliation_wikidata_qid,'') = '';
    ```
 6. **A second affiliation** (Deisseroth: HHMI and Stanford) is never a hand `INSERT`: add a reviewed row to `award_extra_affiliations.tsv`, then `load_extra_affiliations.py --dry-run`, then without the flag (backup first; the load replaces the whole table).
+   The rows are tab-separated, in the file's column order. Names there are not normalized, so type the canonical spelling. The loader refuses any line naming an award that is no longer in `awards`: when you delete awards, delete their TSV lines too.
+   After the load, check that nothing existing changed: `ATTACH` the backup and count `SELECT * FROM old.award_extra_affiliations EXCEPT SELECT * FROM main.award_extra_affiliations` (must be 0).
    A new spelling or unit goes into `AFFILIATIONS` in `scripts/normalize_affiliations.py`; run it dry first. Details: affiliation doc §4 to §6.
 7. **ROR and OpenAlex** (position 1): `lookup_ror.py --db awards.sqlite3 --record-id <id> > ror.json`, review, back up, `--apply ror.json`; then the same with `lookup_openalex.py`. Affiliation doc §5.2 and §5.3.
 
@@ -141,7 +176,8 @@ A blank affiliation QID is unfinished work, not a settled value.
 sqlite3 awards.sqlite3 "PRAGMA integrity_check;"                      # ok
 uv run scripts/validate_awards.py --detail 200 > after.txt; diff before.txt after.txt     # only the baseline failures; it reads awards and award_extra_affiliations
 uv run scripts/normalize_affiliations.py                              # dry run; no new merges
-uv run pytest tests/ && uv run ruff check
+uv run --python 3.12 --with pytest --with jinja2==3.1.6 --with pillow==11.3.0 --with shapely pytest tests/    # 171 pass; plain `uv run pytest` lacks these dependencies
+uv run --with ruff ruff check                                                                                  # pre-existing findings elsewhere; check only the files you changed
 ```
 
 Compare the diff by group, not by count. `scripts/check_coordinates.sql` is named in `AGENTS.md` but missing from the checkout; the two-source check in step 6 stands in for it.
@@ -153,14 +189,18 @@ uv run website/build.py --base-url https://example.org/awards/ --home-only      
 uv run website/build.py --base-url https://example.org/awards/
 ```
 
+There is no per-page build: every run regenerates all ~30,000 pages (one to two minutes), so fix the data first and build once.
 If the check fails, regenerate the catalogues named in `AGENTS.md` ("static awards website": `fetch_wikidata_labels.py`, `translate_catalogue.py es|fr|ja`), review them, and commit them with the data.
+For a single new country the shortcut is one line under `[terms.country]` in each of `en.toml`, `es.toml`, `fr.toml`, `ja.toml`, in alphabetical order (`Chile = "Chile"` / `"Chile"` / `"Chili"` / `"チリ"`); leave it out of `reviewed`. The failure reads `terms.country missing='Chile'`.
+A new country usually means a birth country: fix a historical name from Wikidata (step 5) before adding a catalogue entry for it.
+If the prize's dates changed or a new event was announced, update `website/calendar/events.toml`, run `uv run scripts/build_calendar.py`, and commit the regenerated pages (`AGENTS.md`, "static awards website").
 Look at `website/dist/<prize>/winners/`, one new person page, one new institution page, `/explorer/`.
 
 Write the run note `docs/<prize>_<yyyymmdd>.md` like `docs/nobel-medicine-20261006.md`: records added with source ids and QIDs, URLs used, fields left blank and why, backups, validator diff, pre-existing defects noticed but not changed.
 Commit by name, without `website/dist/`, `*.bak`, or `../awards.sqlite3`, and with no tool-attribution lines in the message:
 
 ```
-git add awards.sqlite3 award_extra_affiliations.tsv docs/<note>.md [website/i18n/*.toml if changed]
+git add awards.sqlite3 award_extra_affiliations.tsv docs/<note>.md [website/i18n/*.toml, website/calendar if changed]
 git commit -m "Add 2026 <prize> laureates" && git push
 git rev-parse HEAD origin/master                                      # the two hashes must match
 ```

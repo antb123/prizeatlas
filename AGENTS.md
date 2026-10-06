@@ -1,6 +1,8 @@
 one row per laureate/recipient
 places - use todays name, country, location
 
+- science prizes only. The database has no Nobel Literature, Peace, or Economic Sciences rows and no Lasker Public Service Award
+  (removed 20261006, 70 rows); Nobel is Physics, Chemistry, and Medicine. Do not add them, and do not list them on the calendar.
 - git currently don't use branches!!
 
 ## validation rules
@@ -135,6 +137,10 @@ Run the website build from this `datasets/` directory:
   server error routing is part of the static build.
 - `website/dist/`, `.dist-staging-*`, and `.dist-backup-*` are generated local state and MUST NOT be versioned.
 - The builder uses only static files; it does not run an application server or modify the database.
+- The award calendar (`/awards/calendar/2026/`, `/2027/`, English only) is pre-rendered, not planned: `website/calendar/events.toml` is its source,
+  `uv run scripts/build_calendar.py` writes `website/calendar/<year>/index.html`, and `write_calendar()` in `website/build.py` copies it to
+  `dist/awards/calendar/` and adds both URLs to the sitemap. Edit the TOML and rerun the script; the rendered HTML is committed. Rows with only a month
+  (`YYYY-MM`) list under that month as TBC. Take a date from the prize's own announcement, and mark an unconfirmed one `projected`. `docs/when.md` is the prose copy.
 
 ## data explorer
 
@@ -295,8 +301,7 @@ under `old/`; the live data for each is the matching `award_record_id` prefix in
 - nobel.csv
   official:   https://www.nobelprize.org
   wikipedia:  https://en.wikipedia.org/wiki/List_of_Nobel_laureates
-  Economics rows use prize family `Sveriges Riksbank Prize in Economic Sciences`
-  and award QID `Q47170`, not `Nobel Prize` / `Q7191`.
+  Physics, Chemistry, and Medicine only; Economic Sciences, Literature, and Peace are out of scope (see the top of this file).
 - shaw_prize.csv
   official:   https://www.shawprize.org
   wikipedia:  https://en.wikipedia.org/wiki/Shaw_Prize
