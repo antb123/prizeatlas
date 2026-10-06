@@ -7,13 +7,11 @@
 title = "Award Calendar 2026: When the Nobel, Fields, Turing and Other Major Prizes Are Announced"
 heading = "Award calendar 2026"
 description = "2026 prize calendar: the dates the Nobel Prize, Fields Medal, Turing Award, Abel Prize, Lasker, Kyoto and 10 more major prizes announce winners and hold ceremonies."
-intro = "A month-by-month calendar of when 16 major science and ideas prizes name their winners and when they present them. Winners are announced in one month and honoured at a ceremony in another, so each prize appears twice. Dates come from the prizes' own announcements."
 
 [year."2027"]
 title = "Award Calendar 2027 (Draft): Projected Dates for the Nobel, Turing, Abel and Other Major Prizes"
 heading = "Award calendar 2027 (draft)"
 description = "2027 prize calendar, draft: projected announcement and ceremony dates for the Nobel Prize, Turing Award, Abel Prize, Lasker, Kyoto and other major prizes."
-intro = "A draft calendar of when 16 major science and ideas prizes will name and present their winners in 2027. Most dates are projected: the 2026 date moved 52 weeks forward to the same weekday. Dashed dates are projections; solid dates are published by the prize. Where only the month is known, the event sits under that month as TBC."
 
 [prize."Nobel Prize"]
 url = "https://www.nobelprize.org/prizes/"
@@ -25,9 +23,9 @@ url = "https://amturing.acm.org/"
 url = "https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille"
 [prize."Abel Prize"]
 url = "https://abelprize.no/"
-[prize."Lasker Awards"]
+[prize."Lasker Award"]
 url = "https://laskerfoundation.org/awards/"
-[prize."Canada Gairdner Awards"]
+[prize."Canada Gairdner International Award"]
 url = "https://www.gairdner.org/awards/canada-gairdner-international-award"
 [prize."Wolf Prize"]
 url = "https://wolffund.org.il/the-wolf-prize/"
@@ -94,7 +92,7 @@ note = "Ceremony 26 May, Oslo"
 
 [[event]]
 date = "2026-03-31"
-prize = "Canada Gairdner Awards"
+prize = "Canada Gairdner International Award"
 kind = "announced"
 status = "confirmed"
 note = "Gala 22 October"
@@ -178,14 +176,14 @@ note = "Oslo; announced 10 June"
 
 [[event]]
 date = "2026-09-09"
-prize = "Lasker Awards"
+prize = "Lasker Award"
 kind = "announced"
 status = "confirmed"
 note = "Ceremony 17 September, New York"
 
 [[event]]
 date = "2026-09-17"
-prize = "Lasker Awards"
+prize = "Lasker Award"
 kind = "ceremony"
 status = "confirmed"
 note = "New York; announced 9 September"
@@ -219,27 +217,6 @@ status = "confirmed"
 note = "Chemistry"
 
 [[event]]
-date = "2026-10-08"
-prize = "Nobel Prize"
-kind = "announced"
-status = "confirmed"
-note = "Literature"
-
-[[event]]
-date = "2026-10-09"
-prize = "Nobel Prize"
-kind = "announced"
-status = "confirmed"
-note = "Peace"
-
-[[event]]
-date = "2026-10-12"
-prize = "Nobel Prize"
-kind = "announced"
-status = "confirmed"
-note = "Economic Sciences (Sveriges Riksbank Prize)"
-
-[[event]]
 date = "2026-10"
 prize = "Shaw Prize"
 kind = "ceremony"
@@ -248,7 +225,7 @@ note = "Hong Kong; 2026 date not yet announced (2025: 21 October); announced 27 
 
 [[event]]
 date = "2026-10-22"
-prize = "Canada Gairdner Awards"
+prize = "Canada Gairdner International Award"
 kind = "ceremony"
 status = "confirmed"
 note = "Gala; announced 31 March"
@@ -272,7 +249,7 @@ date = "2026-12-10"
 prize = "Nobel Prize"
 kind = "ceremony"
 status = "confirmed"
-note = "Peace in Oslo, all others in Stockholm"
+note = "Stockholm"
 
 # ---------------------------------------------------------------- 2027
 
@@ -320,7 +297,7 @@ note = "Ceremony May, Oslo"
 
 [[event]]
 date = "2027-03-30"
-prize = "Canada Gairdner Awards"
+prize = "Canada Gairdner International Award"
 kind = "announced"
 status = "projected"
 note = "Gala in October"
@@ -397,14 +374,14 @@ note = "Helsinki, May or June; winner decided December 2026; every two years"
 
 [[event]]
 date = "2027-09-08"
-prize = "Lasker Awards"
+prize = "Lasker Award"
 kind = "announced"
 status = "projected"
 note = "Ceremony in September, New York"
 
 [[event]]
 date = "2027-09-16"
-prize = "Lasker Awards"
+prize = "Lasker Award"
 kind = "ceremony"
 status = "projected"
 note = "New York"
@@ -431,27 +408,6 @@ status = "projected"
 note = "Chemistry"
 
 [[event]]
-date = "2027-10-07"
-prize = "Nobel Prize"
-kind = "announced"
-status = "projected"
-note = "Literature"
-
-[[event]]
-date = "2027-10-08"
-prize = "Nobel Prize"
-kind = "announced"
-status = "projected"
-note = "Peace"
-
-[[event]]
-date = "2027-10-11"
-prize = "Nobel Prize"
-kind = "announced"
-status = "projected"
-note = "Economic Sciences (Sveriges Riksbank Prize)"
-
-[[event]]
 date = "2027-10"
 prize = "Wolf Prize"
 kind = "announced"
@@ -467,7 +423,7 @@ note = "Hong Kong"
 
 [[event]]
 date = "2027-10-21"
-prize = "Canada Gairdner Awards"
+prize = "Canada Gairdner International Award"
 kind = "ceremony"
 status = "projected"
 note = "Gala"
@@ -491,4 +447,4 @@ date = "2027-12-10"
 prize = "Nobel Prize"
 kind = "ceremony"
 status = "projected"
-note = "Peace in Oslo, all others in Stockholm"
+note = "Stockholm"

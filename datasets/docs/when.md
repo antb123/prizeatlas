@@ -26,7 +26,7 @@ No events.
 | 2026-03-05 | The Brain Prize        | Announced | → ceremony 2026-05-20, Copenhagen                            |
 | 2026-03-18 | Turing Award           | Announced | → banquet 2026-06-13, San Francisco (2025 award)             |
 | 2026-03-19 | Abel Prize             | Announced | → ceremony 2026-05-26, Oslo                                  |
-| 2026-03-31 | Canada Gairdner Awards | Announced | → gala 2026-10-22                                            |
+| 2026-03-31 | Canada Gairdner International Award | Announced | → gala 2026-10-22                                            |
 
 ## April
 
@@ -69,8 +69,8 @@ No events.
 | Date       | Prize         | Event     | Note                                  |
 |------------|---------------|-----------|---------------------------------------|
 | 2026-09-01 | Kavli Prize   | Ceremony  | Oslo; ← announced 2026-06-10          |
-| 2026-09-09 | Lasker Awards | Announced | → ceremony 2026-09-17, New York       |
-| 2026-09-17 | Lasker Awards | Ceremony  | New York; ← announced 2026-09-09      |
+| 2026-09-09 | Lasker Award | Announced | → ceremony 2026-09-17, New York       |
+| 2026-09-17 | Lasker Award | Ceremony  | New York; ← announced 2026-09-09      |
 
 ## October
 
@@ -80,11 +80,8 @@ No events.
 | 2026-10-05 | Nobel Prize            | Announced | Physiology or Medicine, first full week of October; → ceremony 2026-12-10            |
 | 2026-10-06 | Nobel Prize            | Announced | Physics                                                                              |
 | 2026-10-07 | Nobel Prize            | Announced | Chemistry                                                                            |
-| 2026-10-08 | Nobel Prize            | Announced | Literature                                                                           |
-| 2026-10-09 | Nobel Prize            | Announced | Peace                                                                                |
-| 2026-10-12 | Nobel Prize            | Announced | Economic Sciences (Sveriges Riksbank Prize), the following Monday                    |
 | 2026-10    | Shaw Prize             | Ceremony  | Hong Kong; day not yet announced (2025: 2025-10-21); ← announced 2026-05-27         |
-| 2026-10-22 | Canada Gairdner Awards | Ceremony  | gala; ← announced 2026-03-31                                                         |
+| 2026-10-22 | Canada Gairdner International Award | Ceremony  | gala; ← announced 2026-03-31                                                         |
 
 ## November
 
@@ -97,7 +94,7 @@ No events.
 
 | Date       | Prize       | Event    | Note                                                                          |
 |------------|-------------|----------|-------------------------------------------------------------------------------|
-| 2026-12-10 | Nobel Prize | Ceremony | anniversary of Nobel's death; Peace in Oslo, all others in Stockholm          |
+| 2026-12-10 | Nobel Prize | Ceremony | anniversary of Nobel's death; Stockholm          |
 
 ## By prize
 
@@ -108,8 +105,8 @@ No events.
 | Turing Award                | March                   | June                 | yearly        |
 | Max Planck Medal            | November                | March                | yearly        |
 | Abel Prize                  | March                   | May                  | yearly        |
-| Lasker Awards               | September               | September            | yearly        |
-| Canada Gairdner Awards      | March                   | October              | yearly        |
+| Lasker Award               | September               | September            | yearly        |
+| Canada Gairdner International Award      | March                   | October              | yearly        |
 | Wolf Prize                  | October (2026)          | June                 | yearly        |
 | Kyoto Prize                 | June                    | November             | yearly        |
 | Crafoord Prize              | January                 | May                  | yearly        |
@@ -126,4 +123,5 @@ No events.
 - Millennium Technology Prize: winner decided December 2026, announced spring 2027, ceremony May or June 2027 in Helsinki. No exact day published yet.
 - Wolf Prize moved its announcement from February to October with the 2026 cycle; confirm against `wolffund.org.il` before relying on October for 2027.
 - Shaw Prize 2026 ceremony date was "to be announced"; 2025-10-21 is last year's ceremony.
-- Nobel announcement times are "at the earliest" and the order (Medicine, Physics, Chemistry, Literature, Peace, Economics) is fixed.
+- Science prizes only, matching `awards.sqlite3`: Nobel Physics, Chemistry and Physiology or Medicine. The Literature, Peace and Economic Sciences prizes are not in the database and are not listed. Kyoto Prize covers only its Basic Sciences and Advanced Technology categories.
+- Nobel announcement times are "at the earliest"; the order (Medicine, Physics, Chemistry) is fixed.

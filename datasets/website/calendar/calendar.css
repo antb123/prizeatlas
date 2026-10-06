@@ -11,9 +11,9 @@ a { color: inherit; text-decoration-color: var(--line); text-underline-offset: 3
 a:hover { text-decoration-color: currentColor; }
 header, main, footer { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
 header { padding-top: 32px; padding-bottom: 8px; }
-.brand { margin: 0; font-size: .85rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-h1 { font: 400 clamp(2rem, 6vw, 3.25rem)/1.1 Georgia, serif; margin: .25em 0 .3em; }
-.intro { max-width: 60ch; color: var(--muted); margin: 0 0 1em; }
+.crumbs { margin: 0; font-size: .85rem; color: var(--muted); }
+h1 { font: 400 clamp(2rem, 6vw, 3.25rem)/1.1 Georgia, serif; margin: .35em 0 .2em; }
+.tagline { margin: 0 0 1em; color: var(--muted); }
 nav a { display: inline-block; margin-right: 1.25em; padding: 2px 0; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; }
 nav a[aria-current] { color: var(--ink); border-bottom-color: var(--ink); }
 .legend { font-size: .85rem; color: var(--muted); margin: 1em 0 0; }

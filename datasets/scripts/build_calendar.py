@@ -85,9 +85,9 @@ def page(year: str, years: list[str], meta: dict, events: list[dict], prizes: di
 </head>
 <body>
 <header>
-<p class="brand"><a href="https://prizeatlas.org/">PrizeAtlas</a></p>
+<p class="crumbs"><a href="../../../">Home</a> / <a href="../../">Awards</a> / Calendar</p>
 <h1>{escape(meta["heading"])}</h1>
-<p class="intro">{escape(meta["intro"])}</p>
+<p class="tagline">Calendar of all major science prizes in {year}: announcements and ceremonies.</p>
 <nav>{nav}</nav>
 <p class="legend"><span class="key announced"></span>Announced <span class="key ceremony"></span>Ceremony <span class="key mix"></span>Both <span class="key projected"></span>Projected</p>
 </header>

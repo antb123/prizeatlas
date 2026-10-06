@@ -5,5 +5,6 @@
   <h1>{{ heading }}</h1>
   <p>{{ description }}</p>
 </header>
+<p>{{ t("awards.calendar") }}: <a href="{{ asset_href('awards/calendar/2026') }}/">2026</a> · <a href="{{ asset_href('awards/calendar/2027') }}/">2027 ({{ t("awards.calendar_draft") }})</a></p>
 {% include "_awards.html" %}
 {% endblock %}
