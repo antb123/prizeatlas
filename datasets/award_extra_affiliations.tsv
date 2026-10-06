@@ -77,7 +77,6 @@ japan_prize-000102	University of Szeged		Szeged	Hungary	20.1461,46.2502	Q369839
 japan_prize-000108	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 lasker_awards-000003	United States Public Health Service	Staten Island Marine Hospital	New York	United States	-74.0758,40.6222	Q476322
 lasker_awards-000157	Harvard University	Harvard Medical School	Boston	United States	-71.1039,42.3369	Q13371
-lasker_awards-000294	Eleanor Naylor Dana Charitable Trust		New York	United States	-74.0061,40.7128
 lasker_awards-000375	Francis Crick Institute		London	United Kingdom	-0.1289,51.5316	Q326044
 nobel-000354	Royal Society		London	United Kingdom	-0.1322,51.5061	Q123885
 shaw_prize-000081	Cornell University	Weill Cornell Graduate School of Medical Sciences	New York	United States	-73.9541,40.7645	Q49115
@@ -94,3 +93,7 @@ brain_prize-000047	Hebrew University of Jerusalem		Jerusalem	Israel	35.2000,31.7
 brain_prize-000048	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 brain_prize-000050	Howard Hughes Medical Institute		Chevy Chase	United States	-77.0796,38.9985	Q1512226
 nobel-001027	Howard Hughes Medical Institute			United States		Q1512226
+wolf_prize-000394	University of Strasbourg		Strasbourg	France	7.7644,48.5803	Q157575
+wolf_prize-000397	Howard Hughes Medical Institute			United States		Q1512226
+wolf_prize-000398	LMU Munich		Munich	Germany	11.5803,48.1508	Q55044
+wolf_prize-000399	University of Colorado, Boulder		Boulder	United States	-105.2672,40.0067	Q736674

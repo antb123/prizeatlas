@@ -189,11 +189,11 @@ status = "confirmed"
 note = "New York; announced 9 September"
 
 [[event]]
-date = "2026-10-04"
+date = "2026-10-01"
 prize = "Wolf Prize"
 kind = "announced"
 status = "confirmed"
-note = "Ceremony June 2027, Knesset, Jerusalem; earlier cycles announced in February"
+note = "Announced 1-2 October; ceremony June 2027, Knesset, Jerusalem. The 2025 cycle was announced 10 March"
 
 [[event]]
 date = "2026-10-05"
@@ -363,7 +363,7 @@ date = "2027-06"
 prize = "Wolf Prize"
 kind = "ceremony"
 status = "confirmed"
-note = "Knesset, Jerusalem, for the 2026 laureates announced 4 October 2026"
+note = "Knesset, Jerusalem, for the 2026 laureates announced 1 October 2026"
 
 [[event]]
 date = "2027-06"
@@ -412,7 +412,7 @@ date = "2027-10"
 prize = "Wolf Prize"
 kind = "announced"
 status = "projected"
-note = "The 2026 cycle announced in October; earlier cycles in February. Confirm before relying on this"
+note = "The 2026 cycle was announced 1 October and the 2025 cycle 10 March. Confirm before relying on this"
 
 [[event]]
 date = "2027-10"

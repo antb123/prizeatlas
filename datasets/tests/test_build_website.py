@@ -56,6 +56,7 @@ class WebsiteBuildTests(unittest.TestCase):
         shutil.copytree(Path(build.__file__).parent / "templates", self.website / "templates")
         shutil.copytree(Path(build.__file__).parent / "static", self.website / "static")
         shutil.copytree(Path(build.__file__).parent / "i18n", self.website / "i18n")
+        shutil.copytree(Path(build.__file__).parent / "calendar", self.website / "calendar")
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -1349,7 +1350,10 @@ class WebsiteBuildTests(unittest.TestCase):
 
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
-        self.assertEqual(len(plan.jobs), len(locations))
+        # Every planned page, plus the two pre-rendered award calendar pages copied in by write_calendar.
+        self.assertEqual(len(plan.jobs) + 2, len(locations))
+        self.assertIn("https://example.org/awards/awards/calendar/2026/", locations)
+        self.assertIn("https://example.org/awards/awards/calendar/2027/", locations)
         self.assertIn(
             "https://example.org/awards/nobel-prize/physics/1939/ernest-orlando-lawrence/",
             locations,
@@ -2688,7 +2692,7 @@ class WebsiteBuildTests(unittest.TestCase):
         # The error page is not a route: it must stay out of the sitemap and the page counts.
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
-        self.assertEqual(len(plan.jobs), len(locations))
+        self.assertEqual(len(plan.jobs) + 2, len(locations))  # the two award calendar pages are not planned jobs
         self.assertNotIn("https://example.org/awards/404.html", locations)
 
     def test_dataset_csv_dumps_every_award_and_is_linked_from_every_footer(self) -> None:

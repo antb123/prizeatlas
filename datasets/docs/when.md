@@ -52,7 +52,7 @@ No events.
 | 2026-06-10 | Kavli Prize  | Announced | even years only; → ceremony 2026-09-01, Oslo                        |
 | 2026-06-13 | Turing Award | Ceremony  | ACM Awards Banquet, San Francisco; ← announced 2026-03-18          |
 | 2026-06-19 | Kyoto Prize  | Announced | → ceremony 2026-11-10, Kyoto                                        |
-| 2027-06    | Wolf Prize   | Ceremony  | Knesset, Jerusalem; ← announced 2026-10-04                          |
+| 2027-06    | Wolf Prize   | Ceremony  | Knesset, Jerusalem; ← announced 2026-10-01                          |
 
 ## July
 
@@ -76,7 +76,7 @@ No events.
 
 | Date       | Prize                  | Event     | Note                                                                                 |
 |------------|------------------------|-----------|--------------------------------------------------------------------------------------|
-| 2026-10-04 | Wolf Prize             | Announced | → ceremony 2027-06; earlier cycles announced in February                             |
+| 2026-10-01 | Wolf Prize             | Announced | reported 1-2 October; → ceremony 2027-06; the 2025 cycle was announced 2025-03-10    |
 | 2026-10-05 | Nobel Prize            | Announced | Physiology or Medicine, first full week of October; → ceremony 2026-12-10            |
 | 2026-10-06 | Nobel Prize            | Announced | Physics                                                                              |
 | 2026-10-07 | Nobel Prize            | Announced | Chemistry                                                                            |
@@ -121,7 +121,7 @@ No events.
 
 - Max Planck Medal March ceremony has no verified day; the DPG holds it at its annual spring meeting.
 - Millennium Technology Prize: winner decided December 2026, announced spring 2027, ceremony May or June 2027 in Helsinki. No exact day published yet.
-- Wolf Prize moved its announcement from February to October with the 2026 cycle; confirm against `wolffund.org.il` before relying on October for 2027.
+- Wolf Prize announcement dates vary: 2025 was announced 2025-03-10, 2026 on 1-2 October (the Wolf Foundation's own page gave no date; this follows press reports). Confirm against `wolffund.org.il` before relying on October for 2027.
 - Shaw Prize 2026 ceremony date was "to be announced"; 2025-10-21 is last year's ceremony.
 - Science prizes only, matching `awards.sqlite3`: Nobel Physics, Chemistry and Physiology or Medicine. The Literature, Peace and Economic Sciences prizes are not in the database and are not listed. Kyoto Prize covers only its Basic Sciences and Advanced Technology categories.
 - Nobel announcement times are "at the earliest"; the order (Medicine, Physics, Chemistry) is fixed.

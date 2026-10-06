@@ -4,9 +4,10 @@
     uv run scripts/build_calendar.py
 """
 import calendar
-import tomllib
 from html import escape
 from pathlib import Path
+
+import tomllib
 
 CAL_DIR = Path(__file__).resolve().parent.parent / "website" / "calendar"
 BASE_URL = "https://prizeatlas.org/awards/calendar/"
@@ -89,7 +90,8 @@ def page(year: str, years: list[str], meta: dict, events: list[dict], prizes: di
 <h1>{escape(meta["heading"])}</h1>
 <p class="tagline">Calendar of all major science prizes in {year}: announcements and ceremonies.</p>
 <nav>{nav}</nav>
-<p class="legend"><span class="key announced"></span>Announced <span class="key ceremony"></span>Ceremony <span class="key mix"></span>Both <span class="key projected"></span>Projected</p>
+<p class="legend"><span class="key announced"></span>Announced <span class="key ceremony"></span>Ceremony
+<span class="key mix"></span>Both <span class="key projected"></span>Projected</p>
 </header>
 <main>{months}</main>
 <footer><p>Dates change each year; the month and week are the stable part. TBC means the month is known but not the day.</p></footer>
