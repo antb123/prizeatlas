@@ -1,0 +1,494 @@
+# One row per event. date is YYYY-MM-DD, or YYYY-MM when only the month is known.
+# kind: announced | ceremony | both.  status: confirmed | projected.
+# 2027 rows are projected as the 2026 date + 364 days (same weekday) unless the prize has published its own date.
+# Checked 20261006. Sources: each prize's official site, see award_ranking.url.
+
+[year."2026"]
+title = "Award Calendar 2026: When the Nobel, Fields, Turing and Other Major Prizes Are Announced"
+heading = "Award calendar 2026"
+description = "2026 prize calendar: the dates the Nobel Prize, Fields Medal, Turing Award, Abel Prize, Lasker, Kyoto and 10 more major prizes announce winners and hold ceremonies."
+intro = "A month-by-month calendar of when 16 major science and ideas prizes name their winners and when they present them. Winners are announced in one month and honoured at a ceremony in another, so each prize appears twice. Dates come from the prizes' own announcements."
+
+[year."2027"]
+title = "Award Calendar 2027 (Draft): Projected Dates for the Nobel, Turing, Abel and Other Major Prizes"
+heading = "Award calendar 2027 (draft)"
+description = "2027 prize calendar, draft: projected announcement and ceremony dates for the Nobel Prize, Turing Award, Abel Prize, Lasker, Kyoto and other major prizes."
+intro = "A draft calendar of when 16 major science and ideas prizes will name and present their winners in 2027. Most dates are projected: the 2026 date moved 52 weeks forward to the same weekday. Dashed dates are projections; solid dates are published by the prize. Where only the month is known, the event sits under that month as TBC."
+
+[prize."Nobel Prize"]
+url = "https://www.nobelprize.org/prizes/"
+[prize."Fields Medal"]
+url = "https://www.mathunion.org/imu-awards/fields-medal"
+[prize."Turing Award"]
+url = "https://amturing.acm.org/"
+[prize."Max Planck Medal"]
+url = "https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille"
+[prize."Abel Prize"]
+url = "https://abelprize.no/"
+[prize."Lasker Awards"]
+url = "https://laskerfoundation.org/awards/"
+[prize."Canada Gairdner Awards"]
+url = "https://www.gairdner.org/awards/canada-gairdner-international-award"
+[prize."Wolf Prize"]
+url = "https://wolffund.org.il/the-wolf-prize/"
+[prize."Kyoto Prize"]
+url = "https://www.kyotoprize.org/en/"
+[prize."Crafoord Prize"]
+url = "https://www.crafoordprize.se/"
+[prize."The Brain Prize"]
+url = "https://brainprize.org/"
+[prize."Shaw Prize"]
+url = "https://www.shawprize.org/en"
+[prize."Kavli Prize"]
+url = "https://www.kavliprize.org/"
+[prize."Japan Prize"]
+url = "https://www.japanprize.jp/en/"
+[prize."Millennium Technology Prize"]
+url = "https://millenniumprize.org/"
+[prize."Breakthrough Prize"]
+url = "https://breakthroughprize.org/"
+
+# ---------------------------------------------------------------- 2026
+
+[[event]]
+date = "2026-01-21"
+prize = "Japan Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 14 April, Tokyo"
+
+[[event]]
+date = "2026-01-29"
+prize = "Crafoord Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 21 May, Stockholm"
+
+[[event]]
+date = "2026-03"
+prize = "Max Planck Medal"
+kind = "ceremony"
+status = "confirmed"
+note = "DPG annual meeting; announced November 2025"
+
+[[event]]
+date = "2026-03-05"
+prize = "The Brain Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 20 May, Copenhagen"
+
+[[event]]
+date = "2026-03-18"
+prize = "Turing Award"
+kind = "announced"
+status = "confirmed"
+note = "Banquet 13 June, San Francisco"
+
+[[event]]
+date = "2026-03-19"
+prize = "Abel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 26 May, Oslo"
+
+[[event]]
+date = "2026-03-31"
+prize = "Canada Gairdner Awards"
+kind = "announced"
+status = "confirmed"
+note = "Gala 22 October"
+
+[[event]]
+date = "2026-04-14"
+prize = "Japan Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Tokyo; announced 21 January"
+
+[[event]]
+date = "2026-04-18"
+prize = "Breakthrough Prize"
+kind = "both"
+status = "confirmed"
+note = "Santa Monica, California"
+
+[[event]]
+date = "2026-05-20"
+prize = "The Brain Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Copenhagen; announced 5 March"
+
+[[event]]
+date = "2026-05-21"
+prize = "Crafoord Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Stockholm, during Crafoord Days; announced 29 January"
+
+[[event]]
+date = "2026-05-26"
+prize = "Abel Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Oslo; announced 19 March"
+
+[[event]]
+date = "2026-05-27"
+prize = "Shaw Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony in October, Hong Kong"
+
+[[event]]
+date = "2026-06-10"
+prize = "Kavli Prize"
+kind = "announced"
+status = "confirmed"
+note = "Even years only; ceremony 1 September, Oslo"
+
+[[event]]
+date = "2026-06-13"
+prize = "Turing Award"
+kind = "ceremony"
+status = "confirmed"
+note = "ACM Awards Banquet, San Francisco; announced 18 March"
+
+[[event]]
+date = "2026-06-19"
+prize = "Kyoto Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 10 November, Kyoto"
+
+[[event]]
+date = "2026-07-23"
+prize = "Fields Medal"
+kind = "both"
+status = "confirmed"
+note = "Opening of the International Congress of Mathematicians, Philadelphia; every four years, next 2030"
+
+[[event]]
+date = "2026-09-01"
+prize = "Kavli Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Oslo; announced 10 June"
+
+[[event]]
+date = "2026-09-09"
+prize = "Lasker Awards"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony 17 September, New York"
+
+[[event]]
+date = "2026-09-17"
+prize = "Lasker Awards"
+kind = "ceremony"
+status = "confirmed"
+note = "New York; announced 9 September"
+
+[[event]]
+date = "2026-10-04"
+prize = "Wolf Prize"
+kind = "announced"
+status = "confirmed"
+note = "Ceremony June 2027, Knesset, Jerusalem; earlier cycles announced in February"
+
+[[event]]
+date = "2026-10-05"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Physiology or Medicine; ceremony 10 December"
+
+[[event]]
+date = "2026-10-06"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Physics"
+
+[[event]]
+date = "2026-10-07"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Chemistry"
+
+[[event]]
+date = "2026-10-08"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Literature"
+
+[[event]]
+date = "2026-10-09"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Peace"
+
+[[event]]
+date = "2026-10-12"
+prize = "Nobel Prize"
+kind = "announced"
+status = "confirmed"
+note = "Economic Sciences (Sveriges Riksbank Prize)"
+
+[[event]]
+date = "2026-10"
+prize = "Shaw Prize"
+kind = "ceremony"
+status = "projected"
+note = "Hong Kong; 2026 date not yet announced (2025: 21 October); announced 27 May"
+
+[[event]]
+date = "2026-10-22"
+prize = "Canada Gairdner Awards"
+kind = "ceremony"
+status = "confirmed"
+note = "Gala; announced 31 March"
+
+[[event]]
+date = "2026-11-10"
+prize = "Kyoto Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Kyoto, every year on 10 November; announced 19 June"
+
+[[event]]
+date = "2026-11-12"
+prize = "Max Planck Medal"
+kind = "announced"
+status = "projected"
+note = "Mid-November; presented at the DPG meeting in March 2027"
+
+[[event]]
+date = "2026-12-10"
+prize = "Nobel Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Peace in Oslo, all others in Stockholm"
+
+# ---------------------------------------------------------------- 2027
+
+[[event]]
+date = "2027-01-20"
+prize = "Japan Prize"
+kind = "announced"
+status = "projected"
+note = "Ceremony April, Tokyo"
+
+[[event]]
+date = "2027-01"
+prize = "Crafoord Prize"
+kind = "announced"
+status = "projected"
+note = "Late January; ceremony in May, Stockholm"
+
+[[event]]
+date = "2027-03"
+prize = "Max Planck Medal"
+kind = "ceremony"
+status = "projected"
+note = "DPG annual meeting; medal announced November 2026"
+
+[[event]]
+date = "2027-03-04"
+prize = "The Brain Prize"
+kind = "announced"
+status = "projected"
+note = "Ceremony May, Copenhagen"
+
+[[event]]
+date = "2027-03-17"
+prize = "Turing Award"
+kind = "announced"
+status = "projected"
+note = "Banquet June, San Francisco"
+
+[[event]]
+date = "2027-03-18"
+prize = "Abel Prize"
+kind = "announced"
+status = "projected"
+note = "Ceremony May, Oslo"
+
+[[event]]
+date = "2027-03-30"
+prize = "Canada Gairdner Awards"
+kind = "announced"
+status = "projected"
+note = "Gala in October"
+
+[[event]]
+date = "2027-04-13"
+prize = "Japan Prize"
+kind = "ceremony"
+status = "projected"
+note = "Tokyo"
+
+[[event]]
+date = "2027-04-17"
+prize = "Breakthrough Prize"
+kind = "both"
+status = "projected"
+note = "Santa Monica, California"
+
+[[event]]
+date = "2027-05-19"
+prize = "The Brain Prize"
+kind = "ceremony"
+status = "projected"
+note = "Copenhagen"
+
+[[event]]
+date = "2027-05-20"
+prize = "Crafoord Prize"
+kind = "ceremony"
+status = "projected"
+note = "Stockholm"
+
+[[event]]
+date = "2027-05-25"
+prize = "Abel Prize"
+kind = "ceremony"
+status = "projected"
+note = "Oslo"
+
+[[event]]
+date = "2027-05-26"
+prize = "Shaw Prize"
+kind = "announced"
+status = "projected"
+note = "Ceremony in October, Hong Kong"
+
+[[event]]
+date = "2027-06-12"
+prize = "Turing Award"
+kind = "ceremony"
+status = "projected"
+note = "ACM Awards Banquet, San Francisco"
+
+[[event]]
+date = "2027-06-18"
+prize = "Kyoto Prize"
+kind = "announced"
+status = "projected"
+note = "Ceremony 10 November, Kyoto"
+
+[[event]]
+date = "2027-06"
+prize = "Wolf Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Knesset, Jerusalem, for the 2026 laureates announced 4 October 2026"
+
+[[event]]
+date = "2027-06"
+prize = "Millennium Technology Prize"
+kind = "both"
+status = "confirmed"
+note = "Helsinki, May or June; winner decided December 2026; every two years"
+
+[[event]]
+date = "2027-09-08"
+prize = "Lasker Awards"
+kind = "announced"
+status = "projected"
+note = "Ceremony in September, New York"
+
+[[event]]
+date = "2027-09-16"
+prize = "Lasker Awards"
+kind = "ceremony"
+status = "projected"
+note = "New York"
+
+[[event]]
+date = "2027-10-04"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Physiology or Medicine; first full week of October; ceremony 10 December"
+
+[[event]]
+date = "2027-10-05"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Physics"
+
+[[event]]
+date = "2027-10-06"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Chemistry"
+
+[[event]]
+date = "2027-10-07"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Literature"
+
+[[event]]
+date = "2027-10-08"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Peace"
+
+[[event]]
+date = "2027-10-11"
+prize = "Nobel Prize"
+kind = "announced"
+status = "projected"
+note = "Economic Sciences (Sveriges Riksbank Prize)"
+
+[[event]]
+date = "2027-10"
+prize = "Wolf Prize"
+kind = "announced"
+status = "projected"
+note = "The 2026 cycle announced in October; earlier cycles in February. Confirm before relying on this"
+
+[[event]]
+date = "2027-10"
+prize = "Shaw Prize"
+kind = "ceremony"
+status = "projected"
+note = "Hong Kong"
+
+[[event]]
+date = "2027-10-21"
+prize = "Canada Gairdner Awards"
+kind = "ceremony"
+status = "projected"
+note = "Gala"
+
+[[event]]
+date = "2027-11-10"
+prize = "Kyoto Prize"
+kind = "ceremony"
+status = "projected"
+note = "Kyoto, every year on 10 November"
+
+[[event]]
+date = "2027-11"
+prize = "Max Planck Medal"
+kind = "announced"
+status = "projected"
+note = "Mid-November; presented March 2028"
+
+[[event]]
+date = "2027-12-10"
+prize = "Nobel Prize"
+kind = "ceremony"
+status = "projected"
+note = "Peace in Oslo, all others in Stockholm"

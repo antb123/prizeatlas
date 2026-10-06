@@ -4043,6 +4043,13 @@ def write_sitemaps(
     return len(locations)
 
 
+def write_calendar(output: Path, website_dir: Path) -> list[str]:
+    """Copy the pre-rendered award calendar (scripts/build_calendar.py) to /awards/calendar/ and return its routes."""
+    source = website_dir / "calendar"
+    shutil.copytree(source, output / "awards" / "calendar", ignore=shutil.ignore_patterns("events.toml"))
+    return [f"{AWARDS_ROUTE}calendar/{path.name}/" for path in sorted(source.iterdir()) if path.is_dir()]
+
+
 def write_robots(output: Path, base_url: str) -> None:
     body = f"User-agent: *\nAllow: /\n\nSitemap: {public_url(base_url, '/sitemap.xml')}\n"
     (output / "robots.txt").write_text(body, encoding="utf-8")
@@ -4662,7 +4669,8 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR, en
                 plan.jobs,
             )
             list(rendered)
-        write_sitemaps(staging, (job.route for job in plan.jobs), normalized_base_url)
+        calendar_routes = write_calendar(staging, website_dir)
+        write_sitemaps(staging, [*(job.route for job in plan.jobs), *calendar_routes], normalized_base_url)
         write_robots(staging, normalized_base_url)
         write_dataset_csv(staging, records)
         for language in languages:
