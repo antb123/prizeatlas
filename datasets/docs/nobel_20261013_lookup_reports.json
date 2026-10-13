@@ -1,0 +1,284 @@
+{
+  "authors": {
+    "results": [
+      {
+        "award_record_id": "nobel-001030",
+        "laureate_wikidata_qid": "Q20942818",
+        "reason": "exact Wikidata claim verified",
+        "sources": {
+          "openalex": "https://api.openalex.org/authors/orcid:0000-0001-6224-2417",
+          "openalex_p10283": "https://api.openalex.org/authors/A5023747159",
+          "wikidata": "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q20942818&props=claims&format=json"
+        },
+        "status": "confirmed",
+        "updates": {
+          "author_openalex_id": "A5023747159",
+          "orc_id": "0000-0001-6224-2417"
+        }
+      },
+      {
+        "award_record_id": "nobel-001031",
+        "laureate_wikidata_qid": "Q354979",
+        "reason": "exact Wikidata claim verified",
+        "sources": {
+          "openalex_p10283": "https://api.openalex.org/authors/A5049578590",
+          "wikidata": "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q354979&props=claims&format=json"
+        },
+        "status": "confirmed",
+        "updates": {
+          "author_openalex_id": "A5049578590"
+        }
+      },
+      {
+        "award_record_id": "nobel-001032",
+        "laureate_wikidata_qid": "Q24284511",
+        "reason": "exact Wikidata claim verified",
+        "sources": {
+          "openalex": "https://api.openalex.org/authors/orcid:0000-0002-8060-444X",
+          "openalex_p10283": "https://api.openalex.org/authors/A5058976206",
+          "wikidata": "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q24284511&props=claims&format=json"
+        },
+        "status": "confirmed",
+        "updates": {
+          "author_openalex_id": "A5058976206",
+          "orc_id": "0000-0002-8060-444X"
+        }
+      }
+    ],
+    "version": 1
+  },
+  "ror": [
+    {
+      "report_version": 1,
+      "mode": "preview",
+      "database": "awards.sqlite3",
+      "processed": 2,
+      "status_totals": {
+        "confirmed": 2,
+        "blocked_missing_name": 0,
+        "blocked_missing_qid": 0,
+        "blocked_qid_name_conflict": 0,
+        "blocked_name_qid_conflict": 0,
+        "blocked_withdrawn": 0,
+        "abstained_not_found": 0,
+        "abstained_ambiguous": 0,
+        "unchanged": 0
+      },
+      "results": [
+        {
+          "award_record_id": "nobel-001030",
+          "affiliation_name": "University of Wisconsin–Madison",
+          "affiliation_city": "Madison",
+          "affiliation_country": "United States",
+          "affiliation_wikidata_qid": "Q838330",
+          "affiliate_ror": "",
+          "status": "confirmed",
+          "reason": "one active ROR record contains exact Wikidata ID Q838330",
+          "updates": {
+            "affiliate_ror": "01y2jtd41"
+          },
+          "source_url": "https://api.ror.org/v2/organizations",
+          "ror_records": [
+            {
+              "source_url": "https://ror.org/01y2jtd41",
+              "ror_id": "01y2jtd41",
+              "ror_display_name": "University of Wisconsin–Madison",
+              "ror_status": "active",
+              "wikidata_external_ids": [
+                "Q838330",
+                "Q33122195",
+                "Q7662222"
+              ],
+              "ror_locations": [
+                {
+                  "city": "Madison",
+                  "country": "United States",
+                  "country_code": "US"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "award_record_id": "nobel-001032",
+          "affiliation_name": "Tokyo University of Science",
+          "affiliation_city": "Tokyo",
+          "affiliation_country": "Japan",
+          "affiliation_wikidata_qid": "Q1069994",
+          "affiliate_ror": "",
+          "status": "confirmed",
+          "reason": "one active ROR record contains exact Wikidata ID Q1069994",
+          "updates": {
+            "affiliate_ror": "05sj3n476"
+          },
+          "source_url": "https://api.ror.org/v2/organizations",
+          "ror_records": [
+            {
+              "source_url": "https://ror.org/05sj3n476",
+              "ror_id": "05sj3n476",
+              "ror_display_name": "Tokyo University of Science",
+              "ror_status": "active",
+              "wikidata_external_ids": [
+                "Q1069994",
+                "Q39754831"
+              ],
+              "ror_locations": [
+                {
+                  "city": "Tokyo",
+                  "country": "Japan",
+                  "country_code": "JP"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report_version": 1,
+      "mode": "preview",
+      "database": "awards.sqlite3",
+      "processed": 1,
+      "status_totals": {
+        "confirmed": 1,
+        "blocked_missing_name": 0,
+        "blocked_missing_qid": 0,
+        "blocked_qid_name_conflict": 0,
+        "blocked_name_qid_conflict": 0,
+        "blocked_withdrawn": 0,
+        "abstained_not_found": 0,
+        "abstained_ambiguous": 0,
+        "unchanged": 0
+      },
+      "results": [
+        {
+          "award_record_id": "nobel-001031",
+          "affiliation_name": "Paris-Sud University",
+          "affiliation_city": "",
+          "affiliation_country": "France",
+          "affiliation_wikidata_qid": "Q1480643",
+          "affiliate_ror": "",
+          "status": "confirmed",
+          "reason": "one inactive ROR record contains exact Wikidata ID Q1480643",
+          "updates": {
+            "affiliate_ror": "028rypz17"
+          },
+          "source_url": "https://api.ror.org/v2/organizations",
+          "ror_records": [
+            {
+              "source_url": "https://ror.org/028rypz17",
+              "ror_id": "028rypz17",
+              "ror_display_name": "Université Paris-Sud",
+              "ror_status": "inactive",
+              "wikidata_external_ids": [
+                "Q1480643"
+              ],
+              "ror_locations": [
+                {
+                  "city": "Orsay",
+                  "country": "France",
+                  "country_code": "FR"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openalex": [
+    {
+      "report_version": 1,
+      "mode": "preview",
+      "database": "awards.sqlite3",
+      "processed": 2,
+      "status_totals": {
+        "confirmed": 2,
+        "blocked_missing_name": 0,
+        "blocked_missing_qid": 0,
+        "blocked_missing_ror": 0,
+        "blocked_qid_name_conflict": 0,
+        "blocked_name_qid_conflict": 0,
+        "abstained_not_found": 0,
+        "unchanged": 0
+      },
+      "results": [
+        {
+          "award_record_id": "nobel-001030",
+          "affiliation_name": "University of Wisconsin–Madison",
+          "affiliation_wikidata_qid": "Q838330",
+          "affiliate_ror": "01y2jtd41",
+          "institution_openalex_id": "",
+          "status": "confirmed",
+          "reason": "OpenAlex returned institution I135310074 echoing ROR 01y2jtd41",
+          "updates": {
+            "institution_openalex_id": "I135310074"
+          },
+          "request_url": "https://api.openalex.org/institutions/https%3A%2F%2Fror.org%2F01y2jtd41",
+          "openalex_record": {
+            "id": "https://openalex.org/I135310074",
+            "display_name": "University of Wisconsin–Madison",
+            "ror": "https://ror.org/01y2jtd41",
+            "compact_openalex_id": "I135310074"
+          }
+        },
+        {
+          "award_record_id": "nobel-001032",
+          "affiliation_name": "Tokyo University of Science",
+          "affiliation_wikidata_qid": "Q1069994",
+          "affiliate_ror": "05sj3n476",
+          "institution_openalex_id": "",
+          "status": "confirmed",
+          "reason": "OpenAlex returned institution I161296585 echoing ROR 05sj3n476",
+          "updates": {
+            "institution_openalex_id": "I161296585"
+          },
+          "request_url": "https://api.openalex.org/institutions/https%3A%2F%2Fror.org%2F05sj3n476",
+          "openalex_record": {
+            "id": "https://openalex.org/I161296585",
+            "display_name": "Tokyo University of Science",
+            "ror": "https://ror.org/05sj3n476",
+            "compact_openalex_id": "I161296585"
+          }
+        }
+      ]
+    },
+    {
+      "report_version": 1,
+      "mode": "preview",
+      "database": "awards.sqlite3",
+      "processed": 1,
+      "status_totals": {
+        "confirmed": 1,
+        "blocked_missing_name": 0,
+        "blocked_missing_qid": 0,
+        "blocked_missing_ror": 0,
+        "blocked_qid_name_conflict": 0,
+        "blocked_name_qid_conflict": 0,
+        "abstained_not_found": 0,
+        "unchanged": 0
+      },
+      "results": [
+        {
+          "award_record_id": "nobel-001031",
+          "affiliation_name": "Paris-Sud University",
+          "affiliation_wikidata_qid": "Q1480643",
+          "affiliate_ror": "028rypz17",
+          "institution_openalex_id": "",
+          "status": "confirmed",
+          "reason": "OpenAlex returned institution I102197404 echoing ROR 028rypz17",
+          "updates": {
+            "institution_openalex_id": "I102197404"
+          },
+          "request_url": "https://api.openalex.org/institutions/https%3A%2F%2Fror.org%2F028rypz17",
+          "openalex_record": {
+            "id": "https://openalex.org/I102197404",
+            "display_name": "Université Paris-Sud",
+            "ror": "https://ror.org/028rypz17",
+            "compact_openalex_id": "I102197404"
+          }
+        }
+      ]
+    }
+  ]
+}
