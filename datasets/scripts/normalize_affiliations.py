@@ -54,6 +54,8 @@ from pathlib import Path
 #   CSIRO, Division of Marine Research                       government research agency
 #   Laboratories of the Division of Medicine..., Rockefeller foundation, not a university
 #   St. Petersburg Department of the Steklov Institute       research institute
+#   Basel Institute for Immunology                           independent research institute, dissolved 2000; Wikidata lists no parent
+#   Institute of Molecular and Clinical Ophthalmology Basel  independent nonprofit; Wikidata lists no parent
 #
 # Hospitals stay standalone even when closely tied to a university: Massachusetts General, Brigham and Women's,
 # Mayo Clinic and St. Jude are legally independent of the schools they teach for.
@@ -250,6 +252,8 @@ AFFILIATIONS = {
     "University of California San Diego, School of Medicine, Department of Pediatrics": ("University of California, San Diego", "School of Medicine, Department of Pediatrics"),
     "Ruijin Hospital, School of Medicine, Shanghai Jiao Tong University": ("Shanghai Jiao Tong University", "Ruijin Hospital, School of Medicine"),
     "CNRS (VERIMAG)": ("Centre National de la Recherche Scientifique", "VERIMAG"),
+    # A department of the University of Basel: Wikidata Q864916 names it a division, with parent Q372608.
+    "Biozentrum University of Basel": ("University of Basel", "Biozentrum"),
 }
 
 
