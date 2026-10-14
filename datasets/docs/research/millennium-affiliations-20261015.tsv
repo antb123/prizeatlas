@@ -1,0 +1,20 @@
+award_record_id	affiliation_name	affiliation_sub_name	affiliation_country	affiliation_wikidata_qid	source	confidence	notes
+millennium_technology_prize-000002	University of California	University of California, Santa Barbara	United States	Q184478	Curator supplied 20261015	confirmed	Campus Q263064 rolls up to UC parent; https://news.ucsb.edu/2006/012148/2006-millennium-technology-prize-awarded-ucsbs-shuji-nakamura .
+millennium_technology_prize-000003	Massachusetts Institute of Technology		United States	Q49108	Curator supplied 20261015	confirmed	https://news.mit.edu/2008/langer-millennium-0611 .
+millennium_technology_prize-000014	Thales Group	Thales Research & Technology	France	Q1161666	Curator supplied 20261015	confirmed	Supplied QID identifies parent Thales Group; unit preserved separately.
+millennium_technology_prize-000015	Bell Labs		United States	Q217365	Curator supplied 20261015	confirmed	Verified English Wikipedia title Bell Labs; ownership label Alcatel-Lucent omitted from institution name.
+millennium_technology_prize-000016	University of Southampton		United Kingdom	Q76473	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000017	University of Southern California		United States	Q4614	Curator supplied 20261015	confirmed	Emeritus role retained here; not part of institution name.
+millennium_technology_prize-000018	University of Leicester		United Kingdom	Q1333399	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000004	École Polytechnique Fédérale de Lausanne		Switzerland	Q262760	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000019	University of Cambridge		United Kingdom	Q35794	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000020	University of Manchester		United Kingdom	Q230899	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000005	Linux Foundation		United States	Q858851	Curator supplied 20261015	confirmed	Verified organization item and English Wikipedia title.
+millennium_technology_prize-000006	Kyoto University		Japan	Q336264	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000007	Max Planck Society	Max Planck Institute for Microstructure Physics	Germany	Q158085	Curator supplied 20261015	confirmed	Supplied institute Q1912088 has parent P361=Q158085; preserve official unit name separately.
+millennium_technology_prize-000008	California Institute of Technology		United States	Q161562	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000009	Picosun Oy		Finland	Q30284964	Curator supplied 20261015 and official prize interview	confirmed	No English Wikipedia article: official company name retained. Board membership confirmed https://millenniumprize.org/news-articles/news/interview-with-the-2018-millennium-winner/ ; identity crosswalk https://api.ror.org/v2/organizations/02tf6tv07 links Q30284964 to picosun.com and Espoo, Finland. ROR ID not written.
+millennium_technology_prize-000010	University of Cambridge		United Kingdom	Q35794	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000011	University of Cambridge		United Kingdom	Q35794	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000012	University of New South Wales		Australia	Q734764	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.
+millennium_technology_prize-000013	North Carolina State University		United States	Q1132346	Curator supplied 20261015	confirmed	Verified institution item and English Wikipedia title.

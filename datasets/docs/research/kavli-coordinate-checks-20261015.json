@@ -1,0 +1,2000 @@
+[
+  {
+    "award_record_id": "kavli_prize-000001",
+    "lookup_qid": "Q6039897",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.0934,
+          52.2141
+        ]
+      },
+      "properties": {
+        "query": "Q6039897",
+        "wikidata_id": "Q6039897",
+        "label": "Institute of Astronomy, Cambridge",
+        "description": "astronomy department of the University of Cambridge",
+        "match_method": "qid",
+        "dataset_coordinates": "0.0934,52.2141",
+        "source": "https://www.wikidata.org/wiki/Q6039897"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United Kingdom",
+      "results": [
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, United Kingdom",
+          "osm_type": "relation",
+          "osm_id": 295355,
+          "longitude": 0.1391537,
+          "latitude": 52.1975846,
+          "dataset_coordinates": "0.1392,52.1976"
+        },
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 3NR, United Kingdom",
+          "osm_type": "node",
+          "osm_id": 20971094,
+          "longitude": 0.1186637,
+          "latitude": 52.2055314,
+          "dataset_coordinates": "0.1187,52.2055"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "England",
+      "country": "United Kingdom",
+      "country_code": "gb",
+      "display_name": "Madingley Rise, Eddington, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB3 0DY, United Kingdom",
+      "osm_type": "node",
+      "osm_id": 1505302821
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000002",
+    "lookup_qid": "Q161562",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.1244,
+          34.1385
+        ]
+      },
+      "properties": {
+        "query": "Q161562",
+        "wikidata_id": "Q161562",
+        "label": "California Institute of Technology",
+        "description": "private research university located in Pasadena, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.1244,34.1385",
+        "source": "https://www.wikidata.org/wiki/Q161562"
+      }
+    },
+    "nominatim": {
+      "city": "Pasadena",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Pasadena, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 3529725,
+          "longitude": -118.144155,
+          "latitude": 34.1476507,
+          "dataset_coordinates": "-118.1442,34.1477"
+        },
+        {
+          "display_name": "Pasadena, Harris County, Texas, United States",
+          "osm_type": "relation",
+          "osm_id": 115365,
+          "longitude": -95.2092076,
+          "latitude": 29.6910753,
+          "dataset_coordinates": "-95.2092,29.6911"
+        },
+        {
+          "display_name": "Pasadena, Anne Arundel County, Maryland, 21122, United States",
+          "osm_type": "node",
+          "osm_id": 158561282,
+          "longitude": -76.5490844,
+          "latitude": 39.1361859,
+          "dataset_coordinates": "-76.5491,39.1362"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Pasadena",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "San Pasqual Walk, Pasadena Council District 7, Pasadena, Los Angeles County, California, 91125, United States",
+      "osm_type": "node",
+      "osm_id": 7871792657
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000003",
+    "lookup_qid": "Q503419",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.9525,
+          32.2319
+        ]
+      },
+      "properties": {
+        "query": "Q503419",
+        "wikidata_id": "Q503419",
+        "label": "University of Arizona",
+        "description": "public university in Tucson, Arizona, United States",
+        "match_method": "qid",
+        "dataset_coordinates": "-110.9525,32.2319",
+        "source": "https://www.wikidata.org/wiki/Q503419"
+      }
+    },
+    "nominatim": {
+      "city": "Tucson",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Tucson, Pima County, Arizona, United States",
+          "osm_type": "relation",
+          "osm_id": 253824,
+          "longitude": -110.974847,
+          "latitude": 32.2228765,
+          "dataset_coordinates": "-110.9748,32.2229"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Tucson",
+      "state": "Arizona",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Cork n' Craft, 1303, East University Boulevard, Tucson, Pima County, Arizona, 85719, United States",
+      "osm_type": "node",
+      "osm_id": 391934287
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000004",
+    "lookup_qid": "Q1047293",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.0608,
+          36.9914
+        ]
+      },
+      "properties": {
+        "query": "Q1047293",
+        "wikidata_id": "Q1047293",
+        "label": "University of California, Santa Cruz",
+        "description": "public University of California campus in Santa Cruz",
+        "match_method": "qid",
+        "dataset_coordinates": "-122.0608,36.9914",
+        "source": "https://www.wikidata.org/wiki/Q1047293"
+      }
+    },
+    "nominatim": {
+      "city": "Santa Cruz",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Santa Cruz, Santa Cruz County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 111737,
+          "longitude": -122.0294673,
+          "latitude": 36.9743626,
+          "dataset_coordinates": "-122.0295,36.9744"
+        },
+        {
+          "display_name": "Santa Cruz, Sells District, Pima County, Arizona, United States",
+          "osm_type": "node",
+          "osm_id": 150975166,
+          "longitude": -111.90707,
+          "latitude": 32.0345181,
+          "dataset_coordinates": "-111.9071,32.0345"
+        },
+        {
+          "display_name": "Santa Cruz, Santa Fe County, New Mexico, United States",
+          "osm_type": "relation",
+          "osm_id": 171134,
+          "longitude": -106.047302,
+          "latitude": 35.9922268,
+          "dataset_coordinates": "-106.0473,35.9922"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Santa Cruz",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Meadow Chair View, The Webster Way (downhill), University, Santa Cruz, Santa Cruz County, California, 95064, United States",
+      "osm_type": "node",
+      "osm_id": 6237581186
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000006",
+    "lookup_qid": "Q161562",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.1244,
+          34.1385
+        ]
+      },
+      "properties": {
+        "query": "Q161562",
+        "wikidata_id": "Q161562",
+        "label": "California Institute of Technology",
+        "description": "private research university located in Pasadena, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.1244,34.1385",
+        "source": "https://www.wikidata.org/wiki/Q161562"
+      }
+    },
+    "nominatim": {
+      "city": "Pasadena",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Pasadena, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 3529725,
+          "longitude": -118.144155,
+          "latitude": 34.1476507,
+          "dataset_coordinates": "-118.1442,34.1477"
+        },
+        {
+          "display_name": "Pasadena, Harris County, Texas, United States",
+          "osm_type": "relation",
+          "osm_id": 115365,
+          "longitude": -95.2092076,
+          "latitude": 29.6910753,
+          "dataset_coordinates": "-95.2092,29.6911"
+        },
+        {
+          "display_name": "Pasadena, Anne Arundel County, Maryland, 21122, United States",
+          "osm_type": "node",
+          "osm_id": 158561282,
+          "longitude": -76.5490844,
+          "latitude": 39.1361859,
+          "dataset_coordinates": "-76.5491,39.1362"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Pasadena",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "San Pasqual Walk, Pasadena Council District 7, Pasadena, Los Angeles County, California, 91125, United States",
+      "osm_type": "node",
+      "osm_id": 7871792657
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000007",
+    "lookup_qid": "Q174710",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.4428,
+          34.0722
+        ]
+      },
+      "properties": {
+        "query": "Q174710",
+        "wikidata_id": "Q174710",
+        "label": "University of California, Los Angeles",
+        "description": "public university in Los Angeles, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.4428,34.0722",
+        "source": "https://www.wikidata.org/wiki/Q174710"
+      }
+    },
+    "nominatim": {
+      "city": "Los Angeles",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Los Angeles, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 207359,
+          "longitude": -118.2427676,
+          "latitude": 34.0536923,
+          "dataset_coordinates": "-118.2428,34.0537"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Los Angeles",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Janss Steps, Westwood, Los Angeles, Los Angeles County, California, 90095, United States",
+      "osm_type": "node",
+      "osm_id": 14095955995
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000008",
+    "lookup_qid": "Q3138607",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.2674,
+          42.459
+        ]
+      },
+      "properties": {
+        "query": "Q3138607",
+        "wikidata_id": "Q3138607",
+        "label": "MIT Lincoln Laboratory",
+        "description": "research and development center",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.2674,42.4590",
+        "source": "https://www.wikidata.org/wiki/Q3138607"
+      }
+    },
+    "nominatim": {
+      "city": "Lexington",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Lexington, Fayette County, Kentucky, United States",
+          "osm_type": "relation",
+          "osm_id": 11078268,
+          "longitude": -84.4970393,
+          "latitude": 38.0464066,
+          "dataset_coordinates": "-84.4970,38.0464"
+        },
+        {
+          "display_name": "Lexington, Virginia, United States",
+          "osm_type": "relation",
+          "osm_id": 206868,
+          "longitude": -79.4428157,
+          "latitude": 37.7840208,
+          "dataset_coordinates": "-79.4428,37.7840"
+        },
+        {
+          "display_name": "Lexington, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1840167,
+          "longitude": -71.2245003,
+          "latitude": 42.4473175,
+          "dataset_coordinates": "-71.2245,42.4473"
+        },
+        {
+          "display_name": "Lexington, Davidson County, North Carolina, 27792, United States",
+          "osm_type": "relation",
+          "osm_id": 180189,
+          "longitude": -80.2533838,
+          "latitude": 35.8240265,
+          "dataset_coordinates": "-80.2534,35.8240"
+        },
+        {
+          "display_name": "Lexington, Dawson County, Nebraska, 68850, United States",
+          "osm_type": "relation",
+          "osm_id": 169271,
+          "longitude": -99.7414869,
+          "latitude": 40.7788486,
+          "dataset_coordinates": "-99.7415,40.7788"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Lexington",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "S Building, 244, Wood Street, Lexington, Middlesex County, Massachusetts, 01731, United States",
+      "osm_type": "way",
+      "osm_id": 143736667
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000009",
+    "lookup_qid": "Q49108",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0919,
+          42.3597
+        ]
+      },
+      "properties": {
+        "query": "Q49108",
+        "wikidata_id": "Q49108",
+        "label": "Massachusetts Institute of Technology",
+        "description": "private university in Cambridge, Massachusetts, USA, founded 1861",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.0919,42.3597",
+        "source": "https://www.wikidata.org/wiki/Q49108"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United States",
+      "state": "Massachusetts",
+      "results": [
+        {
+          "display_name": "Cambridge, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1933745,
+          "longitude": -71.1040018,
+          "latitude": 42.3656347,
+          "dataset_coordinates": "-71.1040,42.3656"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "10, 222, Memorial Drive, MIT, Cambridge, Middlesex County, Massachusetts, 02142, United States",
+      "osm_type": "way",
+      "osm_id": 32517642
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000010",
+    "lookup_qid": "Q41506",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.1703,
+          37.4275
+        ]
+      },
+      "properties": {
+        "query": "Q41506",
+        "wikidata_id": "Q41506",
+        "label": "Stanford University",
+        "description": "private research university in Stanford, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-122.1703,37.4275",
+        "source": "https://www.wikidata.org/wiki/Q41506"
+      }
+    },
+    "nominatim": {
+      "city": "Stanford",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Stanford, Santa Clara County, California, 94305, United States",
+          "osm_type": "node",
+          "osm_id": 150934500,
+          "longitude": -122.1702445,
+          "latitude": 37.427467,
+          "dataset_coordinates": "-122.1702,37.4275"
+        },
+        {
+          "display_name": "Stanford, Lincoln County, Kentucky, United States",
+          "osm_type": "relation",
+          "osm_id": 130601,
+          "longitude": -84.6618876,
+          "latitude": 37.5311646,
+          "dataset_coordinates": "-84.6619,37.5312"
+        },
+        {
+          "display_name": "Stanford, Judith Basin County, Montana, United States",
+          "osm_type": "relation",
+          "osm_id": 142518,
+          "longitude": -110.2174252,
+          "latitude": 47.1537394,
+          "dataset_coordinates": "-110.2174,47.1537"
+        },
+        {
+          "display_name": "Town of Stanford, Dutchess County, New York, United States",
+          "osm_type": "relation",
+          "osm_id": 3233064,
+          "longitude": -73.703333,
+          "latitude": 41.883889,
+          "dataset_coordinates": "-73.7033,41.8839"
+        },
+        {
+          "display_name": "Stanford, McLean County, Illinois, United States",
+          "osm_type": "relation",
+          "osm_id": 126775,
+          "longitude": -89.2178643,
+          "latitude": 40.4347608,
+          "dataset_coordinates": "-89.2179,40.4348"
+        }
+      ]
+    },
+    "reverse": {
+      "city": null,
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Inner Quad, Stanford, Santa Clara County, California, 94305, United States",
+      "osm_type": "relation",
+      "osm_id": 9701233
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000011",
+    "lookup_qid": "Q688932",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          38.3867,
+          56.0129
+        ]
+      },
+      "properties": {
+        "query": "Q688932",
+        "wikidata_id": "Q688932",
+        "label": "Landau Institute for Theoretical Physics",
+        "description": "Russian research institution",
+        "match_method": "qid",
+        "dataset_coordinates": "38.3867,56.0129",
+        "source": "https://www.wikidata.org/wiki/Q688932"
+      }
+    },
+    "nominatim": {
+      "city": "Chernogolovka",
+      "country": "Russia",
+      "results": [
+        {
+          "display_name": "Черноголовка, городской округ Черноголовка, Московская область, Центральный федеральный округ, 142432, Россия",
+          "osm_type": "way",
+          "osm_id": 35263712,
+          "longitude": 38.3835224,
+          "latitude": 56.0061165,
+          "dataset_coordinates": "38.3835,56.0061"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Черноголовка",
+      "state": "Московская область",
+      "country": "Россия",
+      "country_code": "ru",
+      "display_name": "ИТФ им Ландау, 1А, проспект Академика Семёнова, Черноголовка, городской округ Черноголовка, Московская область, Центральный федеральный округ, 142432, Россия",
+      "osm_type": "way",
+      "osm_id": 52068261
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000012",
+    "lookup_qid": "Q161562",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.1244,
+          34.1385
+        ]
+      },
+      "properties": {
+        "query": "Q161562",
+        "wikidata_id": "Q161562",
+        "label": "California Institute of Technology",
+        "description": "private research university located in Pasadena, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.1244,34.1385",
+        "source": "https://www.wikidata.org/wiki/Q161562"
+      }
+    },
+    "nominatim": {
+      "city": "Pasadena",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Pasadena, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 3529725,
+          "longitude": -118.144155,
+          "latitude": 34.1476507,
+          "dataset_coordinates": "-118.1442,34.1477"
+        },
+        {
+          "display_name": "Pasadena, Harris County, Texas, United States",
+          "osm_type": "relation",
+          "osm_id": 115365,
+          "longitude": -95.2092076,
+          "latitude": 29.6910753,
+          "dataset_coordinates": "-95.2092,29.6911"
+        },
+        {
+          "display_name": "Pasadena, Anne Arundel County, Maryland, 21122, United States",
+          "osm_type": "node",
+          "osm_id": 158561282,
+          "longitude": -76.5490844,
+          "latitude": 39.1361859,
+          "dataset_coordinates": "-76.5491,39.1362"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Pasadena",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "San Pasqual Walk, Pasadena Council District 7, Pasadena, Los Angeles County, California, 91125, United States",
+      "osm_type": "node",
+      "osm_id": 7871792657
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000013",
+    "lookup_qid": "Q161562",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.1244,
+          34.1385
+        ]
+      },
+      "properties": {
+        "query": "Q161562",
+        "wikidata_id": "Q161562",
+        "label": "California Institute of Technology",
+        "description": "private research university located in Pasadena, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.1244,34.1385",
+        "source": "https://www.wikidata.org/wiki/Q161562"
+      }
+    },
+    "nominatim": {
+      "city": "Pasadena",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Pasadena, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 3529725,
+          "longitude": -118.144155,
+          "latitude": 34.1476507,
+          "dataset_coordinates": "-118.1442,34.1477"
+        },
+        {
+          "display_name": "Pasadena, Harris County, Texas, United States",
+          "osm_type": "relation",
+          "osm_id": 115365,
+          "longitude": -95.2092076,
+          "latitude": 29.6910753,
+          "dataset_coordinates": "-95.2092,29.6911"
+        },
+        {
+          "display_name": "Pasadena, Anne Arundel County, Maryland, 21122, United States",
+          "osm_type": "node",
+          "osm_id": 158561282,
+          "longitude": -76.5490844,
+          "latitude": 39.1361859,
+          "dataset_coordinates": "-76.5491,39.1362"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Pasadena",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "San Pasqual Walk, Pasadena Council District 7, Pasadena, Los Angeles County, California, 91125, United States",
+      "osm_type": "node",
+      "osm_id": 7871792657
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000014",
+    "lookup_qid": "Q49108",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0919,
+          42.3597
+        ]
+      },
+      "properties": {
+        "query": "Q49108",
+        "wikidata_id": "Q49108",
+        "label": "Massachusetts Institute of Technology",
+        "description": "private university in Cambridge, Massachusetts, USA, founded 1861",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.0919,42.3597",
+        "source": "https://www.wikidata.org/wiki/Q49108"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United States",
+      "state": "Massachusetts",
+      "results": [
+        {
+          "display_name": "Cambridge, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1933745,
+          "longitude": -71.1040018,
+          "latitude": 42.3656347,
+          "dataset_coordinates": "-71.1040,42.3656"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "10, 222, Memorial Drive, MIT, Cambridge, Middlesex County, Massachusetts, 02142, United States",
+      "osm_type": "way",
+      "osm_id": 32517642
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000015",
+    "lookup_qid": "Q156598",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.4853,
+          52.1569
+        ]
+      },
+      "properties": {
+        "query": "Q156598",
+        "wikidata_id": "Q156598",
+        "label": "Leiden University",
+        "description": "public university in the Netherlands",
+        "match_method": "qid",
+        "dataset_coordinates": "4.4853,52.1569",
+        "source": "https://www.wikidata.org/wiki/Q156598"
+      }
+    },
+    "nominatim": {
+      "city": "Leiden",
+      "country": "Netherlands",
+      "results": [
+        {
+          "display_name": "Leiden, Zuid-Holland, Nederland",
+          "osm_type": "relation",
+          "osm_id": 444400,
+          "longitude": 4.4811089,
+          "latitude": 52.1518157,
+          "dataset_coordinates": "4.4811,52.1518"
+        },
+        {
+          "display_name": "Leiden, Zuid-Holland, Nederland",
+          "osm_type": "relation",
+          "osm_id": 295092,
+          "longitude": 4.4908843,
+          "latitude": 52.1594747,
+          "dataset_coordinates": "4.4909,52.1595"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Leiden",
+      "state": "Zuid-Holland",
+      "country": "Nederland",
+      "country_code": "nl",
+      "display_name": "4, Nonnensteeg, Academiewijk, Binnenstad, Leiden, Zuid-Holland, Nederland, 2311 VJ, Nederland",
+      "osm_type": "node",
+      "osm_id": 2774034656
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000016",
+    "lookup_qid": "Q35794",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.1132,
+          52.2054
+        ]
+      },
+      "properties": {
+        "query": "Q35794",
+        "wikidata_id": "Q35794",
+        "label": "University of Cambridge",
+        "description": "collegiate public research university in Cambridge, England, United Kingdom",
+        "match_method": "qid",
+        "dataset_coordinates": "0.1132,52.2054",
+        "source": "https://www.wikidata.org/wiki/Q35794"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United Kingdom",
+      "results": [
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, United Kingdom",
+          "osm_type": "relation",
+          "osm_id": 295355,
+          "longitude": 0.1391537,
+          "latitude": 52.1975846,
+          "dataset_coordinates": "0.1392,52.1976"
+        },
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 3NR, United Kingdom",
+          "osm_type": "node",
+          "osm_id": 20971094,
+          "longitude": 0.1186637,
+          "latitude": 52.2055314,
+          "dataset_coordinates": "0.1187,52.2055"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "England",
+      "country": "United Kingdom",
+      "country_code": "gb",
+      "display_name": "Divided Circle, Trinity Lane, Newnham, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 1TL, United Kingdom",
+      "osm_type": "node",
+      "osm_id": 3625255544
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000018",
+    "lookup_qid": "Q924265",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.2011,
+          56.1706
+        ]
+      },
+      "properties": {
+        "query": "Q924265",
+        "wikidata_id": "Q924265",
+        "label": "Aarhus University",
+        "description": "public university in Aarhus, Denmark",
+        "match_method": "qid",
+        "dataset_coordinates": "10.2011,56.1706",
+        "source": "https://www.wikidata.org/wiki/Q924265"
+      }
+    },
+    "nominatim": {
+      "city": "Aarhus",
+      "country": "Denmark",
+      "results": [
+        {
+          "display_name": "Aarhus, Aarhus Kommune, Region Midtjylland, 8000, Danmark",
+          "osm_type": "node",
+          "osm_id": 26559213,
+          "longitude": 10.2134046,
+          "latitude": 56.1496278,
+          "dataset_coordinates": "10.2134,56.1496"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Aarhus",
+      "state": "Region Midtjylland",
+      "country": "Danmark",
+      "country_code": "dk",
+      "display_name": "Victor Albecks Vej, Trøjborg, Aarhus, Aarhus Kommune, Region Midtjylland, 8000, Danmark",
+      "osm_type": "node",
+      "osm_id": 12752344103
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000019",
+    "lookup_qid": "Q174710",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.4428,
+          34.0722
+        ]
+      },
+      "properties": {
+        "query": "Q174710",
+        "wikidata_id": "Q174710",
+        "label": "University of California, Los Angeles",
+        "description": "public university in Los Angeles, California, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-118.4428,34.0722",
+        "source": "https://www.wikidata.org/wiki/Q174710"
+      }
+    },
+    "nominatim": {
+      "city": "Los Angeles",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Los Angeles, Los Angeles County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 207359,
+          "longitude": -118.2427676,
+          "latitude": 34.0536923,
+          "dataset_coordinates": "-118.2428,34.0537"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Los Angeles",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Janss Steps, Westwood, Los Angeles, Los Angeles County, California, 90095, United States",
+      "osm_type": "node",
+      "osm_id": 14095955995
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000020",
+    "lookup_qid": "Q13371",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1169,
+          42.3744
+        ]
+      },
+      "properties": {
+        "query": "Q13371",
+        "wikidata_id": "Q13371",
+        "label": "Harvard University",
+        "description": "private university in Cambridge, Massachusetts",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.1169,42.3744",
+        "source": "https://www.wikidata.org/wiki/Q13371"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United States",
+      "state": "Massachusetts",
+      "results": [
+        {
+          "display_name": "Cambridge, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1933745,
+          "longitude": -71.1040018,
+          "latitude": 42.3656347,
+          "dataset_coordinates": "-71.1040,42.3656"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "University Hall, 1, Harvard Yard, Mid-Cambridge, Cambridge, Middlesex County, Massachusetts, 02138, United States",
+      "osm_type": "way",
+      "osm_id": 29530618
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000021",
+    "lookup_qid": "Q49108",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0919,
+          42.3597
+        ]
+      },
+      "properties": {
+        "query": "Q49108",
+        "wikidata_id": "Q49108",
+        "label": "Massachusetts Institute of Technology",
+        "description": "private university in Cambridge, Massachusetts, USA, founded 1861",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.0919,42.3597",
+        "source": "https://www.wikidata.org/wiki/Q49108"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United States",
+      "state": "Massachusetts",
+      "results": [
+        {
+          "display_name": "Cambridge, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1933745,
+          "longitude": -71.1040018,
+          "latitude": 42.3656347,
+          "dataset_coordinates": "-71.1040,42.3656"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "10, 222, Memorial Drive, MIT, Cambridge, Middlesex County, Massachusetts, 02142, United States",
+      "osm_type": "way",
+      "osm_id": 32517642
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000022",
+    "lookup_qid": "Q35794",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.1132,
+          52.2054
+        ]
+      },
+      "properties": {
+        "query": "Q35794",
+        "wikidata_id": "Q35794",
+        "label": "University of Cambridge",
+        "description": "collegiate public research university in Cambridge, England, United Kingdom",
+        "match_method": "qid",
+        "dataset_coordinates": "0.1132,52.2054",
+        "source": "https://www.wikidata.org/wiki/Q35794"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United Kingdom",
+      "results": [
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, United Kingdom",
+          "osm_type": "relation",
+          "osm_id": 295355,
+          "longitude": 0.1391537,
+          "latitude": 52.1975846,
+          "dataset_coordinates": "0.1392,52.1976"
+        },
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 3NR, United Kingdom",
+          "osm_type": "node",
+          "osm_id": 20971094,
+          "longitude": 0.1186637,
+          "latitude": 52.2055314,
+          "dataset_coordinates": "0.1187,52.2055"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "England",
+      "country": "United Kingdom",
+      "country_code": "gb",
+      "display_name": "Divided Circle, Trinity Lane, Newnham, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 1TL, United Kingdom",
+      "osm_type": "node",
+      "osm_id": 3625255544
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000023",
+    "lookup_qid": "Q850730",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.5628,
+          53.2192
+        ]
+      },
+      "properties": {
+        "query": "Q850730",
+        "wikidata_id": "Q850730",
+        "label": "University of Groningen",
+        "description": "university in the Netherlands",
+        "match_method": "qid",
+        "dataset_coordinates": "6.5628,53.2192",
+        "source": "https://www.wikidata.org/wiki/Q850730"
+      }
+    },
+    "nominatim": {
+      "city": "Groningen",
+      "country": "Netherlands",
+      "results": [
+        {
+          "display_name": "Groningen, Nederland",
+          "osm_type": "relation",
+          "osm_id": 409863,
+          "longitude": 6.5680077,
+          "latitude": 53.2190652,
+          "dataset_coordinates": "6.5680,53.2191"
+        },
+        {
+          "display_name": "Groningen, Nederland",
+          "osm_type": "relation",
+          "osm_id": 409862,
+          "longitude": 6.5727542,
+          "latitude": 53.2096623,
+          "dataset_coordinates": "6.5728,53.2097"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Groningen",
+      "state": "Groningen",
+      "country": "Nederland",
+      "country_code": "nl",
+      "display_name": "Broerplein, Binnenstad-noord, Binnenstad, Centrum, Groningen, Nederland, 9712 CP, Nederland",
+      "osm_type": "node",
+      "osm_id": 5815039457
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000025",
+    "lookup_qid": "Q35794",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.1132,
+          52.2054
+        ]
+      },
+      "properties": {
+        "query": "Q35794",
+        "wikidata_id": "Q35794",
+        "label": "University of Cambridge",
+        "description": "collegiate public research university in Cambridge, England, United Kingdom",
+        "match_method": "qid",
+        "dataset_coordinates": "0.1132,52.2054",
+        "source": "https://www.wikidata.org/wiki/Q35794"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United Kingdom",
+      "results": [
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, United Kingdom",
+          "osm_type": "relation",
+          "osm_id": 295355,
+          "longitude": 0.1391537,
+          "latitude": 52.1975846,
+          "dataset_coordinates": "0.1392,52.1976"
+        },
+        {
+          "display_name": "Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 3NR, United Kingdom",
+          "osm_type": "node",
+          "osm_id": 20971094,
+          "longitude": 0.1186637,
+          "latitude": 52.2055314,
+          "dataset_coordinates": "0.1187,52.2055"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "England",
+      "country": "United Kingdom",
+      "country_code": "gb",
+      "display_name": "Divided Circle, Trinity Lane, Newnham, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 1TL, United Kingdom",
+      "osm_type": "node",
+      "osm_id": 3625255544
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000028",
+    "lookup_qid": "Q868421",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.8426,
+          33.6454
+        ]
+      },
+      "properties": {
+        "query": "Q868421",
+        "wikidata_id": "Q868421",
+        "label": "University of California, Irvine",
+        "description": "public research university in Irvine, California, United States",
+        "match_method": "qid",
+        "dataset_coordinates": "-117.8426,33.6454",
+        "source": "https://www.wikidata.org/wiki/Q868421"
+      }
+    },
+    "nominatim": {
+      "city": "Irvine",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Irvine, Orange County, California, United States",
+          "osm_type": "relation",
+          "osm_id": 114485,
+          "longitude": -117.825981,
+          "latitude": 33.6856969,
+          "dataset_coordinates": "-117.8260,33.6857"
+        },
+        {
+          "display_name": "Irvine, Estill County, Kentucky, United States",
+          "osm_type": "relation",
+          "osm_id": 130449,
+          "longitude": -83.973813,
+          "latitude": 37.700638,
+          "dataset_coordinates": "-83.9738,37.7006"
+        },
+        {
+          "display_name": "Irvine, Marion County, Florida, 34686, United States",
+          "osm_type": "node",
+          "osm_id": 154376654,
+          "longitude": -82.2512098,
+          "latitude": 29.4055273,
+          "dataset_coordinates": "-82.2512,29.4055"
+        },
+        {
+          "display_name": "Irvine, Brokenstraw Township, Warren County, Pennsylvania, 16329, United States",
+          "osm_type": "node",
+          "osm_id": 158396507,
+          "longitude": -79.2683812,
+          "latitude": 41.8392258,
+          "dataset_coordinates": "-79.2684,41.8392"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Irvine",
+      "state": "California",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Inner Ring, University of California, Irvine, Irvine, Orange County, California, 92697, United States",
+      "osm_type": "way",
+      "osm_id": 171169291
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000030",
+    "lookup_qid": "Q49108",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0919,
+          42.3597
+        ]
+      },
+      "properties": {
+        "query": "Q49108",
+        "wikidata_id": "Q49108",
+        "label": "Massachusetts Institute of Technology",
+        "description": "private university in Cambridge, Massachusetts, USA, founded 1861",
+        "match_method": "qid",
+        "dataset_coordinates": "-71.0919,42.3597",
+        "source": "https://www.wikidata.org/wiki/Q49108"
+      }
+    },
+    "nominatim": {
+      "city": "Cambridge",
+      "country": "United States",
+      "state": "Massachusetts",
+      "results": [
+        {
+          "display_name": "Cambridge, Middlesex County, Massachusetts, United States",
+          "osm_type": "relation",
+          "osm_id": 1933745,
+          "longitude": -71.1040018,
+          "latitude": 42.3656347,
+          "dataset_coordinates": "-71.1040,42.3656"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Cambridge",
+      "state": "Massachusetts",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "10, 222, Memorial Drive, MIT, Cambridge, Middlesex County, Massachusetts, 02142, United States",
+      "osm_type": "way",
+      "osm_id": 32517642
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000031",
+    "lookup_qid": "Q49213",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.7394,
+          30.2861
+        ]
+      },
+      "properties": {
+        "query": "Q49213",
+        "wikidata_id": "Q49213",
+        "label": "University of Texas at Austin",
+        "description": "public university in Austin, Texas, USA",
+        "match_method": "qid",
+        "dataset_coordinates": "-97.7394,30.2861",
+        "source": "https://www.wikidata.org/wiki/Q49213"
+      }
+    },
+    "nominatim": {
+      "city": "Austin",
+      "country": "United States",
+      "results": [
+        {
+          "display_name": "Austin, Travis County, Texas, United States",
+          "osm_type": "relation",
+          "osm_id": 113314,
+          "longitude": -97.7474086,
+          "latitude": 30.2649261,
+          "dataset_coordinates": "-97.7474,30.2649"
+        },
+        {
+          "display_name": "Austin, Mower County, Minnesota, 55912, United States",
+          "osm_type": "relation",
+          "osm_id": 137800,
+          "longitude": -92.9746498,
+          "latitude": 43.6679992,
+          "dataset_coordinates": "-92.9746,43.6680"
+        },
+        {
+          "display_name": "Austin, Lander County, Nevada, United States",
+          "osm_type": "node",
+          "osm_id": 150946632,
+          "longitude": -117.0714484,
+          "latitude": 39.4929853,
+          "dataset_coordinates": "-117.0714,39.4930"
+        },
+        {
+          "display_name": "Austin, Lonoke County, Arkansas, 72007, United States",
+          "osm_type": "relation",
+          "osm_id": 6017139,
+          "longitude": -91.9837552,
+          "latitude": 34.9984206,
+          "dataset_coordinates": "-91.9838,34.9984"
+        },
+        {
+          "display_name": "Austin, Chicago, West Chicago Township, Cook County, Illinois, United States",
+          "osm_type": "relation",
+          "osm_id": 7836417,
+          "longitude": -87.7648642,
+          "latitude": 41.8880316,
+          "dataset_coordinates": "-87.7649,41.8880"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Main Building, 110, Inner Campus Drive, The Drag, Austin, Travis County, Texas, 78705, United States",
+      "osm_type": "way",
+      "osm_id": 27397894
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000005",
+    "lookup_qid": "Q264620",
+    "resolution": "city reference point, not an exact institution position",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.65,
+          48.25
+        ]
+      },
+      "properties": {
+        "query": "Q264620",
+        "wikidata_id": "Q264620",
+        "label": "Garching bei München",
+        "description": "city in Bavaria, Germany",
+        "match_method": "qid",
+        "dataset_coordinates": "11.6500,48.2500",
+        "source": "https://www.wikidata.org/wiki/Q264620"
+      }
+    },
+    "nominatim": {
+      "city": "Garching bei München",
+      "country": "Germany",
+      "results": [
+        {
+          "display_name": "Garching bei München, Landkreis München, Bayern, 85748, Deutschland",
+          "osm_type": "relation",
+          "osm_id": 30971,
+          "longitude": 11.6509662,
+          "latitude": 48.2513878,
+          "dataset_coordinates": "11.6510,48.2514"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Garching bei München",
+      "state": "Bayern",
+      "country": "Deutschland",
+      "country_code": "de",
+      "display_name": "3, Telschowstraße, Garching bei München, Landkreis München, Bayern, 85748, Deutschland",
+      "osm_type": "way",
+      "osm_id": 94898057
+    },
+    "previous_lookup": {
+      "award_record_id": "kavli_prize-000005",
+      "lookup_qid": "Q151991",
+      "wikidata": {
+        "error": "lookup failed: Q151991 European Southern Observatory (intergovernmental organization and observatory in Chile) has no usable Earth P625 coordinate"
+      },
+      "nominatim": {
+        "city": "Garching bei München",
+        "country": "Germany",
+        "results": [
+          {
+            "display_name": "Garching bei München, Landkreis München, Bayern, 85748, Deutschland",
+            "osm_type": "relation",
+            "osm_id": 30971,
+            "longitude": 11.6509662,
+            "latitude": 48.2513878,
+            "dataset_coordinates": "11.6510,48.2514"
+          }
+        ]
+      },
+      "reverse": {}
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000017",
+    "lookup_qid": "Q118958",
+    "resolution": "city reference point, not an exact institution position",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7044,
+          50.8775
+        ]
+      },
+      "properties": {
+        "query": "Q118958",
+        "wikidata_id": "Q118958",
+        "label": "Leuven",
+        "description": "capital city of Flemish Brabant, Belgium",
+        "match_method": "qid",
+        "dataset_coordinates": "4.7044,50.8775",
+        "source": "https://www.wikidata.org/wiki/Q118958"
+      }
+    },
+    "nominatim": {
+      "city": "Leuven",
+      "country": "Belgium",
+      "results": [
+        {
+          "display_name": "Leuven, Vlaams-Brabant, Vlaanderen, België / Belgique / Belgien",
+          "osm_type": "relation",
+          "osm_id": 196311,
+          "longitude": 4.7011675,
+          "latitude": 50.879202,
+          "dataset_coordinates": "4.7012,50.8792"
+        },
+        {
+          "display_name": "Leuven, Vlaams-Brabant, Vlaanderen, 3000, België / Belgique / Belgien",
+          "osm_type": "relation",
+          "osm_id": 3921680,
+          "longitude": 4.6941084,
+          "latitude": 50.8812008,
+          "dataset_coordinates": "4.6941,50.8812"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Leuven",
+      "state": "Vlaams-Brabant",
+      "country": "België / Belgique / Belgien",
+      "country_code": "be",
+      "display_name": "Tiensestraat, Mussenbuurt, Leuven, Vlaams-Brabant, Vlaanderen, 3000, België / Belgique / Belgien",
+      "osm_type": "node",
+      "osm_id": 5131443745
+    },
+    "previous_lookup": {
+      "award_record_id": "kavli_prize-000017",
+      "lookup_qid": "Q833670",
+      "wikidata": {
+        "error": "lookup failed: Q833670 Katholieke Universiteit Leuven (University since 1968 with its main campus in Leuven, Belgium) has no usable Earth P625 coordinate"
+      },
+      "nominatim": {
+        "city": "Leuven",
+        "country": "Belgium",
+        "results": [
+          {
+            "display_name": "Leuven, Vlaams-Brabant, Vlaanderen, België / Belgique / Belgien",
+            "osm_type": "relation",
+            "osm_id": 196311,
+            "longitude": 4.7011675,
+            "latitude": 50.879202,
+            "dataset_coordinates": "4.7012,50.8792"
+          },
+          {
+            "display_name": "Leuven, Vlaams-Brabant, Vlaanderen, 3000, België / Belgique / Belgien",
+            "osm_type": "relation",
+            "osm_id": 3921680,
+            "longitude": 4.6941084,
+            "latitude": 50.8812008,
+            "dataset_coordinates": "4.6941,50.8812"
+          }
+        ]
+      },
+      "reverse": {}
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000024",
+    "lookup_qid": "Q6602",
+    "resolution": "city reference point, not an exact institution position",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.7522,
+          48.5733
+        ]
+      },
+      "properties": {
+        "query": "Q6602",
+        "wikidata_id": "Q6602",
+        "label": "Strasbourg",
+        "description": "capital and largest city of Grand Est, located in the historical region of Alsace",
+        "match_method": "qid",
+        "dataset_coordinates": "7.7522,48.5733",
+        "source": "https://www.wikidata.org/wiki/Q6602"
+      }
+    },
+    "nominatim": {
+      "city": "Strasbourg",
+      "country": "France",
+      "results": [
+        {
+          "display_name": "Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, France",
+          "osm_type": "relation",
+          "osm_id": 71033,
+          "longitude": 7.7507127,
+          "latitude": 48.584614,
+          "dataset_coordinates": "7.7507,48.5846"
+        },
+        {
+          "display_name": "Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, France",
+          "osm_type": "relation",
+          "osm_id": 4630050,
+          "longitude": 7.6885972,
+          "latitude": 48.5681009,
+          "dataset_coordinates": "7.6886,48.5681"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Strasbourg",
+      "state": "Grand Est",
+      "country": "France",
+      "country_code": "fr",
+      "display_name": "1, Parc de l'Étoile, Neudorf, Neudorf-Musau, Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, 67076, France",
+      "osm_type": "node",
+      "osm_id": 12029036855
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000026",
+    "lookup_qid": "Q60",
+    "resolution": "city reference point, not an exact institution position",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.0061,
+          40.7128
+        ]
+      },
+      "properties": {
+        "query": "Q60",
+        "wikidata_id": "Q60",
+        "label": "New York City",
+        "description": "most populous city in the United States",
+        "match_method": "qid",
+        "dataset_coordinates": "-74.0061,40.7128",
+        "source": "https://www.wikidata.org/wiki/Q60"
+      }
+    },
+    "nominatim": {
+      "city": "New York",
+      "country": "United States",
+      "state": "New York",
+      "results": [
+        {
+          "display_name": "New York, United States",
+          "osm_type": "relation",
+          "osm_id": 175905,
+          "longitude": -74.0060152,
+          "latitude": 40.7127281,
+          "dataset_coordinates": "-74.0060,40.7127"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "New York",
+      "state": "New York",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "New York City Hall, 260, Broadway, Tribeca, Lower Manhattan, Manhattan, New York County, New York, 10000, United States",
+      "osm_type": "way",
+      "osm_id": 575213527
+    },
+    "previous_lookup": {
+      "award_record_id": "kavli_prize-000026",
+      "lookup_qid": "Q28148561",
+      "wikidata": {
+        "error": "lookup failed: Q28148561 Simons Foundation (nonprofit organization in New York, United States) has no usable Earth P625 coordinate"
+      },
+      "nominatim": {
+        "city": "New York",
+        "country": "United States",
+        "results": [
+          {
+            "display_name": "New York, United States",
+            "osm_type": "relation",
+            "osm_id": 175905,
+            "longitude": -74.0060152,
+            "latitude": 40.7127281,
+            "dataset_coordinates": "-74.0060,40.7127"
+          }
+        ]
+      },
+      "reverse": {}
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000029",
+    "lookup_qid": "Q5001311",
+    "resolution": "verified Rutgers Busch campus reference point; department location confirmed at https://physics.rutgers.edu/contact-us/directions",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4667,
+          40.525
+        ]
+      },
+      "properties": {
+        "query": "Q5001311",
+        "wikidata_id": "Q5001311",
+        "label": "Busch Campus of Rutgers University",
+        "description": "census-designated place in New Jersey, United States",
+        "match_method": "qid",
+        "dataset_coordinates": "-74.4667,40.5250",
+        "source": "https://www.wikidata.org/wiki/Q5001311"
+      }
+    },
+    "nominatim": {
+      "city": "Piscataway",
+      "country": "United States",
+      "state": "New Jersey",
+      "results": [
+        {
+          "display_name": "Piscataway Township, Middlesex County, New Jersey, United States",
+          "osm_type": "relation",
+          "osm_id": 961154,
+          "longitude": -74.4660542,
+          "latitude": 40.5464326,
+          "dataset_coordinates": "-74.4661,40.5464"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Piscataway Township",
+      "state": "New Jersey",
+      "country": "United States",
+      "country_code": "us",
+      "display_name": "Rutgers Busch Campus, Brett Road, Piscataway Township, Middlesex County, New Jersey, 08855, United States",
+      "osm_type": "way",
+      "osm_id": 186352183
+    },
+    "previous_lookup": {
+      "award_record_id": "kavli_prize-000029",
+      "lookup_qid": "Q1428659",
+      "resolution": "city reference point, not an exact institution position",
+      "wikidata": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.3992,
+            40.4992
+          ]
+        },
+        "properties": {
+          "query": "Q1428659",
+          "wikidata_id": "Q1428659",
+          "label": "Piscataway",
+          "description": "township in Middlesex County, New Jersey, United States",
+          "match_method": "qid",
+          "dataset_coordinates": "-74.3992,40.4992",
+          "source": "https://www.wikidata.org/wiki/Q1428659"
+        }
+      },
+      "nominatim": {
+        "city": "Piscataway",
+        "country": "United States",
+        "state": "New Jersey",
+        "results": [
+          {
+            "display_name": "Piscataway Township, Middlesex County, New Jersey, United States",
+            "osm_type": "relation",
+            "osm_id": 961154,
+            "longitude": -74.4660542,
+            "latitude": 40.5464326,
+            "dataset_coordinates": "-74.4661,40.5464"
+          }
+        ]
+      },
+      "reverse": {
+        "city": "Edison",
+        "state": "New Jersey",
+        "country": "United States",
+        "country_code": "us",
+        "display_name": "Germantown Avenue, Martins Landing, Edison, Middlesex County, New Jersey, 08817, United States",
+        "osm_type": "relation",
+        "osm_id": 19429386
+      }
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000027",
+    "lookup_qid": "Q1794",
+    "resolution": "city reference point, not an exact institution position",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.6822,
+          50.1106
+        ]
+      },
+      "properties": {
+        "query": "Q1794",
+        "wikidata_id": "Q1794",
+        "label": "Frankfurt",
+        "description": "most populated city of Hesse, Germany",
+        "match_method": "qid",
+        "dataset_coordinates": "8.6822,50.1106",
+        "source": "https://www.wikidata.org/wiki/Q1794"
+      }
+    },
+    "nominatim": {
+      "city": "Frankfurt am Main",
+      "country": "Germany",
+      "results": [
+        {
+          "display_name": "Frankfurt am Main, Hessen, Deutschland",
+          "osm_type": "relation",
+          "osm_id": 62400,
+          "longitude": 8.6820917,
+          "latitude": 50.1106444,
+          "dataset_coordinates": "8.6821,50.1106"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Frankfurt am Main",
+      "state": "Hessen",
+      "country": "Deutschland",
+      "country_code": "de",
+      "display_name": "36, Römerberg, Altstadt, Innenstadt 1, Frankfurt am Main, Hessen, 60311, Deutschland",
+      "osm_type": "way",
+      "osm_id": 72471245
+    },
+    "previous_lookup": {
+      "award_record_id": "kavli_prize-000027",
+      "lookup_qid": "Q832398",
+      "wikidata": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            8.652,
+            50.0935
+          ]
+        },
+        "properties": {
+          "query": "Q832398",
+          "wikidata_id": "Q832398",
+          "label": "Max Planck Institute for Brain Research",
+          "description": "research institute in Frankfurt, Germany",
+          "match_method": "qid",
+          "dataset_coordinates": "8.6520,50.0935",
+          "source": "https://www.wikidata.org/wiki/Q832398"
+        }
+      },
+      "nominatim": {
+        "city": "Frankfurt",
+        "country": "Germany",
+        "results": [
+          {
+            "display_name": "Frankfurt am Main, Hessen, Deutschland",
+            "osm_type": "relation",
+            "osm_id": 62400,
+            "longitude": 8.6820917,
+            "latitude": 50.1106444,
+            "dataset_coordinates": "8.6821,50.1106"
+          },
+          {
+            "display_name": "Frankfurt (Oder), Brandenburg, Deutschland",
+            "osm_type": "relation",
+            "osm_id": 62523,
+            "longitude": 14.549452,
+            "latitude": 52.3412273,
+            "dataset_coordinates": "14.5495,52.3412"
+          }
+        ]
+      },
+      "reverse": {
+        "city": "Frankfurt am Main",
+        "state": "Hessen",
+        "country": "Deutschland",
+        "country_code": "de",
+        "display_name": "Ernst Strüngmann Institut, 46, Deutschordenstraße, Niederrad, Süd, Frankfurt am Main, Hessen, 60528, Deutschland",
+        "osm_type": "way",
+        "osm_id": 89871513
+      }
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  },
+  {
+    "award_record_id": "kavli_prize-000024",
+    "position": 2,
+    "lookup_qid": "Q157575",
+    "wikidata": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.7644,
+          48.5803
+        ]
+      },
+      "properties": {
+        "query": "Q157575",
+        "wikidata_id": "Q157575",
+        "label": "University of Strasbourg",
+        "description": "university in France (1621– )",
+        "match_method": "qid",
+        "dataset_coordinates": "7.7644,48.5803",
+        "source": "https://www.wikidata.org/wiki/Q157575"
+      }
+    },
+    "nominatim": {
+      "city": "Strasbourg",
+      "country": "France",
+      "results": [
+        {
+          "display_name": "Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, France",
+          "osm_type": "relation",
+          "osm_id": 71033,
+          "longitude": 7.7507127,
+          "latitude": 48.584614,
+          "dataset_coordinates": "7.7507,48.5846"
+        },
+        {
+          "display_name": "Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, France",
+          "osm_type": "relation",
+          "osm_id": 4630050,
+          "longitude": 7.6885972,
+          "latitude": 48.5681009,
+          "dataset_coordinates": "7.6886,48.5681"
+        }
+      ]
+    },
+    "reverse": {
+      "city": "Strasbourg",
+      "state": "Grand Est",
+      "country": "France",
+      "country_code": "fr",
+      "display_name": "8, Allée Gaspard Monge, Esplanade, Bourse-Esplanade-Krutenau, Strasbourg, Bas-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, 67000, France",
+      "osm_type": "node",
+      "osm_id": 2844199779
+    },
+    "review_status": "confirmed",
+    "verification": "Wikidata point inside Nominatim city bounds; reverse country matches"
+  }
+]

@@ -1,0 +1,39 @@
+award_record_id	position	affiliation_name	affiliation_sub_name	affiliation_country	affiliation_wikidata_qid	source	confidence	notes
+brain_prize-000001	1	HUN-REN Institute of Experimental Medicine		Hungary	Q30281947	Curator supplied 20261015	confirmed	No English article. Current official English name and independent legal identity confirmed in https://koki.hun-ren.hu/storage/documents/SZMSZ_2023_.pdf ; source-era Hungarian Academy affiliation retained here.
+brain_prize-000002	1	Rutgers University		United States	Q499451	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000003	1	University of Oxford		United Kingdom	Q34433	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000004	1	Collège de France		France	Q202660	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000005	1	Wellcome Sanger Institute		United Kingdom	Q1142544	Curator supplied 20261015	confirmed	Current English Wikipedia title for supplied Wellcome Trust Sanger Institute.
+brain_prize-000006	1	Max Planck Society	Max Planck Institute of Biophysics	Germany	Q158085	Curator supplied 20261015	confirmed	Supplied institute Q255876 has parent P361=Q158085; parent QID used.
+brain_prize-000007	1	Massachusetts Institute of Technology		United States	Q49108	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000008	1	Stanford University		United States	Q41506	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000009	1	Humboldt University of Berlin		Germany	Q152087	Curator supplied 20261015	confirmed	Contemporary 2013 Humboldt institution specifically confirmed by curator; not another Berlin university.
+brain_prize-000010	1	University of Oxford		United Kingdom	Q34433	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000011	1	University of Würzburg		Germany	Q161976	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000012	1	Collège de France		France	Q202660	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000013	1	University of Parma		Italy	Q1758474	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000014	1	University of Cambridge		United Kingdom	Q35794	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000015	1	Max Planck Society	Max Planck Institute of Neurobiology	Germany	Q158085	Curator supplied 20261015	confirmed	Provided QID is Society parent. Historical institute preserved as unit; merged into the new Institute for Biological Intelligence in 2022, not a simple rename: https://www.bi.mpg.de/about-us .
+brain_prize-000016	1	Technical University of Munich		Germany	Q157808	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000017	1	Howard Hughes Medical Institute	Janelia Research Campus	United States	Q1512226	Curator supplied 20261015	confirmed	Supplied campus Q1319362 belongs to HHMI; legally a campus, retained as unit. https://www.janelia.org/about-us/our-model .
+brain_prize-000018	1	Princeton University		United States	Q21578	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000019	1	Francis Crick Institute		United Kingdom	Q326044	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000020	1	University of Bristol		United Kingdom	Q459506	Curator supplied 20261015	confirmed	Contemporary Brain Prize affiliation retained as position 1. Toronto explicitly requested as second affiliation.
+brain_prize-000020	2	University of Toronto		Canada	Q180865	Curator supplied 20261015 and University of Toronto 2016 report	confirmed	https://2016.research.utoronto.ca/awards.html confirms 2016 Physiology affiliation and Brain Prize.
+brain_prize-000021	1	University of Edinburgh		United Kingdom	Q160302	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000022	1	University of Cambridge		United Kingdom	Q35794	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000023	1	University College London		United Kingdom	Q193196	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000024	1	University College London		United Kingdom	Q193196	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000025	1	University College London		United Kingdom	Q193196	Curator supplied 20261015	confirmed	UK Dementia Research Institute at UCL role retained here; KU Leuven separately included. https://www.ucl.ac.uk/brain-sciences/news/2018/mar/ucl-professors-win-2018-brain-prize .
+brain_prize-000025	2	KU Leuven		Belgium	Q833670	Curator supplied 20261015 and UCL 2018 announcement	confirmed	Contemporary professorship confirmed https://www.ucl.ac.uk/brain-sciences/news/2018/mar/ucl-professors-win-2018-brain-prize ; VIB connection and UK DRI role documented there, not conflated into the university name.
+brain_prize-000026	1	University College London		United Kingdom	Q193196	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000027	1	LMU Munich		Germany	Q55044	Curator supplied 20261015	confirmed	English Wikipedia article title from verified QID, rather than Wikidata label.
+brain_prize-000028	1	MRC Laboratory of Molecular Biology		United Kingdom	Q185800	Curator supplied 20261015	confirmed	Existing repository treats this institution as standalone; verified item and English Wikipedia title retained.
+brain_prize-000029	1	Paris Diderot University		France	Q1235608	Curator supplied 20261015	confirmed	Confirmed source-era institution, not replaced by successor university.
+brain_prize-000030	1	Inserm		France	Q1474517	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000031	1	Paris Diderot University		France	Q1235608	Curator supplied 20261015	confirmed	Confirmed source-era institution, not replaced by successor university.
+brain_prize-000032	1	Paris Diderot University		France	Q1235608	Curator supplied 20261015	confirmed	Confirmed source-era institution, not replaced by successor university.
+brain_prize-000033	1	Baylor College of Medicine		United States	Q2892284	Curator supplied 20261015	confirmed	Independent medical school, not a unit of Baylor University.
+brain_prize-000034	1	University of Edinburgh		United Kingdom	Q160302	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000046	1	Columbia University		United States	Q49088	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
+brain_prize-000049	1	Heidelberg University		Germany	Q151510	Curator supplied 20261015	confirmed	Institution QID and English Wikipedia title verified.
