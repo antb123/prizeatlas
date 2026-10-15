@@ -623,12 +623,12 @@ class WebsiteBuildTests(unittest.TestCase):
                 affiliation_country="Included",
                 extras=({"affiliation_country": "Included"}, {"affiliation_country": "Second"}),
             )
-            for year in (2014, 2015, 2025, 2026)
+            for year in (2014, 2015, 2025, 2026, 2027)
         ]
 
-        counts = build.award_affiliation_country_counts(records, 2015, 2025)
+        counts = build.award_affiliation_country_counts(records, build.HOMEPAGE_AWARD_YEAR_FROM, build.HOMEPAGE_AWARD_YEAR_TO)
 
-        self.assertEqual({"Included": 2, "Second": 2}, counts)
+        self.assertEqual({"Included": 3, "Second": 3}, counts)
 
     def test_gdp_per_capita_snapshot_uses_dataset_country_names(self) -> None:
         snapshot = json.loads((Path(build.__file__).parent / "population.json").read_text())
@@ -696,7 +696,7 @@ class WebsiteBuildTests(unittest.TestCase):
                     "award_record_id": f"test-{index}",
                     "award_wikidata_qid": "Q1",
                     "prize_name": "Test Prize",
-                    "year": "2020",
+                    "year": "2026",
                     "full_name": f"Test Winner {index}",
                     "laureate_wikidata_qid": f"Q{index + 10}",
                     "affiliation_country": "United States",
@@ -713,14 +713,14 @@ class WebsiteBuildTests(unittest.TestCase):
         rate = awards_per_million / build.load_gdp_per_capita()["ppp"]["United States"] * 1_000
         home = (self.website / "dist/index.html").read_text()
         self.assertIn("<h2>Award records relative to GDP</h2>", home)
-        self.assertIn("2015–2025 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.", home)
+        self.assertIn("2015–2026 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.", home)
         self.assertIn('<ol class="highlights">', home)
         self.assertIn('href="countries/awarded/united-states/">United States</a>', home)
         self.assertIn(f"<span>{rate:.4f} / $1bn</span>", home)
         self.assertNotIn("awards / $1,000", home)
         explorer = (self.website / "dist/explorer/index.html").read_text()
         self.assertIn("<h2 id=\"gdp-h\">Recent award records relative to GDP</h2>", explorer)
-        self.assertIn("Every country with at least 5 recorded award-recipient rows from 2015–2025", explorer)
+        self.assertIn("Every country with at least 5 recorded award-recipient rows from 2015–2026", explorer)
         self.assertIn("const INCOME_ADJUSTED_AWARDS = DATA.income_adjusted_awards;", explorer)
         self.assertIn("rate.format(row.rate)", explorer)
 

@@ -122,7 +122,7 @@ POPULATION_FILE = SCRIPT_DIR / "population.json"
 CITY_POPULATION_FILE = SCRIPT_DIR / "city_populations.csv"
 GDP_PER_CAPITA_MIN_AWARDS = 5
 HOMEPAGE_AWARD_YEAR_FROM = 2015
-HOMEPAGE_AWARD_YEAR_TO = 2025
+HOMEPAGE_AWARD_YEAR_TO = 2026
 AFFILIATION_ROWS = 40
 # Recorded in the affiliation column but not an institution.
 AFFILIATION_BLOCKLIST = frozenset({"Freelance"})
