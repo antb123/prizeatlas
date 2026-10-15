@@ -49,6 +49,8 @@ Wolf: each laureate has a page, `https://wolffund.org.il/<name-slug>/`, with "Af
 The Foundation's own news pages may give no announcement date; take it from two press reports and say so in the run note.
 
 Result: one list of `year, category, name, motivation, share, source id, institution, URL`. Keep it in scratch until step 8.
+Keep the exact new record IDs as the batch scope through every later step. Start the completion checklist in step 7 now;
+carry unfinished research forward explicitly rather than dropping it after insertion.
 
 ## 2. Backup and baseline
 
@@ -127,7 +129,10 @@ SELECT DISTINCT birth_country FROM awards WHERE year = '2026';       -- `Duchy o
 SELECT award_record_id, birth_date FROM awards WHERE year = '2026' AND birth_date LIKE '%-01-01';   -- Wikidata gives some birth dates by year only (precision 9); `enrich.py` pads them to `YYYY-01-01`. Write `YYYY`
 ```
 
-Confirm the precision with `wbgetentities … props=claims` (`.claims.P569[0].mainsnak.datavalue.value.precision`: 9 is a year, 11 a day). A person with no Wikidata birthplace keeps a blank city and country; do not copy one from another row unless a source states it.
+Confirm the precision with `wbgetentities … props=claims` (`.claims.P569[0].mainsnak.datavalue.value.precision`: 9 is a year, 11 a day).
+An empty enrichment result is not the end of research: check the official profile and reliable biographical sources for missing birth details.
+If only the country is verified, fill it even when the city remains unknown. Leave unsupported fields blank and record the sources checked;
+do not infer birthplace from citizenship, employer, or where someone grew up.
 Then ORCID/OpenAlex author ids: `uv run scripts/lookup_authors.py --db awards.sqlite3 --record-id <id>` previews;
 add `--apply` only after review (it repeats the live lookup, it does not replay the preview).
 Check each `author_openalex_id` before applying: one ORCID can map to several OpenAlex profiles and the tool may pick a fragment (a 6-work profile for a 548-work researcher).
@@ -140,11 +145,12 @@ Do not run `scripts/set_award_subjects.py` without `--dry-run`: it rewrites exis
 Nothing here is automated; each value is hand-written per `award_record_id` and blank-guarded. The institution is the one at the time of the award.
 
 1. **Name:** from the award source (the Nobel API `aff`, the Wolf roster). `affiliation_name` is the English Wikipedia title of the parent institution, not the unit (unit → `affiliation_sub_name`).
-   Position 1 follows the source's order; the rest go to the TSV (point 6). Before writing a name, `grep -n '<name>' scripts/normalize_affiliations.py`: where the normalizer holds a canonical spelling it wins over the Wikipedia title,
-   or the institution splits in rankings (`University of Colorado Boulder` is mapped to `University of Colorado, Boulder`, which `AGENTS.md` contradicts; see the todo list). A joint institute (JILA) is neither parent's unit: record the real employer from the source.
+   Position 1 follows the source's order; the rest go to the TSV (point 6). Before writing a name, use `rg -n '<name>' scripts/normalize_affiliations.py` to check the existing mapping.
+   Take the canonical parent title from the verified QID's `sitelinks.enwiki`. If the normalizer disagrees, flag the conflict; do not apply a conflicting mapping.
+   A joint institute (JILA) is neither parent's unit: record the real employer from the source.
 2. **QID:** resolve to the parent institution and confirm it is the one on this row. If the name search fails, search Wikidata by label and rerun with the exact QID.
    `uv run scripts/lookup_coordinates.py "<institution>" --country "<country>"` (or `… Q… --country …`) prints `wikidata_id`, `description`, and `dataset_coordinates`.
-   Reuse an existing spelling, QID, city, and coordinates when the DB already holds the institution: `SELECT affiliation_name, affiliation_wikidata_qid, affiliation_city, affiliation_coordinates, count(*) FROM awards WHERE affiliation_name LIKE '%<x>%' GROUP BY 1,2,3,4;`
+   Compare existing rows for consistency, but independently verify the institution on each new award row; never copy a QID, city, or coordinates from a same-named row.
 3. **City and country:** today's names, city alone. From the award source, else the institution's Wikipedia article.
 4. **Coordinates** (`longitude,latitude`, four decimals, institution's own point): take `dataset_coordinates` from step 2, then check it against a second source.
    ```
@@ -153,7 +159,8 @@ Nothing here is automated; each value is hand-written per `award_record_id` and 
    ```
    Sources disagree: leave the cell blank. The same trio gives `birth_coordinates` from the verified birth city (optional; blank is acceptable).
    A negative longitude must be passed as `--coordinates="-105.2633,39.9942"`; with a space, argparse reads it as an option.
-   **A city and country without coordinates fail the build** (`invalid coordinate record_id=… field=affiliation_coordinates`): the city pages need a point for every place. Verify one, or blank the city and keep the country (HHMI is recorded that way).
+   **A city and country without coordinates fail the build** (`invalid coordinate record_id=… field=affiliation_coordinates`): the city pages need a point for every place.
+   Research a verified point; if it remains unavailable, report the build limitation and unresolved field. Do not delete a verified city to pass the build.
    An institution's own point is not always the parent's: a unit with its own Wikidata item (NIST Boulder, `Q40215915`) may supply the point, never the QID. Do not reuse a coordinate that equals the city's centre (`-105.2705,40.0150` is Boulder itself).
 5. **Write:**
    ```sql
@@ -169,8 +176,66 @@ Nothing here is automated; each value is hand-written per `award_record_id` and 
 7. **ROR and OpenAlex** (position 1): `lookup_ror.py --db awards.sqlite3 --record-id <id> > ror.json`, review, back up, `--apply ror.json`; then the same with `lookup_openalex.py`. Affiliation doc §5.2 and §5.3.
 
 A blank affiliation QID is unfinished work, not a settled value.
+If the roster omits an affiliation, check the laureate profile and institution's award announcement for the award-time affiliation.
+Current and former employment must not be substituted silently. Record unresolved award-time evidence in the run note.
 
 ## 7. Validate
+
+### Per-record completion review
+
+For **every exact new record ID**, record a result for each row of this checklist in the run note. Use `verified` (with source),
+`unavailable` (sources checked and reason), `not applicable` (reason), or `pending` (remaining work). A command returning success is not a result for every field.
+
+| Review | Fields / evidence to check |
+|---|---|
+| Award record | Recipient and type, year, category where formal, citation, source ID and share only where supplied; official roster complete |
+| Person identity | Unique person QID confirmed against more than the name; organizations have no personal biography fields |
+| Birth and death | Birth date or year with correct precision, modern birth city and country, sex; death date and known place for deceased people, lifespan note cross-checked |
+| Award-time affiliations | Every institution from the source, canonical parent and unit, independently confirmed parent QID, modern country and verified city; extras in the TSV |
+| Coordinates | Birth and affiliation places researched with Wikidata and Nominatim, reverse country checked; unsupported coordinates remain blank |
+| Identifiers and subject | ORCID / OpenAlex author lookup reviewed; position-1 ROR then OpenAlex institution previews reviewed; high-school subject checked under step 5 |
+| Publication | Catalogue coverage, validator diff, tests/lint, full build and page inspection, backup and source handoff |
+
+Run this read-only gap query with the batch's **exact IDs** (replace the example). It catches common omissions, including additional affiliations;
+it does not establish identity, correctness, death status, or whether every source-listed affiliation was captured.
+Every reported blank needs research and a disposition in the checklist, including optional fields; zero rows alone is not proof of completion.
+
+```sql
+WITH batch AS (
+    SELECT * FROM awards WHERE award_record_id IN ('nobel-001030', 'nobel-001031')
+), fields AS (
+    SELECT award_record_id, 'laureate_wikidata_qid' AS field, laureate_wikidata_qid AS value FROM batch
+    UNION ALL SELECT award_record_id, 'birth_date/year', coalesce(nullif(trim(birth_date), ''), birth_year) FROM batch WHERE laureate_type = 'Individual'
+    UNION ALL SELECT award_record_id, 'birth_city', birth_city FROM batch WHERE laureate_type = 'Individual'
+    UNION ALL SELECT award_record_id, 'birth_country', birth_country FROM batch WHERE laureate_type = 'Individual'
+    UNION ALL SELECT award_record_id, 'birth_coordinates', birth_coordinates FROM batch WHERE laureate_type = 'Individual'
+    UNION ALL SELECT award_record_id, 'affiliation_name', affiliation_name FROM batch
+    UNION ALL SELECT award_record_id, 'affiliate_ror', affiliate_ror FROM batch WHERE trim(coalesce(affiliation_name, '')) <> ''
+    UNION ALL SELECT award_record_id, 'institution_openalex_id', institution_openalex_id FROM batch WHERE trim(coalesce(affiliation_name, '')) <> ''
+), institutions AS (
+    SELECT award_record_id, 1 AS position, affiliation_name, affiliation_city, affiliation_country,
+           affiliation_coordinates, affiliation_wikidata_qid FROM batch
+    UNION ALL
+    SELECT e.award_record_id, e.position, e.affiliation_name, e.affiliation_city, e.affiliation_country,
+           e.affiliation_coordinates, e.affiliation_wikidata_qid
+      FROM award_extra_affiliations e JOIN batch b USING (award_record_id)
+), institution_fields AS (
+    SELECT award_record_id, position, 'affiliation_city' AS field, affiliation_city AS value FROM institutions WHERE trim(coalesce(affiliation_name, '')) <> ''
+    UNION ALL SELECT award_record_id, position, 'affiliation_country', affiliation_country FROM institutions WHERE trim(coalesce(affiliation_name, '')) <> ''
+    UNION ALL SELECT award_record_id, position, 'affiliation_coordinates', affiliation_coordinates FROM institutions WHERE trim(coalesce(affiliation_name, '')) <> ''
+    UNION ALL SELECT award_record_id, position, 'affiliation_wikidata_qid', affiliation_wikidata_qid FROM institutions WHERE trim(coalesce(affiliation_name, '')) <> ''
+)
+SELECT award_record_id, 0 AS position, field FROM fields WHERE trim(coalesce(value, '')) = ''
+UNION ALL
+SELECT award_record_id, position, field FROM institution_fields WHERE trim(coalesce(value, '')) = ''
+ORDER BY award_record_id, position, field;
+```
+
+Position 0 means an award/person field; affiliation positions are 1 and above. Count the selected rows separately and confirm they match the planned batch.
+Do not hide a gap by deleting a known place, writing a placeholder, or inferring an identifier. Resolve or explicitly document every gap before completion;
+any `pending` research means report the addition as incomplete. Integrity and the website build check different things and cannot waive this review.
+
+### Regression checks
 
 ```
 sqlite3 awards.sqlite3 "PRAGMA integrity_check;"                      # ok

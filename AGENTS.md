@@ -98,6 +98,12 @@ places - use todays name, country, location
 To add a new year's laureates for any prize family (search, validate, insert, QID, birth place, affiliation, coordinates, website rebuild), follow
 `docs/new_laureate_runbook_20261006.md`. It orders the rules in this file and in `docs/datasets-affiliation-records-20260728.md`; it does not replace them.
 
+An inserted row is not a completed addition. Finish every runbook step for every exact new `award_record_id`, then run
+the per-record completion review in step 7. Research every missing applicable field; a successful enrichment command,
+integrity check, or website build does not prove completeness. The run note must account for every remaining blank with
+sources checked and a reason (unavailable, not applicable, or pending). Pending research means the addition is incomplete;
+never guess a value or silently skip birth details, award-time affiliations, institution QIDs, coordinates, or identifiers.
+
 ## static awards website
 
 Run the website build from this `datasets/` directory:
