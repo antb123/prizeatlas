@@ -2,7 +2,7 @@
 
 A calendar of the 16 award families in `award_ranking`, January to December.
 Winners are announced in one month and honoured at a ceremony in another, so each prize appears twice; the Note column links the two.
-Dates are the most recent cycle (ISO `YYYY-MM-DD`), checked 20261006. Exact days move each year; the month and week are the stable part.
+Dates are the most recent cycle (ISO `YYYY-MM-DD`), checked 20261108. Exact days move each year; the month and week are the stable part.
 A month with no day (`YYYY-MM`) means only the month is known.
 
 The same data drives the web pages: `website/calendar/events.toml` is the source, and `uv run scripts/build_calendar.py` renders `website/calendar/2026.html` and `2027.html` (draft).
@@ -27,6 +27,7 @@ No events.
 | 2026-03-18 | Turing Award           | Announced | → banquet 2026-06-13, San Francisco (2025 award)             |
 | 2026-03-19 | Abel Prize             | Announced | → ceremony 2026-05-26, Oslo                                  |
 | 2026-03-31 | Canada Gairdner International Award | Announced | → gala 2026-10-22                                            |
+| 2027-03-16 | Millennium Technology Prize | Announced | winner decided 2026-12; → ceremony 2027-06-02; every two years |
 
 ## April
 
@@ -42,13 +43,13 @@ No events.
 | 2026-05-20 | The Brain Prize             | Ceremony  | Copenhagen; ← announced 2026-03-05                                     |
 | 2026-05-21 | Crafoord Prize              | Ceremony  | Stockholm, Crafoord Days 18-21 May; ← announced 2026-01-29             |
 | 2026-05-26 | Abel Prize                  | Ceremony  | Oslo; ← announced 2026-03-19                                           |
-| 2026-05-27 | Shaw Prize                  | Announced | → ceremony 2026-10 (day not yet announced), Hong Kong                  |
-| 2027-05    | Millennium Technology Prize | Ceremony  | Helsinki, May or June; every two years, next 2027                      |
+| 2026-05-27 | Shaw Prize                  | Announced | → ceremony 2026-10 projected (no date published as of 2026-11-08), Hong Kong |
 
 ## June
 
 | Date       | Prize        | Event     | Note                                                                |
 |------------|--------------|-----------|---------------------------------------------------------------------|
+| 2027-06-02 | Millennium Technology Prize | Ceremony | ← announced 2027-03-16; every two years                 |
 | 2026-06-10 | Kavli Prize  | Announced | even years only; → ceremony 2026-09-01, Oslo                        |
 | 2026-06-13 | Turing Award | Ceremony  | ACM Awards Banquet, San Francisco; ← announced 2026-03-18          |
 | 2026-06-19 | Kyoto Prize  | Announced | → ceremony 2026-11-10, Kyoto                                        |
@@ -80,7 +81,7 @@ No events.
 | 2026-10-05 | Nobel Prize            | Announced | Physiology or Medicine, first full week of October; → ceremony 2026-12-10            |
 | 2026-10-06 | Nobel Prize            | Announced | Physics                                                                              |
 | 2026-10-07 | Nobel Prize            | Announced | Chemistry                                                                            |
-| 2026-10    | Shaw Prize             | Ceremony  | Hong Kong; day not yet announced (2025: 2025-10-21); ← announced 2026-05-27         |
+| 2026-10    | Shaw Prize             | Ceremony  | projected; Hong Kong; no date published as of 2026-11-08 (2025: 2025-10-21); ← announced 2026-05-27 |
 | 2026-10-22 | Canada Gairdner International Award | Ceremony  | gala; ← announced 2026-03-31                                                         |
 
 ## November
@@ -114,14 +115,14 @@ No events.
 | Shaw Prize                  | May                     | October              | yearly        |
 | Kavli Prize                 | June                    | September            | even years    |
 | Japan Prize                 | January                 | April                | yearly        |
-| Millennium Technology Prize | spring                  | May or June          | every 2 years |
+| Millennium Technology Prize | March                   | June                 | every 2 years |
 | Breakthrough Prize          | April                   | April (same day)     | yearly        |
 
 ## Caveats
 
 - Max Planck Medal March ceremony has no verified day; the DPG holds it at its annual spring meeting.
-- Millennium Technology Prize: winner decided December 2026, announced spring 2027, ceremony May or June 2027 in Helsinki. No exact day published yet.
+- Millennium Technology Prize: winner decided December 2026, announced 2027-03-16, ceremony 2027-06-02 (millenniumprize.org selection schedule, checked 20261108; the page names no venue).
 - Wolf Prize announcement dates vary: 2025 was announced 2025-03-10, 2026 on 1-2 October (the Wolf Foundation's own page gave no date; this follows press reports). Confirm against `wolffund.org.il` before relying on October for 2027.
-- Shaw Prize 2026 ceremony date was "to be announced"; 2025-10-21 is last year's ceremony.
+- Shaw Prize 2026 ceremony date is still "to be announced in due course" as of 20261108; no date was found on shawprize.org or in press. 2025-10-21 is last year's ceremony.
 - Science prizes only, matching `awards.sqlite3`: Nobel Physics, Chemistry and Physiology or Medicine. The Literature, Peace and Economic Sciences prizes are not in the database and are not listed. Kyoto Prize covers only its Basic Sciences and Advanced Technology categories.
 - Nobel announcement times are "at the earliest"; the order (Medicine, Physics, Chemistry) is fixed.

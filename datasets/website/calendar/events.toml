@@ -1,7 +1,7 @@
 # One row per event. date is YYYY-MM-DD, or YYYY-MM when only the month is known.
 # kind: announced | ceremony | both.  status: confirmed | projected.
 # 2027 rows are projected as the 2026 date + 364 days (same weekday) unless the prize has published its own date.
-# Checked 20261006. Sources: each prize's official site, see award_ranking.url.
+# Checked 20261108. Sources: each prize's official site, see award_ranking.url.
 
 [year."2026"]
 title = "Award Calendar 2026: When the Nobel, Fields, Turing and Other Major Prizes Are Announced"
@@ -221,7 +221,7 @@ date = "2026-10"
 prize = "Shaw Prize"
 kind = "ceremony"
 status = "projected"
-note = "Hong Kong; 2026 date not yet announced (2025: 21 October); announced 27 May"
+note = "Hong Kong; no 2026 date published as of 8 November (2025: 21 October); announced 27 May"
 
 [[event]]
 date = "2026-10-22"
@@ -280,6 +280,13 @@ prize = "The Brain Prize"
 kind = "announced"
 status = "projected"
 note = "Ceremony May, Copenhagen"
+
+[[event]]
+date = "2027-03-16"
+prize = "Millennium Technology Prize"
+kind = "announced"
+status = "confirmed"
+note = "Winner decided December 2026; ceremony 2 June; every two years"
 
 [[event]]
 date = "2027-03-17"
@@ -345,6 +352,13 @@ status = "projected"
 note = "Ceremony in October, Hong Kong"
 
 [[event]]
+date = "2027-06-02"
+prize = "Millennium Technology Prize"
+kind = "ceremony"
+status = "confirmed"
+note = "Announced 16 March; every two years"
+
+[[event]]
 date = "2027-06-12"
 prize = "Turing Award"
 kind = "ceremony"
@@ -365,12 +379,6 @@ kind = "ceremony"
 status = "confirmed"
 note = "Knesset, Jerusalem, for the 2026 laureates announced 1 October 2026"
 
-[[event]]
-date = "2027-06"
-prize = "Millennium Technology Prize"
-kind = "both"
-status = "confirmed"
-note = "Helsinki, May or June; winner decided December 2026; every two years"
 
 [[event]]
 date = "2027-09-08"
