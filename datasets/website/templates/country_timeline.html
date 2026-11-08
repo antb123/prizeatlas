@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_view_tabs.html" import country_detail_tabs with context %}
+{% block content %}
+<header class="page-intro">
+  <p class="eyebrow">{{ t("timeline.eyebrow") }}</p>
+  <h1>{{ term("country", country) }}</h1>
+  {% if detail_tabs %}{{ country_detail_tabs(detail_tabs, "timeline") }}{% endif %}
+  <p>{{ t("timeline.blurb", award_count=format_number(award_count), year_span=year_span) }}</p>
+</header>
+{% for year, rows in years %}
+<section>
+<h2>{{ year }}</h2>
+<ul class="timeline">
+{%- for record, route, born, based, died in rows %}
+<li><a href="{{ href(route) }}">{{ record.full_name }}</a> <span class="person-index-meta"><span>{{ term("prize", record.prize_name) }}{% if record.category %} · {{ term("category", record.category) }}{% endif %}</span>
+{%- if born %} <span class="subject-badge">{{ t("timeline.born") }}</span>{% endif %}
+{%- if based %} <span class="subject-badge">{{ t("timeline.based") }}</span>{% endif %}
+{%- if died %} <span class="subject-badge">{{ t("timeline.died") }}</span>{% endif %}</span></li>
+{%- endfor %}
+</ul>
+</section>
+{% endfor %}
+<p><a href="{{ href(countries_route) }}">{{ t("common.all_countries") }}</a></p>
+{% endblock %}

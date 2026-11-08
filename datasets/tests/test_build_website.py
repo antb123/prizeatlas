@@ -722,7 +722,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("<h2>Award records relative to GDP</h2>", home)
         self.assertIn("2015–2026 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.", home)
         self.assertIn('<ol class="highlights">', home)
-        self.assertIn('href="countries/awarded/united-states/">United States</a>', home)
+        self.assertIn('href="countries/united-states/awarded/">United States</a>', home)
         self.assertIn(f"<span>{rate:.4f} / $1bn</span>", home)
         self.assertNotIn("awards / $1,000", home)
         explorer = (self.website / "dist/explorer/index.html").read_text()
@@ -1755,7 +1755,7 @@ class WebsiteBuildTests(unittest.TestCase):
                     "@type": "ListItem",
                     "position": 1,
                     "name": "United Kingdom",
-                    "url": "https://example.org/countries/united-kingdom/",
+                    "url": "https://example.org/countries/united-kingdom/born/",
                 }
             ],
             item_list("/countries/"),
@@ -1796,10 +1796,9 @@ class WebsiteBuildTests(unittest.TestCase):
         # The homepage has no breadcrumbs and no laureate, so it emits no structured data at all.
         self.assertNotIn("application/ld+json", (self.website / "dist/index.html").read_text())
 
-        descriptions = [
-            re.search(r'name="description" content="([^"]*)"', path.read_text()).group(1)
-            for path in (self.website / "dist").rglob("*.html")
-        ]
+        # Legacy-URL redirects are noindex stubs, not pages, and carry no description.
+        pages = [html for path in (self.website / "dist").rglob("*.html") if 'content="noindex"' not in (html := path.read_text())]
+        descriptions = [re.search(r'name="description" content="([^"]*)"', html).group(1) for html in pages]
         self.assertEqual(len(descriptions), len(set(descriptions)), "every page needs its own description")
 
     def test_shared_citation_prints_once_and_year_pages_link_neighbours(self) -> None:
@@ -2064,7 +2063,11 @@ class WebsiteBuildTests(unittest.TestCase):
 
         build.build_site(database, "https://example.org/", self.website)
 
-        born_belgium = (self.website / "dist/countries/belgium/index.html").read_text()
+        born_belgium = (self.website / "dist/countries/belgium/born/index.html").read_text()
+        awarded_belgium = (self.website / "dist/countries/belgium/awarded/index.html").read_text()
+        died_belgium = (self.website / "dist/countries/belgium/died/index.html").read_text()
+        timeline_belgium = (self.website / "dist/countries/belgium/timeline/index.html").read_text()
+        legacy_awarded = (self.website / "dist/countries/awarded/belgium/index.html").read_text()
         people = (self.website / "dist/countries/index.html").read_text()
         institutions = (self.website / "dist/countries/affiliations/index.html").read_text()
         belgium = (self.website / "dist/countries/affiliations/belgium/index.html").read_text()
@@ -2087,8 +2090,32 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Belgian Academy</a>", belgium)
         self.assertIn(">Joint Institute; Partner Lab</a>", canada)
         self.assertIn(">Joint Institute; Partner Lab</a>", switzerland)
-        # The base country route is the people view, so the pre-split URLs still resolve.
-        self.assertTrue((self.website / "dist/countries/canada/index.html").is_file())
+        # Country detail tabs stay inside the country; heading comes first, global tabs are gone.
+        self.assertLess(awarded_belgium.index("<h1>Belgium</h1>"), awarded_belgium.index('href="../born/">Born</a>'))
+        self.assertIn('href="./" aria-current="page">Awarded</a>', awarded_belgium)
+        self.assertIn('href="../died/">Died</a>', awarded_belgium)
+        self.assertNotIn("Cities %", awarded_belgium)
+        self.assertIn('href="../../awarded/">All countries</a>', awarded_belgium)
+        self.assertIn('href="../timeline/">Timeline</a>', awarded_belgium)
+        self.assertIn('href="./" aria-current="page">Timeline</a>', timeline_belgium)
+        self.assertIn('href="../awarded/">Awarded</a>', timeline_belgium)
+        self.assertIn("No recipients recorded for this view.", died_belgium)
+        self.assertIn('href="belgium/born/"', people)
+        # Pre-20261108 view-first URLs are static redirects, kept out of the sitemap.
+        self.assertIn('url=../../belgium/awarded/', legacy_awarded)
+        self.assertIn('<link rel="canonical" href="https://example.org/countries/belgium/awarded/">', legacy_awarded)
+        self.assertIn('url=born/', (self.website / "dist/countries/canada/index.html").read_text())
+        self.assertIn("<loc>https://example.org/countries/belgium/awarded/</loc>", sitemap)
+        self.assertNotIn("<loc>https://example.org/countries/belgium/</loc>", sitemap)
+        self.assertNotIn("<loc>https://example.org/countries/awarded/belgium/</loc>", sitemap)
+        self.assertTrue((self.website / "dist/es/paises/belgica/nacidos/index.html").is_file())
+        self.assertIn("url=../../belgica/premiados/", (self.website / "dist/es/paises/premiados/belgica/index.html").read_text())
+        self.assertTrue((self.website / "dist/ja/countries/belgium/timeline/index.html").is_file())
+        # Timeline: one row per award, newest first, born or based in Belgium.
+        self.assertLess(timeline_belgium.index("Bob Beta"), timeline_belgium.index("Alice Alpha"))
+        self.assertEqual(2, timeline_belgium.count(">Alice Alpha</a>"))
+        self.assertNotIn("Carol Gamma", timeline_belgium)
+        self.assertIn('<span class="subject-badge">Born</span> <span class="subject-badge">Based</span>', timeline_belgium)
         self.assertTrue((self.website / "dist/affiliations/university-one/index.html").is_file())
         # Counts are scoped to the country: University One holds two laureates in the US but only one in Belgium.
         self.assertRegex(united_states, r"(?s)>University One</a>.*?rank-count[^>]*>2<")

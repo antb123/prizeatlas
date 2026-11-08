@@ -735,6 +735,25 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding-block: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.timeline .person-index-meta {
+  color: var(--muted);
+}
+
 .subject-people {
   margin: 0;
   padding: 0;

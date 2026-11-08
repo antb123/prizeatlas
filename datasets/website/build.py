@@ -65,6 +65,8 @@ TEMPLATES = (
     "_view_tabs.html",
     "countries.html",
     "country.html",
+    "country_timeline.html",
+    "country_redirect.html",
     "city_per_capita.html",
     "affiliation_countries.html",
     "affiliation_country.html",
@@ -189,6 +191,8 @@ SEGMENT_DEFAULTS = {
     "winners": "winners",
     "recent": "recent",
     "page": "page",
+    "timeline": "timeline",
+    "born": "born",
 }
 IDENTIFIER_FIELDS = (
     ("ORCID", "orc_id", "https://orcid.org/"),
@@ -776,7 +780,7 @@ def _required_ui_keys(template_dir: Path) -> set[str]:
             "meta.error.title", "meta.error.description",
         }
     )
-    keys.update(f"view.{view}" for view in ("born", "awarded", "died"))
+    keys.update(f"view.{view}" for view in ("born", "awarded", "died", "timeline"))
     keys.update(
         f"crumb.{crumb}"
         for crumb in (
@@ -789,7 +793,7 @@ def _required_ui_keys(template_dir: Path) -> set[str]:
     metadata = (
         "home", "awards", "people", "prize", "prize-winners", "category", "prize-year", "category-year", "winner", "person",
         "subjects", "subject", "subject-affiliations", "subject-recent", "countries-born", "countries-awarded", "countries-died",
-        "cities", "country-born", "country-awarded", "country-died", "city", "cities-per-capita", "affiliation-countries",
+        "cities", "country-born", "country-awarded", "country-died", "country-timeline", "city", "cities-per-capita", "affiliation-countries",
         "affiliation-country", "affiliations", "affiliation", "universities", "universities-countries", "map", "map-subject",
         "explorer", "nearby", "about",
     )
@@ -1704,7 +1708,7 @@ def _facts(record: AwardRecord, birth_countries: frozenset[str]) -> tuple[Fact, 
     if _nonblank(record.birth_date):
         skip.add("birth_year")
     routes = (
-        {"birth_country": f"{COUNTRIES_ROUTE}{slugify(record.birth_country)}/"}
+        {"birth_country": f"{COUNTRIES_ROUTE}{slugify(record.birth_country)}/born/"}
         if record.birth_country in birth_countries
         else {}
     )
@@ -1936,7 +1940,7 @@ MEMBERS = {
 
 def plan_country_places(
     people: list[Laureate],
-    route: str,
+    view: str,
     countries_for: Callable[[Laureate], Iterable[str]],
 ) -> list[Place]:
     """Rank countries by distinct laureates under one country-membership rule."""
@@ -1958,7 +1962,7 @@ def plan_country_places(
             Place(
                 name,
                 slug,
-                f"{route}{slug}/",
+                f"{COUNTRIES_ROUTE}{slug}/{view}/",
                 tuple(sorted(members, key=lambda person: (-len(person.awards), _surname_key(person.name)))),
             )
         )
@@ -2915,8 +2919,15 @@ def plan_subject_pages(
     return jobs
 
 
+def country_detail_tabs(slug: str) -> tuple[tuple[str, str], ...]:
+    """The four tabs every ranked country carries: its Born, Awarded and Died views, then its timeline."""
+    return tuple((view, f"{COUNTRIES_ROUTE}{slug}/{view}/") for view in ("born", "awarded", "died", "timeline"))
+
+
 def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
     jobs: list[PageJob] = []
+    names = sorted({place.name for places in country_places.values() for place in places})
+    places_by_view = {label: {place.name: place for place in places} for label, places in country_places.items()}
     for label, route in COUNTRY_VIEWS:
         places = country_places[label]
         covered = len({person.qid for place in places for person in place.people})
@@ -2991,25 +3002,24 @@ def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
                 plain_counts=label == "Died",
             )
         )
-        for place in places:
+        for name in names:
+            slug = slugify(name)
+            view_routes = dict(country_detail_tabs(slug))
+            place = places_by_view[label].get(name) or Place(name, slug, view_routes[label.lower()], ())
             count = len(place.people)
             laureates = "laureate" if count == 1 else "laureates"
             detail_breadcrumbs = (
-                (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(place.name, None))
-                if label == "Born"
-                else (
-                    Breadcrumb("Home", "/"),
-                    Breadcrumb("Countries", COUNTRIES_ROUTE),
-                    Breadcrumb(label, route),
-                    Breadcrumb(place.name, None),
-                )
+                Breadcrumb("Home", "/"),
+                Breadcrumb("Countries", route),
+                Breadcrumb(name, view_routes["born"]),
+                Breadcrumb(label, None),
             )
             jobs.append(
                 _page(
                     "country.html",
                     place.route,
-                    detail_title.format(name=place.name),
-                    _clamp(detail_description.format(count=count, laureates=laureates, name=place.name)),
+                    detail_title.format(name=name),
+                    _clamp(detail_description.format(count=count, laureates=laureates, name=name)),
                     detail_breadcrumbs,
                     place=place,
                     tab=label,
@@ -3017,8 +3027,47 @@ def plan_country_pages(country_places: dict[str, list[Place]]) -> list[PageJob]:
                     blurb=detail_blurb.format(count=count, laureates=laureates),
                     view_route=route,
                     return_label="All countries",
+                    detail_tabs=tuple(view_routes.items()),
                 )
             )
+    return jobs
+
+
+def plan_country_timeline_pages(records: Iterable[AwardRecord], record_routes: Mapping[str, str], ranked: set[str]) -> list[PageJob]:
+    """Plan one newest-first timeline per country: every award won by someone born, based (award-time
+    institution), or who died there. One row per award, marked with each way it belongs to the country.
+    A country with no ranked view (only QID-less records) has no country tabs to show."""
+    by_country: dict[str, list[tuple[AwardRecord, str, bool, bool, bool]]] = {}
+    for record in records:
+        born, died = record.birth_country.strip(), record.death_country.strip()
+        based = {affiliation.country.strip() for affiliation in record.affiliations}
+        for country in ({born, died} | based) - {""}:
+            row = (record, record_routes[record.award_record_id], country == born, country in based, country == died)
+            by_country.setdefault(country, []).append(row)
+
+    jobs: list[PageJob] = []
+    for name, rows in sorted(by_country.items()):
+        slug = slugify(name)
+        by_year: dict[str, list[tuple[AwardRecord, str, bool, bool, bool]]] = {}
+        for row in sorted(rows, key=lambda row: (row[0].prize_name, row[0].category, _surname_key(row[0].full_name))):
+            by_year.setdefault(row[0].year, []).append(row)
+        years = tuple(sorted(by_year.items(), key=lambda item: -_year_prefix(item[0], item[1][0][0].award_record_id)))
+        year_span = _year_span(list(by_year))
+        jobs.append(
+            _page(
+                "country_timeline.html",
+                f"{COUNTRIES_ROUTE}{slug}/timeline/",
+                f"{name}: timeline of laureates",
+                _clamp(f"{len(rows):,} science awards won by laureates born, based or who died in {name}, {year_span}, newest first."),
+                (Breadcrumb("Home", "/"), Breadcrumb("Countries", COUNTRIES_ROUTE), Breadcrumb(name, None)),
+                country=name,
+                slug=slug,
+                years=years,
+                award_count=len(rows),
+                year_span=year_span,
+                detail_tabs=country_detail_tabs(slug) if name in ranked else (),
+            )
+        )
     return jobs
 
 
@@ -3500,7 +3549,7 @@ def create_site_plan(
     people = plan_people(records, routes_by_laureate, record_routes, subject_order)
     cities = plan_city_places(records, people)
     affiliations = plan_affiliations(records, record_routes, profiles_by_qid)
-    country_places = {label: plan_country_places(people, route, MEMBERS[label]) for label, route in COUNTRY_VIEWS}
+    country_places = {label: plan_country_places(people, label.lower(), MEMBERS[label]) for label, _route in COUNTRY_VIEWS}
     countries = country_places["Born"]
     birth_countries = frozenset(place.name for place in countries)
     affiliation_countries = plan_affiliation_countries(affiliations)
@@ -3526,6 +3575,7 @@ def create_site_plan(
         jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate, birth_countries))
         jobs.extend(plan_prize_year_pages(layout))
     jobs.extend(plan_subject_pages(subjects, records, record_routes))
+    jobs.extend(plan_country_timeline_pages(records, record_routes, {place.name for places in country_places.values() for place in places}))
     jobs.extend(plan_country_pages(country_places))
     jobs.extend(plan_city_pages(cities))
     jobs.append(plan_city_per_capita_page(city_awards_per_capita, cities))
@@ -3592,6 +3642,8 @@ def _stable_key(job: PageJob) -> str:
         if context["tab"] == "Cities":
             return f"city:{context['place'].slug}"
         return f"country:{context['tab'].lower()}:{context['place'].slug}"
+    if job.template == "country_timeline.html":
+        return f"country-timeline:{context['slug']}"
     if job.template == "affiliation_country.html":
         return f"affiliation-country:{context['place'].slug}"
     if job.template == "affiliation.html":
@@ -3643,10 +3695,11 @@ def _localized_place_route(language: Language, context: dict[str, Any], key: str
         return language.route(language.segment("countries"), language.segment("died"))
     if key.startswith("country:"):
         _country, view, _slug = key.split(":", 2)
-        prefix = [language.segment("countries")]
-        if view != "born":
-            prefix.append(language.segment(view))
-        return language.route(*prefix, _term_route_slug(language, "country", context["place"].name, context["place"].slug))
+        slug = _term_route_slug(language, "country", context["place"].name, context["place"].slug)
+        return language.route(language.segment("countries"), slug, language.segment(view))
+    if key.startswith("country-timeline:"):
+        slug = _term_route_slug(language, "country", context["country"], context["slug"])
+        return language.route(language.segment("countries"), slug, language.segment("timeline"))
     if key == "cities":
         return language.route(language.segment("countries"), language.segment("cities"))
     if key.startswith("city:"):
@@ -3703,7 +3756,7 @@ def _localized_route(language: Language, job: PageJob, key: str) -> str:
     parts = job.route.strip("/").split("/") if job.route != "/" else []
     if key.startswith(("people:", "prize:", "prize-winners:", "category:", "category-year:", "prize-year:", "winner:", "person:")):
         return _localized_award_route(language, job.context, key, parts)
-    if key in {"countries:born", "countries:awarded", "countries:died", "cities", "cities-per-capita"} or key.startswith(("country:", "city:")):
+    if key in {"countries:born", "countries:awarded", "countries:died", "cities", "cities-per-capita"} or key.startswith(("country:", "country-timeline:", "city:")):
         return _localized_place_route(language, job.context, key)
     return _localized_directory_route(language, job.context, key)
 
@@ -3751,6 +3804,9 @@ def _localized_breadcrumbs(language: Language, breadcrumbs: Iterable[Breadcrumb]
         "Subjects": "crumb.subjects",
         "Recent": "crumb.recent",
         "Every winner": "crumb.every-winner",
+        "Born": "view.born",
+        "Awarded": "view.awarded",
+        "Died": "view.died",
     }
     result: list[Breadcrumb] = []
     for crumb in breadcrumbs:
@@ -3795,6 +3851,9 @@ def _localized_subject_place_metadata(language: Language, context: dict[str, Any
         _country, view, _slug = key.split(":", 2)
         place: Place = context["place"]
         return {"country": language.term("country", place.name), "person_count": num(len(place.people))}, f"country-{view}"
+    if key.startswith("country-timeline:"):
+        fields = {"country": language.term("country", context["country"]), "award_count": num(context["award_count"]), "year_span": context["year_span"]}
+        return fields, "country-timeline"
     if key == "cities":
         places = context["countries"]
         return {"person_count": num(_country_index_people(places)), "city_count": num(len(places))}, "cities"
@@ -4041,6 +4100,29 @@ def write_sitemaps(
         raise BuildFailure("sitemap index exceeds the byte limit")
     (output / "sitemap.xml").write_bytes(index)
     return len(locations)
+
+
+def write_country_redirects(environment: Environment, output: Path, base_url: str, jobs: Iterable[PageJob]) -> int:
+    """Keep the pre-20261108 view-first country URLs working: /countries/{country}/, /countries/awarded/{country}/ and
+    /countries/died/{country}/ each become a static redirect to the country-first view. Redirects stay out of the sitemap."""
+    template = environment.get_template("country_redirect.html")
+    count = 0
+    for job in jobs:
+        if job.template != "country.html" or not job.key.startswith("country:"):
+            continue
+        language = job.language
+        _country, view, slug = job.key.split(":", 2)
+        prefix = [language.segment("countries")] + ([] if view == "born" else [language.segment(view)])
+        legacy = language.route(*prefix, _term_route_slug(language, "country", job.context["place"].name, slug))
+        target = output / legacy.strip("/") / "index.html"
+        if target.exists():
+            raise BuildFailure(f"country redirect collides with a page route={legacy}")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        html = template.render(lang=language.code, title=job.title, href=relative_route(legacy, job.route), canonical=public_url(base_url, job.route))
+        target.write_text(html, encoding="utf-8")
+        count += 1
+    print(f"website country redirects written={count}")
+    return count
 
 
 def write_calendar(output: Path, website_dir: Path) -> list[str]:
@@ -4679,6 +4761,7 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR, en
                 plan.jobs,
             )
             list(rendered)
+        write_country_redirects(environment, staging, normalized_base_url, plan.jobs)
         calendar_routes = write_calendar(staging, website_dir)
         blog_routes = write_blog(staging, website_dir, {job.route for job in plan.jobs})
         write_sitemaps(staging, [*(job.route for job in plan.jobs), *calendar_routes, *blog_routes], normalized_base_url)

@@ -1,12 +1,14 @@
 {% extends "base.html" %}
-{% from "_view_tabs.html" import country_tabs with context %}
+{% from "_view_tabs.html" import country_tabs, country_detail_tabs with context %}
 {% block content %}
-{{ country_tabs(tab) }}
+{% if is_city %}{{ country_tabs(tab) }}{% endif %}
 <header class="page-intro">
   <p class="eyebrow">{{ eyebrow }}</p>
   <h1>{{ city_label(place.city, place.country) if is_city else term("country", place.name) }}</h1>
-  <p>{{ blurb }}</p>
+  {% if not is_city %}{{ country_detail_tabs(detail_tabs, tab) }}{% endif %}
+  <p>{{ blurb if place.people else t("country.empty") }}</p>
 </header>
+{% if place.people %}
 <ul class="people-index">
   {% for person in place.people %}
   <li>
@@ -18,5 +20,6 @@
   </li>
   {% endfor %}
 </ul>
+{% endif %}
 <p><a href="{{ href(view_route) }}">{{ return_label }}</a></p>
 {% endblock %}

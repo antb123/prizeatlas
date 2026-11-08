@@ -18,3 +18,11 @@
   <a class="tab-alt" href="{{ href(country_affiliations_route) }}"{% if current == "affiliations" %} aria-current="page"{% endif %}>{{ t("tabs.institutions") }}</a>
 </nav>
 {% endmacro %}
+
+{% macro country_detail_tabs(tabs, current) %}
+<nav class="view-tabs" aria-label="{{ t("tabs.country_views_aria") }}">
+  {% for key, route in tabs %}
+  <a href="{{ href(route) }}"{% if current == key %} aria-current="page"{% endif %}>{{ t("view." ~ key) }}</a>
+  {% endfor %}
+</nav>
+{% endmacro %}
