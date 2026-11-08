@@ -147,6 +147,11 @@ Run the website build from this `datasets/` directory:
   `uv run scripts/build_calendar.py` writes `website/calendar/<year>/index.html`, and `write_calendar()` in `website/build.py` copies it to
   `dist/awards/calendar/` and adds both URLs to the sitemap. Edit the TOML and rerun the script; the rendered HTML is committed. Rows with only a month
   (`YYYY-MM`) list under that month as TBC. Take a date from the prize's own announcement, and mark an unconfirmed one `projected`. `docs/when.md` is the prose copy.
+- The blog (`/blog/`, English only) is pre-rendered like the calendar: posts are HTML fragments in `website/blog/posts/YYYYMMDD-<slug>.html`,
+  `uv run scripts/build_blog.py` lints them and writes `website/blog/<slug>/index.html` and `website/blog/index.html` (committed), and `write_blog()` in
+  `website/build.py` copies them to `dist/blog/` and adds them to the sitemap. Lint rules and the author guide are in `docs/website_blog_20261108.md`.
+  Figures are inline SVG in `currentColor` only; no script. Write internal links site-root (`/countries/japan/`); the script makes them relative.
+  A renamed post leaves its old generated directory behind — `git rm` it. `--home-only` links to `/blog/` but does not copy it.
 
 ## data explorer
 

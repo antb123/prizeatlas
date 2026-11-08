@@ -1,0 +1,19 @@
+/* Blog article rules on top of ../static/style.css. Colours come from the site tokens, so dark mode follows. */
+.post, .posts { max-width: 65ch; }
+.post .date { margin: 0 0 .5rem; color: var(--muted); }
+.post .lede { font-size: 1.125rem; }
+.post h2 { margin-top: 2rem; }
+.post figure { margin: 1.5rem 0; }
+.post figure svg { display: block; width: 100%; height: auto; }
+.post svg text { fill: currentColor; }
+.post figcaption, .post caption { font-size: .9rem; color: var(--muted); }
+.post caption { text-align: left; padding-bottom: .5rem; }
+.post table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.post th, .post td { padding: .3rem .5rem; text-align: right; border-bottom: 1px solid var(--rule); }
+.post th:first-child, .post td:first-child { text-align: left; }
+.post thead th { border-bottom: 1px solid currentColor; }
+.posts { list-style: none; padding: 0; }
+.posts li { margin: 0 0 1.5rem; }
+.posts time { display: block; color: var(--muted); font-size: .9rem; }
+.posts p { margin: .25rem 0 0; }
+.more { margin-top: 2.5rem; }

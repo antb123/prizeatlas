@@ -57,6 +57,13 @@ class WebsiteBuildTests(unittest.TestCase):
         shutil.copytree(Path(build.__file__).parent / "static", self.website / "static")
         shutil.copytree(Path(build.__file__).parent / "i18n", self.website / "i18n")
         shutil.copytree(Path(build.__file__).parent / "calendar", self.website / "calendar")
+        # A minimal pre-rendered blog, so sitemap counts do not move with every published post.
+        blog = self.website / "blog"
+        (blog / "posts").mkdir(parents=True)
+        (blog / "posts" / "20261110-fixture.html").write_text('<h1>Fixture</h1>\n<p class="lede">Fixture.</p>\n')
+        (blog / "fixture").mkdir()
+        (blog / "fixture" / "index.html").write_text('<!doctype html><title>Fixture</title><meta name="description" content="Blog fixture post.">')
+        (blog / "index.html").write_text('<!doctype html><title>Blog</title><meta name="description" content="Blog fixture index.">')
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -1350,10 +1357,15 @@ class WebsiteBuildTests(unittest.TestCase):
 
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
-        # Every planned page, plus the two pre-rendered award calendar pages copied in by write_calendar.
-        self.assertEqual(len(plan.jobs) + 2, len(locations))
+        # Every planned page, plus the two pre-rendered calendar pages and the two fixture blog pages copied in unplanned.
+        self.assertEqual(len(plan.jobs) + 4, len(locations))
         self.assertIn("https://example.org/awards/awards/calendar/2026/", locations)
         self.assertIn("https://example.org/awards/awards/calendar/2027/", locations)
+        self.assertIn("https://example.org/awards/blog/", locations)
+        self.assertIn("https://example.org/awards/blog/fixture/", locations)
+        self.assertTrue((self.website / "dist/blog/fixture/index.html").exists())
+        self.assertFalse((self.website / "dist/blog/posts").exists())
+        self.assertIn('href="../blog/">Blog</a>', (self.website / "dist/es/index.html").read_text())
         self.assertIn(
             "https://example.org/awards/nobel-prize/physics/1939/ernest-orlando-lawrence/",
             locations,
@@ -2687,12 +2699,13 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn('href="/awards/"', error_html)
         self.assertIn('href="/awards/awards/">Awards</a>', error_html)
         self.assertIn('href="/awards/map/">Map</a>', error_html)
+        self.assertIn('href="/awards/blog/">Blog</a>', error_html)
         self.assertNotIn("<link rel=\"canonical\"", error_html)
 
         # The error page is not a route: it must stay out of the sitemap and the page counts.
         root = ElementTree.parse(self.website / "dist/sitemap.xml").getroot()
         locations = [element.text for element in root.findall(".//{*}loc")]
-        self.assertEqual(len(plan.jobs) + 2, len(locations))  # the two award calendar pages are not planned jobs
+        self.assertEqual(len(plan.jobs) + 4, len(locations))  # two calendar pages and two blog pages are not planned jobs
         self.assertNotIn("https://example.org/awards/404.html", locations)
 
     def test_dataset_csv_dumps_every_award_and_is_linked_from_every_footer(self) -> None:

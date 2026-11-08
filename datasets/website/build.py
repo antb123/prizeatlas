@@ -4050,6 +4050,15 @@ def write_calendar(output: Path, website_dir: Path) -> list[str]:
     return [f"{AWARDS_ROUTE}calendar/{path.name}/" for path in sorted(source.iterdir()) if path.is_dir()]
 
 
+def write_blog(output: Path, website_dir: Path, routes: set[str]) -> list[str]:
+    """Copy the pre-rendered blog (scripts/build_blog.py) to /blog/ and return its routes."""
+    if "/blog/" in routes:
+        raise SystemExit("website build: /blog/ is a planned route and collides with the pre-rendered blog")
+    source = website_dir / "blog"
+    shutil.copytree(source, output / "blog", ignore=shutil.ignore_patterns("posts"))
+    return ["/blog/", *(f"/blog/{path.stem[9:]}/" for path in sorted((source / "posts").glob("*.html")))]
+
+
 def write_robots(output: Path, base_url: str) -> None:
     body = f"User-agent: *\nAllow: /\n\nSitemap: {public_url(base_url, '/sitemap.xml')}\n"
     (output / "robots.txt").write_text(body, encoding="utf-8")
@@ -4601,6 +4610,7 @@ def render_error_page(environment: Environment, output: Path, base_url: str, lan
         country_views=(),
         structured_data="",
         href=lambda target: root + target.lstrip("/"),
+        asset_href=lambda target: root + target,
         absolute_href=lambda target: public_url(base_url, target),
         alternates={},
         alternate_urls={},
@@ -4670,7 +4680,8 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR, en
             )
             list(rendered)
         calendar_routes = write_calendar(staging, website_dir)
-        write_sitemaps(staging, [*(job.route for job in plan.jobs), *calendar_routes], normalized_base_url)
+        blog_routes = write_blog(staging, website_dir, {job.route for job in plan.jobs})
+        write_sitemaps(staging, [*(job.route for job in plan.jobs), *calendar_routes, *blog_routes], normalized_base_url)
         write_robots(staging, normalized_base_url)
         write_dataset_csv(staging, records)
         for language in languages:
