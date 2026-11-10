@@ -1186,7 +1186,8 @@ def _map_display_label(kind: str, label: tuple[str, ...]) -> str:
     return name or city or country or "Unnamed institution"
 
 
-def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]]:
+def map_payload(records: list[AwardRecord], affiliations: Iterable[Affiliation] = ()) -> dict[str, list[dict[str, object]]]:
+    routes_by_slug = {affiliation.slug: affiliation.route for affiliation in affiliations}
     labels: dict[str, dict[tuple[float, float], Counter[tuple[str, ...]]]] = {
         "birth": {},
         "affiliation": {},
@@ -1259,6 +1260,7 @@ def map_payload(records: list[AwardRecord]) -> dict[str, list[dict[str, object]]
                 marker["city"], marker["country"] = primary
             else:
                 marker["name"], marker["city"], marker["country"], marker["qid"] = primary
+                marker["r"] = routes_by_slug.get(affiliation_slug(primary[0]), "") if primary[0] else ""
             result[kind].append(marker)
     return result
 
@@ -1396,7 +1398,9 @@ def localized_explorer_payload(
     return localized
 
 
-def localized_map_payload(payload: dict[str, Any], language: Language) -> dict[str, Any]:
+def localized_map_payload(
+    payload: dict[str, Any], language: Language, page_route: str = MAP_ROUTE, route_map: Mapping[str, str] | None = None
+) -> dict[str, Any]:
     localized = json.loads(json.dumps(payload))
     countries = {
         marker["country"]
@@ -1419,6 +1423,8 @@ def localized_map_payload(payload: dict[str, Any], language: Language) -> dict[s
         else:
             marker["display_title"] = city or (language.term("country", country) if country else marker["title"])
         marker["title"] = marker["display_title"]
+        if marker.get("r"):
+            marker["r"] = relative_route(page_route, _localized_route_target(marker["r"], route_map or {}))
     return localized
 
 
@@ -3417,8 +3423,8 @@ def plan_people_index(people: list[Laureate]) -> list[PageJob]:
     return jobs
 
 
-def plan_map_pages(records: list[AwardRecord]) -> list[PageJob]:
-    atlas_payload = map_json(map_payload(records))
+def plan_map_pages(records: list[AwardRecord], affiliations: list[Affiliation]) -> list[PageJob]:
+    atlas_payload = map_json(map_payload(records, affiliations))
     jobs = [
         _page(
             "map.html",
@@ -3589,7 +3595,7 @@ def create_site_plan(
     )
     jobs.append(plan_awards_page(rankings, prize_routes))
     jobs.extend(plan_people_index(people))
-    jobs.extend(plan_map_pages(records))
+    jobs.extend(plan_map_pages(records, affiliations))
     jobs.append(plan_explorer_page(explorer, generated))
     jobs.append(plan_nearby_page(records, routes_by_laureate, affiliations))
     jobs.append(plan_about_page(rankings, records, people, countries, subjects, affiliations))
@@ -4592,7 +4598,7 @@ def _render_job(
     if job.template == "explorer.html":
         context["payload"] = explorer_json(localized_explorer_payload(json.loads(context["payload"]), language, route_map))
     elif job.template == "map.html":
-        context["payload"] = map_json(localized_map_payload(json.loads(context["payload"]), language))
+        context["payload"] = map_json(localized_map_payload(json.loads(context["payload"]), language, job.route, route_map))
     elif job.template == "nearby.html":
         context["payload"] = map_json(localized_nearby_payload(json.loads(context["payload"]), language, route_map))
     routes = _language_routes(language)

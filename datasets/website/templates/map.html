@@ -201,6 +201,7 @@
       text-transform: uppercase;
     }
     .place-card h2 { margin: 0; font-size: 1.05rem; font-weight: 500; line-height: 1.15; }
+    .place-card h2 a { color: var(--accent); }
     .place-card .where { margin: .25rem 0 .65rem; color: var(--muted); }
     .place-card .award-count { margin: 0; font-weight: 700; }
     .place-card .also { margin: .35rem 0 0; color: var(--muted); font-size: .75rem; }
@@ -366,7 +367,14 @@
         type.className = "kind";
         type.textContent = definitions[kind].label;
         const title = document.createElement("h2");
-        title.textContent = marker.title;
+        if (marker.r) {
+          const link = document.createElement("a");
+          link.href = marker.r;
+          link.textContent = marker.title;
+          title.append(link);
+        } else {
+          title.textContent = marker.title;
+        }
         const place = document.createElement("p");
         place.className = "where";
         if (kind === "birth") {
