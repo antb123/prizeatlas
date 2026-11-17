@@ -18,7 +18,7 @@
 <section>
   <h2>{{ t("common.awards") }}</h2>
   <ol class="person-awards">
-    {% for record, route in person.awards %}
+    {% for record, route in person.awards | reverse %}
     <li>
       <p class="person-award-year">{{ record.year }}</p>
       <div>

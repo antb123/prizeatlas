@@ -1907,9 +1907,10 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(1, plan.person_count)
         person = self.website / "dist/people/shinya-yamanaka/index.html"
         person_html = person.read_text()
-        # Awards ascend by year, so a career reads in the order it happened.
+        # The most recent award leads the list.
         self.assertIn("Male</p>", person_html)
-        self.assertLess(person_html.index("Wolf Prize"), person_html.index("Nobel Prize"))
+        awards_html = person_html.split('<ol class="person-awards">', 1)[1]
+        self.assertLess(awards_html.index("Nobel Prize"), awards_html.index("Wolf Prize"))
         # Wolf Prize has a single category here, so it is not category-routed; Nobel has two and is.
         self.assertIn('href="../../wolf-prize/2011/shinya-yamanaka/"', person_html)
         self.assertIn('href="../../nobel-prize/medicine/2012/shinya-yamanaka/"', person_html)
