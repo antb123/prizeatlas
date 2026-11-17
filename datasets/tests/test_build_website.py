@@ -2165,11 +2165,12 @@ class WebsiteBuildTests(unittest.TestCase):
         boston = (self.website / "dist/countries/cities/boston-united-states/index.html").read_text()
         sitemap = (self.website / "dist/sitemap.xml").read_text()
 
-        # Born, Awarded, and Died lists flag each country; the Cities list names places, so it carries none.
+        # Born, Awarded, and Died lists flag each country; the Cities lists flag each city's country.
         flag = '<img class="flag" width="20" height="15" src="/static/flags/{}.svg" alt="" loading="lazy">'
         self.assertIn(flag.format("be") + "Belgium</a>", people)
         self.assertIn(flag.format("us") + "United States</a>", (self.website / "dist/countries/awarded/index.html").read_text())
-        self.assertNotIn('class="flag"', cities)
+        self.assertIn(flag.format("us") + "Boston, United States</a>", cities)
+        self.assertIn('<span>' + flag.format("us"), cities_per_capita)
         llms = (self.website / "dist/llms.txt").read_text()
 
         self.assertIn('href="affiliations/">Institutions</a>', people)

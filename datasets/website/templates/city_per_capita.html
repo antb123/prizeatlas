@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import country_tabs with context %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" width="20" height="15" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
 {% block content %}
 {{ country_tabs("cities_per_capita") }}
 <header class="page-intro">
@@ -11,7 +12,7 @@
   {% for row in cities %}
   <li>
     <span class="rank-position">{{ format_number(loop.index) }}</span>
-    <span>{% if row.route %}<a href="{{ href(row.route) }}">{{ city_label(row.city, row.country) }}</a>{% else %}{{ city_label(row.city, row.country) }}{% endif %} · {{ t("plural.award", count=row.award_count) }}</span>
+    <span>{{ flag(row.country) }}{% if row.route %}<a href="{{ href(row.route) }}">{{ city_label(row.city, row.country) }}</a>{% else %}{{ city_label(row.city, row.country) }}{% endif %} · {{ t("plural.award", count=row.award_count) }}</span>
     <span class="rank-count">{{ format_number(row.awards_per_million / 10000, 3) }}%</span>
   </li>
   {% endfor %}

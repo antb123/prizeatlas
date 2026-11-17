@@ -13,7 +13,7 @@
   {% for place in countries %}
   <li>
     <span class="rank-position">{{ format_number(loop.index) }}</span>
-    <a href="{{ href(place.route) }}">{% if tab != "cities" %}{{ flag(place.name) }}{% endif %}{{ place_label(place) }}</a>
+    <a href="{{ href(place.route) }}">{{ flag(place.country or place.name) }}{{ place_label(place) }}</a>
     <span class="rank-count" style="--share: {{ (place.people | length) * 100 // leader }}">{{ format_number(place.people | length) }}</span>
   </li>
   {% endfor %}
