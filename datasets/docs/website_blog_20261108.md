@@ -77,6 +77,8 @@ write_blog(): refuse if /blog/ is a planned route → copytree website/blog → 
 ## Post format
 
 One file per post: `website/blog/posts/YYYYMMDD-<slug>.html`. The filename date is the publication date; `/blog/<slug>/` is the URL.
+Drafts live in `website/blog/posts/drafts/`, which neither `build_blog.py` nor the sitemap reads. To publish, `git mv` the file up into `posts/`
+(update its date) and rerun `build_blog.py`; to unpublish, move it back and `git rm` its generated `website/blog/<slug>/`.
 
 ```html
 <h1>2026 science laureates: where they were born</h1>
