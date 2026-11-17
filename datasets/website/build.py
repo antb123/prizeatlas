@@ -115,6 +115,7 @@ SUBJECTS_ROUTE = "/subjects/"
 EXPLORER_ROUTE = "/explorer/"
 NEARBY_ROUTE = "/nearby/"
 MAP_ROUTE = "/map/"
+MAP_POPUP_NAMES = 8
 ABOUT_ROUTE = "/about/"
 SUBJECTS = (
     "Biology", "Physics", "Chemistry", "Math", "CS",
@@ -1198,6 +1199,7 @@ def map_payload(records: list[AwardRecord], affiliations: Iterable[Affiliation] 
         "birth": {},
         "affiliation": {},
     }
+    born: dict[tuple[float, float], dict[str, str]] = {}
 
     def add(kind: str, point: tuple[float, float], label: tuple[str, ...], subject: str, decade: str) -> None:
         labels[kind].setdefault(point, Counter())[label] += 1
@@ -1216,6 +1218,7 @@ def map_payload(records: list[AwardRecord], affiliations: Iterable[Affiliation] 
                 multiple=False,
             )[0]
             add("birth", point, (record.birth_city.strip(), record.birth_country.strip()), subject, decade)
+            born.setdefault(point, {})[record.laureate_wikidata_qid or f"row:{record.award_record_id}"] = record.full_name.strip()
 
         for affiliation in record.affiliations:
             if not _nonblank(affiliation.coordinates):
@@ -1258,6 +1261,9 @@ def map_payload(records: list[AwardRecord], affiliations: Iterable[Affiliation] 
             }
             if kind == "birth":
                 marker["city"], marker["country"] = primary
+                names = sorted(set(born[point].values()))
+                marker["people"] = names[:MAP_POPUP_NAMES]
+                marker["more"] = len(names) - len(marker["people"])
             else:
                 marker["name"], marker["city"], marker["country"], marker["qid"] = primary
                 marker["r"] = routes_by_slug.get(affiliation_slug(primary[0]), "") if primary[0] else ""

@@ -204,6 +204,7 @@
     .place-card h2 a { color: var(--accent); }
     .place-card .where { margin: .25rem 0 .65rem; color: var(--muted); }
     .place-card .award-count { margin: 0; font-weight: 700; }
+    .place-card .people { margin: .35rem 0 0; font-size: .75rem; line-height: 1.35; }
     .place-card .also { margin: .35rem 0 0; color: var(--muted); font-size: .75rem; }
     @media (max-width: 52rem) {
       .stats {
@@ -387,6 +388,12 @@
         const filterLabel = [selectedSubject ? subjectLabel(selectedSubject) : "", selectedDecade].filter(Boolean).join(" · ");
         count.textContent = pluralText(UI.recordedAwards, visibleCount, {count: number.format(visibleCount)}) + (filterLabel ? ` · ${filterLabel}` : "");
         card.append(type, title, place, count);
+        if (marker.people && marker.people.length) {
+          const people = document.createElement("p");
+          people.className = "people";
+          people.textContent = marker.people.join(", ") + (marker.more ? ", …" : "");
+          card.append(people);
+        }
         if (marker.extra_labels) {
           const also = document.createElement("p");
           also.className = "also";
