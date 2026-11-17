@@ -17,13 +17,17 @@
 </header>
 <section>
   <h2>{{ t("common.awards") }}</h2>
+  {% if person.subjects %}
+  <p class="subject-badges">
+    {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
+  </p>
+  {% endif %}
   <ol class="person-awards">
     {% for record, route in person.awards | reverse %}
     <li>
       <p class="person-award-year">{{ record.year }}</p>
       <div>
         <h3><a href="{{ href(route) }}">{{ term("prize", record.prize_name) }}{% if record.category %} — {{ term("category", record.category) }}{% endif %}</a></h3>
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", record.high_school_subject) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
         {% if record.motivation %}<p>{{ record.motivation }}</p>{% endif %}
       </div>
     </li>

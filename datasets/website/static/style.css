@@ -353,6 +353,24 @@ h3 {
   border-bottom: 1px solid var(--rule);
 }
 
+.prize-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.prize-list .award-logo {
+  width: 1.5rem;
+}
+
+.flag {
+  width: 1.25rem;
+  aspect-ratio: 4 / 3;
+  margin-right: 0.5rem;
+  vertical-align: -0.15em;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
 .highlights span {
   flex: none;
   max-width: 55%;

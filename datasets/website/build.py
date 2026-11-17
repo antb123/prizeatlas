@@ -123,6 +123,7 @@ SUBJECTS = (
 )
 POPULATION_FILE = SCRIPT_DIR / "population.json"
 CITY_POPULATION_FILE = SCRIPT_DIR / "city_populations.csv"
+COUNTRY_CODES_FILE = SCRIPT_DIR / "country_codes.tsv"
 GDP_PER_CAPITA_MIN_AWARDS = 5
 HOMEPAGE_AWARD_YEAR_FROM = 2015
 HOMEPAGE_AWARD_YEAR_TO = 2026
@@ -978,6 +979,12 @@ def load_city_populations(population_file: Path = CITY_POPULATION_FILE) -> dict[
                 raise BuildFailure(f"invalid city population city={city!r} country={country!r}")
             populations[city, country] = population, geoname_id
     return populations
+
+
+def load_country_flags(codes_file: Path = COUNTRY_CODES_FILE) -> dict[str, str]:
+    """Map country names to their flag in static/flags/; a country without a code has no flag."""
+    with codes_file.open(newline="", encoding="utf-8") as source:
+        return {row["country"]: f"static/flags/{row['iso2']}.svg" for row in csv.DictReader(source, delimiter="\t")}
 
 
 def load_gdp_per_capita(population_file: Path = POPULATION_FILE) -> dict[str, dict[str, float]]:
@@ -4488,6 +4495,7 @@ def _environment(website_dir: Path) -> Environment:
     )
     environment.filters["slugify"] = slugify
     environment.globals["built"] = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
+    environment.globals["country_flags"] = load_country_flags()
     for name in TEMPLATES:
         environment.get_template(name)
     return environment

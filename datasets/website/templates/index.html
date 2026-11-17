@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
+{% macro record_flag(record) %}{{ flag((record.affiliations | selectattr("country") | map(attribute="country") | list + [record.birth_country]) | first) }}{% endmacro %}
 <header class="page-intro">
   <h1>{{ hero_heading }}</h1>
   <p>{{ t("home.intro") }}</p>
@@ -12,15 +14,29 @@
   </div>
   {% endfor %}
 </dl>
+{% if recent %}
+<section>
+  <h2>{{ t("home.recently_awarded") }}</h2>
+  <ol class="highlights">
+    {% for record, route, prize in recent %}
+    <li>
+      <a href="{{ href(route) }}">{{ record_flag(record) }}{{ record.full_name }}</a>
+      <span>
+        {{ term("prize", prize.prize_name) }}, {{ record.year }}
+      </span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
 {% if decorated %}
 <section>
   <h2>{{ t("home.most_decorated") }}</h2>
   <ol class="highlights">
     {% for person in decorated %}
     <li>
-      <a href="{{ href(person.route) }}">{{ person.name }}</a>
+      <a href="{{ href(person.route) }}">{{ record_flag(person.awards[-1][0]) }}{{ person.name }}</a>
       <span>
-        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
         {{ t("plural.award", count=person.awards | length) }}
       </span>
     </li>
@@ -34,28 +50,12 @@
   <ol class="highlights">
     {% for affiliation in top_institutions %}
     <li>
-      <a href="{{ href(affiliation.route) }}">{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
+      <a href="{{ href(affiliation.route) }}">{{ flag(affiliation.awards | map(attribute="affiliation.country") | select | first) }}{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
       <span>{{ t("plural.laureate", count=affiliation.count) }}</span>
     </li>
     {% endfor %}
   </ol>
   <p><a href="{{ href(affiliations_route) }}">{{ t("common.all_institutions") }}</a></p>
-</section>
-{% endif %}
-{% if recent %}
-<section>
-  <h2>{{ t("home.recently_awarded") }}</h2>
-  <ol class="highlights">
-    {% for record, route, prize in recent %}
-    <li>
-      <a href="{{ href(route) }}">{{ record.full_name }}</a>
-      <span>
-        {% if record.high_school_subject %}<a class="subject-badge" href="{{ href(subjects_route ~ term_slug("subject", record.high_school_subject) ~ '/') }}">{{ term("subject", record.high_school_subject) }}</a>{% endif %}
-        {{ term("prize", prize.prize_name) }}, {{ record.year }}
-      </span>
-    </li>
-    {% endfor %}
-  </ol>
 </section>
 {% endif %}
 {% if top_women %}
@@ -64,9 +64,8 @@
   <ol class="highlights">
     {% for person in top_women %}
     <li>
-      <a href="{{ href(person.route) }}">{{ person.name }}</a>
+      <a href="{{ href(person.route) }}">{{ record_flag(person.awards[-1][0]) }}{{ person.name }}</a>
       <span>
-        {% for name, route in person.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}
         {{ t("plural.award", count=person.awards | length) }}
       </span>
     </li>
@@ -81,7 +80,7 @@
   <ol class="highlights">
     {% for country in top_countries %}
     <li>
-      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
+      <a href="{{ href(country.route) }}">{{ flag(country.name) }}{{ place_label(country) }}</a>
       <span>{{ t("plural.laureate", count=country.people | length) }}</span>
     </li>
     {% endfor %}
@@ -95,26 +94,20 @@
   <ol class="highlights">
     {% for country, rate in affiliation_rates %}
     <li>
-      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
+      <a href="{{ href(country.route) }}">{{ flag(country.name) }}{{ place_label(country) }}</a>
       <span>{{ t("home.rate_per_million", rate=format_number(rate, 1)) }}</span>
     </li>
     {% endfor %}
   </ol>
 </section>
 {% endif %}
-{% if income_adjusted_awards %}
-<section>
-  <h2>{{ t("home.gdp_award_records") }}</h2>
-  <p>{{ t("home.gdp_description") }}</p>
-  <ol class="highlights">
-    {% for country, rate in income_adjusted_awards %}
-    <li>
-      <a href="{{ href(country.route) }}">{{ place_label(country) }}</a>
-      <span>{{ t("home.rate_per_billion", rate=format_number(rate, 4)) }}</span>
-    </li>
+<section id="awards">
+  <h2>{{ t("home.prizes") }}</h2>
+  <ol class="highlights prize-list">
+    {% for prize, route in prizes %}
+    <li><a href="{{ href(route) }}">{% if prize.logo %}<img class="award-logo" src="{{ asset_href(prize.logo) }}" alt="">{% endif %}{{ term("prize", prize.prize_name) }}</a></li>
     {% endfor %}
   </ol>
+  <p><a href="{{ href(awards_route) }}">{{ t("error404.browse_awards") }}</a></p>
 </section>
-{% endif %}
-{% include "_awards.html" %}
 {% endblock %}

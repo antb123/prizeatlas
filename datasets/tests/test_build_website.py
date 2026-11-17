@@ -714,17 +714,9 @@ class WebsiteBuildTests(unittest.TestCase):
 
         build.build_site(database, "https://example.org/", self.website)
 
-        population = build.load_population(["United States"])[0]
-        self.assertIsNotNone(population)
-        awards_per_million = 5 / population * 1_000_000
-        rate = awards_per_million / build.load_gdp_per_capita()["ppp"]["United States"] * 1_000
+        # The GDP ranking lives in the explorer only; the homepage no longer repeats it.
         home = (self.website / "dist/index.html").read_text()
-        self.assertIn("<h2>Award records relative to GDP</h2>", home)
-        self.assertIn("2015–2026 award-recipient rows by affiliation country at the time of award, per $1 billion of 2024 GDP at PPP.", home)
-        self.assertIn('<ol class="highlights">', home)
-        self.assertIn('href="countries/united-states/awarded/">United States</a>', home)
-        self.assertIn(f"<span>{rate:.4f} / $1bn</span>", home)
-        self.assertNotIn("awards / $1,000", home)
+        self.assertNotIn("<h2>Award records relative to GDP</h2>", home)
         explorer = (self.website / "dist/explorer/index.html").read_text()
         self.assertIn("<h2 id=\"gdp-h\">Recent award records relative to GDP</h2>", explorer)
         self.assertIn("Every country with at least 5 recorded award-recipient rows from 2015–2026", explorer)
