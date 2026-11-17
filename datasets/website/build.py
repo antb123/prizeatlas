@@ -137,6 +137,8 @@ SUBJECT_RECENT_YEARS = 3
 # The prize page shows recent years only. Its complete index of recipients lives one segment below.
 WINNERS_SEGMENT = "winners"
 DESCRIPTION_LIMIT = 160
+# The site covers three of the six Nobel prizes, so the Nobel hub's description names them.
+NOBEL_QID = "Q7191"
 SHARE_IMAGE_WIDTH = 1200
 SHARE_IMAGE_HEIGHT = 630
 SHARE_IMAGE_DIRECTORY = "static/share"
@@ -2516,6 +2518,12 @@ def plan_category_pages(layout: PrizeLayout) -> list[PageJob]:
                 prize=layout.ranking,
                 category=category,
                 years=tuple(category_years),
+                item_list=tuple(
+                    (record.full_name, winner_route)
+                    for _year, _route, _prefix, groups in category_years
+                    for _motivation, members in groups
+                    for record, winner_route in members
+                )[:ITEM_LIST_CAP],
             )
         )
     return jobs
@@ -2558,11 +2566,21 @@ def plan_prize_page(layout: PrizeLayout, rank: int, subject_order: dict[str, int
 
     prize_title = f"{layout.ranking.prize_name}: Winners by Year"
     prize_span = _year_span([record.year for record in layout.records])
+    if layout.ranking.qid == NOBEL_QID:
+        prize_description = (
+            f"Browse all {len(layout.records)} {layout.ranking.prize_name} laureates in Physics, Chemistry, and Physiology or Medicine, "
+            f"{prize_span}, by award year, with the citation for each award."
+        )
+    else:
+        prize_description = (
+            f"Browse all {len(layout.records)} {layout.ranking.prize_name} laureates, {prize_span}, by award year, "
+            "with a link to every winner and the citation for each award."
+        )
     return _page(
         "prize.html",
         layout.route,
         prize_title,
-        _clamp(f"All {len(layout.records)} {layout.ranking.prize_name} laureates, {prize_span}. {layout.ranking.blurb}"),
+        _clamp(prize_description),
         (Breadcrumb("Home", "/"), Breadcrumb(layout.ranking.prize_name, None)),
         prize=layout.ranking,
         routed_categories=layout.routed_categories,
@@ -3366,9 +3384,8 @@ def plan_home_page(
         "/",
         f"PrizeAtlas: Nobel Prize, Fields Medal & {other_prize_count} More Awards",
         _clamp(
-            f"The Nobel Prize, Fields Medal, and {other_prize_count} more: {len(people):,} laureates and "
-            f"{len(records):,} awards across {len(rankings)} international prizes, {min(year_prefixes)}-{latest_year}. "
-            "Free, fast, and sourced from Wikidata, Wikipedia, and ROR."
+            f"Explore {len(people):,} laureates and {len(records):,} awards from the Nobel Prize, Fields Medal, and "
+            f"{other_prize_count} more international prizes, {min(year_prefixes)}-{latest_year}, by year, country, and institution."
         ),
         (),
         hero_heading=hero_heading,
@@ -3978,12 +3995,12 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
     years = plan.year_span.split("-", 1)
     year_from, year_to = (years[0], years[-1])
     num = lambda value: format_number(value, language)
+    description_field = "description"
     if key == "home":
         fields = {
             "other_prize_count": num(plan.prize_count - 2),
             "people_count": num(plan.person_count),
             "award_count": num(plan.recipient_count),
-            "prize_count": num(plan.prize_count),
             "year_from": year_from,
             "year_to": year_to,
         }
@@ -4007,9 +4024,10 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
             "prize": language.term("prize", prize.prize_name),
             "recipient_count": num(len(prize_records)),
             "year_span": _year_span([record.year for record in prize_records]),
-            "blurb": language.ranking_blurb(prize.qid),
         }
         name = "prize"
+        if prize.qid == NOBEL_QID:
+            description_field = "description_nobel"
     elif key.startswith("category:"):
         prize = context["prize"]
         recipients = sum(len(members) for _year, _route, _prefix, groups in context["years"] for _motivation, members in groups)
@@ -4083,7 +4101,7 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
     # " & Other Awards" is the first thing to give up when the full title would be cut off in search results.
     if name == "person" and context["other_awards"] and len(more := metadata("title_more")) <= TITLE_LIMIT:
         title = more
-    return title, _clamp(metadata("description"))
+    return title, _clamp(metadata(description_field))
 
 
 def create_multilingual_site_plan(

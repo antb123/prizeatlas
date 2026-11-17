@@ -1578,7 +1578,8 @@ class WebsiteBuildTests(unittest.TestCase):
             institution,
         )
         self.assertIn(
-            '<meta property="og:description" content="All 2 Nobel Prize laureates, 2024. Blurb.">',
+            '<meta property="og:description" content="Browse all 2 Nobel Prize laureates, 2024, by award year, '
+            'with a link to every winner and the citation for each award.">',
             prize,
         )
 
@@ -1784,6 +1785,89 @@ class WebsiteBuildTests(unittest.TestCase):
         pages = [html for path in (self.website / "dist").rglob("*.html") if 'content="noindex"' not in (html := path.read_text())]
         descriptions = [re.search(r'name="description" content="([^"]*)"', html).group(1) for html in pages]
         self.assertEqual(len(descriptions), len(set(descriptions)), "every page needs its own description")
+
+    def test_category_page_item_list_follows_visible_recipients_in_every_language(self) -> None:
+        def item_list(route: str) -> list[dict]:
+            html = (self.website / "dist" / route.strip("/") / "index.html").read_text()
+            block = html.split('<script type="application/ld+json">')[1].split("</script>")[0]
+            graph = {entry["@type"]: entry for entry in json.loads(block)["@graph"]}
+            return graph["ItemList"]["itemListElement"]
+
+        rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
+        shared = "for foundational discoveries in machine learning"
+        records = [
+            {"award_record_id": "nobel-1", "award_wikidata_qid": "Q1", "prize_name": "Nobel Prize", "category": "Physics",
+             "year": "2024", "full_name": "John J. Hopfield", "motivation": shared},
+            {"award_record_id": "nobel-2", "award_wikidata_qid": "Q1", "prize_name": "Nobel Prize", "category": "Physics",
+             "year": "2024", "full_name": "Geoffrey Hinton", "motivation": shared},
+            {"award_record_id": "nobel-3", "award_wikidata_qid": "Q1", "prize_name": "Nobel Prize", "category": "Physics",
+             "year": "2023", "full_name": "Pierre Agostini", "motivation": "for attosecond pulses of light"},
+            {"award_record_id": "nobel-4", "award_wikidata_qid": "Q1", "prize_name": "Nobel Prize", "category": "Chemistry",
+             "year": "2024", "full_name": "David Baker", "motivation": "for computational protein design"},
+        ]
+        plan = build.build_site(self.create_database(rankings, records), "https://example.org/", self.website)
+        jobs = {(job.key, job.language.code): job for job in plan.jobs}
+
+        # Newest year first, recipients within a year in record order: the order the page prints them.
+        names = ["John J. Hopfield", "Geoffrey Hinton", "Pierre Agostini"]
+        english = (self.website / "dist/nobel-prize/physics/index.html").read_text()
+        visible = [
+            name
+            for recipients in re.findall(r'class="recipient-names">(.*?)</p>', english, re.DOTALL)
+            for name in re.findall(r">([^<]+)</a>", recipients)
+        ]
+        self.assertEqual(names, visible)
+        self.assertEqual(
+            [
+                {"@type": "ListItem", "position": 1, "name": "John J. Hopfield", "url": "https://example.org/nobel-prize/physics/2024/john-j-hopfield/"},
+                {"@type": "ListItem", "position": 2, "name": "Geoffrey Hinton", "url": "https://example.org/nobel-prize/physics/2024/geoffrey-hinton/"},
+                {"@type": "ListItem", "position": 3, "name": "Pierre Agostini", "url": "https://example.org/nobel-prize/physics/2023/pierre-agostini/"},
+            ],
+            item_list("/nobel-prize/physics/"),
+        )
+        # Every language keeps the personal names and points each entry at its own localized award page.
+        for code in build.LANGUAGE_CODES:
+            category = jobs[("category:Q1:physics", code)]
+            expected = [
+                build.public_url("https://example.org/", jobs[(f"winner:{record_id}", code)].route)
+                for record_id in ("nobel-1", "nobel-2", "nobel-3")
+            ]
+            entries = item_list(category.route)
+            self.assertEqual(names, [entry["name"] for entry in entries], code)
+            self.assertEqual(expected, [entry["url"] for entry in entries], code)
+
+        with mock.patch.object(build, "ITEM_LIST_CAP", 2):
+            (self.directory / "awards.sqlite3").unlink()
+            build.build_site(self.create_database(rankings, records), "https://example.org/", self.website)
+            self.assertEqual(names[:2], [entry["name"] for entry in item_list("/nobel-prize/physics/")])
+            self.assertIn(">Pierre Agostini</a>", (self.website / "dist/nobel-prize/physics/index.html").read_text())
+
+    def test_nobel_prize_hub_description_names_the_covered_prizes(self) -> None:
+        def description(route: str) -> str:
+            html = (self.website / "dist" / route.strip("/") / "index.html").read_text()
+            return re.search(r'name="description" content="([^"]*)"', html).group(1)
+
+        rankings = [
+            ("Q7191", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100),
+            ("Q28835", "Fields Medal", "fields-medal", "https://example.org/fields", 90),
+        ]
+        records = [
+            {"award_record_id": "nobel-1", "award_wikidata_qid": "Q7191", "prize_name": "Nobel Prize", "category": "Physics",
+             "year": "2024", "full_name": "Geoffrey Hinton"},
+            {"award_record_id": "fields-1", "award_wikidata_qid": "Q28835", "prize_name": "Fields Medal", "category": "",
+             "year": "2022", "full_name": "Maryna Viazovska"},
+        ]
+        build.build_site(self.create_database(rankings, records), "https://example.org/", self.website, en_only=True)
+
+        self.assertEqual(
+            "Browse all 1 Nobel Prize laureates in Physics, Chemistry, and Physiology or Medicine, 2024, by award year, "
+            "with the citation for each award.",
+            description("/nobel-prize/"),
+        )
+        self.assertEqual(
+            "Browse all 1 Fields Medal laureates, 2022, by award year, with a link to every winner and the citation for each award.",
+            description("/fields-medal/"),
+        )
 
     def test_shared_citation_prints_once_and_year_pages_link_neighbours(self) -> None:
         rankings = [("Q1", "Nobel Prize", "nobel-prize", "https://example.org/nobel", 100)]
