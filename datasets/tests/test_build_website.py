@@ -1246,8 +1246,8 @@ class WebsiteBuildTests(unittest.TestCase):
 
         physics_html = physics.read_text()
         self.assertIn("<title>Ernest Orlando Lawrence — Nobel Prize for Physics, 1939 | PrizeAtlas</title>", physics_html)
-        self.assertIn('href="../../../../favicon.svg"', physics_html)
-        self.assertIn('href="../../../../static/style.css"', physics_html)
+        self.assertIn('href="/awards/favicon.svg"', physics_html)
+        self.assertIn('href="/awards/static/style.css"', physics_html)
         self.assertIn("&lt;em&gt;unsafe&lt;/em&gt;", physics_html)
         self.assertNotIn("<em>unsafe</em>", physics_html)
         self.assertIn('href="../"', physics_html)
@@ -1282,7 +1282,7 @@ class WebsiteBuildTests(unittest.TestCase):
             'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
             home_html,
         )
-        self.assertIn('src="static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
+        self.assertIn('src="/awards/static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
         self.assertIn('href="awards/">Awards</a>', home_html)
         self.assertIn('<dt><a href="awards/">3</a></dt>', home_html)
         self.assertIn('<dd><a href="awards/">prizes</a></dd>', home_html)
@@ -1298,7 +1298,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertLess(home_awards.group(0).index(">Nobel Prize</a>"), home_awards.group(0).index(">Turing Award</a>"))
         self.assertLess(home_awards.group(0).index(">Turing Award</a>"), home_awards.group(0).index(">Japan Prize</a>"))
         self.assertEqual(len(rankings), awards_html.count("<article>"))
-        self.assertIn('src="../static/logos/nobel-prize.png" alt="Nobel Prize logo"', awards_html)
+        self.assertIn('src="/awards/static/logos/nobel-prize.png" alt="Nobel Prize logo"', awards_html)
         self.assertIn("<p>Blurb.</p>", awards_html)
         self.assertNotIn('<span>Score</span>', awards_html)
         self.assertIn('href="./">Awards</a>', awards_html)
@@ -1318,7 +1318,7 @@ class WebsiteBuildTests(unittest.TestCase):
         map_html = (self.website / "dist/map/index.html").read_text()
         biology_map_html = (self.website / "dist/map/biology/index.html").read_text()
         self.assertIn('<body class="map-layout">', map_html)
-        self.assertIn('href="../static/style.css"', map_html)
+        self.assertIn('href="/awards/static/style.css"', map_html)
         self.assertIn('href="./">Map</a>', map_html)
         self.assertIn("leaflet@1.9.4", map_html)
         self.assertIn("sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=", map_html)
@@ -1348,7 +1348,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn("https://example.org/awards/blog/fixture/", locations)
         self.assertTrue((self.website / "dist/blog/fixture/index.html").exists())
         self.assertFalse((self.website / "dist/blog/posts").exists())
-        self.assertIn('href="../blog/">Blog</a>', (self.website / "dist/es/index.html").read_text())
+        self.assertIn('href="/awards/blog/">Blog</a>', (self.website / "dist/es/index.html").read_text())
         self.assertIn(
             "https://example.org/awards/nobel-prize/physics/1939/ernest-orlando-lawrence/",
             locations,
@@ -1636,7 +1636,7 @@ class WebsiteBuildTests(unittest.TestCase):
         )
         self.assertNotIn("<script>", rendered)
         self.assertIn("\\u003c/script>", rendered)
-        self.assertEqual("</script><script>alert(1)</script>", json.loads(rendered)["@graph"][0]["affiliation"]["name"])
+        self.assertEqual("</script><script>alert(1)</script>", json.loads(rendered)["@graph"][-1]["affiliation"]["name"])
 
         source = award(
             ({"affiliation_name": "Second University"},),
@@ -1776,8 +1776,9 @@ class WebsiteBuildTests(unittest.TestCase):
             self.assertEqual(1, len(item_list("/nobel-prize/winners/")))
             self.assertIn(">Second Laureate</a>", winners_html)
 
-        # The homepage has no breadcrumbs and no laureate, so it emits no structured data at all.
-        self.assertNotIn("application/ld+json", (self.website / "dist/index.html").read_text())
+        # The homepage has no breadcrumbs and no laureate, so it carries only the site-wide publisher and website.
+        home_block = (self.website / "dist/index.html").read_text().split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0]
+        self.assertEqual(["Organization", "WebSite"], [node["@type"] for node in json.loads(home_block)["@graph"]])
 
         # Legacy-URL redirects are noindex stubs, not pages, and carry no description.
         pages = [html for path in (self.website / "dist").rglob("*.html") if 'content="noindex"' not in (html := path.read_text())]
@@ -1882,12 +1883,27 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "2012",
                 "full_name": "Unlinked Laureate",
             },
+            *(
+                {
+                    "award_record_id": f"{prize}-long",
+                    "award_wikidata_qid": qid,
+                    "prize_name": name,
+                    "category": "Medicine",
+                    "year": "2013",
+                    "full_name": "Bartholomew Montgomery-Fitzwilliam",
+                    "laureate_wikidata_qid": "Q999",
+                }
+                for prize, qid, name in (("wolf", "Q2", "Wolf Prize"), ("nobel", "Q1", "Nobel Prize"))
+            ),
         ]
         database = self.create_database(rankings, records)
 
         plan = build.build_site(database, "https://example.org/", self.website)
 
-        self.assertEqual(1, plan.person_count)
+        self.assertEqual(2, plan.person_count)
+        # A title that would run past 60 characters gives up " & Other Awards" first.
+        long_html = (self.website / "dist/people/bartholomew-montgomery-fitzwilliam/index.html").read_text()
+        self.assertIn("<title>Bartholomew Montgomery-Fitzwilliam — Nobel Prize 2013 | PrizeAtlas</title>", long_html)
         person = self.website / "dist/people/shinya-yamanaka/index.html"
         person_html = person.read_text()
         # The title names the most prestigious prize and its year, not every prize.
@@ -2776,7 +2792,7 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual("I136199984", rows[2][build.AWARD_COLUMNS.index("institution_openalex_id")])
 
         nested_html = (self.website / "dist/test-prize/physics/2000/index.html").read_text()
-        self.assertIn('href="../../../awards.csv" download', nested_html)
+        self.assertIn('href="/awards/awards.csv" download', nested_html)
         error_html = (self.website / "dist/404.html").read_text()
         self.assertIn('href="/awards/awards.csv" download', error_html)
 
@@ -3077,10 +3093,26 @@ class WebsiteBuildTests(unittest.TestCase):
         ]
         self.assertNotIn("https://example.org/awards/llms.txt", locations)
 
+    def test_sitemap_lastmod_keeps_date_of_unchanged_pages(self) -> None:
+        dist, staging = self.directory / "dist", self.directory / "staging"
+        for root, same, changed in ((dist, "same", "old"), (staging, "same", "new")):
+            for route, html in (("same", same), ("changed", changed)):
+                (root / route).mkdir(parents=True)
+                (root / route / "index.html").write_text(html)
+        build.write_sitemaps(dist, {"/same/": "2026-01-02", "/changed/": "2026-01-02"}, "https://example.org/")
+        (staging / "new").mkdir()
+        (staging / "new" / "index.html").write_text("new")
+
+        lastmods = build.page_lastmods(staging, dist, ["/same/", "/changed/", "/new/"], "https://example.org/", "2026-11-17")
+
+        self.assertEqual({"/same/": "2026-01-02", "/changed/": "2026-11-17", "/new/": "2026-11-17"}, lastmods)
+        build.write_sitemaps(staging, lastmods, "https://example.org/")
+        self.assertIn("<url><loc>https://example.org/same/</loc><lastmod>2026-01-02</lastmod></url>", (staging / "sitemap.xml").read_text())
+
     def test_sitemap_splits_at_url_limit(self) -> None:
         output = self.directory / "sitemaps"
         output.mkdir()
-        routes = [f"/route-{number}/" for number in range(50_001)]
+        routes = {f"/route-{number}/": "2026-11-17" for number in range(50_001)}
 
         self.assertEqual(50_001, build.write_sitemaps(output, routes, "https://example.org/base/"))
 

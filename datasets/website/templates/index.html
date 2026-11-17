@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" width="20" height="15" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
 {% macro record_flag(record) %}{{ flag((record.affiliations | selectattr("country") | map(attribute="country") | list + [record.birth_country]) | first) }}{% endmacro %}
 <header class="page-intro">
   <h1>{{ hero_heading }}</h1>
@@ -105,7 +105,7 @@
   <h2>{{ t("home.prizes") }}</h2>
   <ol class="highlights prize-list">
     {% for prize, route in prizes %}
-    <li><a href="{{ href(route) }}">{% if prize.logo %}<img class="award-logo" src="{{ asset_href(prize.logo) }}" alt="">{% endif %}{{ term("prize", prize.prize_name) }}</a></li>
+    <li><a href="{{ href(route) }}">{% if prize.logo %}<img class="award-logo" width="24" height="24" src="{{ asset_href(prize.logo) }}" alt="">{% endif %}{{ term("prize", prize.prize_name) }}</a></li>
     {% endfor %}
   </ol>
   <p><a href="{{ href(awards_route) }}">{{ t("error404.browse_awards") }}</a></p>

@@ -19,7 +19,7 @@
 {% block content %}
 <header class="page-intro">
   <h1>{{ title }}</h1>
-  <p>{{ ranking_blurb(prize.qid) }}</p>
+  <p>{{ lead }} {{ ranking_blurb(prize.qid) }}</p>
   <p><a class="external-source" href="{{ prize.url }}">{{ t("common.official_website") }} <span aria-hidden="true">↗</span></a></p>
 </header>
 {% if routed_categories %}

@@ -3,7 +3,7 @@
 <header class="page-intro">
   <p class="eyebrow">{{ t("affiliation.eyebrow") }}</p>
   {% if affiliation.profile and affiliation.profile.logo_url %}
-  <img class="award-logo award-logo-large" src="{{ affiliation.profile.logo_url }}" alt="{{ t("common.logo_alt", name=language.entity_label(affiliation.qid, affiliation.name)) }}">
+  <img class="award-logo award-logo-large" width="52" height="52" src="{{ affiliation.profile.logo_url }}" alt="{{ t("common.logo_alt", name=language.entity_label(affiliation.qid, affiliation.name)) }}">
   {% endif %}
   <h1>{{ language.entity_label(affiliation.qid, affiliation.name) }}</h1>
   <p class="subject-badges">

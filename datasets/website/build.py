@@ -34,6 +34,7 @@ from types import MappingProxyType
 from typing import Any
 from urllib.parse import quote, quote_plus, urlsplit, urlunsplit
 from xml.sax.saxutils import escape as xml_escape
+from xml.sax.saxutils import unescape as xml_unescape
 
 import tomllib
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
@@ -90,6 +91,7 @@ PEOPLE_PER_PAGE = 200
 # Caps the ItemList structured-data block so a large page (a century of Nobel winners) doesn't add outsized
 # JSON-LD parse weight to first load; the visible HTML list itself is never truncated.
 ITEM_LIST_CAP = 200
+TITLE_LIMIT = 60  # characters a search result shows before cutting; the " | PrizeAtlas" suffix may be cut
 HOMEPAGE_ROWS = 8
 COUNTRIES_ROUTE = "/countries/"
 CITIES_ROUTE = "/countries/cities/"
@@ -636,11 +638,6 @@ def _localized_route_target(target: str, route_map: Mapping[str, str]) -> str:
         return route_map[target]
     except KeyError as error:
         raise BuildFailure(f"unmapped internal route target={target}") from error
-
-
-def relative_file(source_route: str, target: str) -> str:
-    source = source_route.strip("/") or "."
-    return posixpath.relpath(target, source)
 
 
 def _text(value: object) -> str:
@@ -1875,7 +1872,15 @@ def _localized_item_list(job: PageJob) -> tuple[tuple[str, str], ...]:
 def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] | None = None) -> str:
     route_map = route_map or {}
     localized_route = lambda route: _localized_route_target(route, route_map)
-    graph: list[dict[str, Any]] = []
+    home = public_url(base_url, localized_route("/"))
+    # Every page names the site and its publisher; the @id lets crawlers merge the copies into one entity each.
+    graph: list[dict[str, Any]] = [
+        {"@type": "Organization", "@id": public_url(base_url, "/#organization"), "name": "PrizeAtlas", "url": public_url(base_url, "/"),
+         "logo": public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}")},
+        {"@type": "WebSite", "@id": home + "#website", "name": "PrizeAtlas", "url": home,
+         "publisher": {"@id": public_url(base_url, "/#organization")},
+         **({"inLanguage": job.language.code} if job.language is not None else {})},
+    ]
     if job.breadcrumbs:
         # Google requires `item` on every ListItem except the final one. A crumb with no route names a place
         # the site does not page (a non-routed category), so drop every routeless intermediate crumb from the
@@ -1901,7 +1906,10 @@ def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] |
     if schema := job.context.get("schema"):
         if not isinstance(schema, dict):
             raise BuildFailure(f"invalid schema route={job.route}")
-        localized_schema = {**_localized_schema(job, schema), "url": public_url(base_url, job.route)}
+        # A laureate's URL is their profile, the hub for all their awards, even on a single-award page.
+        person_route = job.context.get("person_route")
+        url = public_url(base_url, localized_route(person_route) if person_route else job.route)
+        localized_schema = {**_localized_schema(job, schema), "url": url}
         if job.language is not None:
             localized_schema["inLanguage"] = job.language.code
         graph.append(localized_schema)
@@ -1915,8 +1923,6 @@ def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] |
                 ],
             }
         )
-    if not graph:
-        return ""
     # Escaping "<" keeps a "</script>" inside any field from closing the block early; it stays valid JSON.
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False).replace("<", "\\u003c")
 
@@ -2563,8 +2569,11 @@ def plan_prize_page(layout: PrizeLayout, rank: int, subject_order: dict[str, int
         category_links=category_links,
         year_links=tuple(direct_years),
         recent_groups=_year_groups(recent, layout.record_routes),
+        item_list=tuple((record.full_name, layout.record_routes[record.award_record_id]) for record in recent[:ITEM_LIST_CAP]),
         recent_years=PRIZE_PAGE_YEARS,
         winners_route=layout.route + f"{WINNERS_SEGMENT}/",
+        recipient_count=len(layout.records),
+        span=prize_span,
         share_card=ShareCard(
             "Prize",
             layout.ranking.prize_name,
@@ -2836,6 +2845,7 @@ def plan_person_pages(
                     "award": [f"{record.prize_name}, {record.year}" for record, _ in person.awards],
                 },
                 schema_record=latest,
+                top_record=top,
                 share_card=ShareCard(
                     "Laureate",
                     person.name,
@@ -3464,7 +3474,7 @@ def plan_explorer_page(
         "explorer.html",
         EXPLORER_ROUTE,
         "Data Explorer",
-        "Explore ranked laureates across fourteen international prize families by awards, points, country, and career.",
+        "Explore ranked laureates across every international prize family by awards, points, country, and career.",
         (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
         payload=explorer_json(payload),
         generated=generated,
@@ -3799,6 +3809,55 @@ def _localized_award_label(language: Language, record: AwardRecord) -> str:
     return language.text("meta.award-with-category", prize=prize, category=language.term("category", record.category)) if record.category else prize
 
 
+LEAD_ITEMS = 5  # awards or names a lead lists before "+ N more"
+LEAD_CITATION_WORDS = 30  # keeps a lead near 40-80 words when the citation is long
+
+
+def _more(language: Language, items: list[str]) -> str:
+    """Join the first LEAD_ITEMS items, then say how many were left out."""
+    shown = "; ".join(items[:LEAD_ITEMS])
+    if len(items) <= LEAD_ITEMS:
+        return shown
+    return f"{shown} {language.text('affiliations.more', count=len(items) - LEAD_ITEMS)}"
+
+
+def _person_lead(language: Language, context: Mapping[str, Any]) -> str:
+    """One paragraph that answers "what has this person won": every award, the top citation, and where they were."""
+    person: Laureate = context["person"]
+    top: AwardRecord = context["top_record"]
+    awards = [f"{_localized_award_label(language, record)}, {record.year}" for record, _ in reversed(person.awards)]
+    parts = [
+        language.text(
+            "person.lead",
+            name=person.name,
+            awards=language.text("plural.award", count=len(person.awards)),
+            year_span=_year_span([record.year for record, _ in person.awards]),
+            award_list=_more(language, awards),
+        )
+    ]
+    if _nonblank(top.motivation):
+        words = top.motivation.split()
+        motivation = " ".join(words[:LEAD_CITATION_WORDS]) + ("…" if len(words) > LEAD_CITATION_WORDS else "")
+        parts.append(language.text("person.lead_citation", award=_localized_award_label(language, top), year=top.year, motivation=motivation))
+    if first := next((item for item in top.affiliations if _nonblank(item.name)), None):
+        parts.append(language.text("meta.winner.affiliation", institution=language.entity_label(first.wikidata_qid, first.name)).strip())
+    return " ".join(parts)
+
+
+def _prize_lead(language: Language, context: Mapping[str, Any]) -> str:
+    """One paragraph that answers "who has won this prize": the count, the span, and the latest winners."""
+    prize: Ranking = context["prize"]
+    year, winners = context["recent_groups"][0]
+    return language.text(
+        "prize.lead",
+        recipients=language.text("plural.laureate", count=context["recipient_count"]),
+        prize=language.term("prize", prize.prize_name),
+        year_span=context["span"],
+        year=year,
+        names=_more(language, [record.full_name for record, _ in winners]),
+    )
+
+
 def _localized_breadcrumbs(language: Language, breadcrumbs: Iterable[Breadcrumb]) -> tuple[Breadcrumb, ...]:
     fixed = {
         "Home": "crumb.home",
@@ -3906,7 +3965,7 @@ def _localized_directory_metadata(
     if key.startswith("map:"):
         return {"subject": language.term("subject", context["initial_subject"])}, "map-subject"
     if key in {"explorer", "nearby"}:
-        return {}, key
+        return {"prize_count": num(plan.prize_count)}, key
     if key == "about":
         return {"prize_count": num(plan.prize_count), "person_count": num(plan.person_count)}, "about"
     return None
@@ -4020,8 +4079,11 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
             raise BuildFailure(f"language={language.code} ui format={catalogue_key}") from error
         return language.text(catalogue_key, **values)
 
-    title_field = "title_more" if name == "person" and context["other_awards"] else "title"
-    return metadata(title_field), _clamp(metadata("description"))
+    title = metadata("title")
+    # " & Other Awards" is the first thing to give up when the full title would be cut off in search results.
+    if name == "person" and context["other_awards"] and len(more := metadata("title_more")) <= TITLE_LIMIT:
+        title = more
+    return title, _clamp(metadata("description"))
 
 
 def create_multilingual_site_plan(
@@ -4066,16 +4128,38 @@ def _sitemap_document(root: str, entries: list[str]) -> bytes:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<{root} xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}\n</{root}>\n'.encode()
 
 
+SITEMAP_ENTRY = re.compile(r"<url><loc>([^<]+)</loc><lastmod>([0-9-]+)</lastmod></url>")
+
+
+def page_lastmods(staging: Path, dist: Path, routes: Iterable[str], base_url: str, today: str) -> dict[str, str]:
+    """Date each route by when its HTML last changed: a page byte-identical to the previous build keeps its old date."""
+    previous: dict[str, str] = {}
+    for sitemap in dist.glob("sitemap*.xml"):
+        previous.update((xml_unescape(loc), date) for loc, date in SITEMAP_ENTRY.findall(sitemap.read_text(encoding="utf-8")))
+    lastmods: dict[str, str] = {}
+    kept = 0
+    for route in routes:
+        page = Path(route.strip("/")) / "index.html"
+        old = dist / page
+        date = previous.get(public_url(base_url, route))
+        unchanged = date is not None and old.is_file() and old.read_bytes() == (staging / page).read_bytes()
+        lastmods[route] = date if unchanged else today
+        kept += unchanged
+    print(f"website sitemap lastmod routes={len(lastmods)} unchanged={kept} changed={len(lastmods) - kept} today={today}")
+    return lastmods
+
+
 def write_sitemaps(
     output: Path,
-    routes: Iterable[str],
+    lastmods: Mapping[str, str],
     base_url: str,
     *,
     url_limit: int = SITEMAP_URL_LIMIT,
     byte_limit: int = SITEMAP_BYTE_LIMIT,
 ) -> int:
-    locations = [public_url(base_url, route) for route in sorted(routes)]
-    entries = [f"  <url><loc>{xml_escape(location)}</loc></url>" for location in locations]
+    """Write sitemap.xml from route -> YYYY-MM-DD lastmod; past the protocol limits it becomes an index of numbered sitemaps."""
+    locations = [(public_url(base_url, route), lastmods[route]) for route in sorted(lastmods)]
+    entries = [f"  <url><loc>{xml_escape(location)}</loc><lastmod>{date}</lastmod></url>" for location, date in locations]
     single = _sitemap_document("urlset", entries)
     if len(entries) <= url_limit and len(single) <= byte_limit:
         (output / "sitemap.xml").write_bytes(single)
@@ -4601,6 +4685,10 @@ def _render_job(
         context["place"] = _localized_affiliation_country(language, context["place"])
     elif job.template == "university_countries.html":
         context["countries"] = tuple(_localized_affiliation_country(language, place) for place in context["countries"])
+    if job.template == "person.html":
+        context["lead"] = _person_lead(language, context)
+    elif job.template == "prize.html":
+        context["lead"] = _prize_lead(language, context)
     if job.template == "explorer.html":
         context["payload"] = explorer_json(localized_explorer_payload(json.loads(context["payload"]), language, route_map))
     elif job.template == "map.html":
@@ -4634,6 +4722,7 @@ def _render_job(
     target_directory.mkdir(parents=True, exist_ok=True)
     template = environment.get_template(job.template)
     page_url = public_url(base_url, job.route)
+    root = urlsplit(base_url).path
     html = template.render(
         title=job.title,
         description=job.description,
@@ -4644,10 +4733,11 @@ def _render_job(
         share_image_height=SHARE_IMAGE_HEIGHT,
         breadcrumbs=job.breadcrumbs,
         home_href=relative_route(job.route, language.route()),
-        favicon_href=relative_file(job.route, "favicon.svg"),
-        style_href=relative_file(job.route, "static/style.css"),
-        csv_href=relative_file(job.route, "awards.csv"),
-        asset_href=lambda target: relative_file(job.route, target) if target else "",
+        # Assets are root-relative: one URL per file however deep the page, so crawlers and caches see a single copy.
+        favicon_href=root + "favicon.svg",
+        style_href=root + "static/style.css",
+        csv_href=root + "awards.csv",
+        asset_href=lambda target: root + target if target else "",
         country_views=country_views,
         structured_data=_structured_data(base_url, job, route_map),
         href=href,
@@ -4776,7 +4866,9 @@ def build_site(database: Path, base_url: str, website_dir: Path = SCRIPT_DIR, en
         write_country_redirects(environment, staging, normalized_base_url, plan.jobs)
         calendar_routes = write_calendar(staging, website_dir)
         blog_routes = write_blog(staging, website_dir, {job.route for job in plan.jobs})
-        write_sitemaps(staging, [*(job.route for job in plan.jobs), *calendar_routes, *blog_routes], normalized_base_url)
+        sitemap_routes = [*(job.route for job in plan.jobs), *calendar_routes, *blog_routes]
+        today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
+        write_sitemaps(staging, page_lastmods(staging, dist, sitemap_routes, normalized_base_url, today), normalized_base_url)
         write_robots(staging, normalized_base_url)
         write_dataset_csv(staging, records)
         for language in languages:

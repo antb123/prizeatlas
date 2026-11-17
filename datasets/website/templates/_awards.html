@@ -5,7 +5,7 @@
     <li>
       <article>
         <div class="award-identity">
-          {% if prize.logo %}<img class="award-logo" src="{{ asset_href(prize.logo) }}" alt="{{ t("common.logo_alt", name=term("prize", prize.prize_name)) }}">{% endif %}
+          {% if prize.logo %}<img class="award-logo" width="52" height="52" src="{{ asset_href(prize.logo) }}" alt="{{ t("common.logo_alt", name=term("prize", prize.prize_name)) }}">{% endif %}
         </div>
         <div>
           <h3>

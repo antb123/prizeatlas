@@ -3,7 +3,7 @@ prize_name = "Nobel Prize"
 slug = "nobel-prize"
 url = "https://www.nobelprize.org/prizes/"
 score = 100
-blurb = "Established by Alfred Nobel's 1895 will and first awarded in 1901, recognizing major contributions to physics, chemistry, medicine, literature, and peace. Presented every 10 December: the science and literature prizes at the Stockholm Concert Hall in Sweden, the Peace Prize at Oslo City Hall in Norway. Carries a prize of roughly $1.1 million, split among co-recipients."
+blurb = "Physics, Chemistry, and Physiology or Medicine only: the science prizes founded by Alfred Nobel's 1895 will and first awarded in 1901. The Literature, Peace, and Economic Sciences prizes are not covered. Presented every 10 December at the Stockholm Concert Hall in Sweden, with roughly $1.1 million split among co-recipients."
 reasoning = "Its recipients have an unmatched long-term record of changing human knowledge across multiple fields."
 
 [Q28835]

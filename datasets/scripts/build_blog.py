@@ -7,6 +7,7 @@ A post is an HTML fragment named YYYYMMDD-<slug>.html. Rules and the author guid
 The first violation stops the run before anything is written.
 """
 import datetime
+import json
 import re
 from dataclasses import dataclass
 from html import escape
@@ -168,7 +169,7 @@ def nice(date: datetime.date) -> str:
     return f"{date.day} {date:%B %Y}"
 
 
-def page(title: str, description: str, canonical: str, root: str, css: str, og_type: str, crumbs: str, content: str) -> str:
+def page(title: str, description: str, canonical: str, root: str, css: str, og_type: str, crumbs: str, content: str, schema: str = "") -> str:
     t, d, c = (escape(value, quote=True) for value in (title, description, canonical))
     return f"""<!doctype html>
 <html lang="en">
@@ -188,7 +189,7 @@ def page(title: str, description: str, canonical: str, root: str, css: str, og_t
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{root}static/style.css">
 <link rel="stylesheet" href="{css}">
-</head>
+{schema}</head>
 <body>
 <header class="site-header"><a class="site-name" href="{root}">PrizeAtlas</a></header>
 <nav class="breadcrumbs" aria-label="Breadcrumb"><ol>{crumbs}</ol></nav>
@@ -208,7 +209,26 @@ def render_post(post: Post) -> str:
         f'<article class="post">\n<p class="date"><time datetime="{post.date.isoformat()}">{nice(post.date)}</time></p>\n{body.strip()}\n</article>\n'
         f'<p class="more"><a href="../">← All posts</a></p>'
     )
-    return page(f"{post.title} | PrizeAtlas Blog", post.lede, f"{BASE_URL}{post.slug}/", "../../", "../blog.css", "article", crumbs, content)
+    url = f"{BASE_URL}{post.slug}/"
+    return page(f"{post.title} | PrizeAtlas Blog", post.lede, url, "../../", "../blog.css", "article", crumbs, content, article_schema(post, url))
+
+
+def article_schema(post: Post, url: str) -> str:
+    """schema.org Article for one post; escaping "<" keeps the JSON from closing its script element."""
+    publisher = {"@type": "Organization", "@id": "https://prizeatlas.org/#organization", "name": "PrizeAtlas", "url": "https://prizeatlas.org/"}
+    article = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.lede,
+        "datePublished": post.date.isoformat(),
+        "url": url,
+        "mainEntityOfPage": url,
+        "inLanguage": "en",
+        "author": publisher,
+        "publisher": publisher,
+    }
+    return f'<script type="application/ld+json">{json.dumps(article, ensure_ascii=False).replace("<", "\\u003c")}</script>\n'
 
 
 def render_index(posts: list[Post]) -> str:
