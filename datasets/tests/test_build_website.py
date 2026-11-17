@@ -669,7 +669,7 @@ class WebsiteBuildTests(unittest.TestCase):
 
         self.assertEqual([("First", 7.0), ("Second", 5.0)], [(place.name, rate) for place, rate in rates])
 
-    def test_homepage_income_adjusted_rows_sort_and_preserve_routes(self) -> None:
+    def test_income_adjusted_rankings_sort_by_rate(self) -> None:
         country_names = [f"Country {index}" for index in range(16)]
         comparison = [
             {
@@ -681,19 +681,10 @@ class WebsiteBuildTests(unittest.TestCase):
             }
             for index in range(16)
         ]
-        places = [
-            build.Place(name, build.slugify(name), f"/countries/awarded/{build.slugify(name)}/", ())
-            for index, name in enumerate(country_names)
-            if index != 1
-        ]
-
         rankings = build.plan_income_adjusted_award_rankings(country_names, comparison)
-        rows = build.plan_income_adjusted_award_rows(country_names, rankings, places)
 
-        self.assertEqual(15, len(rows))
-        self.assertEqual([*(f"Country {index}" for index in range(15, 1, -1)), "Country 0"], [country.name for country, _ in rows])
-        self.assertNotIn("Country 1", [country.name for country, _ in rows])
-        self.assertEqual(15.125, rows[0][1])
+        self.assertEqual(list(range(15, -1, -1)), [row["country_idx"] for row in rankings])
+        self.assertEqual(15.125, rankings[0]["rate"])
 
     def test_homepage_renders_income_adjusted_award_ranking(self) -> None:
         database = self.create_database(

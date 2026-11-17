@@ -2063,21 +2063,6 @@ def plan_income_adjusted_award_rankings(
     return sorted(rows, key=lambda row: (-float(row["rate"]), country_names[int(row["country_idx"])]))
 
 
-def plan_income_adjusted_award_rows(
-    country_names: list[str],
-    rankings: list[dict[str, int | float]],
-    places: Iterable[Place],
-) -> list[tuple[Place, float]]:
-    """Rank homepage countries by award records per $1 billion of 2024 GDP PPP."""
-    by_name = {place.name: place for place in places}
-    rows: list[tuple[Place, float]] = []
-    for row in rankings:
-        country = by_name.get(country_names[int(row["country_idx"])])
-        if country is not None:
-            rows.append((country, float(row["rate"])))
-    return rows
-
-
 def plan_affiliations(
     records: list[AwardRecord],
     record_routes: dict[str, str],
@@ -3329,7 +3314,6 @@ def plan_home_page(
     prize_routes: dict[str, str],
     ranking_by_qid: dict[str, Ranking],
     record_routes: dict[str, str],
-    income_adjusted_awards: list[tuple[Place, float]],
 ) -> PageJob:
     """Plan the homepage last because it reports on laureates and routes from the whole site."""
     year_prefixes = [_year_prefix(record.year, record.award_record_id) for record in records]
@@ -3395,7 +3379,6 @@ def plan_home_page(
         women_pct=women_pct,
         top_countries=tuple(top_countries),
         affiliation_rates=tuple(affiliation_rates[:HOMEPAGE_ROWS]),
-        income_adjusted_awards=tuple(income_adjusted_awards[:HOMEPAGE_ROWS]),
         top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
     )
 
@@ -3594,9 +3577,6 @@ def create_site_plan(
     )
     income_adjusted_rankings = plan_income_adjusted_award_rankings(explorer["countries"], homepage_comparison)
     explorer["income_adjusted_awards"] = income_adjusted_rankings
-    income_adjusted_awards = plan_income_adjusted_award_rows(
-        explorer["countries"], income_adjusted_rankings, country_places["Awarded"]
-    )
 
     jobs.extend(plan_person_pages(people, base_url, explorer["people"], ranking_by_qid))
     for layout in layouts:
@@ -3612,7 +3592,7 @@ def create_site_plan(
     jobs.extend(plan_university_pages(affiliations))
     jobs.append(
         plan_home_page(
-            rankings, records, people, affiliations, country_places, prize_routes, ranking_by_qid, record_routes, income_adjusted_awards
+            rankings, records, people, affiliations, country_places, prize_routes, ranking_by_qid, record_routes
         )
     )
     jobs.append(plan_awards_page(rankings, prize_routes))
