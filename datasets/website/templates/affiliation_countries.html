@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_view_tabs.html" import country_tabs with context %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" width="20" height="15" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
 {% block content %}
 {{ country_tabs("affiliations") }}
 <header class="page-intro">
@@ -12,7 +13,7 @@
   {% for place in countries %}
   <li>
     <span class="rank-position">{{ format_number(loop.index) }}</span>
-    <a href="{{ href(place.route) }}">{{ place_label(place) }}</a>
+    <a href="{{ href(place.route) }}">{{ flag(place.name) }}{{ place_label(place) }}</a>
     <span class="rank-count" style="--share: {{ (place.members | length) * 100 // leader }}">{{ format_number(place.members | length) }}</span>
   </li>
   {% endfor %}

@@ -2080,6 +2080,12 @@ class WebsiteBuildTests(unittest.TestCase):
         cities_per_capita = (self.website / "dist/countries/cities-per-capita/index.html").read_text()
         boston = (self.website / "dist/countries/cities/boston-united-states/index.html").read_text()
         sitemap = (self.website / "dist/sitemap.xml").read_text()
+
+        # Born, Awarded, and Died lists flag each country; the Cities list names places, so it carries none.
+        flag = '<img class="flag" width="20" height="15" src="/static/flags/{}.svg" alt="" loading="lazy">'
+        self.assertIn(flag.format("be") + "Belgium</a>", people)
+        self.assertIn(flag.format("us") + "United States</a>", (self.website / "dist/countries/awarded/index.html").read_text())
+        self.assertNotIn('class="flag"', cities)
         llms = (self.website / "dist/llms.txt").read_text()
 
         self.assertIn('href="affiliations/">Institutions</a>', people)
@@ -2224,6 +2230,7 @@ class WebsiteBuildTests(unittest.TestCase):
                 "year": "2000",
                 "full_name": "Alice Alpha",
                 "laureate_wikidata_qid": "Q100",
+                "birth_country": "Japan",
                 "affiliation_name": "Paris Institute",
                 "affiliation_city": "Paris",
                 "affiliation_country": "France",
@@ -2249,6 +2256,10 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Paris Institute</a>", winner)
         self.assertIn(">Boston Institute</a>", winner)
         self.assertLess(winner.index("Paris Institute"), winner.index("Boston Institute"))
+        # A small flag sits beside the birth country and beside each affiliation's place.
+        self.assertIn('<dd><img class="flag" width="20" height="15" src="/static/flags/jp.svg" alt="" loading="lazy">', winner)
+        self.assertIn('<p class="place"><img class="flag" width="20" height="15" src="/static/flags/fr.svg" alt="" loading="lazy">Paris, France</p>', winner)
+        self.assertIn('<p class="place"><img class="flag" width="20" height="15" src="/static/flags/us.svg" alt="" loading="lazy">Boston, United States</p>', winner)
 
         # One award, two recorded institutions: neither ranking under-counts it.
         paris = (self.website / "dist/affiliations/paris-institute/index.html").read_text()
@@ -2265,6 +2276,15 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertIn(">Boston Institute</a>", united_states)
         self.assertIn("Boston", united_states)
         self.assertNotIn("Paris", united_states)
+
+        # The institution ranking and its by-country view flag each row by the country recorded for it.
+        flag = '<img class="flag" width="20" height="15" src="/static/flags/{}.svg" alt="" loading="lazy">'
+        institutions = (self.website / "dist/affiliations/index.html").read_text()
+        self.assertIn(flag.format("fr") + "Paris Institute</a>", institutions)
+        self.assertIn(flag.format("us") + "Boston Institute</a>", institutions)
+        by_country = (self.website / "dist/countries/affiliations/index.html").read_text()
+        self.assertIn(flag.format("fr") + "France</a>", by_country)
+        self.assertIn(flag.format("us") + "United States</a>", by_country)
 
     def test_repeated_parent_affiliation_counts_one_share_card_award(self) -> None:
         rankings = [("Q1", "Test Prize", "test-prize", "https://example.org/prize", 100)]

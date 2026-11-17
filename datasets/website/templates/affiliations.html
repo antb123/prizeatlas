@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" width="20" height="15" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
 {% block content %}
 <nav class="view-tabs" aria-label="{{ t("tabs.institution_views_aria") }}">
   <a href="{{ href(affiliations_route) }}" aria-current="page">{{ t("common.all_institutions") }}</a>
@@ -15,7 +16,7 @@
   {% for affiliation in affiliations %}
   <li>
     <span class="rank-position">{{ format_number(loop.index) }}</span>
-    <div><a href="{{ href(affiliation.route) }}">{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
+    <div><a href="{{ href(affiliation.route) }}">{{ flag((affiliation.awards | map(attribute="affiliation.country") | select | list + [""]) | first) }}{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
       {% if affiliation.units %}
       <ul class="rank-units">
         {% for unit, unit_count in affiliation.units[:3] %}

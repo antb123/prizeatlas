@@ -129,7 +129,7 @@ COUNTRY_CODES_FILE = SCRIPT_DIR / "country_codes.tsv"
 GDP_PER_CAPITA_MIN_AWARDS = 5
 HOMEPAGE_AWARD_YEAR_FROM = 2015
 HOMEPAGE_AWARD_YEAR_TO = 2026
-AFFILIATION_ROWS = 40
+AFFILIATION_ROWS = 50
 # Recorded in the affiliation column but not an institution.
 AFFILIATION_BLOCKLIST = frozenset({"Freelance"})
 PRIZE_PAGE_YEARS = 30
