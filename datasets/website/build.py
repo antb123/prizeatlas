@@ -2790,7 +2790,9 @@ def plan_year_pages(
     return jobs
 
 
-def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: list[dict[str, Any]]) -> list[PageJob]:
+def plan_person_pages(
+    people: list[Laureate], base_url: str, explorer_people: list[dict[str, Any]], ranking_by_qid: dict[str, Ranking]
+) -> list[PageJob]:
     ranking_by_route = {
         row["r"]: (rank, row["c"])
         for rank, row in enumerate(explorer_people, start=1)
@@ -2803,6 +2805,10 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
             raise BuildFailure(f"invalid laureate share ranking qid={person.qid}")
         prizes = list(dict.fromkeys(record.prize_name for record, _ in person.awards))
         span = _year_span([record.year for record, _ in person.awards])
+        # The title names only the most prestigious prize; scores are unique, so max() has one answer.
+        top = max((record for record, _ in person.awards), key=lambda record: ranking_by_qid[record.award_wikidata_qid].score)
+        top_years = ", ".join(sorted({record.year[:4] for record, _ in person.awards if record.award_wikidata_qid == top.award_wikidata_qid}))
+        other_awards = len(prizes) > 1
         latest = person.awards[-1][0]
         birth_date = next((record.birth_date for record, _ in person.awards if _nonblank(record.birth_date)), "")
         recorded_birth_year = next((record.birth_year for record, _ in person.awards if _nonblank(record.birth_year)), "")
@@ -2816,13 +2822,16 @@ def plan_person_pages(people: list[Laureate], base_url: str, explorer_people: li
             _page(
                 "person.html",
                 person.route,
-                f"{person.name} — {_names(prizes, limit=2)} ({span})",
+                f"{person.name} — {top.prize_name} {top_years}{' & Other Awards' if other_awards else ''}",
                 _clamp(
                     f"{person.name} won {len(person.awards)} recorded {'award' if len(person.awards) == 1 else 'awards'} "
                     f"({span}): {_names(prizes, limit=4)}."
                 ),
                 (Breadcrumb("Home", "/"), Breadcrumb("People", PEOPLE_ROUTE), Breadcrumb(person.name, None)),
                 person=person,
+                top_prize=top.prize_name,
+                top_years=top_years,
+                other_awards=other_awards,
                 birth_year=birth_year,
                 birth_country=birth_country,
                 sex=next((record.sex[:1] for record, _ in person.awards if _nonblank(record.sex)), ""),
@@ -3582,7 +3591,7 @@ def create_site_plan(
         explorer["countries"], income_adjusted_rankings, country_places["Awarded"]
     )
 
-    jobs.extend(plan_person_pages(people, base_url, explorer["people"]))
+    jobs.extend(plan_person_pages(people, base_url, explorer["people"], ranking_by_qid))
     for layout in layouts:
         jobs.extend(plan_year_pages(layout, base_url, routes_by_laureate, birth_countries))
         jobs.extend(plan_prize_year_pages(layout))
@@ -4004,6 +4013,8 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
         fields = {
             "name": person.name,
             "prizes": ", ".join(language.term("prize", prize) for prize in dict.fromkeys(record.prize_name for record, _route in person.awards)),
+            "prize": language.term("prize", context["top_prize"]),
+            "years": context["top_years"],
             "year_span": _year_span([record.year for record, _route in person.awards]),
             "award_count": num(len(person.awards)),
         }
@@ -4022,7 +4033,8 @@ def _localized_metadata(language: Language, job: PageJob, plan: SitePlan) -> tup
             raise BuildFailure(f"language={language.code} ui format={catalogue_key}") from error
         return language.text(catalogue_key, **values)
 
-    return metadata("title"), _clamp(metadata("description"))
+    title_field = "title_more" if name == "person" and context["other_awards"] else "title"
+    return metadata(title_field), _clamp(metadata("description"))
 
 
 def create_multilingual_site_plan(

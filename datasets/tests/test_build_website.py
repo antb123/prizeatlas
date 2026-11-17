@@ -1907,6 +1907,8 @@ class WebsiteBuildTests(unittest.TestCase):
         self.assertEqual(1, plan.person_count)
         person = self.website / "dist/people/shinya-yamanaka/index.html"
         person_html = person.read_text()
+        # The title names the most prestigious prize and its year, not every prize.
+        self.assertIn("<title>Shinya Yamanaka — Nobel Prize 2012 &amp; Other Awards | PrizeAtlas</title>", person_html)
         # The most recent award leads the list.
         self.assertIn("Male</p>", person_html)
         awards_html = person_html.split('<ol class="person-awards">', 1)[1]
