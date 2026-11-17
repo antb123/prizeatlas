@@ -21,6 +21,7 @@
   <meta property="og:image:height" content="{{ share_image_height }}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="{{ share_image }}">
+  <meta name="twitter:site" content="@prizeatlas">
   <link rel="icon" href="{{ favicon_href }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ style_href }}">
   {% if structured_data %}<script type="application/ld+json">{{ structured_data|safe }}</script>{% endif %}
@@ -72,6 +73,10 @@
       <a class="footer-badge" href="https://github.com/antb123/prizeatlas" target="_blank" rel="noopener noreferrer">
         <svg aria-hidden="true" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.5"/><circle cx="6.5" cy="5.5" r="1.6"/><circle cx="6.5" cy="14.5" r="1.6"/><circle cx="13.5" cy="10" r="1.6"/><path d="M6.5 7.1v6.3M6.5 8.7A3.8 3.8 0 0 0 10 10.5h1.9"/></svg>
         {{ t("chrome.open_source") }}
+      </a>
+      <a class="footer-badge" href="https://x.com/prizeatlas" target="_blank" rel="noopener noreferrer me">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @prizeatlas
       </a>
     </p>
     {% set correction = correction_href(record.award_record_id if record is defined else '') %}

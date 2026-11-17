@@ -28,7 +28,7 @@ reference pages, with one fixed post structure that a linter enforces so every p
 
 1. **(load-bearing)** Posts are hand-written HTML fragments; no Markdown, no new dependency (stdlib `html.parser`).
 2. **(load-bearing)** Figures are static inline `<svg>`, monochrome via `currentColor` so they follow dark mode; no `<script>`,
-   no `<img>`, no external resources.
+   no `<img>` except the site's own country flags (`<img class="flag" src="/static/flags/<iso2>.svg">`), no external resources.
 3. **(load-bearing)** Blog pages are pre-rendered by `scripts/build_blog.py` (not planned by `website/build.py`), but use the
    site stylesheet and wordmark so they read as the same site. They do not copy the full menu (it would drift).
 4. The canonical base is hard-coded `https://prizeatlas.org/blog/`, as the calendar hard-codes its own (`build_calendar.py:13`);
@@ -108,14 +108,15 @@ at least 12 units in a 320-unit viewBox; labels left, bars right; state the key 
 2. **Opening.** Text MUST sit inside an element (none before `<h1>`, none between top-level blocks). The `<h1>` is the only one and the first element; the next element
    is the only `<p class="lede">`. Both MUST contain text only, no child elements.
 3. **Elements** (closed list). HTML: `h1 h2 h3 p a ul ol li dl dt dd strong em code sup cite blockquote hr br figure figcaption
-   table caption thead tbody tr th td`. SVG: `svg g path rect circle line polyline polygon text tspan title`.
-4. **Attributes** (closed list, per element; `html.parser` lowercases names): `a`: `href`; `p`: `class="lede"` only;
+   table caption thead tbody tr th td img`. SVG: `svg g path rect circle line polyline polygon text tspan title`.
+4. **Attributes** (closed list, per element; `html.parser` lowercases names): `a`: `href`; `p`: `class="lede"` only; `img`: `class="flag" src alt width height loading`, `src` MUST match
+   `/static/flags/[a-z]{2}.svg` and is made relative like `href`;
    `th`/`td`: `colspan rowspan scope`; `svg`: `viewbox role`; other SVG elements: `x y x1 y1 x2 y2 cx cy r width height d points
    transform fill stroke stroke-width fill-opacity text-anchor font-size`. `fill` and `stroke` MUST be `currentColor` or `none`.
 5. **SVG.** Every `<svg>` MUST have `viewbox` and `role="img"`, and its first element child (whitespace skipped) MUST be `<title>`.
 6. **Links.** `href` MUST start with `/` (internal) or `https://`.
-7. **Nesting.** The linter keeps its own open-element stack: a start tag pushes, an end tag MUST match the top. `br` and `hr` are
-   the only HTML void elements; the self-closing form (`<x/>`) is allowed only for SVG elements, `br` and `hr`. The stack MUST be
+7. **Nesting.** The linter keeps its own open-element stack: a start tag pushes, an end tag MUST match the top. `br`, `hr` and `img` are
+   the only HTML void elements; the self-closing form (`<x/>`) is allowed only for SVG elements, `br`, `hr` and `img`. The stack MUST be
    empty at end of file.
 8. **No hidden content.** Comments, `<!doctype>`, `<![CDATA[` and processing instructions MUST fail.
 9. **Not empty.** The run MUST fail when `posts/` holds no post.

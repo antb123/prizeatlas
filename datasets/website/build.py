@@ -1878,7 +1878,7 @@ def _structured_data(base_url: str, job: PageJob, route_map: Mapping[str, str] |
     # Every page names the site and its publisher; the @id lets crawlers merge the copies into one entity each.
     graph: list[dict[str, Any]] = [
         {"@type": "Organization", "@id": public_url(base_url, "/#organization"), "name": "PrizeAtlas", "url": public_url(base_url, "/"),
-         "logo": public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}")},
+         "logo": public_url(base_url, f"/{SHARE_IMAGE_FALLBACK}"), "sameAs": ["https://x.com/prizeatlas"]},
         {"@type": "WebSite", "@id": home + "#website", "name": "PrizeAtlas", "url": home,
          "publisher": {"@id": public_url(base_url, "/#organization")},
          **({"inLanguage": job.language.code} if job.language is not None else {})},

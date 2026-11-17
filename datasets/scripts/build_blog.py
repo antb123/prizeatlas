@@ -21,12 +21,14 @@ BASE_URL = "https://prizeatlas.org/blog/"
 MAX_BYTES = 60 * 1024
 SLUG = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
 HTML_ELEMENTS = {"h1", "h2", "h3", "p", "a", "ul", "ol", "li", "dl", "dt", "dd", "strong", "em", "code", "sup", "cite",
-                 "blockquote", "hr", "br", "figure", "figcaption", "table", "caption", "thead", "tbody", "tr", "th", "td"}
+                 "blockquote", "hr", "br", "img", "figure", "figcaption", "table", "caption", "thead", "tbody", "tr", "th", "td"}
 SVG_ELEMENTS = {"svg", "g", "path", "rect", "circle", "line", "polyline", "polygon", "text", "tspan", "title"}
-VOID = {"br", "hr"}
+VOID = {"br", "hr", "img"}
+CLASSES = {"p": "lede", "img": "flag"}
+FLAG_SRC = re.compile(r"/static/flags/[a-z]{2}\.svg")
 SVG_ATTRIBUTES = {"x", "y", "x1", "y1", "x2", "y2", "cx", "cy", "r", "width", "height", "d", "points", "transform", "fill",
                   "stroke", "stroke-width", "fill-opacity", "text-anchor", "font-size"}
-ATTRIBUTES = {"a": {"href"}, "p": {"class"}, "th": {"colspan", "rowspan", "scope"}, "td": {"colspan", "rowspan", "scope"},
+ATTRIBUTES = {"a": {"href"}, "p": {"class"}, "img": {"class", "src", "alt", "width", "height", "loading"}, "th": {"colspan", "rowspan", "scope"}, "td": {"colspan", "rowspan", "scope"},
               "svg": {"viewbox", "role"}}
 
 
@@ -75,8 +77,12 @@ class Linter(HTMLParser):
                 self.fail(f"{name} must be currentColor or none")
             if name == "href" and not (value or "").startswith(("/", "https://")):
                 self.fail("href must start with / or https://")
-            if name == "class" and value != "lede":
-                self.fail('class allowed only as class="lede"')
+            if name == "class" and value != CLASSES.get(tag):
+                self.fail('class allowed only as p class="lede" or img class="flag"')
+            if name == "src" and not FLAG_SRC.fullmatch(value or ""):
+                self.fail("src must be /static/flags/<iso2>.svg")
+        if tag == "img" and (values.get("class") != "flag" or "src" not in values):
+            self.fail('img needs class="flag" and src')
         if tag == "svg":
             if "viewbox" not in values or values.get("role") != "img":
                 self.fail('svg needs viewBox and role="img"')
@@ -186,6 +192,7 @@ def page(title: str, description: str, canonical: str, root: str, css: str, og_t
 <meta property="og:description" content="{d}">
 <meta property="og:url" content="{c}">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@prizeatlas">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{root}static/style.css">
 <link rel="stylesheet" href="{css}">
@@ -203,7 +210,7 @@ def page(title: str, description: str, canonical: str, root: str, css: str, og_t
 
 
 def render_post(post: Post) -> str:
-    body = post.body.replace('href="/', 'href="../../').replace("href='/", "href='../../")
+    body = post.body.replace('href="/', 'href="../../').replace("href='/", "href='../../").replace('src="/', 'src="../../')
     crumbs = f'<li><a href="../../">Home</a></li><li><a href="../">Blog</a></li><li><span aria-current="page">{escape(post.title)}</span></li>'
     content = (
         f'<article class="post">\n<p class="date"><time datetime="{post.date.isoformat()}">{nice(post.date)}</time></p>\n{body.strip()}\n</article>\n'

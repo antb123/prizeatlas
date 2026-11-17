@@ -118,6 +118,17 @@ class BlogBuildTests(unittest.TestCase):
     def test_self_closing_html_not_allowed(self) -> None:
         self.assertFails(VALID + "<p/>\n", "self-closing <p/> not allowed")
 
+    def test_flag_renders_relative(self) -> None:
+        self.post(VALID + '<p><img class="flag" width="20" height="15" src="/static/flags/us.svg" alt="" loading="lazy">United States</p>\n')
+        self.build()
+        self.assertIn('src="../../static/flags/us.svg"', (self.blog / "fixture/index.html").read_text())
+
+    def test_img_must_be_local_flag(self) -> None:
+        self.assertFails(VALID + '<p><img class="flag" src="https://example.org/x.png" alt=""></p>\n', "src must be /static/flags/<iso2>.svg")
+
+    def test_img_needs_flag_class(self) -> None:
+        self.assertFails(VALID + '<p><img src="/static/flags/us.svg" alt=""></p>\n', 'img needs class="flag" and src')
+
     def test_comment_not_allowed(self) -> None:
         self.assertFails(VALID + "<!-- draft -->\n", "comments not allowed")
 
