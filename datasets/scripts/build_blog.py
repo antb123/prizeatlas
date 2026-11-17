@@ -198,7 +198,7 @@ def page(title: str, description: str, canonical: str, root: str, css: str, og_t
 <link rel="stylesheet" href="{css}">
 {schema}</head>
 <body>
-<header class="site-header"><a class="site-name" href="{root}">PrizeAtlas</a></header>
+<header class="site-header"><a class="site-name" href="{root}"><img class="site-logo" src="{root}favicon.svg" width="28" height="28" alt="">PrizeAtlas</a></header>
 <nav class="breadcrumbs" aria-label="Breadcrumb"><ol>{crumbs}</ol></nav>
 <main>
 {content}

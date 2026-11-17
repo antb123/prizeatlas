@@ -143,6 +143,7 @@ SHARE_IMAGE_WIDTH = 1200
 SHARE_IMAGE_HEIGHT = 630
 SHARE_IMAGE_DIRECTORY = "static/share"
 SHARE_IMAGE_FALLBACK = f"{SHARE_IMAGE_DIRECTORY}/default.png"
+SHARE_LOGO_FILE = SCRIPT_DIR / "share_logo.png"
 SHARE_IMAGE_LAUREATES = f"{SHARE_IMAGE_DIRECTORY}/laureates.png"
 SHARE_IMAGE_INSTITUTIONS = f"{SHARE_IMAGE_DIRECTORY}/institutions.png"
 SHARE_IMAGE_UNIVERSITIES = f"{SHARE_IMAGE_DIRECTORY}/universities.png"
@@ -4472,7 +4473,9 @@ def _write_share_image(
     draw = ImageDraw.Draw(image)
     draw.rounded_rectangle((48, 42, 1152, 588), radius=30, fill=surface, outline=rule, width=2)
     draw.rounded_rectangle((48, 42, 66, 588), radius=9, fill=accent)
-    draw.text((96, 78), "PRIZEATLAS", font=_share_font(28, fonts), fill=accent)
+    with Image.open(SHARE_LOGO_FILE) as logo:
+        image.paste(logo, (96, 60), logo)
+    draw.text((172, 78), "PRIZEATLAS", font=_share_font(28, fonts), fill=accent)
 
     if card is None:
         generic_key = {None: "default", "Laureates": "laureates", "Institutions": "institutions", "Universities": "universities", "Map": "map", "Nearby": "nearby"}[generic]
