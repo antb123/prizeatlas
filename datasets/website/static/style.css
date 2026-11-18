@@ -356,9 +356,15 @@ h3 {
 .highlights li {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 1rem;
   padding-block: 0.55rem;
   border-bottom: 1px solid var(--rule);
+}
+
+.highlights a:has(> .flag) {
+  padding-left: 1.75rem;
+  text-indent: -1.75rem;
 }
 
 .prize-list a {
