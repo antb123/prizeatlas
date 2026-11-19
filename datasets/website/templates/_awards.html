@@ -13,6 +13,13 @@
             <a class="external-link" href="{{ prize.url }}" aria-label="{{ t("common.official_website_aria", name=term("prize", prize.prize_name)) }}" title="{{ t("common.official_website") }}">↗</a>
           </h3>
           <p>{{ ranking_blurb(prize.qid) }}</p>
+          {% set card = cards[prize.qid] %}
+          <dl class="award-meta">
+            <div><dt>{{ t("awards.founded") }}</dt><dd>{{ card.founded }}</dd></div>
+            <div><dt>{{ t("awards.location") }}</dt><dd>{% for city, country in card.places %}{% if not loop.first %} · {% endif %}{{ city_label(city, country) if city else term("country", country) }}{% endfor %}</dd></div>
+            <div><dt>{{ t("awards.subjects") }}</dt><dd class="subject-badges">{% for name, route in card.subjects %}<a class="subject-badge" href="{{ href(route) }}">{{ term("subject", name) }}</a>{% endfor %}</dd></div>
+            <div><dt>{{ t("awards.notable") }}</dt><dd>{% for name, route in card.winners %}{% if not loop.first %}<span class="award-meta-sep"> · </span>{% endif %}<a href="{{ href(route) }}">{{ name }}</a>{% endfor %}</dd></div>
+          </dl>
         </div>
       </article>
     </li>

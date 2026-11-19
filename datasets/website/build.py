@@ -347,6 +347,14 @@ class Ranking:
 
 
 @dataclass(frozen=True, slots=True)
+class AwardCard:
+    founded: int
+    places: tuple[tuple[str, str], ...]    # (city, country); a blank city shows the country alone
+    subjects: tuple[tuple[str, str], ...]  # (subject, route), most awarded first
+    winners: tuple[tuple[str, str], ...]   # (display name, person route)
+
+
+@dataclass(frozen=True, slots=True)
 class AwardRecord:
     award_record_id: str
     year: str
@@ -1551,16 +1559,16 @@ def read_database(database: Path) -> tuple[list[Ranking], list[AffiliationProfil
                 "max-planck-medal": "static/logos/max-planck-medal.png",
                 "abel-prize": "static/logos/abel-prize.png",
                 "lasker-award": "static/logos/lasker-award.svg",
-                "canada-gairdner-international-award": "static/logos/canada-gairdner-international-award.png",
+                "canada-gairdner-international-award": "static/logos/canada-gairdner-international-award.svg",
                 "wolf-prize": "static/logos/wolf-prize.png",
                 "kyoto-prize": "static/logos/kyoto-prize.png",
                 "crafoord-prize": "static/logos/crafoord-prize.png",
                 "shaw-prize": "static/logos/shaw-prize.png",
                 "japan-prize": "static/logos/japan-prize.png",
-                "breakthrough-prize": "static/logos/breakthrough-prize.png",
+                "breakthrough-prize": "static/logos/breakthrough-prize.svg",
                 "kavli-prize": "static/logos/kavli-prize.png",
                 "millennium-technology-prize": "static/logos/millennium-technology-prize.svg",
-                "the-brain-prize": "static/logos/the-brain-prize.svg",
+                "the-brain-prize": "static/logos/the-brain-prize.png",
             }.get(_text(row["slug"]), ""),
         )
         for row in ranking_rows
@@ -3411,7 +3419,65 @@ def plan_home_page(
     )
 
 
-def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> PageJob:
+# Awards page card facts by prize slug: (founded, ((city, country), ...), ((laureate QID, display name), ...)).
+# Founded is the year the prize was established, not first awarded. Places are where it is presented or, for a prize
+# that moves, where it is based. Winners are the best-known recipients; each QID must have won that prize.
+AWARD_FACTS: dict[str, tuple[int, tuple[tuple[str, str], ...], tuple[tuple[str, str], ...]]] = {
+    "nobel-prize": (1895, (("Stockholm", "Sweden"),), (("Q937", "Albert Einstein"), ("Q7186", "Marie Curie"), ("Q39246", "Richard Feynman"))),
+    "fields-medal": (
+        1932, (("Berlin", "Germany"), ("Toronto", "Canada")),
+        (("Q295981", "Terence Tao"), ("Q117346", "Grigori Perelman"), ("Q1771279", "Maryam Mirzakhani")),
+    ),
+    "turing-award": (
+        1966, (("New York City", "United States"),), (("Q80", "Tim Berners-Lee"), ("Q92894", "Geoffrey Hinton"), ("Q17457", "Donald Knuth")),
+    ),
+    "max-planck-medal": (1929, (("Bad Honnef", "Germany"),), (("Q937", "Albert Einstein"), ("Q9021", "Max Planck"), ("Q40904", "Werner Heisenberg"))),
+    "abel-prize": (2002, (("Oslo", "Norway"),), (("Q184433", "Andrew Wiles"), ("Q38636", "Karen Uhlenbeck"))),
+    "lasker-award": (1945, (("New York City", "United States"),), (("Q200101", "Jonas Salk"), ("Q462843", "Tu Youyou"), ("Q88608397", "Katalin Karikó"))),
+    "canada-gairdner-international-award": (1957, (("Toronto", "Canada"),), (("Q56068", "Jennifer Doudna"), ("Q88608397", "Katalin Karikó"))),
+    "wolf-prize": (1975, (("Jerusalem", "Israel"),), (("Q17714", "Stephen Hawking"), ("Q173746", "Paul Erdős"), ("Q193803", "Roger Penrose"))),
+    "kyoto-prize": (1984, (("Kyoto", "Japan"),), (("Q184746", "Jane Goodall"), ("Q17457", "Donald Knuth"))),
+    "crafoord-prize": (
+        1980, (("Lund", "Sweden"), ("Stockholm", "Sweden")),
+        (("Q211029", "E. O. Wilson"), ("Q77141", "Alexander Grothendieck"), ("Q295981", "Terence Tao")),
+    ),
+    "the-brain-prize": (2010, (("Copenhagen", "Denmark"),), (("Q935993", "Karl Deisseroth"),)),
+    "shaw-prize": (2002, (("", "Hong Kong"),), (("Q184433", "Andrew Wiles"), ("Q323320", "Kip Thorne"), ("Q728331", "James Peebles"))),
+    "kavli-prize": (2005, (("Oslo", "Norway"),), (("Q323316", "Alan Guth"), ("Q323320", "Kip Thorne"))),
+    "japan-prize": (1983, (("Tokyo", "Japan"),), (("Q80", "Tim Berners-Lee"), ("Q92743", "Vint Cerf"), ("Q56068", "Jennifer Doudna"))),
+    "millennium-technology-prize": (
+        2004, (("Helsinki", "Finland"),), (("Q80", "Tim Berners-Lee"), ("Q34253", "Linus Torvalds"), ("Q730065", "Shuji Nakamura")),
+    ),
+    "breakthrough-prize": (
+        2012, (("Los Angeles", "United States"),), (("Q17714", "Stephen Hawking"), ("Q295981", "Terence Tao"), ("Q56068", "Jennifer Doudna")),
+    ),
+}
+
+
+def plan_award_cards(
+    rankings: list[Ranking], records_by_qid: Mapping[str, list[AwardRecord]], routes_by_laureate: dict[str, str]
+) -> dict[str, AwardCard]:
+    cards: dict[str, AwardCard] = {}
+    for ranking in rankings:
+        if ranking.slug not in AWARD_FACTS:
+            raise BuildFailure(f"award facts missing slug={ranking.slug}")
+        founded, places, notable = AWARD_FACTS[ranking.slug]
+        records = records_by_qid[ranking.qid]
+        winner_qids = {record.laureate_wikidata_qid for record in records}
+        for qid, name in notable:
+            if qid not in winner_qids:
+                raise BuildFailure(f"award facts winner did not win slug={ranking.slug} qid={qid} name={name!r}")
+        counts = Counter(record.high_school_subject for record in records if _nonblank(record.high_school_subject))
+        cards[ranking.qid] = AwardCard(
+            founded=founded,
+            places=places,
+            subjects=tuple((subject, f"{SUBJECTS_ROUTE}{slugify(subject)}/") for subject in sorted(counts, key=lambda s: (-counts[s], s))),
+            winners=tuple((name, routes_by_laureate[qid]) for qid, name in notable),
+        )
+    return cards
+
+
+def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str], cards: dict[str, AwardCard]) -> PageJob:
     return _page(
         "awards.html",
         AWARDS_ROUTE,
@@ -3421,6 +3487,7 @@ def plan_awards_page(rankings: list[Ranking], prize_routes: dict[str, str]) -> P
         # The title carries the search terms; the heading only has to hold one line on a phone.
         heading="Science and Math Awards",
         prizes=tuple((ranking, prize_routes[ranking.qid]) for ranking in rankings),
+        cards=cards,
         item_list=tuple((ranking.prize_name, prize_routes[ranking.qid]) for ranking in rankings),
     )
 
@@ -3623,7 +3690,7 @@ def create_site_plan(
             rankings, records, people, affiliations, country_places, prize_routes, ranking_by_qid, record_routes
         )
     )
-    jobs.append(plan_awards_page(rankings, prize_routes))
+    jobs.append(plan_awards_page(rankings, prize_routes, plan_award_cards(rankings, records_by_qid, routes_by_laureate)))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records, affiliations))
     jobs.append(plan_explorer_page(explorer, generated))

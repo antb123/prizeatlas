@@ -26,7 +26,7 @@ reasoning = "Its recipients define much of the theoretical and practical foundat
 prize_name = "Max Planck Medal"
 slug = "max-planck-medal"
 url = "https://www.dpg-physik.de/auszeichnungen/dpg-preise/max-planck-medaille"
-score = 92
+score = 89
 blurb = "The German Physical Society's highest honor, endowed in 1929 for Max Planck's 70th birthday, for outstanding achievement in theoretical physics. Awarded annually by the society, which is based at Bad Honnef near Bonn, and presented at its spring meeting in a rotating German host city. Carries no cash prize."
 reasoning = "Its historic recipient list represents an extraordinary concentration of lasting impact on physical knowledge."
 
@@ -122,6 +122,6 @@ reasoning = "Its winners have produced widely adopted technologies, but the priz
 prize_name = "Breakthrough Prize"
 slug = "breakthrough-prize"
 url = "https://breakthroughprize.org/"
-score = 66
+score = 71
 blurb = "Founded in 2012 by a group of technology entrepreneurs to reward achievements in fundamental physics, life sciences, and mathematics. Awarded annually at a televised ceremony in the Los Angeles area of California. Carries a prize of $3 million per award, the largest of any prize on this site."
 reasoning = "Its recipients are strong, but the award is too young to show comparable lasting impact as an institution."
