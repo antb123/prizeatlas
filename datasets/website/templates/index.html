@@ -58,22 +58,6 @@
   <p><a href="{{ href(affiliations_route) }}">{{ t("common.all_institutions") }}</a></p>
 </section>
 {% endif %}
-{% if top_women %}
-<section>
-  <h2>{{ t("home.top_women") }}</h2>
-  <ol class="highlights">
-    {% for person in top_women %}
-    <li>
-      <a href="{{ href(person.route) }}">{{ record_flag(person.awards[-1][0]) }}{{ person.name }}</a>
-      <span>
-        {{ t("plural.award", count=person.awards | length) }}
-      </span>
-    </li>
-    {% endfor %}
-  </ol>
-  <p>{{ t("home.women_percentage", percentage=women_pct) }}</p>
-</section>
-{% endif %}
 {% if top_countries %}
 <section>
   <h2>{{ t("home.top_countries") }}</h2>

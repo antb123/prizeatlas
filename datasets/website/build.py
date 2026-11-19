@@ -3374,12 +3374,6 @@ def plan_home_page(
         (person for person in people if len(person.awards) > 1),
         key=lambda person: (-len(person.awards), _surname_key(person.name)),
     )
-    women = sorted(
-        (person for person in people if any(record.sex == "Female" for record, _ in person.awards)),
-        key=lambda person: (-len(person.awards), _surname_key(person.name)),
-    )
-    sexed_records = sum(1 for record in records if record.sex in ("Female", "Male"))
-    women_pct = round(100 * sum(1 for record in records if record.sex == "Female") / sexed_records) if sexed_records else 0
     top_countries = country_places["Awarded"][:7]
     affiliation_rates = plan_per_capita_places(country_places["Awarded"])
     # Nobel Prize and Fields Medal are the two prizes people actually search for by name; the rest of the
@@ -3411,8 +3405,6 @@ def plan_home_page(
             for record in recent[:HOMEPAGE_ROWS]
         ),
         decorated=tuple(decorated[:HOMEPAGE_ROWS]),
-        top_women=tuple(women[:HOMEPAGE_ROWS]),
-        women_pct=women_pct,
         top_countries=tuple(top_countries),
         affiliation_rates=tuple(affiliation_rates[:HOMEPAGE_ROWS]),
         top_institutions=tuple(affiliations[:HOMEPAGE_ROWS]),
@@ -3554,7 +3546,15 @@ def plan_map_pages(records: list[AwardRecord], affiliations: list[Affiliation]) 
 def plan_explorer_page(
     payload: dict[str, Any],
     generated: str,
+    records: list[AwardRecord],
+    people: list[Laureate],
 ) -> PageJob:
+    women = sorted(
+        (person for person in people if any(record.sex == "Female" for record, _ in person.awards)),
+        key=lambda person: (-len(person.awards), _surname_key(person.name)),
+    )
+    sexed_records = sum(1 for record in records if record.sex in ("Female", "Male"))
+    women_pct = round(100 * sum(1 for record in records if record.sex == "Female") / sexed_records) if sexed_records else 0
     return _page(
         "explorer.html",
         EXPLORER_ROUTE,
@@ -3563,6 +3563,8 @@ def plan_explorer_page(
         (Breadcrumb("Home", "/"), Breadcrumb("Explorer", None)),
         payload=explorer_json(payload),
         generated=generated,
+        top_women=tuple(women[:HOMEPAGE_ROWS]),
+        women_pct=women_pct,
     )
 
 
@@ -3693,7 +3695,7 @@ def create_site_plan(
     jobs.append(plan_awards_page(rankings, prize_routes, plan_award_cards(rankings, records_by_qid, routes_by_laureate)))
     jobs.extend(plan_people_index(people))
     jobs.extend(plan_map_pages(records, affiliations))
-    jobs.append(plan_explorer_page(explorer, generated))
+    jobs.append(plan_explorer_page(explorer, generated, records, people))
     jobs.append(plan_nearby_page(records, routes_by_laureate, affiliations))
     jobs.append(plan_about_page(rankings, records, people, countries, subjects, affiliations))
 

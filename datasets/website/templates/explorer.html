@@ -115,6 +115,8 @@
 </style>
 {% endblock %}
 {% block content %}
+{% macro flag(country) %}{% set path = country_flags.get(country) %}{% if path %}<img class="flag" width="20" height="15" src="{{ asset_href(path) }}" alt="" loading="lazy">{% endif %}{% endmacro %}
+{% macro record_flag(record) %}{{ flag((record.affiliations | selectattr("country") | map(attribute="country") | list + [record.birth_country]) | first) }}{% endmacro %}
 <div class="explorer">
   <header class="hero">
     <p class="eyebrow">{{ t("explorer.eyebrow") }}</p>
@@ -168,6 +170,21 @@
     <p class="section-note">{{ t("explorer.gdp_note") }}</p>
     <figure id="gdp-chart"></figure>
   </section>
+
+  {% if top_women %}
+  <section aria-labelledby="women-h">
+    <h2 id="women-h">{{ t("home.top_women") }}</h2>
+    <p class="section-note">{{ t("home.women_percentage", percentage=women_pct) }}</p>
+    <ol class="highlights">
+      {% for person in top_women %}
+      <li>
+        <a href="{{ href(person.route) }}">{{ record_flag(person.awards[-1][0]) }}{{ person.name }}</a>
+        <span>{{ t("plural.award", count=person.awards | length) }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endif %}
 
   <section aria-labelledby="young-h">
     <h2 id="young-h">{{ t("explorer.young_heading") }}</h2>
