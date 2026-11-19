@@ -18,7 +18,10 @@
 {% endmacro %}
 {% block content %}
 <header class="page-intro">
-  <h1>{{ title }}</h1>
+  <div class="prize-heading">
+    {% if prize.logo %}<img class="award-logo" width="64" height="64" src="{{ asset_href(prize.logo) }}" alt="{{ t("common.logo_alt", name=term("prize", prize.prize_name)) }}">{% endif %}
+    <h1>{{ title }}</h1>
+  </div>
   <p>{{ lead }} {{ ranking_blurb(prize.qid) }}</p>
   <p><a class="external-source" href="{{ prize.url }}">{{ t("common.official_website") }} <span aria-hidden="true">↗</span></a></p>
 </header>

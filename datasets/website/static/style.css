@@ -418,6 +418,22 @@ h3 {
   width: 1.5rem;
 }
 
+.prize-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.25rem 0 1rem;
+}
+
+.prize-heading h1 {
+  margin: 0;
+}
+
+.prize-heading .award-logo {
+  flex: none;
+  width: clamp(2.75rem, 7vw, 4rem);
+}
+
 .flag {
   width: 1.25rem;
   height: auto;
