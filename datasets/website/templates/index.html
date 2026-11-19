@@ -50,7 +50,7 @@
   <ol class="highlights">
     {% for affiliation in top_institutions %}
     <li>
-      <a href="{{ href(affiliation.route) }}">{{ flag(affiliation.awards | map(attribute="affiliation.country") | select | first) }}{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
+      <a href="{{ href(affiliation.route) }}">{{ flag(affiliation.awards | map(attribute="affiliation.country") | select | first | default("")) }}{{ language.entity_label(affiliation.qid, affiliation.name) }}</a>
       <span>{{ t("plural.laureate", count=affiliation.count) }}</span>
     </li>
     {% endfor %}

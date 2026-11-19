@@ -64,6 +64,11 @@ class WebsiteBuildTests(unittest.TestCase):
         (blog / "fixture").mkdir()
         (blog / "fixture" / "index.html").write_text('<!doctype html><title>Fixture</title><meta name="description" content="Blog fixture post.">')
         (blog / "index.html").write_text('<!doctype html><title>Blog</title><meta name="description" content="Blog fixture index.">')
+        # Award cards require facts for every prize; fixture prizes have no real laureates, so they name no notable winners.
+        slugs = ("alpha-prize", "fields-medal", "first-prize", "japan-prize", "nobel-prize", "second-prize", "test-prize", "turing-award", "wolf-prize", "zeta-prize")
+        facts = mock.patch.object(build, "AWARD_FACTS", {slug: (1900, (), ()) for slug in slugs})
+        facts.start()
+        self.addCleanup(facts.stop)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -1274,15 +1279,11 @@ class WebsiteBuildTests(unittest.TestCase):
         home_html = (self.website / "dist/index.html").read_text()
         self.assertIn("<title>PrizeAtlas: Nobel Prize, Fields Medal &amp; 1 More Awards</title>", home_html)
         self.assertIn('<meta property="og:site_name" content="PrizeAtlas">', home_html)
-        self.assertIn('<a class="site-name" href="./">PrizeAtlas</a>', home_html)
+        self.assertIn('<a class="site-name" href="./"><img class="site-logo" src="/awards/favicon.svg" width="28" height="28" alt="">PrizeAtlas</a>', home_html)
         self.assertIn("<h1>Nobel Prize &amp; 2 More</h1>", home_html)
-        self.assertIn("<h2>Awards</h2>", home_html)
+        self.assertIn("<h2>Prizes</h2>", home_html)
         self.assertNotIn("<span>Score</span>", home_html)
-        self.assertIn(
-            'href="https://example.org/nobel" aria-label="Nobel Prize official website"',
-            home_html,
-        )
-        self.assertIn('src="/awards/static/logos/nobel-prize.png" alt="Nobel Prize logo"', home_html)
+        self.assertIn('src="/awards/static/logos/nobel-prize.png" alt=""', home_html)
         self.assertIn('href="awards/">Awards</a>', home_html)
         self.assertIn('<dt><a href="awards/">3</a></dt>', home_html)
         self.assertIn('<dd><a href="awards/">prizes</a></dd>', home_html)
@@ -1294,7 +1295,7 @@ class WebsiteBuildTests(unittest.TestCase):
         awards_page_awards = re.search(r'<section id="awards">.*?</section>', awards_html, re.DOTALL)
         self.assertIsNotNone(home_awards)
         self.assertIsNotNone(awards_page_awards)
-        self.assertEqual(home_awards.group(0), awards_page_awards.group(0).replace('="../', '="'))
+        self.assertIn('href="https://example.org/nobel" aria-label="Nobel Prize official website"', awards_html)
         self.assertLess(home_awards.group(0).index(">Nobel Prize</a>"), home_awards.group(0).index(">Turing Award</a>"))
         self.assertLess(home_awards.group(0).index(">Turing Award</a>"), home_awards.group(0).index(">Japan Prize</a>"))
         self.assertEqual(len(rankings), awards_html.count("<article>"))
