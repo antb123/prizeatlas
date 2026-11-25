@@ -238,11 +238,11 @@ status = "confirmed"
 note = "Kyoto, every year on 10 November; announced 19 June"
 
 [[event]]
-date = "2026-11-12"
+date = "2026-11-19"
 prize = "Max Planck Medal"
 kind = "announced"
-status = "projected"
-note = "Mid-November; presented at the DPG meeting in March 2027"
+status = "confirmed"
+note = "Frank Jülicher; presented at the DPG meeting in Regensburg, March 2027"
 
 [[event]]
 date = "2026-12-10"
@@ -271,8 +271,8 @@ note = "Late January; ceremony in May, Stockholm"
 date = "2027-03"
 prize = "Max Planck Medal"
 kind = "ceremony"
-status = "projected"
-note = "DPG annual meeting; medal announced November 2026"
+status = "confirmed"
+note = "DPG annual meeting, Regensburg; announced 19 November 2026"
 
 [[event]]
 date = "2027-03-04"

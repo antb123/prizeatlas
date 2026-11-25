@@ -89,7 +89,7 @@ No events.
 | Date       | Prize            | Event     | Note                                                            |
 |------------|------------------|-----------|-----------------------------------------------------------------|
 | 2026-11-10 | Kyoto Prize      | Ceremony  | Kyoto, every year on 10 November; ← announced 2026-06-19        |
-| 2026-11-12 | Max Planck Medal | Announced | projected, mid-November; → ceremony 2027-03 (DPG meeting)       |
+| 2026-11-19 | Max Planck Medal | Announced | Frank Jülicher; → ceremony 2027-03 (DPG meeting, Regensburg)    |
 
 ## December
 
